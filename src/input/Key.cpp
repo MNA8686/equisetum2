@@ -66,11 +66,11 @@ namespace Equisetum2
 		uint32_t down;
 		uint32_t last;
 	}stCombinationKeyTimeStamp;
-	static std::unordered_map<const CombinationKey*, std::shared_ptr<stCombinationKeyTimeStamp>> g_mapCombinationKeyTimeStamp;
+	static std::unordered_map<const CombinationKey*, stCombinationKeyTimeStamp> g_mapCombinationKeyTimeStamp;
 
 	void CombinationKey::RegisterTimeStamp()
 	{
-		g_mapCombinationKeyTimeStamp[this] = std::make_shared<stCombinationKeyTimeStamp>();
+		g_mapCombinationKeyTimeStamp[this] = {};
 	}
 
 	CombinationKey::~CombinationKey()
@@ -153,7 +153,7 @@ namespace Equisetum2
 			down = true;
 
 			// 押された時間を記録
-			g_mapCombinationKeyTimeStamp[this]->down = timeStamp;
+			g_mapCombinationKeyTimeStamp[this].down = timeStamp;
 		}
 
 		return down;
@@ -172,7 +172,7 @@ namespace Equisetum2
 					up = true;
 
 					// 離された時間を記録
-					g_mapCombinationKeyTimeStamp[this]->last = Singleton<SystemTimerInternal>::GetInstance()->Ticks();
+					g_mapCombinationKeyTimeStamp[this].last = Singleton<SystemTimerInternal>::GetInstance()->Ticks();
 					break;
 				}
 			}
@@ -199,23 +199,23 @@ namespace Equisetum2
 
 	uint32_t CombinationKey::TimeStamp() const
 	{
-		return g_mapCombinationKeyTimeStamp[this]->down;
+		return g_mapCombinationKeyTimeStamp[this].down;
 	}
 
 	uint32_t CombinationKey::PressedDuration() const
 	{
 		uint32_t duration = 0;
-		auto p = g_mapCombinationKeyTimeStamp[this];
+		const auto& ref = g_mapCombinationKeyTimeStamp[this];
 
 		if (IsPress())
 		{
 			// 押されている間は押下開始時と現在時刻の差を求める
-			duration = TickCounter::ElapsedTicks(p->down, Singleton<SystemTimerInternal>::GetInstance()->Ticks());
+			duration = TickCounter::ElapsedTicks(ref.down, Singleton<SystemTimerInternal>::GetInstance()->Ticks());
 		}
 		else
 		{
 			// 離されていたら押下開始時と離された時間の差を求める
-			duration = TickCounter::ElapsedTicks(p->down, p->last);
+			duration = TickCounter::ElapsedTicks(ref.down, ref.last);
 		}
 
 		return duration;
