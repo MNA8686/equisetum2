@@ -31,6 +31,7 @@ namespace Equisetum2
 		int NumButtons(int joyIndex) const;
 		int NumHats(int joyIndex) const;
 		const std::string Name(int joyIndex) const;
+		void SetEventListener(int joyIndex, const stJoystickEvent& listener, void* key);
 		int NumJoysticks() const;
 
 	private:

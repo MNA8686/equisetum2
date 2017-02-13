@@ -19,6 +19,12 @@ namespace Equisetum2
 		return std::make_shared<JoystickDummy>(index);
 	}
 
+	Joystick::~Joystick()
+	{
+		// リスナー削除
+		Singleton<JoystickInternal>::GetInstance()->SetEventListener(m_Index, {}, this);
+	}
+
 	Joystick::Joystick(int index)
 	{
 		m_Index = index;
@@ -121,9 +127,7 @@ namespace Equisetum2
 
 	void Joystick::SetEventListener(const stJoystickEvent& listener)
 	{
-		// TODO 挿抜イベントなどはここで登録する
-		//Singleton<JoystickInternal>::GetInstance()->SetEventListener(this, listener);
-		// deleteされるようにすること
+		Singleton<JoystickInternal>::GetInstance()->SetEventListener(m_Index, listener, this);
 	}
 
 	int Joystick::NumJoysticks()

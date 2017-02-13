@@ -6,6 +6,8 @@
 #include "SDL.h"
 
 #include <vector>
+#include <unordered_map>
+#include <functional>
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4351 )  
@@ -83,6 +85,14 @@ namespace Equisetum2
 									}
 								}
 
+								for (auto& listener : m_JoyState[joyIndex].eventListener)
+								{
+									if (listener.second.OnConnected)
+									{
+										listener.second.OnConnected(joyIndex);
+									}
+								}
+
 								Logger::OutputInfo("joy %d opened. Axes %d, Buttons %d, Hats %d\n", joyIndex, NumAxes(joyIndex), NumButtons(joyIndex), NumHats(joyIndex));
 							}
 						}
@@ -100,6 +110,14 @@ namespace Equisetum2
 							{
 								inst.JoyInstance = nullptr;
 								Logger::OutputInfo("joy %d closed\n", i);
+
+								for (auto& listener : m_JoyState[i].eventListener)
+								{
+									if (listener.second.OnRemoved)
+									{
+										listener.second.OnRemoved(i);
+									}
+								}
 								break;
 							}
 							i++;
@@ -343,6 +361,19 @@ namespace Equisetum2
 			return IsConnected(joyIndex) ? SDL_JoystickName(m_JoyState[joyIndex].JoyInstance.get()) : "null device";
 		}
 
+		void SetEventListener(int joyIndex, const stJoystickEvent& listener, void* key)
+		{
+			if (listener.OnConnected == nullptr && listener.OnRemoved == nullptr)
+			{
+				// 削除
+				m_JoyState[joyIndex].eventListener.erase(key);
+			}
+			else
+			{
+				m_JoyState[joyIndex].eventListener[key] = listener;
+			}
+		}
+
 		int NumJoysticks() const
 		{
 			return SDL_NumJoysticks();
@@ -377,6 +408,8 @@ namespace Equisetum2
 				stKeyState state[(int)eHatState::Max];
 			}stHatState;
 			std::vector<stHatState> vHats;
+			// イベントリスナー
+			std::unordered_map<void*, stJoystickEvent> eventListener;
 		}stJoyState;
 		stJoyState m_JoyState[JoyMax] = {};
 

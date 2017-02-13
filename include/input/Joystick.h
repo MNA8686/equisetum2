@@ -14,8 +14,8 @@ namespace Equisetum2
 
 	typedef struct
 	{
-		std::function<void()> OnConnected;
-		std::function<void()> OnRemoved;
+		std::function<void(int index)> OnConnected;
+		std::function<void(int index)> OnRemoved;
 	}stJoystickEvent;
 
 	class Joystick
@@ -40,6 +40,8 @@ namespace Equisetum2
 		void SetEventListener(const stJoystickEvent& listener);
 
 		static int NumJoysticks();
+		
+		~Joystick();
 
 	protected:
 

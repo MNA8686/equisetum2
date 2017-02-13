@@ -75,6 +75,11 @@ namespace Equisetum2
 		return m_Impl->Name(joyIndex);
 	}
 
+	void JoystickInternal::SetEventListener(int joyIndex, const stJoystickEvent& listener, void* key)
+	{
+		return m_Impl->SetEventListener(joyIndex, listener, key);
+	}
+
 	int JoystickInternal::NumJoysticks() const
 	{
 		return m_Impl->NumJoysticks();
