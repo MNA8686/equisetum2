@@ -21,7 +21,10 @@ namespace Equisetum2
 
 		bool IsConnected(int joyIndex) const;
 		int16_t Axis(int joyIndex, int num) const;
-		HatState Hat(int joyIndex, int num) const;
+		const stKeyState& HatUp(int joyIndex, int num) const;
+		const stKeyState& HatDown(int joyIndex, int num) const;
+		const stKeyState& HatLeft(int joyIndex, int num) const;
+		const stKeyState& HatRight(int joyIndex, int num) const;
 		const stKeyState& Button(int joyIndex, int num) const;
 
 		int NumAxes(int joyIndex) const;

@@ -77,7 +77,10 @@ namespace Equisetum2
 								m_JoyState[joyIndex].vHats.resize(NumHats(joyIndex));
 								for (auto& hat : m_JoyState[joyIndex].vHats)
 								{
-									hat = {};
+									for (auto& keyState : hat.state)
+									{
+										keyState = {};
+									}
 								}
 
 								Logger::OutputInfo("joy %d opened. Axes %d, Buttons %d, Hats %d\n", joyIndex, NumAxes(joyIndex), NumButtons(joyIndex), NumHats(joyIndex));
@@ -159,38 +162,31 @@ namespace Equisetum2
 							e.jaxis.which == SDL_JoystickInstanceID(inst.JoyInstance.get()))
 						{
 							auto hatIndex = e.jhat.hat;	// ハット番号
-							auto hatValue = HatState::Centered;
-
-							// SDLの値からEquisetum2の値へ変換
-							switch (e.jhat.value)
+							auto update = [hatIndex, &inst, e](eHatState hatState, int mask)
 							{
-							case SDL_HAT_RIGHT:
-								hatValue = HatState::Right;
-								break;
-							case SDL_HAT_DOWN:
-								hatValue = HatState::Down;
-								break;
-							case SDL_HAT_LEFT:
-								hatValue = HatState::Left;
-								break;
-							case SDL_HAT_UP:
-								hatValue = HatState::Up;
-								break;
-							case SDL_HAT_RIGHTUP:
-								hatValue = HatState::RightUp;
-								break;
-							case SDL_HAT_RIGHTDOWN:
-								hatValue = HatState::RightDown;
-								break;
-							case SDL_HAT_LEFTUP:
-								hatValue = HatState::LeftUp;
-								break;
-							case SDL_HAT_LEFTDOWN:
-								hatValue = HatState::LeftDown;
-								break;
-							}
+								auto& key = inst.vHats[hatIndex].state[(int)hatState];
+								if (e.jhat.value & mask)
+								{
+									if (!key.press)
+									{
+										key.down = true;
+									}
+									key.press = true;
+								}
+								else
+								{
+									if (key.press)
+									{
+										key.up = true;
+									}
+									key.press = false;
+								}
+							};
 
-							inst.vHats[hatIndex] = hatValue;
+							update(eHatState::Left, SDL_HAT_LEFT);
+							update(eHatState::Right, SDL_HAT_RIGHT);
+							update(eHatState::Up, SDL_HAT_UP);
+							update(eHatState::Down, SDL_HAT_DOWN);
 
 							Logger::OutputInfo("SDL_JOYHATMOTION %d %d\n", hatIndex, inst.vHats[hatIndex]);
 							break;
@@ -208,10 +204,21 @@ namespace Equisetum2
 			// 変化エッジフラグは1フレーム経過したらクリアする
 			for (auto& inst : m_JoyState)
 			{
+				// ボタン
 				for (auto& keyState : inst.vKeyState)
 				{
 					keyState.down = false;
 					keyState.up = false;
+				}
+
+				// ハット
+				for (auto& keyState : inst.vHats)
+				{
+					for (auto& key : keyState.state)
+					{
+						key.down = false;
+						key.up = false;
+					}
 				}
 			}
 		}
@@ -220,6 +227,7 @@ namespace Equisetum2
 		{
 			for (auto& inst : m_JoyState)
 			{
+				// ボタン
 				for (auto& keyState : inst.vKeyState)
 				{
 					if (keyState.press)
@@ -227,8 +235,22 @@ namespace Equisetum2
 						keyState.pressedDuration = TickCounter::ElapsedTicks(keyState.timeStamp, m_timeStamp);
 					}
 				}
+
+				// ハット
+				for (auto& keyState : inst.vHats)
+				{
+					for (auto& keyState_ : keyState.state)
+					{
+						if (keyState_.press)
+						{
+							keyState_.pressedDuration = TickCounter::ElapsedTicks(keyState_.timeStamp, m_timeStamp);
+						}
+					}
+				}
 			}
 		}
+
+		static const stKeyState m_nullState;// = { "nul device" };
 
 		bool IsConnected(int joyIndex) const
 		{
@@ -242,16 +264,57 @@ namespace Equisetum2
 				m_JoyState[joyIndex].vAxes[num] : 0;
 		}
 
-		HatState Hat(int joyIndex, int num) const
+		const stKeyState& HatUp(int joyIndex, int num) const
 		{
-			return (IsConnected(joyIndex) && num < (int)m_JoyState[joyIndex].vHats.size()) ?
-				m_JoyState[joyIndex].vHats[num] : HatState::Centered;
+			const auto* pState = &m_nullState;
+
+			if (IsConnected(joyIndex))
+			{
+				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Up];
+			}
+
+			return *pState;
+		}
+
+		const stKeyState& HatDown(int joyIndex, int num) const
+		{
+			const auto* pState = &m_nullState;
+
+			if (IsConnected(joyIndex))
+			{
+				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Down];
+			}
+
+			return *pState;
+		}
+
+		const stKeyState& HatLeft(int joyIndex, int num) const
+		{
+			const auto* pState = &m_nullState;
+
+			if (IsConnected(joyIndex))
+			{
+				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Left];
+			}
+
+			return *pState;
+		}
+
+		const stKeyState& HatRight(int joyIndex, int num) const
+		{
+			const auto* pState = &m_nullState;
+
+			if (IsConnected(joyIndex))
+			{
+				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Right];
+			}
+
+			return *pState;
 		}
 
 		const stKeyState& Button(int joyIndex, int num) const
 		{
-			static const stKeyState state = { "nul device" };
-			const auto* pState = &state;
+			const auto* pState = &m_nullState;
 
 			if (IsConnected(joyIndex) &&
 				num < (int)m_JoyState[joyIndex].vKeyState.size())
@@ -292,6 +355,21 @@ namespace Equisetum2
 		// SDLイベントリスナー
 		std::shared_ptr<SDLEventListener> m_listener;
 
+		// ハットスイッチの定義
+		enum class eHatState : int
+		{
+			Right,
+			Up,
+			Left,
+			Down,
+			Max,
+		};
+
+		typedef struct
+		{
+			stKeyState state[(int)eHatState::Max];
+		}stHatState;
+
 		typedef struct
 		{
 			// ジョイスティックインスタンス
@@ -301,11 +379,13 @@ namespace Equisetum2
 			// 軸バッファ
 			std::vector<int16_t> vAxes;
 			// ハットバッファ
-			std::vector<HatState> vHats;
+			std::vector<stHatState> vHats;
 		}stJoyState;
 		stJoyState m_JoyState[JoyMax] = {};
 
 		// タイムスタンプ
 		uint32_t m_timeStamp = 0;
 	};
+
+	const stKeyState JoystickInternal::Impl::m_nullState = { "nul device" };
 }

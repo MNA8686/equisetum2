@@ -30,9 +30,24 @@ namespace Equisetum2
 		return m_Impl->Axis(joyIndex, num);
 	}
 
-	HatState JoystickInternal::Hat(int joyIndex, int num) const
+	const stKeyState& JoystickInternal::HatUp(int joyIndex, int num) const
 	{
-		return m_Impl->Hat(joyIndex, num);
+		return m_Impl->HatUp(joyIndex, num);
+	}
+
+	const stKeyState& JoystickInternal::HatDown(int joyIndex, int num) const
+	{
+		return m_Impl->HatDown(joyIndex, num);
+	}
+
+	const stKeyState& JoystickInternal::HatLeft(int joyIndex, int num) const
+	{
+		return m_Impl->HatLeft(joyIndex, num);
+	}
+
+	const stKeyState& JoystickInternal::HatRight(int joyIndex, int num) const
+	{
+		return m_Impl->HatRight(joyIndex, num);
 	}
 
 	const stKeyState& JoystickInternal::Button(int joyIndex, int num) const
