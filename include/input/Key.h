@@ -74,12 +74,12 @@ namespace Equisetum2
 		}
 	};
 
-	inline CombinationKey operator | (Key key1, Key key2)
+	inline CombinationKey operator | (const Key& key1, const Key& key2)
 	{
 		return CombinationKey(key1, key2);
 	}
 
-	inline CombinationKey operator | (Key key1, const CombinationKey& key2)
+	inline CombinationKey operator | (const Key& key1, const CombinationKey& key2)
 	{
 		return CombinationKey(key1, key2);
 	}
