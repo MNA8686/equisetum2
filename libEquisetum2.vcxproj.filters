@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\stream">
+      <UniqueIdentifier>{ea36b93d-c85b-4944-8983-0549cfdff84e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\timer">
+      <UniqueIdentifier>{38d3685a-1320-42eb-b5b9-66e7ab8cb658}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\stream">
+      <UniqueIdentifier>{20693fce-8712-45c0-9320-e9515f551cad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\timer">
+      <UniqueIdentifier>{001eee81-3e54-4981-b36a-6204108404e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\system">
+      <UniqueIdentifier>{b1848e4d-929b-4ead-b52a-6f6b0a6e710e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\system">
+      <UniqueIdentifier>{0bba7750-4ecc-4d27-8bdd-8acafcb13f07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\input">
+      <UniqueIdentifier>{608cf444-342a-40f3-891b-6776f76520da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\input">
+      <UniqueIdentifier>{ae88c937-7001-438d-8a76-3c827e767e9c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Equisetum2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer\TickCounter.h">
+      <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer\ITimer.h">
+      <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer\FpsPaceMaker.h">
+      <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer\FpsCounter.h">
+      <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stream\IStream.h">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stream\FileStream.h">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\system\System.h">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </ClInclude>
+    <ClInclude Include="include\system\Logger.h">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </ClInclude>
+    <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h">
+      <Filter>ソース ファイル\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="src\porting\SDL\system\SDLEvent.h">
+      <Filter>ソース ファイル\system</Filter>
+    </ClInclude>
+    <ClInclude Include="src\system\Singleton.h">
+      <Filter>ソース ファイル\system</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\KeyCode.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\IKeyState.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\Key.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\KeyboardInternal.h">
+      <Filter>ソース ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\JoystickInternal.h">
+      <Filter>ソース ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\Joystick.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\porting\SDL\timer\SystemTimerInternal.h">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\timer\SystemTimer.h">
+      <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\timer\TickCounter.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer\FpsPaceMaker.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer\FpsCounter.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\porting\SDL\stream\FileStream.cpp">
+      <Filter>ソース ファイル\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\porting\SDL\system\System.cpp">
+      <Filter>ソース ファイル\system</Filter>
+    </ClCompile>
+    <ClCompile Include="src\porting\SDL\system\Logger.cpp">
+      <Filter>ソース ファイル\system</Filter>
+    </ClCompile>
+    <ClCompile Include="src\system\Singleton.cpp">
+      <Filter>ソース ファイル\system</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\Key.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\JoystickInternal.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\KeyboardInternal.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\Joystick.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\porting\SDL\timer\SystemTimerInternal.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer\SystemTimer.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\porting\SDL\input\KeyboardInternalImpl.inl">
+      <Filter>ソース ファイル\input</Filter>
+    </None>
+    <None Include="src\porting\SDL\input\JoystickInternalImpl.inl">
+      <Filter>ソース ファイル\input</Filter>
+    </None>
+    <None Include="src\porting\SDL\timer\SystemTimerInternalImpl.inl">
+      <Filter>ソース ファイル\timer</Filter>
+    </None>
+  </ItemGroup>
+</Project>
