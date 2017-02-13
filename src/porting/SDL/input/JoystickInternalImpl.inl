@@ -250,8 +250,6 @@ namespace Equisetum2
 			}
 		}
 
-		static const stKeyState m_nullState;// = { "nul device" };
-
 		bool IsConnected(int joyIndex) const
 		{
 			return (joyIndex < JoyMax &&
@@ -385,6 +383,8 @@ namespace Equisetum2
 
 		// タイムスタンプ
 		uint32_t m_timeStamp = 0;
+
+		static const stKeyState m_nullState;
 	};
 
 	const stKeyState JoystickInternal::Impl::m_nullState = { "nul device" };
