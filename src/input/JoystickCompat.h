@@ -11,10 +11,10 @@ namespace Equisetum2
 	// ジョイスティックのポーティングクラス
 	// 存在しないジョイスティックの番号を入力してもクラッシュしないことが保証されている
 
-	class JoystickInternal final
+	class JoystickCompat final
 	{
 	public:
-		friend Singleton<JoystickInternal>;	// シングルトンからインスタンスを作成してもらえるようにする
+		friend Singleton<JoystickCompat>;	// シングルトンからインスタンスを作成してもらえるようにする
 
 		void Prepare();
 		void Update();
@@ -38,7 +38,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		JoystickInternal();	// インスタンス作成封じ
+		JoystickCompat();	// インスタンス作成封じ
 	};
 }
 

@@ -20,7 +20,7 @@ namespace Equisetum2
 		}
 	};
 
-	class SystemTimerInternal::Impl final : public SDLTimer
+	class SystemTimerCompat::Impl final : public SDLTimer
 	{
 	public:
 		Impl(){}

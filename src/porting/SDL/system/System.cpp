@@ -1,10 +1,10 @@
 #include "system/System.h"
 #include "system/Singleton.h"
 #include "system/Logger.h"
-#include "timer/SystemTimerInternal.h"
+#include "timer/SystemTimerCompat.h"
 #include "input/Key.h"
-#include "input/KeyboardInternal.h"
-#include "input/JoystickInternal.h"
+#include "input/KeyboardCompat.h"
+#include "input/JoystickCompat.h"
 #include "SDL.h"
 #include "SDLEvent.h"
 
@@ -25,9 +25,9 @@ namespace Equisetum2
 		bool continueFlag = true;
 
 		// キーボード更新準備
-		Singleton<KeyboardInternal>::GetInstance()->Prepare();
+		Singleton<KeyboardCompat>::GetInstance()->Prepare();
 		// ジョイスティック更新準備
-		Singleton<JoystickInternal>::GetInstance()->Prepare();
+		Singleton<JoystickCompat>::GetInstance()->Prepare();
 
 		// イベントループ
 		while (SDL_PollEvent(&e))
@@ -41,9 +41,9 @@ namespace Equisetum2
 		}
 
 		// キーボードの状態を更新
-		Singleton<KeyboardInternal>::GetInstance()->Update();
+		Singleton<KeyboardCompat>::GetInstance()->Update();
 		// ジョイスティックの状態を更新
-		Singleton<JoystickInternal>::GetInstance()->Update();
+		Singleton<JoystickCompat>::GetInstance()->Update();
 
 		return continueFlag;
 	}
@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
 
 	// シングルトンのインスタンス作成
 	Singleton<SDLEventManager>::GetInstance();
-	Singleton<SystemTimerInternal>::GetInstance();
-	Singleton<KeyboardInternal>::GetInstance();
-	Singleton<JoystickInternal>::GetInstance();
+	Singleton<SystemTimerCompat>::GetInstance();
+	Singleton<KeyboardCompat>::GetInstance();
+	Singleton<JoystickCompat>::GetInstance();
 
 	SDL_Window *gWindow = SDL_CreateWindow(SDL_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOW_WIDTH,

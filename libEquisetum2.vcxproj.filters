@@ -87,20 +87,20 @@
     <ClInclude Include="include\input\Key.h">
       <Filter>ヘッダー ファイル\input</Filter>
     </ClInclude>
-    <ClInclude Include="src\input\KeyboardInternal.h">
-      <Filter>ソース ファイル\input</Filter>
-    </ClInclude>
-    <ClInclude Include="src\input\JoystickInternal.h">
-      <Filter>ソース ファイル\input</Filter>
-    </ClInclude>
     <ClInclude Include="include\input\Joystick.h">
       <Filter>ヘッダー ファイル\input</Filter>
     </ClInclude>
-    <ClInclude Include="src\porting\SDL\timer\SystemTimerInternal.h">
-      <Filter>ソース ファイル\timer</Filter>
-    </ClInclude>
     <ClInclude Include="include\timer\SystemTimer.h">
       <Filter>ヘッダー ファイル\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\JoystickCompat.h">
+      <Filter>ソース ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\KeyboardCompat.h">
+      <Filter>ソース ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\porting\SDL\timer\SystemTimerCompat.h">
+      <Filter>ソース ファイル\timer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,30 +128,30 @@
     <ClCompile Include="src\input\Key.cpp">
       <Filter>ソース ファイル\input</Filter>
     </ClCompile>
-    <ClCompile Include="src\input\JoystickInternal.cpp">
-      <Filter>ソース ファイル\input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\input\KeyboardInternal.cpp">
-      <Filter>ソース ファイル\input</Filter>
-    </ClCompile>
     <ClCompile Include="src\input\Joystick.cpp">
       <Filter>ソース ファイル\input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\porting\SDL\timer\SystemTimerInternal.cpp">
-      <Filter>ソース ファイル\timer</Filter>
     </ClCompile>
     <ClCompile Include="src\timer\SystemTimer.cpp">
       <Filter>ソース ファイル\timer</Filter>
     </ClCompile>
+    <ClCompile Include="src\input\JoystickCompat.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\KeyboardCompat.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\porting\SDL\timer\SystemTimerCompat.cpp">
+      <Filter>ソース ファイル\timer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\porting\SDL\input\KeyboardInternalImpl.inl">
+    <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
       <Filter>ソース ファイル\input</Filter>
     </None>
-    <None Include="src\porting\SDL\input\JoystickInternalImpl.inl">
+    <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
       <Filter>ソース ファイル\input</Filter>
     </None>
-    <None Include="src\porting\SDL\timer\SystemTimerInternalImpl.inl">
+    <None Include="src\porting\SDL\timer\SystemTimerCompatImpl.inl">
       <Filter>ソース ファイル\timer</Filter>
     </None>
   </ItemGroup>

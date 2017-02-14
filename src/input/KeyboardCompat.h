@@ -8,10 +8,10 @@
 
 namespace Equisetum2
 {
-	class KeyboardInternal final
+	class KeyboardCompat final
 	{
 	public:
-		friend Singleton<KeyboardInternal>;	// シングルトンからインスタンスを作成してもらえるようにする
+		friend Singleton<KeyboardCompat>;	// シングルトンからインスタンスを作成してもらえるようにする
 
 		void Prepare();
 		void Update();
@@ -22,7 +22,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		KeyboardInternal();	// インスタンス作成封じ
+		KeyboardCompat();	// インスタンス作成封じ
 	};
 }
 

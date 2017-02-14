@@ -1,5 +1,5 @@
 #include "timer/SystemTimer.h"
-#include "timer/SystemTimerInternal.h"
+#include "timer/SystemTimerCompat.h"
 
 namespace Equisetum2
 {
@@ -30,7 +30,7 @@ namespace Equisetum2
 
 	bool SystemTimer::Update()
 	{
-		m_Ticks = Singleton<SystemTimerInternal>::GetInstance()->Ticks();
+		m_Ticks = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 		return true;
 	}
 

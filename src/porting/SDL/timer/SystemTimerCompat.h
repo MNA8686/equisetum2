@@ -6,10 +6,10 @@
 
 namespace Equisetum2
 {
-	class SystemTimerInternal final
+	class SystemTimerCompat final
 	{
 	public:
-		friend Singleton<SystemTimerInternal>;	// シングルトンからインスタンスを作成してもらえるようにする
+		friend Singleton<SystemTimerCompat>;	// シングルトンからインスタンスを作成してもらえるようにする
 
 		uint32_t Ticks() const;
 
@@ -17,7 +17,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		SystemTimerInternal();	// インスタンス作成封じ
+		SystemTimerCompat();	// インスタンス作成封じ
 	};
 }
 

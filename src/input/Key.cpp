@@ -1,7 +1,7 @@
 #include "input/Key.h"
-#include "input/KeyboardInternal.h"
+#include "input/KeyboardCompat.h"
 #include "timer/TickCounter.h"
-#include "timer/SystemTimerInternal.h"
+#include "timer/SystemTimerCompat.h"
 #include "system/Logger.h"
 
 #include <unordered_map>
@@ -55,7 +55,7 @@ namespace Equisetum2
 	{
 		return [keyCode]()->stKeyState
 		{
-			return Singleton<KeyboardInternal>::GetInstance()->GetKeyState(keyCode);
+			return Singleton<KeyboardCompat>::GetInstance()->GetKeyState(keyCode);
 		};
 	}
 
@@ -172,7 +172,7 @@ namespace Equisetum2
 					up = true;
 
 					// —£‚³‚ê‚½ŠÔ‚ğ‹L˜^
-					g_mapCombinationKeyTimeStamp[this].last = Singleton<SystemTimerInternal>::GetInstance()->Ticks();
+					g_mapCombinationKeyTimeStamp[this].last = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 					break;
 				}
 			}
@@ -210,7 +210,7 @@ namespace Equisetum2
 		if (IsPress())
 		{
 			// ‰Ÿ‚³‚ê‚Ä‚¢‚éŠÔ‚Í‰Ÿ‰ºŠJn‚ÆŒ»İ‚Ì·‚ğ‹‚ß‚é
-			duration = TickCounter::ElapsedTicks(ref.down, Singleton<SystemTimerInternal>::GetInstance()->Ticks());
+			duration = TickCounter::ElapsedTicks(ref.down, Singleton<SystemTimerCompat>::GetInstance()->Ticks());
 		}
 		else
 		{

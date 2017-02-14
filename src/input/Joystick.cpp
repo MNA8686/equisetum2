@@ -1,6 +1,6 @@
 #include "input/Joystick.h"
 #include "system/Logger.h"
-#include "input/JoystickInternal.h"
+#include "input/JoystickCompat.h"
 
 namespace Equisetum2
 {
@@ -22,7 +22,7 @@ namespace Equisetum2
 	Joystick::~Joystick()
 	{
 		// ÉäÉXÉiÅ[çÌèú
-		Singleton<JoystickInternal>::GetInstance()->SetEventListener(m_Index, {}, this);
+		Singleton<JoystickCompat>::GetInstance()->SetEventListener(m_Index, {}, this);
 	}
 
 	Joystick::Joystick(int index)
@@ -32,12 +32,12 @@ namespace Equisetum2
 
 	bool Joystick::IsConnected() const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->IsConnected(m_Index);
+		return Singleton<JoystickCompat>::GetInstance()->IsConnected(m_Index);
 	}
 
 	int16_t Joystick::Axis(int num) const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->Axis(m_Index, num);
+		return Singleton<JoystickCompat>::GetInstance()->Axis(m_Index, num);
 	}
 
 	const Key Joystick::HatUp(int num) const
@@ -46,7 +46,7 @@ namespace Equisetum2
 
 		const Key joyHat([index, num]()->stKeyState
 		{
-			return Singleton<JoystickInternal>::GetInstance()->HatUp(index, num);
+			return Singleton<JoystickCompat>::GetInstance()->HatUp(index, num);
 		});
 
 		return joyHat;
@@ -58,7 +58,7 @@ namespace Equisetum2
 
 		const Key joyHat([index, num]()->stKeyState
 		{
-			return Singleton<JoystickInternal>::GetInstance()->HatDown(index, num);
+			return Singleton<JoystickCompat>::GetInstance()->HatDown(index, num);
 		});
 
 		return joyHat;
@@ -70,7 +70,7 @@ namespace Equisetum2
 
 		const Key joyHat([index, num]()->stKeyState
 		{
-			return Singleton<JoystickInternal>::GetInstance()->HatLeft(index, num);
+			return Singleton<JoystickCompat>::GetInstance()->HatLeft(index, num);
 		});
 
 		return joyHat;
@@ -82,7 +82,7 @@ namespace Equisetum2
 
 		const Key joyHat([index, num]()->stKeyState
 		{
-			return Singleton<JoystickInternal>::GetInstance()->HatRight(index, num);
+			return Singleton<JoystickCompat>::GetInstance()->HatRight(index, num);
 		});
 
 		return joyHat;
@@ -94,7 +94,7 @@ namespace Equisetum2
 
 		const Key joyButton([index, num]()->stKeyState
 		{
-			return Singleton<JoystickInternal>::GetInstance()->Button(index, num);
+			return Singleton<JoystickCompat>::GetInstance()->Button(index, num);
 		});
 
 		return joyButton;
@@ -102,22 +102,22 @@ namespace Equisetum2
 
 	int Joystick::NumAxes() const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->NumAxes(m_Index);
+		return Singleton<JoystickCompat>::GetInstance()->NumAxes(m_Index);
 	}
 
 	int Joystick::NumButtons() const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->NumButtons(m_Index);
+		return Singleton<JoystickCompat>::GetInstance()->NumButtons(m_Index);
 	}
 
 	int Joystick::NumHats() const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->NumHats(m_Index);
+		return Singleton<JoystickCompat>::GetInstance()->NumHats(m_Index);
 	}
 	
 	const std::string Joystick::Name() const
 	{
-		return Singleton<JoystickInternal>::GetInstance()->Name(m_Index);
+		return Singleton<JoystickCompat>::GetInstance()->Name(m_Index);
 	}
 
 	int Joystick::Index()
@@ -127,12 +127,12 @@ namespace Equisetum2
 
 	void Joystick::SetEventListener(const stJoystickEvent& listener)
 	{
-		Singleton<JoystickInternal>::GetInstance()->SetEventListener(m_Index, listener, this);
+		Singleton<JoystickCompat>::GetInstance()->SetEventListener(m_Index, listener, this);
 	}
 
 	int Joystick::NumJoysticks()
 	{
-		return Singleton<JoystickInternal>::GetInstance()->NumJoysticks();
+		return Singleton<JoystickCompat>::GetInstance()->NumJoysticks();
 	}
 }
 

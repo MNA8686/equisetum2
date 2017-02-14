@@ -1,6 +1,6 @@
 #include "system/Logger.h"
-#include "input/KeyboardInternal.h"
-#include "timer/SystemTimerInternal.h"
+#include "input/KeyboardCompat.h"
+#include "timer/SystemTimerCompat.h"
 #include "timer/TickCounter.h"
 #include "system/SDLEvent.h"
 #include "SDL.h"
@@ -160,7 +160,7 @@ namespace Equisetum2
 #undef KEYCODE_CONV
 	};
 
-	class KeyboardInternal::Impl final
+	class KeyboardCompat::Impl final
 	{
 	public:
 		Impl()
@@ -200,7 +200,7 @@ namespace Equisetum2
 
 		void Prepare()
 		{
-			m_timeStamp = Singleton<SystemTimerInternal>::GetInstance()->Ticks();
+			m_timeStamp = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 
 			// 変化エッジフラグは1フレーム経過したらクリアする
 			for (auto& keyState : m_keyStateArray)
