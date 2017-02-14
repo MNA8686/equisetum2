@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./include;./src;./src/porting/SDL;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src/common;./src/compat;./src/porting/SDL;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,7 +76,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./include;./src;./src/porting/SDL;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src/common;./src/compat;./src/porting/SDL;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,37 +112,38 @@
     <ClInclude Include="include\timer\FpsPaceMaker.h" />
     <ClInclude Include="include\timer\ITimer.h" />
     <ClInclude Include="include\timer\TickCounter.h" />
-    <ClInclude Include="src\input\JoystickCompat.h" />
-    <ClInclude Include="src\input\KeyboardCompat.h" />
+    <ClInclude Include="src\common\system\Singleton.h" />
+    <ClInclude Include="src\compat\input\JoystickCompat.h" />
+    <ClInclude Include="src\compat\input\KeyboardCompat.h" />
+    <ClInclude Include="src\compat\timer\SystemTimerCompat.h" />
     <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h" />
     <ClInclude Include="src\porting\SDL\system\SDLEvent.h" />
-    <ClInclude Include="src\system\Singleton.h" />
-    <ClInclude Include="src\timer\SystemTimerCompat.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\input\Joystick.cpp" />
-    <ClCompile Include="src\input\JoystickCompat.cpp" />
-    <ClCompile Include="src\input\Key.cpp" />
-    <ClCompile Include="src\input\KeyboardCompat.cpp" />
+    <ClCompile Include="src\common\input\Joystick.cpp" />
+    <ClCompile Include="src\common\input\Key.cpp" />
+    <ClCompile Include="src\common\system\Singleton.cpp" />
+    <ClCompile Include="src\common\timer\FpsCounter.cpp" />
+    <ClCompile Include="src\common\timer\FpsPaceMaker.cpp" />
+    <ClCompile Include="src\common\timer\SystemTimer.cpp" />
+    <ClCompile Include="src\common\timer\TickCounter.cpp" />
+    <ClCompile Include="src\compat\input\JoystickCompat.cpp" />
+    <ClCompile Include="src\compat\input\KeyboardCompat.cpp" />
+    <ClCompile Include="src\compat\timer\SystemTimerCompat.cpp" />
     <ClCompile Include="src\porting\SDL\stream\FileStream.cpp" />
     <ClCompile Include="src\porting\SDL\system\Logger.cpp" />
     <ClCompile Include="src\porting\SDL\system\System.cpp" />
-    <ClCompile Include="src\system\Singleton.cpp" />
-    <ClCompile Include="src\timer\FpsCounter.cpp" />
-    <ClCompile Include="src\timer\FpsPaceMaker.cpp" />
-    <ClCompile Include="src\timer\SystemTimer.cpp" />
-    <ClCompile Include="src\timer\SystemTimerCompat.cpp" />
-    <ClCompile Include="src\timer\TickCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="src\porting\SDL\timer\SystemTimerCompatImpl.inl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
