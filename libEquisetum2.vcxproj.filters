@@ -25,9 +25,6 @@
     <Filter Include="ヘッダー ファイル\input">
       <UniqueIdentifier>{608cf444-342a-40f3-891b-6776f76520da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\compat">
-      <UniqueIdentifier>{fe1f176d-8732-43b8-89b5-57248ebaa406}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\common">
       <UniqueIdentifier>{3ccfe52f-f079-48c5-81d6-ce215c688e61}</UniqueIdentifier>
     </Filter>
@@ -43,16 +40,19 @@
     <Filter Include="ソース ファイル\common\input">
       <UniqueIdentifier>{ae88c937-7001-438d-8a76-3c827e767e9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\compat\input">
+    <Filter Include="ソース ファイル\compat&amp;porting">
+      <UniqueIdentifier>{fe1f176d-8732-43b8-89b5-57248ebaa406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\compat&amp;porting\input">
       <UniqueIdentifier>{5895df99-ef72-4db5-8a0e-9433ea627db2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\compat\stream">
+    <Filter Include="ソース ファイル\compat&amp;porting\stream">
       <UniqueIdentifier>{2f94f556-a981-47ec-987b-ec2cc4a61a9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\compat\timer">
+    <Filter Include="ソース ファイル\compat&amp;porting\timer">
       <UniqueIdentifier>{551d8cf1-9b01-453e-bf03-e868f0141568}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\compat\system">
+    <Filter Include="ソース ファイル\compat&amp;porting\system">
       <UniqueIdentifier>{8c871951-d23e-4fe7-9292-a384337d4b64}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -106,19 +106,19 @@
       <Filter>ヘッダー ファイル\timer</Filter>
     </ClInclude>
     <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h">
-      <Filter>ソース ファイル\compat\stream</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </ClInclude>
     <ClInclude Include="src\common\system\Singleton.h">
       <Filter>ソース ファイル\common\system</Filter>
     </ClInclude>
     <ClInclude Include="src\compat\timer\SystemTimerCompat.h">
-      <Filter>ソース ファイル\compat\timer</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\timer</Filter>
     </ClInclude>
     <ClInclude Include="src\compat\input\KeyboardCompat.h">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClInclude>
     <ClInclude Include="src\compat\input\JoystickCompat.h">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -150,27 +150,27 @@
       <Filter>ソース ファイル\common\input</Filter>
     </ClCompile>
     <ClCompile Include="src\compat\timer\SystemTimerCompat.cpp">
-      <Filter>ソース ファイル\compat\timer</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\timer</Filter>
     </ClCompile>
     <ClCompile Include="src\compat\input\JoystickCompat.cpp">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClCompile>
     <ClCompile Include="src\compat\input\KeyboardCompat.cpp">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClCompile>
     <ClCompile Include="src\porting\SDL\stream\FileStream.cpp">
-      <Filter>ソース ファイル\compat\stream</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </None>
     <None Include="src\porting\SDL\timer\SystemTimerCompatImpl.inl">
-      <Filter>ソース ファイル\compat\timer</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\timer</Filter>
     </None>
     <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
-      <Filter>ソース ファイル\compat\input</Filter>
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </None>
   </ItemGroup>
 </Project>
