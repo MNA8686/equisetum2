@@ -99,7 +99,7 @@
     <ClInclude Include="src\input\KeyboardCompat.h">
       <Filter>ソース ファイル\input</Filter>
     </ClInclude>
-    <ClInclude Include="src\porting\SDL\timer\SystemTimerCompat.h">
+    <ClInclude Include="src\timer\SystemTimerCompat.h">
       <Filter>ソース ファイル\timer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,7 +140,7 @@
     <ClCompile Include="src\input\KeyboardCompat.cpp">
       <Filter>ソース ファイル\input</Filter>
     </ClCompile>
-    <ClCompile Include="src\porting\SDL\timer\SystemTimerCompat.cpp">
+    <ClCompile Include="src\timer\SystemTimerCompat.cpp">
       <Filter>ソース ファイル\timer</Filter>
     </ClCompile>
   </ItemGroup>

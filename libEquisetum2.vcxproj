@@ -116,8 +116,8 @@
     <ClInclude Include="src\input\KeyboardCompat.h" />
     <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h" />
     <ClInclude Include="src\porting\SDL\system\SDLEvent.h" />
-    <ClInclude Include="src\porting\SDL\timer\SystemTimerCompat.h" />
     <ClInclude Include="src\system\Singleton.h" />
+    <ClInclude Include="src\timer\SystemTimerCompat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\input\Joystick.cpp" />
@@ -127,11 +127,11 @@
     <ClCompile Include="src\porting\SDL\stream\FileStream.cpp" />
     <ClCompile Include="src\porting\SDL\system\Logger.cpp" />
     <ClCompile Include="src\porting\SDL\system\System.cpp" />
-    <ClCompile Include="src\porting\SDL\timer\SystemTimerCompat.cpp" />
     <ClCompile Include="src\system\Singleton.cpp" />
     <ClCompile Include="src\timer\FpsCounter.cpp" />
     <ClCompile Include="src\timer\FpsPaceMaker.cpp" />
     <ClCompile Include="src\timer\SystemTimer.cpp" />
+    <ClCompile Include="src\timer\SystemTimerCompat.cpp" />
     <ClCompile Include="src\timer\TickCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
