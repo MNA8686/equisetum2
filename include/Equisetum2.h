@@ -8,6 +8,7 @@
 #include "stream/FileStream.h"
 
 #include "input/Key.h"
+#include "input/Mouse.h"
 #include "input/Joystick.h"
 
 #include "timer/ITimer.h"

@@ -120,6 +120,15 @@
     <ClInclude Include="src\compat\input\JoystickCompat.h">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClInclude>
+    <ClInclude Include="src\compat\system\LoggerCompat.h">
+      <Filter>ソース ファイル\compat&amp;porting\system</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\Mouse.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compat\input\MouseCompat.h">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -161,6 +170,15 @@
     <ClCompile Include="src\porting\SDL\stream\FileStream.cpp">
       <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\compat\system\LoggerCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\system</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\input\Mouse.cpp">
+      <Filter>ソース ファイル\common\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compat\input\MouseCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -170,6 +188,12 @@
       <Filter>ソース ファイル\compat&amp;porting\timer</Filter>
     </None>
     <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </None>
+    <None Include="src\compat\system\LoggerCompat.inl">
+      <Filter>ソース ファイル\compat&amp;porting\system</Filter>
+    </None>
+    <None Include="src\porting\SDL\input\MouseCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </None>
   </ItemGroup>
