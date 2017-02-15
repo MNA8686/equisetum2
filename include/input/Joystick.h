@@ -26,10 +26,10 @@ namespace Equisetum2
 
 		bool IsConnected() const;
 		int16_t Axis(int num) const;
-		const Key HatUp(int num) const;
-		const Key HatDown(int num) const;
-		const Key HatLeft(int num) const;
-		const Key HatRight(int num) const;
+		const Key HatUp(int num = 0) const;
+		const Key HatDown(int num = 0) const;
+		const Key HatLeft(int num = 0) const;
+		const Key HatRight(int num = 0) const;
 		const Key Button(int num) const;
 
 		int NumAxes() const;
