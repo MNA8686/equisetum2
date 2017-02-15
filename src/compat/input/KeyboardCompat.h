@@ -1,5 +1,5 @@
-#if !defined(_EQKEYBOARDINTERNAL_H_)
-#define _EQKEYBOARDINTERNAL_H_
+#if !defined(_EQKEYBOARDCOMPAT_H_)
+#define _EQKEYBOARDCOMPAT_H_
 
 #include "system/Singleton.h"
 #include "input/KeyCode.h"

@@ -1,5 +1,5 @@
-#if !defined(_EQJOYSTICKINTERNAL_H_)
-#define _EQJOYSTICKINTERNAL_H_
+#if !defined(_EQJOYSTICKCOMPAT_H_)
+#define _EQJOYSTICKCOMPAT_H_
 
 #include "system/Singleton.h"
 #include "input/IKeyState.h"

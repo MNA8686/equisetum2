@@ -1,5 +1,5 @@
-#if !defined(_EQSYSTEMTIMERINTERNAL_H_)
-#define _EQSYSTEMTIMERINTERNAL_H_
+#if !defined(_EQSYSTEMTIMERCOMPAT_H_)
+#define _EQSYSTEMTIMERCOMPAT_H_
 
 #include "system/Singleton.h"
 #include <memory>
