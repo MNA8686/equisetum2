@@ -79,9 +79,19 @@ namespace Equisetum2
 								m_JoyState[joyIndex].vHats.resize(NumHats(joyIndex));
 								for (auto& hat : m_JoyState[joyIndex].vHats)
 								{
+									int i = 0;
 									for (auto& keyState : hat.state)
 									{
-										keyState = {};
+										const char* name[] = 
+										{
+											"eHatState::Right",
+											"eHatState::Up",
+											"eHatState::Left",
+											"eHatState::Down",
+										};
+
+										keyState = { name[i] };
+										i++;
 									}
 								}
 
@@ -419,5 +429,5 @@ namespace Equisetum2
 		static const stKeyState m_nullState;
 	};
 
-	const stKeyState JoystickCompat::Impl::m_nullState = { "nul device" };
+	const stKeyState JoystickCompat::Impl::m_nullState = { "null device" };
 }
