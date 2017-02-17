@@ -5,6 +5,7 @@
 #include "input/Key.h"
 #include "input/KeyboardCompat.h"
 #include "input/MouseCompat.h"
+#include "input/TouchCompat.h"
 #include "input/JoystickCompat.h"
 #include "SDL.h"
 #include "SDLEvent.h"
@@ -29,6 +30,8 @@ namespace Equisetum2
 		Singleton<KeyboardCompat>::GetInstance()->Prepare();
 		// マウス更新準備
 		Singleton<MouseCompat>::GetInstance()->Prepare();
+		// タッチパネル更新準備
+		Singleton<TouchCompat>::GetInstance()->Prepare();
 		// ジョイスティック更新準備
 		Singleton<JoystickCompat>::GetInstance()->Prepare();
 
@@ -47,6 +50,8 @@ namespace Equisetum2
 		Singleton<KeyboardCompat>::GetInstance()->Update();
 		// マウスの状態を更新
 		Singleton<MouseCompat>::GetInstance()->Update();
+		// タッチパネルの状態を更新
+		Singleton<TouchCompat>::GetInstance()->Update();
 		// ジョイスティックの状態を更新
 		Singleton<JoystickCompat>::GetInstance()->Update();
 
@@ -83,6 +88,7 @@ int main(int argc, char *argv[])
 	Singleton<SystemTimerCompat>::GetInstance();
 	Singleton<KeyboardCompat>::GetInstance();
 	Singleton<MouseCompat>::GetInstance();
+	Singleton<TouchCompat>::GetInstance();
 	Singleton<JoystickCompat>::GetInstance();
 
 	SDL_Window *gWindow = SDL_CreateWindow(SDL_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,

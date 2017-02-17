@@ -104,6 +104,7 @@
     <ClInclude Include="include\input\Key.h" />
     <ClInclude Include="include\input\KeyCode.h" />
     <ClInclude Include="include\input\Mouse.h" />
+    <ClInclude Include="include\input\Touch.h" />
     <ClInclude Include="include\stream\FileStream.h" />
     <ClInclude Include="include\stream\IStream.h" />
     <ClInclude Include="include\system\Logger.h" />
@@ -113,10 +114,12 @@
     <ClInclude Include="include\timer\FpsPaceMaker.h" />
     <ClInclude Include="include\timer\ITimer.h" />
     <ClInclude Include="include\timer\TickCounter.h" />
+    <ClInclude Include="include\type\Point.h" />
     <ClInclude Include="src\common\system\Singleton.h" />
     <ClInclude Include="src\compat\input\JoystickCompat.h" />
     <ClInclude Include="src\compat\input\KeyboardCompat.h" />
     <ClInclude Include="src\compat\input\MouseCompat.h" />
+    <ClInclude Include="src\compat\input\TouchCompat.h" />
     <ClInclude Include="src\compat\system\LoggerCompat.h" />
     <ClInclude Include="src\compat\timer\SystemTimerCompat.h" />
     <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h" />
@@ -126,6 +129,7 @@
     <ClCompile Include="src\common\input\Joystick.cpp" />
     <ClCompile Include="src\common\input\Key.cpp" />
     <ClCompile Include="src\common\input\Mouse.cpp" />
+    <ClCompile Include="src\common\input\Touch.cpp" />
     <ClCompile Include="src\common\system\Singleton.cpp" />
     <ClCompile Include="src\common\timer\FpsCounter.cpp" />
     <ClCompile Include="src\common\timer\FpsPaceMaker.cpp" />
@@ -134,6 +138,7 @@
     <ClCompile Include="src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="src\compat\input\KeyboardCompat.cpp" />
     <ClCompile Include="src\compat\input\MouseCompat.cpp" />
+    <ClCompile Include="src\compat\input\TouchCompat.cpp" />
     <ClCompile Include="src\compat\system\LoggerCompat.cpp" />
     <ClCompile Include="src\compat\timer\SystemTimerCompat.cpp" />
     <ClCompile Include="src\porting\SDL\stream\FileStream.cpp" />
@@ -154,6 +159,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="src\porting\SDL\input\MouseCompatImpl.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="src\porting\SDL\input\TouchCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>

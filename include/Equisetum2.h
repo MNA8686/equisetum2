@@ -9,6 +9,7 @@
 
 #include "input/Key.h"
 #include "input/Mouse.h"
+#include "input/Touch.h"
 #include "input/Joystick.h"
 
 #include "timer/ITimer.h"

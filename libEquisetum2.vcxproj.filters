@@ -55,6 +55,9 @@
     <Filter Include="ソース ファイル\compat&amp;porting\system">
       <UniqueIdentifier>{8c871951-d23e-4fe7-9292-a384337d4b64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\type">
+      <UniqueIdentifier>{6260c2cf-22ab-4635-9c7b-8b3d9461a7ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -129,6 +132,15 @@
     <ClInclude Include="src\compat\input\MouseCompat.h">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClInclude>
+    <ClInclude Include="src\compat\input\TouchCompat.h">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\input\Touch.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\type\Point.h">
+      <Filter>ヘッダー ファイル\type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -179,6 +191,12 @@
     <ClCompile Include="src\compat\input\MouseCompat.cpp">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </ClCompile>
+    <ClCompile Include="src\compat\input\TouchCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\input\Touch.cpp">
+      <Filter>ソース ファイル\common\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -194,6 +212,9 @@
       <Filter>ソース ファイル\compat&amp;porting\system</Filter>
     </None>
     <None Include="src\porting\SDL\input\MouseCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </None>
+    <None Include="src\porting\SDL\input\TouchCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
     </None>
   </ItemGroup>
