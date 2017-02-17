@@ -223,6 +223,11 @@ namespace Equisetum2
 					break;
 				}
 			});
+
+			for (auto& inst : m_JoyState)
+			{
+				inst = {};
+			}
 		}
 
 		void Prepare()
