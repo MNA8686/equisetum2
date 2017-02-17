@@ -20,12 +20,12 @@ namespace Equisetum2
 		m_Impl->Update();
 	}
 
-	const Point& MouseCompat::Pos() const
+	const Point<int32_t>& MouseCompat::Pos() const
 	{
 		return m_Impl->Pos();
 	}
 
-	const Point& MouseCompat::Delta() const
+	const Point<int32_t>& MouseCompat::Delta() const
 	{
 		return m_Impl->Delta();
 	}

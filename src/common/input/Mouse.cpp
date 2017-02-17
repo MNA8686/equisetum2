@@ -4,43 +4,27 @@
 
 namespace Equisetum2
 {
-	std::shared_ptr<Mouse> Mouse::Create()
-	{
-		class MouseDummy : public Mouse
-		{
-		};
-		return std::make_shared<MouseDummy>();
-	}
-
-	Mouse::Mouse()
-	{
-	}
-
-	Mouse::~Mouse()
-	{
-	}
-
-	Point Mouse::Pos() const
+	Point<int32_t> Mouse::Pos()
 	{
 		return Singleton<MouseCompat>::GetInstance()->Pos();
 	}
 
-	Point Mouse::Delta() const
+	Point<int32_t> Mouse::Delta()
 	{
 		return Singleton<MouseCompat>::GetInstance()->Delta();
 	}
 
-	int32_t Mouse::Wheel() const
+	int32_t Mouse::Wheel()
 	{
 		return Singleton<MouseCompat>::GetInstance()->Wheel();
 	}
 
-	int32_t Mouse::WheelH() const
+	int32_t Mouse::WheelH()
 	{
 		return Singleton<MouseCompat>::GetInstance()->WheelH();
 	}
 
-	const Key Mouse::Button(MouseButton button) const
+	const Key Mouse::Button(MouseButton button)
 	{
 		const Key mouseButton([button]()->stKeyState
 		{

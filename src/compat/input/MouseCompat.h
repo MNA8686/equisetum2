@@ -16,8 +16,8 @@ namespace Equisetum2
 		void Prepare();
 		void Update();
 
-		const Point& Pos() const;
-		const Point& Delta() const;
+		const Point<int32_t>& Pos() const;
+		const Point<int32_t>& Delta() const;
 		int32_t Wheel() const;
 		int32_t WheelH() const;
 		const stKeyState& Button(MouseButton button) const;

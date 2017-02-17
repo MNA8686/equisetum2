@@ -3,17 +3,12 @@
 
 #include "input/IKeyState.h"
 #include "input/Key.h"
+#include "type/Point.h"
 #include <memory>
 #include <functional>
 
 namespace Equisetum2
 {
-	typedef struct
-	{
-		int32_t x;
-		int32_t y;
-	}Point;
-
 	enum class MouseButton : int
 	{
 		Left,
@@ -25,22 +20,12 @@ namespace Equisetum2
 	class Mouse
 	{
 	public:
-
-		static std::shared_ptr<Mouse> Create();
-
-		Point Pos() const;
-		Point Delta() const;
-		int32_t Wheel() const;
-		int32_t WheelH() const;
-		const Key Button(MouseButton button) const;
-
-		bool ShowCursor(bool toggle);
-
-		~Mouse();
-
-	protected:
-
-		Mouse();	// インスタンス作成封じ
+		static Point<int32_t> Pos();
+		static Point<int32_t> Delta();
+		static int32_t Wheel();
+		static int32_t WheelH();
+		static const Key Button(MouseButton button = MouseButton::Left);
+		static bool ShowCursor(bool toggle);
 	};
 }
 
