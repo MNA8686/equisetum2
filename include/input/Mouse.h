@@ -4,8 +4,6 @@
 #include "input/IKeyState.h"
 #include "input/Key.h"
 #include "type/Point.h"
-#include <memory>
-#include <functional>
 
 namespace Equisetum2
 {
