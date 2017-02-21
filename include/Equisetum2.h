@@ -1,6 +1,8 @@
 #if !defined(_EQUISETUM2_H_)
 #define _EQUISETUM2_H_
 
+#include "std/optional.hpp"
+
 #include "system/System.h"
 #include "system/Logger.h"
 

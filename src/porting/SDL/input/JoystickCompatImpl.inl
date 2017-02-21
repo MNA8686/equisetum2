@@ -411,6 +411,11 @@ namespace Equisetum2
 
 		typedef struct
 		{
+			stKeyState state[(int)eHatState::Max];
+		}stHatState;
+
+		typedef struct
+		{
 			// ジョイスティックインスタンス
 			std::shared_ptr<SDL_Joystick> JoyInstance;
 			// キーバッファ
@@ -418,10 +423,6 @@ namespace Equisetum2
 			// 軸バッファ
 			std::vector<int16_t> vAxes;
 			// ハットバッファ
-			typedef struct
-			{
-				stKeyState state[(int)eHatState::Max];
-			}stHatState;
 			std::vector<stHatState> vHats;
 			// イベントリスナー
 			std::unordered_map<void*, stJoystickEvent> eventListener;

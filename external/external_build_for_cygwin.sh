@@ -94,7 +94,7 @@ mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
 if [ ! -e ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} ]; then
 	unzip ${SRC_DIR}/${LIB_DIR}.zip -d ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}
 fi
-cd ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}/sdk/angelscript/projects/msvc2013
+cd ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}/sdk/angelscript/projects/msvc2015
 MSBuild.exe angelscript.sln /t:Build /p:Configuration=Release
 
 # Deploy
