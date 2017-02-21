@@ -50,7 +50,7 @@ namespace Equisetum2
 	}
 
 
-	const TouchState Touch::GetStateByFingerIndex(int fingerIndex)
+	const std::experimental::optional<TouchState> Touch::GetStateByFingerIndex(int fingerIndex)
 	{
 		class TouchStateWithSetter : public TouchState
 		{
@@ -64,7 +64,12 @@ namespace Equisetum2
 			}
 		};
 
-		return TouchStateWithSetter(fingerIndex);
+		std::experimental::optional<TouchState> state;
+		if (fingerIndex >= 0 && fingerIndex < NumSupportedFinger())
+		{
+			state = TouchStateWithSetter(fingerIndex);
+		}
+		return state;
 	}
 
 	const std::vector<TouchState> Touch::GetTouches()
@@ -72,11 +77,13 @@ namespace Equisetum2
 		std::vector<TouchState> vState;
 		for (int i = 0; i < NumSupportedFinger(); i++)
 		{
-			auto state = GetStateByFingerIndex(i);
-			// ‰Ÿ‚³‚ê‚Ä‚¢‚éŽw‚Æ—£‚³‚ê‚½uŠÔ‚ð—LŒø‚È‚à‚Ì‚Æ‚µ‚Äˆ—‚·‚é
-			if (state.IsPress() || state.IsUp())
+			if (auto state = GetStateByFingerIndex(i))
 			{
-				vState.push_back(state);
+				// ‰Ÿ‚³‚ê‚Ä‚¢‚éŽw‚Æ—£‚³‚ê‚½uŠÔ‚ð—LŒø‚È‚à‚Ì‚Æ‚µ‚Äˆ—‚·‚é
+				if ((*state).IsPress() || (*state).IsUp())
+				{
+					vState.push_back((*state));
+				}
 			}
 		}
 
