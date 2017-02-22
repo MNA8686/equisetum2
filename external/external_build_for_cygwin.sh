@@ -50,6 +50,66 @@ cp VisualC/Win32/Release/SDL2.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME
 cd ${CUR_DIR}
 
 ################################
+# SDL_image                    #
+################################
+LIB_NAME=SDL2_image
+LIB_DIR=SDL2_image-2.0.1
+
+# Make Deploy Directory
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+
+# Build
+if [ ! -e ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} ]; then
+	unzip ${SRC_DIR}/${LIB_DIR}.zip -d ${BUILD_DIR}/${TARGET_DIR}
+	patch -p1 -d ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} < ${SRC_DIR}/${LIB_DIR}_for_win32.patch
+fi
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}/VisualC
+MSBuild.exe SDL_image.sln /t:Build /p:Configuration=Release
+
+# Deploy
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}
+cp SDL_image.h ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+cp VisualC/Win32/Release/${LIB_NAME}.lib ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+cp VisualC/Win32/Release/${LIB_NAME}.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/libjpeg-9.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/libpng16-16.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/libtiff-5.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/libwebp-4.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cd ${CUR_DIR}
+
+################################
+# SDL2_ttf                    #
+################################
+LIB_NAME=SDL2_ttf
+LIB_DIR=SDL2_ttf-2.0.14
+
+# Make Deploy Directory
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+
+# Build
+if [ ! -e ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} ]; then
+	unzip ${SRC_DIR}/${LIB_DIR}.zip -d ${BUILD_DIR}/${TARGET_DIR}
+	patch -p1 -d ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} < ${SRC_DIR}/${LIB_DIR}_for_win32.patch
+fi
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}/VisualC
+MSBuild.exe SDL_ttf.sln /t:Build /p:Configuration=Release
+
+# Deploy
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}
+cp SDL_ttf.h ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+cp VisualC/Win32/Release/${LIB_NAME}.lib ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+cp VisualC/Win32/Release/${LIB_NAME}.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/libfreetype-6.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cp VisualC/Win32/Release/zlib1.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cd ${CUR_DIR}
+
+################################
 # SDL_mixer                    #
 ################################
 LIB_NAME=SDL2_mixer
