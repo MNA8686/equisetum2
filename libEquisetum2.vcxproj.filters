@@ -156,6 +156,9 @@
     <ClInclude Include="src\compat\graphic\WindowCompat.h">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="include\type\Optional.h">
+      <Filter>ヘッダー ファイル\type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">

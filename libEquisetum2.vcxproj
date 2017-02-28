@@ -129,6 +129,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\timer\FpsPaceMaker.h" />
     <ClInclude Include="include\timer\ITimer.h" />
     <ClInclude Include="include\timer\TickCounter.h" />
+    <ClInclude Include="include\type\Optional.h" />
     <ClInclude Include="include\type\Point.h" />
     <ClInclude Include="src\common\system\Singleton.h" />
     <ClInclude Include="src\compat\graphic\WindowCompat.h" />
