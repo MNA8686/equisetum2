@@ -50,7 +50,7 @@ namespace Equisetum2
 	}
 
 
-	const std::experimental::optional<TouchState> Touch::GetStateByFingerIndex(int fingerIndex)
+	const Optional<TouchState> Touch::GetStateByFingerIndex(int fingerIndex)
 	{
 		class TouchStateWithSetter : public TouchState
 		{
@@ -64,7 +64,7 @@ namespace Equisetum2
 			}
 		};
 
-		std::experimental::optional<TouchState> state;
+		Optional<TouchState> state;
 		if (fingerIndex >= 0 && fingerIndex < NumSupportedFinger())
 		{
 			state = TouchStateWithSetter(fingerIndex);

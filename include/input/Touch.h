@@ -4,8 +4,8 @@
 #include "input/IKeyState.h"
 #include "input/Key.h"
 #include "type/Point.h"
+#include "type/Optional.h"
 #include <vector>
-#include "std/optional.hpp"
 
 namespace Equisetum2
 {
@@ -38,7 +38,7 @@ namespace Equisetum2
 	class Touch
 	{
 	public:
-		static const std::experimental::optional<TouchState> GetStateByFingerIndex(int fingerIndex);
+		static const Optional<TouchState> GetStateByFingerIndex(int fingerIndex);
 		static int NumSupportedFinger();
 		static const std::vector<TouchState> GetTouches();
 	};
