@@ -1,9 +1,9 @@
 #if !defined(_EQKEY_H_)
 #define _EQKEY_H_
 
-#include <string>
 #include <vector>
 #include <functional>
+#include "type/String.h"
 #include "input/IKeyState.h"
 #include "input/KeyCode.h"
 
@@ -17,7 +17,7 @@ namespace Equisetum2
 
 	public:
 
-		virtual const std::string Name() const override;
+		virtual const String Name() const override;
 		virtual bool IsDown() const override;
 		virtual bool IsUp() const override;
 		virtual bool IsPress() const override;
@@ -39,7 +39,7 @@ namespace Equisetum2
 
 	public:
 
-		virtual const std::string Name() const override;
+		virtual const String Name() const override;
 		virtual bool IsDown() const override;
 		virtual bool IsUp() const override;
 		virtual bool IsPress() const override;

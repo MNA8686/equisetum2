@@ -22,7 +22,7 @@ namespace Equisetum2
 	}
 
 
-	void WindowCompat::SetTitle(const std::string& title)
+	void WindowCompat::SetTitle(const String& title)
 	{
 		m_Impl->SetTitle(title);
 	}
@@ -47,7 +47,7 @@ namespace Equisetum2
 		m_Impl->Centering();
 	}
 
-	const std::string WindowCompat::Title()
+	const String WindowCompat::Title()
 	{
 		return m_Impl->Title();
 	}

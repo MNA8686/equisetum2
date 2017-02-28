@@ -9,7 +9,7 @@ namespace Equisetum2
 		StreamImpl(SDL_RWops* pRWops) : SDLBinderRWops(pRWops){}
 	};
 
-	std::shared_ptr<FileStream> FileStream::CreateFromPath(const std::string& strPath, const std::string& strMethod)
+	std::shared_ptr<FileStream> FileStream::CreateFromPath(const String& strPath, const String& strMethod)
 	{
 		class EqFileStreamDummy : public FileStream
 		{
@@ -37,7 +37,7 @@ namespace Equisetum2
 	{
 	}
 
-	bool FileStream::OpenFromPath(const std::string& strPath, const std::string& strMethod)
+	bool FileStream::OpenFromPath(const String& strPath, const String& strMethod)
 	{
 		auto pRWops = SDL_RWFromFile(strPath.c_str(), strMethod.c_str());
 		if(pRWops)

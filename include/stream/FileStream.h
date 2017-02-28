@@ -1,6 +1,7 @@
 #if !defined(_EQFILESTREAM_H_)
 #define _EQFILESTREAM_H_
 
+#include "type/String.h"
 #include "IStream.h"
 #include <memory>
 
@@ -12,7 +13,7 @@ namespace Equisetum2
 	public:
 
 		// ファクトリー
-		static std::shared_ptr<FileStream> CreateFromPath(const std::string& strPath, const std::string& strMethod);
+		static std::shared_ptr<FileStream> CreateFromPath(const String& strPath, const String& strMethod);
 
 //		virtual bool CanRead() const;
 //		virtual bool CanSeek() const;
@@ -30,7 +31,7 @@ namespace Equisetum2
 
 		explicit FileStream();
 		virtual ~FileStream();
-		virtual bool OpenFromPath(const std::string& strPath, const std::string& strMethod);
+		virtual bool OpenFromPath(const String& strPath, const String& strMethod);
 
 	private:
 

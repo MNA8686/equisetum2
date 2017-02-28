@@ -4,7 +4,7 @@
 
 namespace Equisetum2
 {
-	void Window::SetTitle(const std::string& title)
+	void Window::SetTitle(const String& title)
 	{
 		Singleton<WindowCompat>::GetInstance()->SetTitle(title);
 	}
@@ -29,7 +29,7 @@ namespace Equisetum2
 		Singleton<WindowCompat>::GetInstance()->Centering();
 	}
 
-	const std::string Window::Title()
+	const String Window::Title()
 	{
 		return Singleton<WindowCompat>::GetInstance()->Title();
 	}

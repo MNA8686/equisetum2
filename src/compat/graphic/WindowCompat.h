@@ -16,13 +16,13 @@ namespace Equisetum2
 		void Prepare();
 		void Update();
 
-		void SetTitle(const std::string& title);
+		void SetTitle(const String& title);
 		void SetSize(int width, int height);
 		void SetStyle(WindowStyle style);
 		void SetPos(int x, int y);
 		void Centering();
 
-		const std::string Title();
+		const String Title();
 		Equisetum2::Size Size();
 		Point<int> Pos();
 		WindowStyle Style();

@@ -19,7 +19,7 @@ namespace Equisetum2
 		return m_FingerId;
 	}
 
-	const std::string TouchState::Name() const
+	const String TouchState::Name() const
 	{
 		return m_KeyState.name;
 	}

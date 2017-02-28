@@ -1,7 +1,7 @@
 #if !defined(_EQIKEYSTATE_H_)
 #define _EQIKEYSTATE_H_
 
-#include <string>
+#include "type/String.h"
 #include <cstdint>
 
 namespace Equisetum2
@@ -19,7 +19,7 @@ namespace Equisetum2
 	class IKeyState
 	{
 	public:
-		virtual const std::string Name() const = 0;
+		virtual const String Name() const = 0;
 		virtual bool IsDown() const = 0;
 		virtual bool IsUp() const = 0;
 		virtual bool IsPress() const = 0;

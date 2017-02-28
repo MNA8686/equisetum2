@@ -46,7 +46,7 @@ namespace Equisetum2
 		return m_Listener().pressedDuration;
 	}
 
-	const std::string Key::Name() const
+	const String Key::Name() const
 	{
 		return m_Listener().name;
 	}
@@ -83,9 +83,9 @@ namespace Equisetum2
 		m_vKey.push_back(key);
 	}
 
-	const std::string CombinationKey::Name() const
+	const String CombinationKey::Name() const
 	{
-		std::string name = "(";
+		String name = "(";
 		int i = 0;
 
 		for (auto& key : m_vKey)

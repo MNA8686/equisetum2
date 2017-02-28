@@ -16,7 +16,7 @@ namespace Equisetum2
 		void Prepare();
 		void Update();
 		const stKeyState& GetKeyState(KeyCode keyCode) const;
-		const std::string GetNameFromKeyCode(KeyCode keyCode) const;
+		const String GetNameFromKeyCode(KeyCode keyCode) const;
 
 	private:
 

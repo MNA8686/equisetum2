@@ -70,7 +70,7 @@ namespace Equisetum2
 		return m_Impl->NumHats(joyIndex);
 	}
 	
-	const std::string JoystickCompat::Name(int joyIndex) const
+	const String JoystickCompat::Name(int joyIndex) const
 	{
 		return m_Impl->Name(joyIndex);
 	}

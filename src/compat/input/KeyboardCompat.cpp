@@ -25,7 +25,7 @@ namespace Equisetum2
 		return m_Impl->GetKeyState(keyCode);
 	}
 
-	const std::string KeyboardCompat::GetNameFromKeyCode(KeyCode keyCode) const
+	const String KeyboardCompat::GetNameFromKeyCode(KeyCode keyCode) const
 	{
 		return m_Impl->GetNameFromKeyCode(keyCode);
 	}

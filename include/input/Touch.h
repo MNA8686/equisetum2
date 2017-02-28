@@ -20,7 +20,7 @@ namespace Equisetum2
 		const Point<float> Delta() const;
 		int64_t FingerId() const;
 
-		const std::string Name() const override;
+		const String Name() const override;
 		bool IsDown() const override;
 		bool IsUp() const override;
 		bool IsPress() const override;

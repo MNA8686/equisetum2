@@ -115,7 +115,7 @@ namespace Equisetum2
 		return Singleton<JoystickCompat>::GetInstance()->NumHats(m_Index);
 	}
 	
-	const std::string Joystick::Name() const
+	const String Joystick::Name() const
 	{
 		return Singleton<JoystickCompat>::GetInstance()->Name(m_Index);
 	}

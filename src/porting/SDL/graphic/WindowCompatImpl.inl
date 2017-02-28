@@ -38,7 +38,7 @@ namespace Equisetum2
 		{
 		}
 
-		void SetTitle(const std::string& title)
+		void SetTitle(const String& title)
 		{
 			SDL_SetWindowTitle(m_pWindow.get(), title.c_str());
 		}
@@ -70,7 +70,7 @@ namespace Equisetum2
 			SDL_SetWindowPosition(m_pWindow.get(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 
-		const std::string Title()
+		const String Title()
 		{
 			return SDL_GetWindowTitle(m_pWindow.get());
 		}
