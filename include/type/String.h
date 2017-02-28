@@ -35,6 +35,11 @@ namespace Equisetum2
 			return{ to_u32().substr(pos, len) };
 		}
 
+		String at_by_codepoints(size_t offset) const
+		{
+			return std::u32string{ to_u32().at(offset) };
+		}
+
 		void from_u32(const std::u32string& src)
 		{
 			// VC++のバグ対策でいろいろキャストしてる
@@ -86,7 +91,7 @@ namespace Equisetum2
 			va_copy(copy, argList);
 
 			auto return_value = vsnprintf(nullptr, 0, fmt, argList);
-			if (return_value > 0)
+			if (return_value >= 0)
 			{
 				std::vector<char> buf(return_value + 1);
 
