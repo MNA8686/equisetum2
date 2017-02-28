@@ -58,6 +58,15 @@
     <Filter Include="ヘッダー ファイル\type">
       <UniqueIdentifier>{6260c2cf-22ab-4635-9c7b-8b3d9461a7ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\graphic">
+      <UniqueIdentifier>{3b711cd6-f722-4abb-9695-126e68a51d9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\graphic">
+      <UniqueIdentifier>{c19ed7ba-2c57-4d38-970a-71495ff7dac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\compat&amp;porting\graphic">
+      <UniqueIdentifier>{a961bd8e-8460-40c5-93e0-214f67bff893}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -141,6 +150,12 @@
     <ClInclude Include="include\type\Point.h">
       <Filter>ヘッダー ファイル\type</Filter>
     </ClInclude>
+    <ClInclude Include="include\graphic\Window.h">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compat\graphic\WindowCompat.h">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -197,6 +212,12 @@
     <ClCompile Include="src\common\input\Touch.cpp">
       <Filter>ソース ファイル\common\input</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\graphic\Window.cpp">
+      <Filter>ソース ファイル\common\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compat\graphic\WindowCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -216,6 +237,9 @@
     </None>
     <None Include="src\porting\SDL\input\TouchCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
+    </None>
+    <None Include="src\porting\SDL\graphic\WindowCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
   </ItemGroup>
 </Project>

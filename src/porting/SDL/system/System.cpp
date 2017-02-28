@@ -1,6 +1,7 @@
 #include "system/System.h"
 #include "system/Singleton.h"
 #include "system/LoggerCompat.h"
+#include "graphic/WindowCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "input/Key.h"
 #include "input/KeyboardCompat.h"
@@ -26,6 +27,8 @@ namespace Equisetum2
 		SDL_Event e;
 		bool continueFlag = true;
 
+		// ウィンドウ更新準備
+		Singleton<WindowCompat>::GetInstance()->Prepare();
 		// キーボード更新準備
 		Singleton<KeyboardCompat>::GetInstance()->Prepare();
 		// マウス更新準備
@@ -46,6 +49,8 @@ namespace Equisetum2
 			}
 		}
 
+		// ウィンドウの状態を更新
+		Singleton<WindowCompat>::GetInstance()->Update();
 		// キーボードの状態を更新
 		Singleton<KeyboardCompat>::GetInstance()->Update();
 		// マウスの状態を更新
@@ -61,10 +66,6 @@ namespace Equisetum2
 
 using namespace Equisetum2;
 extern void Main();
-
-#define SDL_WINDOW_TITLE "SDL2"
-#define SDL_WINDOW_WIDTH (640)
-#define SDL_WINDOW_HEIGHT (360)
 
 int main(int argc, char *argv[])
 {
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
 	}
 
 	// シングルトンのインスタンス作成
+	Singleton<WindowCompat>::GetInstance();
 	Singleton<LoggerCompat>::GetInstance();
 	Singleton<SDLEventManager>::GetInstance();
 	Singleton<SystemTimerCompat>::GetInstance();
@@ -91,15 +93,10 @@ int main(int argc, char *argv[])
 	Singleton<TouchCompat>::GetInstance();
 	Singleton<JoystickCompat>::GetInstance();
 
-	SDL_Window *gWindow = SDL_CreateWindow(SDL_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOW_WIDTH,
-		SDL_WINDOW_HEIGHT, 0);
-
 	Main();
 
 	SingletonFinalizer::Finalize();
 
-	SDL_DestroyWindow(gWindow);
 	SDL_Quit();
 
 	return 0;

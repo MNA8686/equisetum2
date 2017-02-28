@@ -9,6 +9,7 @@
 #include "stream/IStream.h"
 #include "stream/FileStream.h"
 
+#include "graphic/Window.h"
 #include "input/Key.h"
 #include "input/Mouse.h"
 #include "input/Touch.h"

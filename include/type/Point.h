@@ -14,6 +14,12 @@ namespace Equisetum2
 		{
 		}
 
+		Point(T x_, T y_)
+		{
+			x = x_;
+			y = y_;
+		}
+
 		Point(const Point<T>& src)
 		{
 			x = src.x;
@@ -84,6 +90,8 @@ namespace Equisetum2
 	{
 		return op1.x != op2.x || op1.y != op2.y;
 	}
+
+	using Size = Point<int>;
 }
 
 #endif

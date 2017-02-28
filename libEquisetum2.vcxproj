@@ -113,6 +113,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Equisetum2.h" />
+    <ClInclude Include="include\graphic\Window.h" />
     <ClInclude Include="include\input\IKeyState.h" />
     <ClInclude Include="include\input\Joystick.h" />
     <ClInclude Include="include\input\Key.h" />
@@ -130,6 +131,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\timer\TickCounter.h" />
     <ClInclude Include="include\type\Point.h" />
     <ClInclude Include="src\common\system\Singleton.h" />
+    <ClInclude Include="src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="src\compat\input\JoystickCompat.h" />
     <ClInclude Include="src\compat\input\KeyboardCompat.h" />
     <ClInclude Include="src\compat\input\MouseCompat.h" />
@@ -140,6 +142,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="src\porting\SDL\system\SDLEvent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\graphic\Window.cpp" />
     <ClCompile Include="src\common\input\Joystick.cpp" />
     <ClCompile Include="src\common\input\Key.cpp" />
     <ClCompile Include="src\common\input\Mouse.cpp" />
@@ -149,6 +152,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClCompile Include="src\common\timer\FpsPaceMaker.cpp" />
     <ClCompile Include="src\common\timer\SystemTimer.cpp" />
     <ClCompile Include="src\common\timer\TickCounter.cpp" />
+    <ClCompile Include="src\compat\graphic\WindowCompat.cpp" />
     <ClCompile Include="src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="src\compat\input\KeyboardCompat.cpp" />
     <ClCompile Include="src\compat\input\MouseCompat.cpp" />
@@ -161,6 +165,10 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\compat\system\LoggerCompat.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="src\porting\SDL\graphic\WindowCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
