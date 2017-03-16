@@ -1,5 +1,5 @@
 #include "stream/FileStream.h"
-#include "SDLBinderRWops.h"
+#include "stream/SDLBinderRWops.h"
 
 namespace Equisetum2
 {
