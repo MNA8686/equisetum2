@@ -7,23 +7,38 @@
 
 namespace Equisetum2
 {
-//	class StreamImpl;
 	class FileStream : public IStream
 	{
 	public:
 
-		// ファクトリー
-		static std::shared_ptr<FileStream> CreateFromPath(const String& strPath, const String& strMethod);
+		class Method
+		{
+		public:
+			static const int Read = (1 << 0);
+			static const int Write = (1 << 1);
+			static const int Append = (1 << 2);
+			static const int Create = (1 << 3);
 
-//		virtual bool CanRead() const;
-//		virtual bool CanSeek() const;
-//		virtual bool CanWrite() const;
+			// Read : "rb"
+			// Write : "wb"
+			// Append : "ab"
+			// Append | Read : "ab+"
+			// Read | Write : "rb+"
+			// Read | Write | Create : "wb+"
+		};
+
+		// ファクトリー
+		static std::shared_ptr<FileStream> CreateFromPath(const String& strPath, int openMethod = Method::Read);
+
+		virtual bool CanRead() const override;
+		virtual bool CanSeek() const override;
+		virtual bool CanWrite() const override;
 		virtual int64_t Position() const override;
 		virtual int64_t Length() const override;
-//		virtual void CopyTo(IStream& stream) override;
+		virtual bool CopyTo(std::shared_ptr<IStream> stream) override;
 		virtual int64_t Seek(int64_t offset, SeekOrigin origin) override;
-		virtual size_t Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
-		virtual size_t Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
+		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
+		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
 
@@ -31,15 +46,16 @@ namespace Equisetum2
 
 		explicit FileStream();
 		virtual ~FileStream();
-		virtual bool OpenFromPath(const String& strPath, const String& strMethod);
+		virtual bool OpenFromPath(const String& strPath, int openMethod);
 
 	private:
 
 		class StreamImpl;
 		std::shared_ptr<StreamImpl> m_pImpl;
+		int m_method = 0;
 
-		FileStream(const FileStream&);				// コピーコンストラクタ封じ
-		FileStream& operator= (const FileStream&);	// コピーコンストラクタ封じ
+		FileStream(const FileStream&) {}				// コピーコンストラクタ封じ
+		FileStream& operator= (const FileStream&) {}	// コピーコンストラクタ封じ
 	};
 }
 

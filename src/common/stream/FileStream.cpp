@@ -1,15 +1,41 @@
 #include "stream/FileStream.h"
-#include "stream/SDLBinderRWops.h"
+
+#include "stream/FileStream.inl"
 
 namespace Equisetum2
 {
-	class FileStream::StreamImpl : public SDLBinderRWops
+	// どこに置こう
+	static bool CopyTo(IStream* pSrc, IStream* pDst)
 	{
-	public:
-		StreamImpl(SDL_RWops* pRWops) : SDLBinderRWops(pRWops){}
-	};
+		auto result = false;
 
-	std::shared_ptr<FileStream> FileStream::CreateFromPath(const String& strPath, const String& strMethod)
+		if (pSrc &&
+			pDst &&
+			pSrc->CanRead() &&
+			pDst->CanWrite())
+		{
+			std::vector<uint8_t> buf(40960);
+
+			while (auto readSize = pSrc->Read(buf, 0, buf.size()))
+			{
+				if (*readSize == 0)
+				{
+					result = true;
+					break;
+				}
+
+				auto writeSize = pDst->Write(buf, 0, *readSize);
+				if (!writeSize || *writeSize < *readSize)
+				{
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	std::shared_ptr<FileStream> FileStream::CreateFromPath(const String& strPath, int openMethod)
 	{
 		class EqFileStreamDummy : public FileStream
 		{
@@ -18,10 +44,9 @@ namespace Equisetum2
 		};
 
 		std::shared_ptr<FileStream> inst;
-		auto inst_ = std::make_shared<EqFileStreamDummy>();
-		if (inst_)
+		if (auto inst_ = std::make_shared<EqFileStreamDummy>())
 		{
-			if (inst_->OpenFromPath(strPath, strMethod))
+			if (inst_->OpenFromPath(strPath, openMethod))
 			{
 				inst = inst_;
 			}
@@ -37,33 +62,29 @@ namespace Equisetum2
 	{
 	}
 
-	bool FileStream::OpenFromPath(const String& strPath, const String& strMethod)
+	bool FileStream::OpenFromPath(const String& strPath, int openMethod)
 	{
-		auto pRWops = SDL_RWFromFile(strPath.c_str(), strMethod.c_str());
-		if(pRWops)
-		{
-			m_pImpl = std::make_shared<StreamImpl>(pRWops);
-		}
-
+		m_method = openMethod;	// オープンの設定を保持
+		m_pImpl = StreamImpl::OpenFromPath(strPath, openMethod);
 		return m_pImpl != nullptr;
 	}
 
-#if 0
 	bool FileStream::CanRead() const
 	{
-		return true;
+		return !!(m_method & Method::Read);
 	}
 
 	bool FileStream::CanSeek() const
 	{
+		// 固定
 		return true;
 	}
 
 	bool FileStream::CanWrite() const
 	{
-		return true;	// とは限らない
+		// Writeでオープンできたってことは書き込みできるのであろう
+		return !!(m_method & Method::Write);
 	}
-#endif
 
 	int64_t FileStream::Position() const
 	{
@@ -75,26 +96,38 @@ namespace Equisetum2
 		return m_pImpl->Length();
 	}
 
-#if 0
-	void FileStream::CopyTo(IStream& stream)
+	bool FileStream::CopyTo(std::shared_ptr<IStream> stream)
 	{
-
+		return Equisetum2::CopyTo(this, stream ? stream.get() : nullptr);
 	}
-#endif
 
 	int64_t FileStream::Seek(int64_t offset, SeekOrigin origin)
 	{
 		return m_pImpl->Seek(offset, origin);
 	}
 
-	size_t FileStream::Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
+	const Optional<size_t> FileStream::Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
 	{
-		return m_pImpl->Read(&vByteArray[begin], size);
+		Optional<size_t> optSize;
+
+		if (begin + size <= vByteArray.size())
+		{
+			optSize = m_pImpl->Read(&vByteArray[begin], size);
+		}
+
+		return optSize;
 	}
 
-	size_t FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
+	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
 	{
-		return m_pImpl->Write(&vByteArray[begin], size);
+		Optional<size_t> optSize;
+
+		if (begin + size <= vByteArray.size())
+		{
+			optSize = m_pImpl->Write(&vByteArray[begin], size);
+		}
+
+		return optSize;
 	}
 
 	int FileStream::ReadByte()

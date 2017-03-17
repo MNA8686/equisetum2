@@ -117,9 +117,6 @@
     <ClInclude Include="include\timer\SystemTimer.h">
       <Filter>ヘッダー ファイル\timer</Filter>
     </ClInclude>
-    <ClInclude Include="src\porting\SDL\stream\SDLBinderRWops.h">
-      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
-    </ClInclude>
     <ClInclude Include="src\common\system\Singleton.h">
       <Filter>ソース ファイル\common\system</Filter>
     </ClInclude>
@@ -246,6 +243,12 @@
     </None>
     <None Include="src\porting\SDL\graphic\WindowCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </None>
+    <None Include="src\porting\SDL\stream\FileStream.inl">
+      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
+    </None>
+    <None Include="src\porting\SDL\stream\SDLBinderRWops.inl">
+      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </None>
   </ItemGroup>
 </Project>
