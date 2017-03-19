@@ -118,6 +118,11 @@ namespace Equisetum2
 		return optSize;
 	}
 
+	const Optional<size_t> FileStream::Read(std::vector<uint8_t>& vByteArray, size_t size)
+	{
+		return Read(vByteArray, 0, size);
+	}
+
 	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
 	{
 		Optional<size_t> optSize;
@@ -128,6 +133,16 @@ namespace Equisetum2
 		}
 
 		return optSize;
+	}
+
+	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t size)
+	{
+		return Write(vByteArray, 0, size);
+	}
+
+	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray)
+	{
+		return Write(vByteArray, 0, vByteArray.size());
 	}
 
 	int FileStream::ReadByte()

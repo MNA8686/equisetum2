@@ -27,7 +27,10 @@ namespace Equisetum2
 		virtual bool CopyTo(std::shared_ptr<IStream> stream) = 0;
 		virtual int64_t Seek(int64_t offset, SeekOrigin origin) = 0;
 		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size) = 0;
+		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t size) = 0;
 		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size) = 0;
+		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t size) = 0;
+		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray) = 0;
 		virtual int ReadByte() = 0;
 		virtual int WriteByte(uint8_t writeData) = 0;
 	};
