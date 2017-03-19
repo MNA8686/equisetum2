@@ -123,6 +123,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\stream\FileStream.h" />
     <ClInclude Include="include\stream\IStream.h" />
     <ClInclude Include="include\stream\TextReader.h" />
+    <ClInclude Include="include\stream\TextWriter.h" />
     <ClInclude Include="include\system\Logger.h" />
     <ClInclude Include="include\system\System.h" />
     <ClInclude Include="include\timer\SystemTimer.h" />
@@ -151,6 +152,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClCompile Include="src\common\input\Touch.cpp" />
     <ClCompile Include="src\common\stream\FileStream.cpp" />
     <ClCompile Include="src\common\stream\TextReader.cpp" />
+    <ClCompile Include="src\common\stream\TextWriter.cpp" />
     <ClCompile Include="src\common\system\Singleton.cpp" />
     <ClCompile Include="src\common\timer\FpsCounter.cpp" />
     <ClCompile Include="src\common\timer\FpsPaceMaker.cpp" />

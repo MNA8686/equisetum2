@@ -162,6 +162,9 @@
     <ClInclude Include="include\stream\TextReader.h">
       <Filter>ヘッダー ファイル\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\stream\TextWriter.h">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -225,6 +228,9 @@
       <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
     <ClCompile Include="src\common\stream\TextReader.cpp">
+      <Filter>ソース ファイル\common\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\stream\TextWriter.cpp">
       <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
   </ItemGroup>
