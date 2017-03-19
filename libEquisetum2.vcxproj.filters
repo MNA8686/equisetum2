@@ -165,6 +165,9 @@
     <ClInclude Include="include\stream\TextWriter.h">
       <Filter>ヘッダー ファイル\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\stream\MemoryStream.h">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -233,6 +236,9 @@
     <ClCompile Include="src\common\stream\TextWriter.cpp">
       <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\stream\MemoryStream.cpp">
+      <Filter>ソース ファイル\common\stream</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -260,6 +266,9 @@
       <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </None>
     <None Include="src\porting\SDL\stream\SDLBinderRWops.inl">
+      <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
+    </None>
+    <None Include="src\porting\SDL\stream\MemoryStream.inl">
       <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
     </None>
   </ItemGroup>

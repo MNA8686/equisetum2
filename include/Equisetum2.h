@@ -8,6 +8,7 @@
 
 #include "stream/IStream.h"
 #include "stream/FileStream.h"
+#include "stream/MemoryStream.h"
 #include "stream/TextReader.h"
 #include "stream/TextWriter.h"
 

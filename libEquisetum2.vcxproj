@@ -122,6 +122,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\input\Touch.h" />
     <ClInclude Include="include\stream\FileStream.h" />
     <ClInclude Include="include\stream\IStream.h" />
+    <ClInclude Include="include\stream\MemoryStream.h" />
     <ClInclude Include="include\stream\TextReader.h" />
     <ClInclude Include="include\stream\TextWriter.h" />
     <ClInclude Include="include\system\Logger.h" />
@@ -151,6 +152,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClCompile Include="src\common\input\Mouse.cpp" />
     <ClCompile Include="src\common\input\Touch.cpp" />
     <ClCompile Include="src\common\stream\FileStream.cpp" />
+    <ClCompile Include="src\common\stream\MemoryStream.cpp" />
     <ClCompile Include="src\common\stream\TextReader.cpp" />
     <ClCompile Include="src\common\stream\TextWriter.cpp" />
     <ClCompile Include="src\common\system\Singleton.cpp" />
@@ -194,6 +196,10 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="src\porting\SDL\stream\FileStream.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="src\porting\SDL\stream\MemoryStream.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
