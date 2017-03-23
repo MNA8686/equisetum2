@@ -14,7 +14,7 @@ namespace Equisetum2
 		Exception(const String& msg, const String& file, int line, const String& function) :
 			m_msg(msg), m_file(file), m_line(line), m_function(function)
 		{
-			m_what.format("%s (%d): %s() %s", m_file.c_str(), m_line, m_function.c_str(), m_msg.c_str());
+			m_what.format("%s (%d): In function '%s()': %s", m_file.c_str(), m_line, m_function.c_str(), m_msg.c_str());
 		}
 
 		const char* what() const noexcept override
