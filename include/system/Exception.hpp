@@ -38,8 +38,8 @@ namespace Equisetum2
 	};
 }
 
-#define EQ_DURING { Exception _e_; do{
-#define EQ_HANDLER }while(0); __ERROR__: if(_e_){
+#define EQ_DURING { Exception _e_; {
+#define EQ_HANDLER } __ERROR__: if(_e_){
 #define EQ_END_HANDLER }}
 #define EQ_THROW(msg) do{ _e_ = Exception((msg), __FILE__, __LINE__, __FUNCTION__); goto __ERROR__;}while(0)
 #define EQ_GET_HANDLER() (_e_)
