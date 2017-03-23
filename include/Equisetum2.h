@@ -3,6 +3,7 @@
 
 #include "type/Optional.h"
 
+#include "system/Exception.hpp"
 #include "system/System.h"
 #include "system/Logger.h"
 

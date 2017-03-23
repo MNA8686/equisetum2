@@ -168,6 +168,9 @@
     <ClInclude Include="include\stream\MemoryStream.h">
       <Filter>ヘッダー ファイル\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\system\Exception.hpp">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">

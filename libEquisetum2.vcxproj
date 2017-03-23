@@ -125,6 +125,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\stream\MemoryStream.h" />
     <ClInclude Include="include\stream\TextReader.h" />
     <ClInclude Include="include\stream\TextWriter.h" />
+    <ClInclude Include="include\system\Exception.hpp" />
     <ClInclude Include="include\system\Logger.h" />
     <ClInclude Include="include\system\System.h" />
     <ClInclude Include="include\timer\SystemTimer.h" />
