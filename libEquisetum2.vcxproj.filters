@@ -176,9 +176,6 @@
     <ClCompile Include="src\porting\SDL\system\System.cpp">
       <Filter>ソース ファイル\common\system</Filter>
     </ClCompile>
-    <ClCompile Include="src\porting\SDL\system\Logger.cpp">
-      <Filter>ソース ファイル\common\system</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\timer\TickCounter.cpp">
       <Filter>ソース ファイル\common\timer</Filter>
     </ClCompile>
@@ -242,6 +239,9 @@
     <ClCompile Include="src\common\stream\MemoryStream.cpp">
       <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\system\Logger.cpp">
+      <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -252,9 +252,6 @@
     </None>
     <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
-    </None>
-    <None Include="src\compat\system\LoggerCompat.inl">
-      <Filter>ソース ファイル\compat&amp;porting\system</Filter>
     </None>
     <None Include="src\porting\SDL\input\MouseCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\input</Filter>
@@ -273,6 +270,9 @@
     </None>
     <None Include="src\porting\SDL\stream\MemoryStream.inl">
       <Filter>ソース ファイル\compat&amp;porting\stream</Filter>
+    </None>
+    <None Include="src\porting\SDL\system\LoggerCompat.inl">
+      <Filter>ソース ファイル\compat&amp;porting\system</Filter>
     </None>
   </ItemGroup>
 </Project>
