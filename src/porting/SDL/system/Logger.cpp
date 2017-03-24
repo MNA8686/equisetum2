@@ -1,11 +1,19 @@
-#include "system/Logger.h"
+﻿#include "system/Logger.h"
 #include "system/Singleton.h"
 #include "system/LoggerCompat.h"
+#include "type/String.h"
 
 #include <stdarg.h>
 
 namespace Equisetum2
 {
+	static Logger::cb_t cb;
+
+	void Logger::SetCallback(const Logger::cb_t& cb_)
+	{
+		cb = cb_;
+	}
+
 	void Logger::SetPriority(LogLevel level)
 	{
 		Singleton<LoggerCompat>::GetInstance()->SetPriority(level);
@@ -22,7 +30,27 @@ namespace Equisetum2
 
 	void Logger::OutputV(LogLevel level, const char* format, va_list arg)
 	{
-		Singleton<LoggerCompat>::GetInstance()->OutputV(level, format, arg);
+		// 万一コールバックからLoggerが呼び出されても永久ループにならないようにする
+		static bool entry = false;
+		bool out = true;
+
+		if (!entry)
+		{
+			entry = true;
+
+			if (cb && cb(String().formatV(format, arg).c_str()))
+			{
+				// コールバックがtrueを返したらLoggerはログを出力しない
+				out = false;
+			}
+
+			entry = false;
+		}
+
+		if (out)
+		{
+			Singleton<LoggerCompat>::GetInstance()->OutputV(level, format, arg);
+		}
 	}
 
 	void Logger::OutputVerbose(const char* format, ...)
