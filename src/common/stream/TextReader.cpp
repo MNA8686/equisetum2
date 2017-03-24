@@ -1,28 +1,54 @@
-#include "stream/TextReader.h"
+ï»¿#include "stream/TextReader.h"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
 
 namespace Equisetum2
 {
 	std::shared_ptr<TextReader> TextReader::CreateFromStream(std::shared_ptr<IStream> stream)
 	{
-		class TextReaderDummy : public TextReader
-		{
-			// ‚±‚Ìƒtƒ@ƒNƒgƒŠ[ˆÈŠO‚ÅƒCƒ“ƒXƒ^ƒ“ƒX‚ğì‚ç‚¹‚È‚¢‚æ‚¤‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÆƒfƒXƒgƒ‰ƒNƒ^‚ğ
-			// protectedéŒ¾‚µ‚Ä‚¢‚é‚ªA‚»‚Ì‚Ü‚Ü‚¾‚Æmake_shared‚ÅƒGƒ‰[‚É‚È‚é‚Ì‚Åˆê’Uƒ_ƒ~[ƒNƒ‰ƒX‚ğ‹²‚Ş
-
-		public:
-			explicit TextReaderDummy(std::shared_ptr<IStream>& stream) : TextReader(stream) {};
-		};
-
 		std::shared_ptr<TextReader> inst;
-		if (stream &&
-			stream->CanRead() &&
-			stream->CanSeek())
+
+		EQ_DURING
 		{
-			if (auto inst_ = std::make_shared<TextReaderDummy>(stream))
+			if (!stream)
 			{
-				inst = inst_;
+				EQ_THROW(u8"æœ‰åŠ¹ãªã‚¹ãƒˆãƒªãƒ¼ãƒ ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚");
 			}
+
+			if (!stream->CanRead())
+			{
+				EQ_THROW(u8"ãƒªãƒ¼ãƒ‰å±æ€§ãŒå¿…è¦ã§ã™ã€‚");
+			}
+
+			if (!stream->CanSeek())
+			{
+				EQ_THROW(u8"ã‚·ãƒ¼ã‚¯å±æ€§ãŒå¿…è¦ã§ã™ã€‚");
+			}
+
+			class TextReaderDummy : public TextReader
+			{
+				// ã“ã®ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ä»¥å¤–ã§ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œã‚‰ã›ãªã„ã‚ˆã†ã«ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¨ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’
+				// protectedå®£è¨€ã—ã¦ã„ã‚‹ãŒã€ãã®ã¾ã¾ã ã¨make_sharedã§ã‚¨ãƒ©ãƒ¼ã«ãªã‚‹ã®ã§ä¸€æ—¦ãƒ€ãƒŸãƒ¼ã‚¯ãƒ©ã‚¹ã‚’æŒŸã‚€
+
+			public:
+				explicit TextReaderDummy(std::shared_ptr<IStream>& stream) : TextReader(stream) {};
+			};
+
+			auto inst_ = std::make_shared<TextReaderDummy>(stream);
+
+			if (!inst_)
+			{
+				EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
+			}
+
+			inst = inst_;
 		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
 		return inst;
 	}
 
@@ -48,19 +74,20 @@ namespace Equisetum2
 				break;
 			}
 
-			// 2ƒoƒCƒg–ÚˆÈ~‚É—ˆ‚é‚Í‚¸‚Ì•¶š‚ª—ˆ‚Ä‚½‚çˆ—I—¹
+			// 2ãƒã‚¤ãƒˆç›®ä»¥é™ã«æ¥ã‚‹ã¯ãšã®æ–‡å­—ãŒæ¥ã¦ãŸã‚‰å‡¦ç†çµ‚äº†
 			if (readByte >= 0x80 && readByte <= 0xBF)
 			{
+				Logger::OutputError(u8"ä¸æ­£ãªUTF-8ã§ã™ã€‚");
 				break;
 			}
 
-			// 1ƒoƒCƒg–Ú‚ÍŠm’è
+			// 1ãƒã‚¤ãƒˆç›®ã¯ç¢ºå®š
 			code += (uint8_t)readByte;
 
 			// ASCII?
 			if (readByte <= 0x7F)
 			{
-				// ‰üsƒR[ƒh‚ğˆ—
+				// æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡¦ç†
 				if (code == "\r" ||
 					code == "\n")
 				{
@@ -70,7 +97,7 @@ namespace Equisetum2
 						if (readByte >= 0 &&
 							readByte != '\n')
 						{
-							// “Ç‚İ–ß‚·
+							// èª­ã¿æˆ»ã™
 							m_stream->Seek(-1, SeekOrigin::Current);
 						}
 					}
@@ -82,7 +109,7 @@ namespace Equisetum2
 				break;
 			}
 
-			// ‰½ƒoƒCƒg‚Å\¬‚³‚ê‚Ä‚¢‚é‚©‚ğZo
+			// ä½•ãƒã‚¤ãƒˆã§æ§‹æˆã•ã‚Œã¦ã„ã‚‹ã‹ã‚’ç®—å‡º
 			auto byte = (uint8_t)readByte;
 			int count = 0;
 			while (byte & 0x80)
@@ -91,7 +118,7 @@ namespace Equisetum2
 				count++;
 			}
 
-			// •K—v‚ÈƒoƒCƒg”‚ğæ‚èo‚·
+			// å¿…è¦ãªãƒã‚¤ãƒˆæ•°ã‚’å–ã‚Šå‡ºã™
 			for (int i = 0; i < count-1; i++)
 			{
 				readByte = m_stream->ReadByte();
@@ -103,17 +130,18 @@ namespace Equisetum2
 
 			if (code.size() != count)
 			{
+				Logger::OutputError(u8"ä¸æ­£ãªUTF-8ã§ã™ã€‚");
 				break;
 			}
 
-			// BOMƒ`ƒFƒbƒN
+			// BOMãƒã‚§ãƒƒã‚¯
 			if (code.size() == 3)
 			{
 				const char bom[] = { '\xEF', '\xBB', '\xBF', '\0' };
 
 				if (code == bom)
 				{
-					// ‚Ç‚¤‚â‚çBOM‚¾‚Á‚½‚æ‚¤‚È‚Ì‚Å–³‹‚µ‚ÄŸ‚Ì•¶š‚ğæ“¾‚·‚é
+					// ã©ã†ã‚„ã‚‰BOMã ã£ãŸã‚ˆã†ãªã®ã§ç„¡è¦–ã—ã¦æ¬¡ã®æ–‡å­—ã‚’å–å¾—ã™ã‚‹
 					code.clear();
 					continue;
 				}

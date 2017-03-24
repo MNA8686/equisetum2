@@ -1,27 +1,46 @@
-#include "stream/TextWriter.h"
+ï»¿#include "stream/TextWriter.h"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
 
 namespace Equisetum2
 {
 	std::shared_ptr<TextWriter> TextWriter::CreateFromStream(std::shared_ptr<IStream> stream)
 	{
-		class TextWriterDummy : public TextWriter
-		{
-			// ‚±‚Ìƒtƒ@ƒNƒgƒŠ[ˆÈŠO‚ÅƒCƒ“ƒXƒ^ƒ“ƒX‚ğì‚ç‚¹‚È‚¢‚æ‚¤‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÆƒfƒXƒgƒ‰ƒNƒ^‚ğ
-			// protectedéŒ¾‚µ‚Ä‚¢‚é‚ªA‚»‚Ì‚Ü‚Ü‚¾‚Æmake_shared‚ÅƒGƒ‰[‚É‚È‚é‚Ì‚Åˆê’Uƒ_ƒ~[ƒNƒ‰ƒX‚ğ‹²‚Ş
-
-		public:
-			explicit TextWriterDummy(std::shared_ptr<IStream>& stream) : TextWriter(stream) {};
-		};
-
 		std::shared_ptr<TextWriter> inst;
-		if (stream &&
-			stream->CanWrite())
+
+		EQ_DURING
 		{
-			if (auto inst_ = std::make_shared<TextWriterDummy>(stream))
+			if (!stream)
 			{
-				inst = inst_;
+				EQ_THROW(u8"æœ‰åŠ¹ãªã‚¹ãƒˆãƒªãƒ¼ãƒ ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚");
 			}
+
+			if (!stream->CanWrite())
+			{
+				EQ_THROW(u8"ãƒ©ã‚¤ãƒˆå±æ€§ãŒå¿…è¦ã§ã™ã€‚");
+			}
+
+			class TextWriterDummy : public TextWriter
+			{
+			public:
+				explicit TextWriterDummy(std::shared_ptr<IStream>& stream) : TextWriter(stream) {};
+			};
+
+			auto inst_ = std::make_shared<TextWriterDummy>(stream);
+
+			if (!inst_)
+			{
+				EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
+			}
+
+			inst = inst_;
 		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+			
 		return inst;
 	}
 
@@ -39,7 +58,7 @@ namespace Equisetum2
 		std::vector<uint8_t> out;
 		bool ret = false;
 
-		// ‰üsƒR[ƒh‚ğˆ—
+		// æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡¦ç†
 		if (code == "\r\n" ||
 			code == "\r" ||
 			code == "\n")
@@ -53,6 +72,10 @@ namespace Equisetum2
 			{
 				out.push_back((uint8_t)c);
 			}
+		}
+		else
+		{
+			Logger::OutputError(u8"å…¥åŠ›å¯èƒ½ãªã®ã¯1ã‚³ãƒ¼ãƒ‰ãƒã‚¤ãƒ³ãƒˆã ã‘ã§ã™ã€‚");
 		}
 
 		if (out.size() > 0)

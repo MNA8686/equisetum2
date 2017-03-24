@@ -1,10 +1,12 @@
-#include "stream/MemoryStream.h"
+﻿#include "stream/MemoryStream.h"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
 
 #include "stream/MemoryStream.inl"
 
 namespace Equisetum2
 {
-	// �ǂ��ɒu����
+	// どこに置こう
 	static bool CopyTo(IStream* pSrc, IStream* pDst)
 	{
 		auto result = false;
@@ -37,19 +39,33 @@ namespace Equisetum2
 
 	std::shared_ptr<MemoryStream> MemoryStream::Create(std::shared_ptr<StreamImpl>& impl)
 	{
-		class EqMemoryStreamDummy : public MemoryStream
-		{
-		};
-
 		std::shared_ptr<MemoryStream> inst;
-		if (auto inst_ = std::make_shared<EqMemoryStreamDummy>())
+
+		EQ_DURING
 		{
-			if (impl)
+			if (!impl)
 			{
-				inst_->m_pImpl = impl;
-				inst = inst_;
+				EQ_THROW(u8"バッファの作成に失敗しました。");
 			}
+		
+			class EqMemoryStreamDummy : public MemoryStream {};
+
+			auto inst_ = std::make_shared<EqMemoryStreamDummy>();
+
+			if (!inst_)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			inst_->m_pImpl = impl;
+			inst = inst_;
 		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
 		return inst;
 	}
 
@@ -78,13 +94,13 @@ namespace Equisetum2
 
 	bool MemoryStream::CanRead() const
 	{
-		// �Œ�
+		// 固定
 		return true;
 	}
 
 	bool MemoryStream::CanSeek() const
 	{
-		// �Œ�
+		// 固定
 		return true;
 	}
 

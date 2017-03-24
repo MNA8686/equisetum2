@@ -1,19 +1,38 @@
-#include "stream/FileStream.h"
+ï»¿#include "stream/FileStream.h"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
 
 #include "stream/FileStream.inl"
 
 namespace Equisetum2
 {
-	// ‚Ç‚±‚É’u‚±‚¤
+	// ã©ã“ã«ç½®ã“ã†
 	static bool CopyTo(IStream* pSrc, IStream* pDst)
 	{
 		auto result = false;
 
-		if (pSrc &&
-			pDst &&
-			pSrc->CanRead() &&
-			pDst->CanWrite())
+		EQ_DURING
 		{
+			if (!pSrc)
+			{
+				EQ_THROW(u8"èª­ã¿å‡ºã—å…ƒãŒæœ‰åŠ¹ãªã‚¹ãƒˆãƒªãƒ¼ãƒ ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚");
+			}
+
+			if (!pSrc->CanRead())
+			{
+				EQ_THROW(u8"èª­ã¿å‡ºã—å…ƒã«ãƒªãƒ¼ãƒ‰å±æ€§ãŒå¿…è¦ã§ã™ã€‚");
+			}
+
+			if (!pDst)
+			{
+				EQ_THROW(u8"æ›¸ãè¾¼ã¿å…ˆãŒæœ‰åŠ¹ãªã‚¹ãƒˆãƒªãƒ¼ãƒ ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚");
+			}
+
+			if (!pDst->CanWrite())
+			{
+				EQ_THROW(u8"æ›¸ãè¾¼ã¿å…ˆã«ãƒ©ã‚¤ãƒˆå±æ€§ãŒå¿…è¦ã§ã™ã€‚");
+			}
+
 			std::vector<uint8_t> buf(40960);
 
 			while (auto readSize = pSrc->Read(buf, 0, buf.size()))
@@ -27,30 +46,52 @@ namespace Equisetum2
 				auto writeSize = pDst->Write(buf, 0, *readSize);
 				if (!writeSize || *writeSize < *readSize)
 				{
+					EQ_THROW(u8"æ›¸ãè¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 					break;
 				}
 			}
 		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
 
 		return result;
 	}
 
 	std::shared_ptr<FileStream> FileStream::CreateFromPath(const String& strPath, int openMethod)
 	{
-		class EqFileStreamDummy : public FileStream
-		{
-			// ‚±‚Ìƒtƒ@ƒNƒgƒŠ[ˆÈŠO‚ÅƒCƒ“ƒXƒ^ƒ“ƒX‚ğì‚ç‚¹‚È‚¢‚æ‚¤‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÆƒfƒXƒgƒ‰ƒNƒ^‚ğ
-			// protectedéŒ¾‚µ‚Ä‚¢‚é‚ªA‚»‚Ì‚Ü‚Ü‚¾‚Æmake_shared‚ÅƒGƒ‰[‚É‚È‚é‚Ì‚Åˆê’Uƒ_ƒ~[ƒNƒ‰ƒX‚ğ‹²‚Ş
-		};
-
 		std::shared_ptr<FileStream> inst;
-		if (auto inst_ = std::make_shared<EqFileStreamDummy>())
+
+		EQ_DURING
 		{
-			if (inst_->OpenFromPath(strPath, openMethod))
+			if (strPath.size() == 0)
 			{
-				inst = inst_;
+				EQ_THROW(u8"ãƒ•ã‚¡ã‚¤ãƒ«åãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
 			}
+
+			class EqFileStreamDummy : public FileStream	{};
+			auto inst_ = std::make_shared<EqFileStreamDummy>();
+
+			if (!inst_)
+			{
+				EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
+			}
+
+			if (!inst_->OpenFromPath(strPath, openMethod))
+			{
+				EQ_THROW(String::Sprintf(u8"ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ªãƒ¼ãƒ—ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ name=%s, method=%d", strPath.c_str(), openMethod));
+			}
+
+			inst = inst_;
 		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
 		return inst;
 	}
 
@@ -64,7 +105,7 @@ namespace Equisetum2
 
 	bool FileStream::OpenFromPath(const String& strPath, int openMethod)
 	{
-		m_method = openMethod;	// ƒI[ƒvƒ“‚Ìİ’è‚ğ•Û
+		m_method = openMethod;	// ã‚ªãƒ¼ãƒ—ãƒ³ã®è¨­å®šã‚’ä¿æŒ
 		m_pImpl = StreamImpl::OpenFromPath(strPath, openMethod);
 		return m_pImpl != nullptr;
 	}
@@ -76,13 +117,13 @@ namespace Equisetum2
 
 	bool FileStream::CanSeek() const
 	{
-		// ŒÅ’è
+		// å›ºå®š
 		return true;
 	}
 
 	bool FileStream::CanWrite() const
 	{
-		// Write‚ÅƒI[ƒvƒ“‚Å‚«‚½‚Á‚Ä‚±‚Æ‚Í‘‚«‚İ‚Å‚«‚é‚Ì‚Å‚ ‚ë‚¤
+		// Writeã§ã‚ªãƒ¼ãƒ—ãƒ³ã§ããŸã£ã¦ã“ã¨ã¯æ›¸ãè¾¼ã¿ã§ãã‚‹ã®ã§ã‚ã‚ã†
 		return !!(m_method & Method::Write);
 	}
 
