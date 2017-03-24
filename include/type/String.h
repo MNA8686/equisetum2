@@ -1,4 +1,10 @@
-﻿#if !defined(_EQSTRING_H_)
+﻿/**
+* @file String.h
+* @brief UTF-8を使うのに特化したstd::string
+* @author MNA
+* @date 2017/02/28 新規作成
+*/
+#if !defined(_EQSTRING_H_)
 #define _EQSTRING_H_
 
 #include <stdarg.h> 
@@ -10,45 +16,100 @@
 
 namespace Equisetum2
 {
-	// UTF8を扱うための文字列クラス
-
+	/**
+	* UTF-8を使うのに特化したstd::string
+	*/
 	class String : public std::string
 	{
 	public:
 
+		/**
+		* @brief 空の文字列を作成
+		*/
 		String() {}
+
+		/**
+		* @brief C文字列を元にUTF-8文字列を作成
+		* @param str C文字列
+		*/
 		String(const char* str) : std::string(str) {}
+
+		/**
+		* @brief std::stringを元にUTF-8文字列を作成
+		* @param str std::string
+		*/
 		String(const std::string& str) : std::string(str) {}
+
+		/**
+		* @brief std::u16stringを元にUTF-8文字列を作成
+		* @param str std::u16string
+		*/
 		String(const std::u16string& str) { from_u16(str); }
+
+		/**
+		* @brief std::u32stringを元にUTF-8文字列を作成
+		* @param str std::u32string
+		*/
 		String(const std::u32string& str) { from_u32(str); }
+
+		/**
+		* @brief std::Stringを元にUTF-8文字列を作成
+		* @param str std::String
+		*/
 		String(const String& str) : std::string(str) {}
 
-		// コードポイント単位のサイズを返す
-		// u8"ハム太郎" size() => 12, size_by_codepoints() => 4
+		/**
+		* @brief コードポイント単位のサイズを返す
+		* @return コードポイント数
+		*
+		* @detail 例: u8"ハム太郎" size() => 12, size_by_codepoints() => 4
+		*/
 		size_type size_by_codepoints() const noexcept
 		{
 			return to_u32().size();
 		}
 
+		/**
+		* @brief コードポイント単位でsubstrを行う
+		* @param pos 取り出し開始位置
+		* @param len 取り出しコードポイント数
+		* @return 取り出したUTF-8文字列
+		*/
 		String substr_by_codepoints(size_t pos = 0, size_t len = std::string::npos) const
 		{
 			return{ to_u32().substr(pos, len) };
 		}
 
+		/**
+		* @brief コードポイント単位でatを行う
+		* @param pos 取得位置
+		* @return 取り出したUTF-8文字(1コードポイント)
+		*/
 		String at_by_codepoints(size_t offset) const
 		{
 			return std::u32string{ to_u32().at(offset) };
 		}
 
-		void from_u32(const std::u32string& src)
+		/**
+		* @brief UTF-32からUTF-8文字列を作成する
+		* @param src UTF-32文字列
+		* @return 自身への参照
+		*/
+		String& from_u32(const std::u32string& src)
 		{
 			// VC++のバグ対策でいろいろキャストしてる
 			// 本来は int32_t -> char32_t
 			std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> conv;
 			auto u8str = conv.to_bytes((const int32_t*)src.c_str());
 			assign(u8str);
+
+			return *this;
 		}
 
+		/**
+		* @brief UTF-8からUTF-32文字列を作成する
+		* @return UTF-32文字列
+		*/
 		std::u32string to_u32() const
 		{
 			// VC++のバグ対策でいろいろキャストしてる
@@ -58,7 +119,12 @@ namespace Equisetum2
 			return{ (const char32_t*)u32str.c_str() };
 		}
 
-		void from_u16(const std::u16string& src)
+		/**
+		* @brief UTF-16からUTF-8文字列を作成する
+		* @param src UTF-16文字列
+		* @return 自身への参照
+		*/
+		String& from_u16(const std::u16string& src)
 		{
 			// VC++のバグ対策でいろいろキャストしてる
 			// 本来は wchar_t -> char16_t (UTF8への変換時はwchar_tにしないと何故かクラッシュする)
@@ -66,8 +132,14 @@ namespace Equisetum2
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> conv;
 			auto u8str = conv.to_bytes((const wchar_t*)src.c_str());
 			assign(u8str);
+
+			return *this;
 		}
 
+		/**
+		* @brief UTF-8からUTF-16文字列を作成する
+		* @return UTF-16文字列
+		*/
 		std::u16string to_u16() const
 		{
 			// VC++のバグ対策でいろいろキャストしてる
@@ -77,15 +149,27 @@ namespace Equisetum2
 			return{ (const char16_t*)u16str.c_str() };
 		}
 
-		void format(const char* fmt, ...)
+		/**
+		* @brief UTF-8をformatする
+		* @param fmt UTF8文字列
+		* @return 自身への参照
+		*/
+		String& format(const char* fmt, ...)
 		{
 			va_list argList;
 			va_start(argList, fmt);
 			formatV(fmt, argList);
 			va_end(argList);
+
+			return *this;
 		}
 
-		void formatV(const char* fmt, va_list argList)
+		/**
+		* @brief UTF-8をformatする
+		* @param fmt UTF8文字列
+		* @return 自身への参照
+		*/
+		String& formatV(const char* fmt, va_list argList)
 		{
 			va_list copy;
 			va_copy(copy, argList);
@@ -98,8 +182,15 @@ namespace Equisetum2
 				vsnprintf(&buf[0], return_value + 1, fmt, copy);
 				this->assign(&buf[0]);
 			}
+
+			return *this;
 		}
 
+		/**
+		* @brief UTF-8をformatし、新たなStringとして返す
+		* @param fmt UTF8文字列
+		* @return 作成したString
+		*/
 		static String Sprintf(const char* fmt, ...)
 		{
 			String str;
