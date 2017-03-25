@@ -12,19 +12,19 @@ namespace Equisetum2
 			SDL_LogPriority pri = SDL_LOG_PRIORITY_VERBOSE;
 			switch (level)
 			{
-			case LogLevel::DEBUG:
+			case LogLevel::Debug:
 				pri = SDL_LOG_PRIORITY_DEBUG;
 				break;
-			case LogLevel::INFO:
+			case LogLevel::Info:
 				pri = SDL_LOG_PRIORITY_INFO;
 				break;
-			case LogLevel::WARN:
+			case LogLevel::Warn:
 				pri = SDL_LOG_PRIORITY_WARN;
 				break;
-			case LogLevel::ERROR:
+			case LogLevel::Error:
 				pri = SDL_LOG_PRIORITY_ERROR;
 				break;
-			case LogLevel::CRITICAL:
+			case LogLevel::Critical:
 				pri = SDL_LOG_PRIORITY_CRITICAL;
 				break;
 			}

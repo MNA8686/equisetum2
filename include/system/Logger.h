@@ -18,12 +18,12 @@ namespace Equisetum2
 	*/
 	enum class LogLevel : int
 	{
-		VERBOSE = 1,
-		DEBUG,
-		INFO,
-		WARN,
-		ERROR,
-		CRITICAL,
+		Verbose = 1,
+		Debug,
+		Info,
+		Warn,
+		Error,
+		Critical,
 	};
 
 	/**
@@ -35,7 +35,7 @@ namespace Equisetum2
 		/** コールバック型定義<br>
 		* コールバック内でtrueを返すと、loggerはログを出力しない
 		*/
-		using cb_t = std::function<bool(const char*)>;
+		using cb_t = std::function<bool(LogLevel level, const char*)>;
 
 		/**
 		* @brief メッセージ出力時に呼び出すコールバックを設定する

@@ -38,7 +38,7 @@ namespace Equisetum2
 		{
 			entry = true;
 
-			if (cb && cb(String().formatV(format, arg).c_str()))
+			if (cb && cb(level, String().formatV(format, arg).c_str()))
 			{
 				// コールバックがtrueを返したらLoggerはログを出力しない
 				out = false;
@@ -58,7 +58,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::VERBOSE, format, arg);
+		OutputV(LogLevel::Verbose, format, arg);
 		va_end(arg);
 	}
 
@@ -67,7 +67,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::DEBUG, format, arg);
+		OutputV(LogLevel::Debug, format, arg);
 		va_end(arg);
 	}
 
@@ -76,7 +76,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::INFO, format, arg);
+		OutputV(LogLevel::Info, format, arg);
 		va_end(arg);
 	}
 
@@ -85,7 +85,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::WARN, format, arg);
+		OutputV(LogLevel::Warn, format, arg);
 		va_end(arg);
 	}
 
@@ -94,7 +94,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::ERROR, format, arg);
+		OutputV(LogLevel::Error, format, arg);
 		va_end(arg);
 	}
 
@@ -103,7 +103,7 @@ namespace Equisetum2
 		va_list arg;
 
 		va_start(arg, format);
-		OutputV(LogLevel::CRITICAL, format, arg);
+		OutputV(LogLevel::Critical, format, arg);
 		va_end(arg);
 	}
 }
