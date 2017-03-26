@@ -47,6 +47,11 @@ namespace Equisetum2
 		m_Impl->Centering();
 	}
 
+	void WindowCompat::ShowAlert(const String& msg)
+	{
+		m_Impl->ShowAlert(msg);
+	}
+
 	const String WindowCompat::Title()
 	{
 		return m_Impl->Title();

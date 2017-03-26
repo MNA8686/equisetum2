@@ -25,6 +25,7 @@ namespace Equisetum2
 		static void SetStyle(WindowStyle style);
 		static void SetPos(int x, int y);
 		static void Centering();
+		static void ShowAlert(const String& msg);
 
 		static const String Title();
 		static Size Size();

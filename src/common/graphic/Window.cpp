@@ -29,6 +29,11 @@ namespace Equisetum2
 		Singleton<WindowCompat>::GetInstance()->Centering();
 	}
 
+	void Window::ShowAlert(const String& msg)
+	{
+		Singleton<WindowCompat>::GetInstance()->ShowAlert(msg);
+	}
+
 	const String Window::Title()
 	{
 		return Singleton<WindowCompat>::GetInstance()->Title();

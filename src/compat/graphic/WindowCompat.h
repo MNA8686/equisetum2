@@ -21,6 +21,7 @@ namespace Equisetum2
 		void SetStyle(WindowStyle style);
 		void SetPos(int x, int y);
 		void Centering();
+		void ShowAlert(const String& msg);
 
 		const String Title();
 		Equisetum2::Size Size();
