@@ -10,6 +10,10 @@
 #include "system/System.h"
 #include "system/Logger.h"
 
+#include "fs/File.hpp"
+#include "fs/Directory.hpp"
+#include "fs/Path.hpp"
+
 #include "stream/IStream.h"
 #include "stream/FileStream.h"
 #include "stream/MemoryStream.h"

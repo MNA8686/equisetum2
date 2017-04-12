@@ -73,6 +73,9 @@
     <Filter Include="ソース ファイル\common\util">
       <UniqueIdentifier>{e9ee131b-cb55-46b4-8a6c-a153e96f8878}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\fs">
+      <UniqueIdentifier>{43b7e9ab-f45c-4162-92bb-848a404f97e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -179,6 +182,15 @@
     </ClInclude>
     <ClInclude Include="include\util\Regex.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs\Path.hpp">
+      <Filter>ヘッダー ファイル\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs\Directory.hpp">
+      <Filter>ヘッダー ファイル\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fs\File.hpp">
+      <Filter>ヘッダー ファイル\fs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -113,6 +113,9 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Equisetum2.h" />
+    <ClInclude Include="include\fs\Directory.hpp" />
+    <ClInclude Include="include\fs\File.hpp" />
+    <ClInclude Include="include\fs\Path.hpp" />
     <ClInclude Include="include\graphic\Window.h" />
     <ClInclude Include="include\input\IKeyState.h" />
     <ClInclude Include="include\input\Joystick.h" />
