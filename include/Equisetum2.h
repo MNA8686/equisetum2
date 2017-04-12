@@ -4,6 +4,8 @@
 #include "type/Optional.h"
 #include "type/String.h"
 
+#include "util/Regex.hpp"
+
 #include "system/Exception.hpp"
 #include "system/System.h"
 #include "system/Logger.h"

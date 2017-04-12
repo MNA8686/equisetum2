@@ -67,6 +67,12 @@
     <Filter Include="ソース ファイル\compat&amp;porting\graphic">
       <UniqueIdentifier>{a961bd8e-8460-40c5-93e0-214f67bff893}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\util">
+      <UniqueIdentifier>{cf97c714-6beb-4305-a326-51f2a66f37e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\util">
+      <UniqueIdentifier>{e9ee131b-cb55-46b4-8a6c-a153e96f8878}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -171,6 +177,9 @@
     <ClInclude Include="include\system\Exception.hpp">
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
+    <ClInclude Include="include\util\Regex.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -241,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="src\common\system\Logger.cpp">
       <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\util\Regex.cpp">
+      <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
