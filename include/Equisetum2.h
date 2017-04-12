@@ -2,6 +2,7 @@
 #define _EQUISETUM2_H_
 
 #include "type/Optional.h"
+#include "type/String.h"
 
 #include "system/Exception.hpp"
 #include "system/System.h"
