@@ -1,8 +1,8 @@
-/**
+ï»¿/**
 * @file Regex.cpp
-* @brief ³‹K•\Œ»‚ğˆµ‚¤ƒNƒ‰ƒX
+* @brief æ­£è¦è¡¨ç¾ã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹
 * @author MNA
-* @date 2017/04/12 V‹Kì¬
+* @date 2017/04/12 æ–°è¦ä½œæˆ
 */
 
 #include "util/Regex.hpp"
@@ -32,7 +32,7 @@ namespace Equisetum2
 		{
 			std::vector<String> v;
 
-			// ƒLƒƒƒvƒ`ƒƒŒ‹‰Ê‚È‚Ç‚ğvector‚ÉŠi”[‚·‚é
+			// ã‚­ãƒ£ãƒ—ãƒãƒ£çµæœãªã©ã‚’vectorã«æ ¼ç´ã™ã‚‹
 			for (const auto& submatch : match)
 			{
 				v.push_back(String(submatch));
@@ -53,7 +53,7 @@ namespace Equisetum2
 		{
 			std::vector<String> v;
 
-			// ƒLƒƒƒvƒ`ƒƒŒ‹‰Ê‚È‚Ç‚ğvector‚ÉŠi”[‚·‚é
+			// ã‚­ãƒ£ãƒ—ãƒãƒ£çµæœãªã©ã‚’vectorã«æ ¼ç´ã™ã‚‹
 			for (const auto& submatch : match)
 			{
 				v.push_back(String(submatch));

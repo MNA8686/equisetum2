@@ -1,8 +1,8 @@
-/**
+ï»¿/**
 * @file Regex.hpp
-* @brief ³‹K•\Œ»‚ğˆµ‚¤ƒNƒ‰ƒX
+* @brief æ­£è¦è¡¨ç¾ã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹
 * @author MNA
-* @date 2017/04/12 V‹Kì¬
+* @date 2017/04/12 æ–°è¦ä½œæˆ
 */
 #if !defined(_EQREGEX_H_)
 #define _EQREGEX_H_
@@ -14,44 +14,44 @@
 namespace Equisetum2
 {
 	/**
-	* ³‹K•\Œ»‚ğˆµ‚¤ƒNƒ‰ƒX
+	* æ­£è¦è¡¨ç¾ã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹
 	*/
 	class Regex
 	{
 	public:
 		/**
-		* @brief ƒ}ƒbƒ`‚µ‚½•¶š—ñ‚ğ’uŠ·‚·‚é(Å‰‚Éƒ}ƒbƒ`‚µ‚½‚à‚Ì‚Ì‚İ’uŠ·)
-		* @param src “ü—Í•¶š—ñ
-		* @param regex ŒŸõ‚·‚é³‹K•\Œ»
-		* @param replacement ’uŠ·Œã‚Ì³‹K•\Œ»
-		* @return ’uŠ·Œã‚Ì•¶š—ñ
+		* @brief ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—ã‚’ç½®æ›ã™ã‚‹(æœ€åˆã«ãƒãƒƒãƒã—ãŸã‚‚ã®ã®ã¿ç½®æ›)
+		* @param src å…¥åŠ›æ–‡å­—åˆ—
+		* @param regex æ¤œç´¢ã™ã‚‹æ­£è¦è¡¨ç¾
+		* @param replacement ç½®æ›å¾Œã®æ­£è¦è¡¨ç¾
+		* @return ç½®æ›å¾Œã®æ–‡å­—åˆ—
 		*/
 		static String ReplaceFirst(const String& src, const String& regex, const String& replacement);
 
 		/**
-		* @brief ƒ}ƒbƒ`‚µ‚½•¶š—ñ‚ğ’uŠ·‚·‚é
-		* @param src “ü—Í•¶š—ñ
-		* @param regex ŒŸõ‚·‚é³‹K•\Œ»
-		* @param replacement ’uŠ·Œã‚Ì³‹K•\Œ»
-		* @return ’uŠ·Œã‚Ì•¶š—ñ
+		* @brief ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—ã‚’ç½®æ›ã™ã‚‹
+		* @param src å…¥åŠ›æ–‡å­—åˆ—
+		* @param regex æ¤œç´¢ã™ã‚‹æ­£è¦è¡¨ç¾
+		* @param replacement ç½®æ›å¾Œã®æ­£è¦è¡¨ç¾
+		* @return ç½®æ›å¾Œã®æ–‡å­—åˆ—
 		*/
 		static String ReplaceAll(const String& src, const String& regex, const String& replacement);
 
 		/**
-		* @brief •¶š—ñ‚ğŒŸõ‚·‚é
-		* @param src “ü—Í•¶š—ñ
-		* @param regex ŒŸõ‚·‚é³‹K•\Œ»
-		* @return Œ©‚Â‚¯‚½•¶š—ñ
-		* @detail •”•ª“I‚Éˆê’v‚·‚é•¶š—ñ‚ğ’T‚·Û‚Ég—p‚·‚éB
+		* @brief æ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹
+		* @param src å…¥åŠ›æ–‡å­—åˆ—
+		* @param regex æ¤œç´¢ã™ã‚‹æ­£è¦è¡¨ç¾
+		* @return è¦‹ã¤ã‘ãŸæ–‡å­—åˆ—
+		* @detail éƒ¨åˆ†çš„ã«ä¸€è‡´ã™ã‚‹æ–‡å­—åˆ—ã‚’æ¢ã™éš›ã«ä½¿ç”¨ã™ã‚‹ã€‚
 		*/
 		static Optional<std::vector<String>> Search(const String& src, const String& regex);
 
 		/**
-		* @brief •¶š—ñ‚ªˆê’v‚·‚é‚©”»’è‚·‚é
-		* @param src “ü—Í•¶š—ñ
-		* @param regex ŒŸõ‚·‚é³‹K•\Œ»
-		* @return ˆê’v‚µ‚½•¶š—ñ
-		* @detail ‘S‘Ì‚ªˆê’v‚·‚é‚©‚Ç‚¤‚©‚ğ”»’è‚·‚éB
+		* @brief æ–‡å­—åˆ—ãŒä¸€è‡´ã™ã‚‹ã‹åˆ¤å®šã™ã‚‹
+		* @param src å…¥åŠ›æ–‡å­—åˆ—
+		* @param regex æ¤œç´¢ã™ã‚‹æ­£è¦è¡¨ç¾
+		* @return ä¸€è‡´ã—ãŸæ–‡å­—åˆ—
+		* @detail å…¨ä½“ãŒä¸€è‡´ã™ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹ã€‚
 		*/
 		static Optional<std::vector<String>> Match(const String& src, const String& regex);
 	};
