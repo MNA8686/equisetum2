@@ -1,8 +1,8 @@
-/**
+﻿/**
 * @file File.hpp
-* @brief �t�@�C������Ɋւ���N���X
+* @brief ファイル操作に関するクラス
 * @author MNA
-* @date 2017/04/12 �V�K�쐬
+* @date 2017/04/12 新規作成
 */
 #if !defined(_EQFILE_H_)
 #define _EQFILE_H_
@@ -12,15 +12,47 @@
 namespace Equisetum2
 {
 	/**
-	* �t�@�C������Ɋւ���N���X
+	* ファイル操作に関するクラス
 	*/
 	class File
 	{
 	public:
-		static bool Create(const String& name);
-		static bool Delete(const String& name);
+
+		/**
+		* @brief ファイルを作成する
+		* @param path ファイル名
+		* @return 成否
+		*/
+		static bool Create(const String& path);
+
+		/**
+		* @brief ファイルを削除する
+		* @param path ファイル名
+		* @return 成否
+		*/
+		static bool Delete(const String& path);
+
+		/**
+		* @brief ファイルが存在するか確認する
+		* @param path ファイル名
+		* @return 存在有無
+		*/
+		static bool Exists(const String& path);
+
+		/**
+		* @brief ファイルを移動する
+		* @param src 移動元ファイル名
+		* @param dst 移動先ファイル名
+		* @return 成否
+		*/
 		static bool Move(const String& src, const String& dst);
-		static bool Exists(const String& name);
+
+		/**
+		* @brief ファイルをコピーする
+		* @param src コピー元ファイル名
+		* @param dst コピー先ファイル名
+		* @return 成否
+		*/
 		static bool Copy(const String& src, const String& dst, bool overWrite=false);
 	};
 }

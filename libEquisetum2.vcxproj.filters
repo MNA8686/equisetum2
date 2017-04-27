@@ -76,6 +76,12 @@
     <Filter Include="ヘッダー ファイル\fs">
       <UniqueIdentifier>{43b7e9ab-f45c-4162-92bb-848a404f97e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\compat&amp;porting\fs">
+      <UniqueIdentifier>{3571759c-3389-4ec7-8bf8-fafb9909811a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\fs">
+      <UniqueIdentifier>{338fcf76-36fd-4b4b-bbb8-f808830f5184}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -266,6 +272,15 @@
     <ClCompile Include="src\common\util\Regex.cpp">
       <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\fs\File.cpp">
+      <Filter>ソース ファイル\common\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\fs\Directory.cpp">
+      <Filter>ソース ファイル\common\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\fs\Path.cpp">
+      <Filter>ソース ファイル\common\fs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
@@ -297,6 +312,15 @@
     </None>
     <None Include="src\porting\SDL\system\LoggerCompat.inl">
       <Filter>ソース ファイル\compat&amp;porting\system</Filter>
+    </None>
+    <None Include="src\porting\Win32\fs\DirectoryCompat.inl">
+      <Filter>ソース ファイル\compat&amp;porting\fs</Filter>
+    </None>
+    <None Include="src\porting\Win32\fs\FileCompat.inl">
+      <Filter>ソース ファイル\compat&amp;porting\fs</Filter>
+    </None>
+    <None Include="src\porting\Win32\fs\PathCompat.inl">
+      <Filter>ソース ファイル\compat&amp;porting\fs</Filter>
     </None>
   </ItemGroup>
 </Project>
