@@ -187,6 +187,74 @@ namespace Equisetum2
 		}
 
 		/**
+		* @brief 前後のスペースを取り除く
+		* @param separator スペースとして認識するUTF8文字列
+		* @return トリムされた文字列
+		*/
+		String trim(const String& separator = " \t")
+		{
+			auto str32 = to_u32();
+			auto isSpace32 = separator.to_u32();
+			String trimed;
+
+			// 左側からトリムする文字以外が見つかる位置を検索
+			auto left = str32.find_first_not_of(isSpace32);
+			if (left != std::u32string::npos)
+			{
+				// 右からトリムする文字以外が見つかる位置を検索
+				auto right = str32.find_last_not_of(isSpace32);
+				if (right != std::u32string::npos)
+				{
+					auto result = str32.substr(left, right - left + 1);
+					trimed.from_u32(result);
+				}
+			}
+
+			return trimed;
+		}
+
+		/**
+		* @brief 与えられたセパレータを元に文字列を分割する
+		* @param separator デリミタとして認識するUTF8文字列
+		* @param compressBlank 真の場合、空白を無視する
+		* @return 分割された文字列の配列
+		*/
+		std::vector<String> split(const String& separator = " \t", bool compressBlank = true)
+		{
+			auto str32 = to_u32();
+			auto isSpace32 = separator.to_u32();
+			std::u32string::size_type pos = 0;
+
+			std::vector<String> v;
+
+			while (true)
+			{
+				auto delimPos = str32.find_first_of(isSpace32, pos);
+				if (delimPos == std::u32string::npos)
+				{
+					auto sub = str32.substr(pos, std::u32string::npos);
+					if (!compressBlank || sub.size() > 0)
+					{
+						v.push_back(String(sub));
+					}
+					break;
+				}
+				else
+				{
+					if (!compressBlank || delimPos - pos > 0)
+					{
+						auto sub = str32.substr(pos, delimPos - pos);
+						v.push_back(String(sub));
+					}
+
+					pos = delimPos + 1;
+				}
+			}
+
+			return v;
+		}
+
+		/**
 		* @brief UTF-8をformatし、新たなStringとして返す
 		* @param fmt UTF8文字列
 		* @return 作成したString
