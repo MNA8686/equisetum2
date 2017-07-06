@@ -112,6 +112,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\crypt\HMAC.hpp" />
+    <ClInclude Include="include\crypt\MessageDigest.hpp" />
     <ClInclude Include="include\Equisetum2.h" />
     <ClInclude Include="include\fs\Directory.hpp" />
     <ClInclude Include="include\fs\File.hpp" />
@@ -140,6 +142,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="include\type\Point.h" />
     <ClInclude Include="include\type\String.h" />
     <ClInclude Include="include\util\Regex.hpp" />
+    <ClInclude Include="include\util\SHA256.hpp" />
+    <ClInclude Include="src\common\crypt\MessageDigestSHA256.hpp" />
     <ClInclude Include="src\common\system\Singleton.h" />
     <ClInclude Include="src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="src\compat\input\JoystickCompat.h" />
@@ -151,6 +155,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClInclude Include="src\porting\SDL\system\SDLEvent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\crypt\HMAC.cpp" />
+    <ClCompile Include="src\common\crypt\MessageDigest.cpp" />
     <ClCompile Include="src\common\fs\Directory.cpp" />
     <ClCompile Include="src\common\fs\File.cpp" />
     <ClCompile Include="src\common\fs\Path.cpp" />
@@ -170,6 +176,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     <ClCompile Include="src\common\timer\SystemTimer.cpp" />
     <ClCompile Include="src\common\timer\TickCounter.cpp" />
     <ClCompile Include="src\common\util\Regex.cpp" />
+    <ClCompile Include="src\common\util\SHA256.cpp" />
     <ClCompile Include="src\compat\graphic\WindowCompat.cpp" />
     <ClCompile Include="src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="src\compat\input\KeyboardCompat.cpp" />

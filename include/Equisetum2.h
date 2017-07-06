@@ -5,6 +5,7 @@
 #include "type/String.h"
 
 #include "util/Regex.hpp"
+#include "util/SHA256.hpp"
 
 #include "system/Exception.hpp"
 #include "system/System.h"

@@ -82,6 +82,12 @@
     <Filter Include="ソース ファイル\common\fs">
       <UniqueIdentifier>{338fcf76-36fd-4b4b-bbb8-f808830f5184}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\crypt">
+      <UniqueIdentifier>{dee16cb8-747e-4454-9118-516cad8998d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\crypt">
+      <UniqueIdentifier>{80bbc527-46e0-4c2f-9806-3fc1178a746c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -198,6 +204,18 @@
     <ClInclude Include="include\fs\File.hpp">
       <Filter>ヘッダー ファイル\fs</Filter>
     </ClInclude>
+    <ClInclude Include="include\crypt\MessageDigest.hpp">
+      <Filter>ヘッダー ファイル\crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\crypt\HMAC.hpp">
+      <Filter>ヘッダー ファイル\crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\SHA256.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\crypt\MessageDigestSHA256.hpp">
+      <Filter>ソース ファイル\common\crypt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\porting\SDL\system\System.cpp">
@@ -280,6 +298,15 @@
     </ClCompile>
     <ClCompile Include="src\common\fs\Path.cpp">
       <Filter>ソース ファイル\common\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\crypt\HMAC.cpp">
+      <Filter>ソース ファイル\common\crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\crypt\MessageDigest.cpp">
+      <Filter>ソース ファイル\common\crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\util\SHA256.cpp">
+      <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
