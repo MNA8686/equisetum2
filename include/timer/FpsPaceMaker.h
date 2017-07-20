@@ -34,8 +34,8 @@ namespace Equisetum2
 		uint32_t m_ElapsedFrame = 0;	// 経過フレーム数
 		std::shared_ptr<TickCounter> m_TickCounter;
 
-		FpsPaceMaker(const FpsPaceMaker&);				// コピーコンストラクタ封じ
-		FpsPaceMaker& operator= (const FpsPaceMaker&);	// コピーコンストラクタ封じ
+		FpsPaceMaker(const FpsPaceMaker&) = delete;				// コピーコンストラクタ封じ
+		FpsPaceMaker& operator= (const FpsPaceMaker&) = delete;	// コピーコンストラクタ封じ
 
 		const int32_t m_FractionalPart = 16;	// 固定小数点の小数部分の桁数
 	};

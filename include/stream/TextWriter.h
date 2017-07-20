@@ -27,8 +27,8 @@ namespace Equisetum2
 
 	private:
 
-		TextWriter(const TextWriter&) {}				// コピーコンストラクタ封じ
-		TextWriter& operator= (const TextWriter&) {}	// コピーコンストラクタ封じ
+		TextWriter(const TextWriter&) = delete;				// コピーコンストラクタ封じ
+		TextWriter& operator= (const TextWriter&) = delete;	// コピーコンストラクタ封じ
 
 		std::shared_ptr<IStream> m_stream;
 	};

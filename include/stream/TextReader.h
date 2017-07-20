@@ -28,8 +28,8 @@ namespace Equisetum2
 
 	private:
 
-		TextReader(const TextReader&) {}				// コピーコンストラクタ封じ
-		TextReader& operator= (const TextReader&) {}	// コピーコンストラクタ封じ
+		TextReader(const TextReader&) = delete;				// コピーコンストラクタ封じ
+		TextReader& operator= (const TextReader&) = delete;	// コピーコンストラクタ封じ
 
 		std::shared_ptr<IStream> m_stream;
 	};

@@ -43,8 +43,8 @@ namespace Equisetum2
 		static std::shared_ptr<MemoryStream> Create(std::shared_ptr<StreamImpl>& impl);
 		bool m_writable = false;
 
-		MemoryStream(const MemoryStream&) {}				// コピーコンストラクタ封じ
-		MemoryStream& operator= (const MemoryStream&) {}	// コピーコンストラクタ封じ
+		MemoryStream(const MemoryStream&) = delete;				// コピーコンストラクタ封じ
+		MemoryStream& operator= (const MemoryStream&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 

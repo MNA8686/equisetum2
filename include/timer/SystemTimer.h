@@ -24,8 +24,8 @@ namespace Equisetum2
 	private:
 		uint32_t m_Ticks = 0;		// 現在のチック値
 
-		SystemTimer(const SystemTimer&);				// コピーコンストラクタ封じ
-		SystemTimer& operator= (const SystemTimer&);	// コピーコンストラクタ封じ
+		SystemTimer(const SystemTimer&) = delete;				// コピーコンストラクタ封じ
+		SystemTimer& operator= (const SystemTimer&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 

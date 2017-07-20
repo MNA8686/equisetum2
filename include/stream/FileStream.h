@@ -57,8 +57,8 @@ namespace Equisetum2
 		std::shared_ptr<StreamImpl> m_pImpl;
 		int m_method = 0;
 
-		FileStream(const FileStream&) {}				// コピーコンストラクタ封じ
-		FileStream& operator= (const FileStream&) {}	// コピーコンストラクタ封じ
+		FileStream(const FileStream&) = delete;				// コピーコンストラクタ封じ
+		FileStream& operator= (const FileStream&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 

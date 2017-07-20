@@ -30,8 +30,8 @@ namespace Equisetum2
 		uint32_t m_RecentFps = 0;		// 1秒前のFPS
 		std::shared_ptr<TickCounter> m_TickCounter;
 
-		FpsCounter(const FpsCounter&);				// コピーコンストラクタ封じ
-		FpsCounter& operator= (const FpsCounter&);	// コピーコンストラクタ封じ
+		FpsCounter(const FpsCounter&) = delete;				// コピーコンストラクタ封じ
+		FpsCounter& operator= (const FpsCounter&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 

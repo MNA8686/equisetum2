@@ -31,8 +31,8 @@ namespace Equisetum2
 		uint32_t m_PastTicks = 0;		// 現在のチック値
 		std::shared_ptr<ITimer> m_Timer;
 
-		TickCounter(const TickCounter&);				// コピーコンストラクタ封じ
-		TickCounter& operator= (const TickCounter&);	// コピーコンストラクタ封じ
+		TickCounter(const TickCounter&) = delete;				// コピーコンストラクタ封じ
+		TickCounter& operator= (const TickCounter&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 
