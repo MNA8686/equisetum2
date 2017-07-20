@@ -27,6 +27,8 @@ namespace Equisetum2
 			case LogLevel::Critical:
 				pri = SDL_LOG_PRIORITY_CRITICAL;
 				break;
+            default:
+                break;
 			}
 
 			return pri;

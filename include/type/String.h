@@ -82,7 +82,7 @@ namespace Equisetum2
 
 		/**
 		* @brief コードポイント単位でatを行う
-		* @param pos 取得位置
+		* @param offset 取得位置
 		* @return 取り出したUTF-8文字(1コードポイント)
 		*/
 		String at_by_codepoints(size_t offset) const
@@ -99,9 +99,14 @@ namespace Equisetum2
 		{
 			// VC++のバグ対策でいろいろキャストしてる
 			// 本来は int32_t -> char32_t
-			std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> conv;
+#ifdef _MSC_VER
+            std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> conv;
 			auto u8str = conv.to_bytes((const int32_t*)src.c_str());
-			assign(u8str);
+#else
+            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+            auto u8str = conv.to_bytes((const char32_t*)src.c_str());
+#endif
+            assign(u8str);
 
 			return *this;
 		}
@@ -114,10 +119,14 @@ namespace Equisetum2
 		{
 			// VC++のバグ対策でいろいろキャストしてる
 			// 本来は int32_t -> char32_t
+#ifdef _MSC_VER
 			std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> conv;
-			auto u32str = conv.from_bytes(*this);
-			return{ (const char32_t*)u32str.c_str() };
-		}
+#else
+            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+#endif
+            auto u32str = conv.from_bytes(*this);
+            return{ (const char32_t*)u32str.c_str() };
+        }
 
 		/**
 		* @brief UTF-16からUTF-8文字列を作成する
@@ -144,8 +153,12 @@ namespace Equisetum2
 		{
 			// VC++のバグ対策でいろいろキャストしてる
 			// 本来は int16_t -> char16_t
+#ifdef _MSC_VER
 			std::wstring_convert<std::codecvt_utf8<int16_t>, int16_t> conv;
-			auto u16str = conv.from_bytes(*this);
+#else
+            std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> conv;
+#endif
+            auto u16str = conv.from_bytes(*this);
 			return{ (const char16_t*)u16str.c_str() };
 		}
 

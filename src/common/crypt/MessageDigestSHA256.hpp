@@ -83,7 +83,7 @@ namespace Equisetum2
 			return (x&y) ^ (x&z) ^ (y&z);
 		}
 
-		static inline void SHA_Reverse_INT64(unsigned char *data, unsigned __int64 write)
+		static inline void SHA_Reverse_INT64(unsigned char *data,  uint64_t write)
 		{
 			unsigned char cdata[8];
 			memcpy(cdata, &write, sizeof(uint64_t));
@@ -97,7 +97,7 @@ namespace Equisetum2
 		{
 			unsigned char b_data[4], a_data[4];
 			SHA_INT_TYPE ret;
-			memcpy(b_data, &d, sizeof(__int32));
+			memcpy(b_data, &d, sizeof(uint32_t));
 			for (int i = 0; i < 4; i++)
 			{
 				a_data[i] = b_data[3 - i];
@@ -182,7 +182,7 @@ namespace Equisetum2
 				auto ret = true;
 
 				memcpy(m_digest, SHA256_H_Val, sizeof(SHA256_H_Val));
-				m_stream = MemoryStream::CreateFromBuf(&m_buf[0], m_buf.size());
+				m_stream = MemoryStream::CreateFromBuf(&m_buf[0], (int)m_buf.size());
 				dataSize = 0;
 
 				if (!m_stream)
@@ -235,7 +235,7 @@ namespace Equisetum2
 				dataSize += (size_t)m_stream->Position();
 
 				// 処理するデータのサイズ
-				SHA_INT_TYPE mod = dataSize % m_buf.size();
+				SHA_INT_TYPE mod = dataSize % (int)m_buf.size();
 
 				// パディングを設定する
 				for (auto i = mod; i < m_buf.size(); i++)

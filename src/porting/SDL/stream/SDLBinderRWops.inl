@@ -29,6 +29,8 @@ namespace Equisetum2
 		case RW_SEEK_END:
 			origin = SeekOrigin::End;
 			break;
+        default:
+            return -1;
 		}
 
 		auto stream = (IStream*)context->hidden.unknown.data1;
@@ -120,7 +122,7 @@ namespace Equisetum2
 
 		inline int WriteByte(uint8_t writeByte)
 		{
-			return Write(&writeByte, 1);
+			return (int)Write(&writeByte, 1);
 		}
 
 		inline int64_t Seek(int64_t offset, SeekOrigin origin)
