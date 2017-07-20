@@ -2,11 +2,83 @@
 #define _EQSTREAMIMPL_H_
 
 #include "SDL.h"
+#include "stream/IStream.h"
 #include <vector>
 #include <memory>
 
 namespace Equisetum2
 {
+	static Sint64 size(struct SDL_RWops *context)
+	{
+		auto stream = (IStream*)context->hidden.unknown.data1;
+		return stream->Length();
+	}
+
+	static Sint64 seek(struct SDL_RWops *context, Sint64 offset, int whence)
+	{
+		SeekOrigin origin;
+
+		switch (whence)
+		{
+		case RW_SEEK_SET:
+			origin = SeekOrigin::Begin;
+			break;
+		case RW_SEEK_CUR:
+			origin = SeekOrigin::Current;
+			break;
+		case RW_SEEK_END:
+			origin = SeekOrigin::End;
+			break;
+		}
+
+		auto stream = (IStream*)context->hidden.unknown.data1;
+		return stream->Seek(offset, origin);
+	}
+
+	static size_t read(struct SDL_RWops *context, void *ptr, size_t size, size_t maxnum)
+	{
+		auto stream = (IStream*)context->hidden.unknown.data1;
+		size_t count = 0;
+
+		for (size_t i = 0; i < maxnum; i++)
+		{
+			auto opt = stream->Read(&((uint8_t*)ptr)[size * i], size);
+			if (!opt)
+			{
+				break;
+			}
+
+			count++;
+		}
+
+		return count;
+	}
+
+	static size_t write(struct SDL_RWops *context, const void *ptr, size_t size, size_t num)
+	{
+		auto stream = (IStream*)context->hidden.unknown.data1;
+		size_t count = 0;
+
+		for (size_t i = 0; i < num; i++)
+		{
+			auto opt = stream->Write(&((const uint8_t*)ptr)[size * i], size);
+			if (!opt)
+			{
+				break;
+			}
+
+			count++;
+		}
+
+		return count;
+	}
+
+	static int close(struct SDL_RWops *context)
+	{
+		// ストリームはスマートポインタで解放されるはず
+		return 0;
+	}
+
 	// SDLのRWops丸投げクラス :p
 	class SDLBinderRWops
 	{
@@ -82,6 +154,22 @@ namespace Equisetum2
 					pRWops->close(pRWops);		// 中でSDL_FreeRWも呼ばれる
 				}
 			});
+		}
+
+		// ストリームからrwopsを生成する
+		static SDL_RWops CreateFromStream(std::shared_ptr<IStream> stream)
+		{
+			SDL_RWops ops = {};
+
+			ops.type = SDL_RWOPS_UNKNOWN;
+			ops.hidden.unknown.data1 = stream.get();
+			ops.size = size;
+			ops.read = read;
+			ops.write = write;
+			ops.seek = seek;
+			ops.close = close;
+
+			return ops;
 		}
 
 	private:
