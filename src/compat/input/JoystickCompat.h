@@ -1,4 +1,4 @@
-#if !defined(_EQJOYSTICKCOMPAT_H_)
+﻿#if !defined(_EQJOYSTICKCOMPAT_H_)
 #define _EQJOYSTICKCOMPAT_H_
 
 #include "system/Singleton.h"
@@ -8,13 +8,13 @@
 
 namespace Equisetum2
 {
-	// �W���C�X�e�B�b�N�̃|�[�e�B���O�N���X
-	// ���݂��Ȃ��W���C�X�e�B�b�N�̔ԍ�����͂��Ă��N���b�V�����Ȃ����Ƃ��ۏ؂���Ă���
+	// ジョイスティックのポーティングクラス
+	// 存在しないジョイスティックの番号を入力してもクラッシュしないことが保証されている
 
 	class JoystickCompat final
 	{
 	public:
-		friend Singleton<JoystickCompat>;	// �V���O���g������C���X�^���X���쐬���Ă��炦��悤�ɂ���
+		friend Singleton<JoystickCompat>;	// シングルトンからインスタンスを作成してもらえるようにする
 
 		void Prepare();
 		void Update();
@@ -38,7 +38,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		JoystickCompat();	// �C���X�^���X�쐬����
+		JoystickCompat();	// インスタンス作成封じ
 	};
 }
 

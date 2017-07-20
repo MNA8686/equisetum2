@@ -1,4 +1,4 @@
-#include "stream/MemoryStream.h"
+﻿#include "stream/MemoryStream.h"
 
 #include "stream/SDLBinderRWops.inl"
 

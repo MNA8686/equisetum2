@@ -1,4 +1,4 @@
-#if !defined(_EQTOUCHCOMPAT_H_)
+ï»¿#if !defined(_EQTOUCHCOMPAT_H_)
 #define _EQTOUCHCOMPAT_H_
 
 #include "system/Singleton.h"
@@ -11,7 +11,7 @@ namespace Equisetum2
 	class TouchCompat final
 	{
 	public:
-		friend Singleton<TouchCompat>;	// ƒVƒ“ƒOƒ‹ƒgƒ“‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ä‚à‚ç‚¦‚é‚æ‚¤‚É‚·‚é
+		friend Singleton<TouchCompat>;	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¦ã‚‚ã‚‰ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 		void Prepare();
 		void Update();
@@ -27,7 +27,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		TouchCompat();	// ƒCƒ“ƒXƒ^ƒ“ƒXì¬••‚¶
+		TouchCompat();	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆå°ã˜
 	};
 }
 

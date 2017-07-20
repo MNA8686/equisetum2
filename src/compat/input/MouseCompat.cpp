@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+﻿#include "system/Logger.h"
 #include "input/MouseCompat.h"
 
 #include "input/MouseCompatImpl.inl"

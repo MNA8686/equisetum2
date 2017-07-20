@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "input/MouseCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "timer/TickCounter.h"
@@ -86,8 +86,8 @@ namespace Equisetum2
 
 					if (e.wheel.which != SDL_TOUCH_MOUSEID)
 					{
-						m_wheel = e.wheel.y;	// ‚’¼•ûŒü
-						m_wheelH = e.wheel.x;	// …•½•ûŒü
+						m_wheel = e.wheel.y;	// å‚ç›´æ–¹å‘
+						m_wheelH = e.wheel.x;	// æ°´å¹³æ–¹å‘
 
 						Logger::OutputInfo("SDL_MOUSE WHEEL v %d, h %d\n", m_wheel, m_wheelH);
 					}
@@ -95,7 +95,7 @@ namespace Equisetum2
 				}
 			});
 
-			// ƒ{ƒ^ƒ“‚Ì–¼‘O‚ğ“o˜^
+			// ãƒœã‚¿ãƒ³ã®åå‰ã‚’ç™»éŒ²
 			int i = 0;
 			for (auto& state : m_buttonStateArray)
 			{
@@ -119,7 +119,7 @@ namespace Equisetum2
 			m_wheel = 0;
 			m_wheelH = 0;
 
-			// •Ï‰»ƒGƒbƒWƒtƒ‰ƒO‚Í1ƒtƒŒ[ƒ€Œo‰ß‚µ‚½‚çƒNƒŠƒA‚·‚é
+			// å¤‰åŒ–ã‚¨ãƒƒã‚¸ãƒ•ãƒ©ã‚°ã¯1ãƒ•ãƒ¬ãƒ¼ãƒ çµŒéã—ãŸã‚‰ã‚¯ãƒªã‚¢ã™ã‚‹
 			for (auto& state : m_buttonStateArray)
 			{
 				state.down = false;
@@ -170,21 +170,21 @@ namespace Equisetum2
 
 	private:
 
-		// SDLƒCƒxƒ“ƒgƒŠƒXƒi[
+		// SDLã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 		std::shared_ptr<SDLEventListener> m_listener;
 
-		// â‘ÎÀ•W
+		// çµ¶å¯¾åº§æ¨™
 		Point<int32_t> m_pos = {};
-		// ‘Š‘ÎÀ•W
+		// ç›¸å¯¾åº§æ¨™
 		Point<int32_t> m_delta = {};
-		// ƒzƒC[ƒ‹(‚’¼)
+		// ãƒ›ã‚¤ãƒ¼ãƒ«(å‚ç›´)
 		int32_t m_wheel = 0;
-		// ƒzƒC[ƒ‹(…•½)
+		// ãƒ›ã‚¤ãƒ¼ãƒ«(æ°´å¹³)
 		int32_t m_wheelH = 0;
-		// ƒ}ƒEƒXƒ{ƒ^ƒ“ŠÇ—”z—ñ
+		// ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ç®¡ç†é…åˆ—
 		stKeyState m_buttonStateArray[(int)MouseButton::Max] = {};
 
-		// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+		// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—
 		uint32_t m_timeStamp = 0;
 	};
 }

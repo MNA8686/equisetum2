@@ -1,6 +1,6 @@
-#include "system/LoggerCompat.h"
+ï»¿#include "system/LoggerCompat.h"
 
-#include "system/LoggerCompat.inl"		// ŠÂ‹«ˆË‘¶ƒR[ƒh‚ğƒCƒ“ƒNƒ‹[ƒh
+#include "system/LoggerCompat.inl"		// ç’°å¢ƒä¾å­˜ã‚³ãƒ¼ãƒ‰ã‚’ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰
 
 namespace Equisetum2
 {

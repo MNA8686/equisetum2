@@ -1,4 +1,4 @@
-#include "input/Key.h"
+ï»¿#include "input/Key.h"
 #include "input/KeyboardCompat.h"
 #include "timer/TickCounter.h"
 #include "timer/SystemTimerCompat.h"
@@ -59,8 +59,8 @@ namespace Equisetum2
 		};
 	}
 
-	// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒvŠÇ—\‘¢‘Ì
-	// (ƒL[‰Ÿ‰º‚É‰Ÿ‚³‚ê‚½ŠÔ‚ğ•Û‚µ‚½‚¢‚ªAIsDown()‚Íconst‚È‚Ì‚Å‚â‚Ş‚È‚­ƒNƒ‰ƒX‚ÌŠO•”‚É‚Â‚±‚Æ‚Æ‚·‚é)
+	// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ç®¡ç†æ§‹é€ ä½“
+	// (ã‚­ãƒ¼æŠ¼ä¸‹æ™‚ã«æŠ¼ã•ã‚ŒãŸæ™‚é–“ã‚’ä¿æŒã—ãŸã„ãŒã€IsDown()ã¯constãªã®ã§ã‚„ã‚€ãªãã‚¯ãƒ©ã‚¹ã®å¤–éƒ¨ã«æŒã¤ã“ã¨ã¨ã™ã‚‹)
 	typedef struct
 	{
 		uint32_t down;
@@ -134,7 +134,7 @@ namespace Equisetum2
 			{
 				numDown++;
 
-				// ‰Ÿ‰º”»’èŠJn“_‚ÅÅ‚à’·‚­‰Ÿ‚³‚ê‚Ä‚¢‚éƒL[‚Ìƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ğÌ—p‚·‚é
+				// æŠ¼ä¸‹åˆ¤å®šé–‹å§‹æ™‚ç‚¹ã§æœ€ã‚‚é•·ãæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‚­ãƒ¼ã®ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã‚’æ¡ç”¨ã™ã‚‹
 				if (duration <= key.PressedDuration())
 				{
 					duration = key.PressedDuration();
@@ -152,7 +152,7 @@ namespace Equisetum2
 		{
 			down = true;
 
-			// ‰Ÿ‚³‚ê‚½ŠÔ‚ğ‹L˜^
+			// æŠ¼ã•ã‚ŒãŸæ™‚é–“ã‚’è¨˜éŒ²
 			g_mapCombinationKeyTimeStamp[this].down = timeStamp;
 		}
 
@@ -171,7 +171,7 @@ namespace Equisetum2
 				{
 					up = true;
 
-					// —£‚³‚ê‚½ŠÔ‚ğ‹L˜^
+					// é›¢ã•ã‚ŒãŸæ™‚é–“ã‚’è¨˜éŒ²
 					g_mapCombinationKeyTimeStamp[this].last = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 					break;
 				}
@@ -209,12 +209,12 @@ namespace Equisetum2
 
 		if (IsPress())
 		{
-			// ‰Ÿ‚³‚ê‚Ä‚¢‚éŠÔ‚Í‰Ÿ‰ºŠJn‚ÆŒ»İ‚Ì·‚ğ‹‚ß‚é
+			// æŠ¼ã•ã‚Œã¦ã„ã‚‹é–“ã¯æŠ¼ä¸‹é–‹å§‹æ™‚ã¨ç¾åœ¨æ™‚åˆ»ã®å·®ã‚’æ±‚ã‚ã‚‹
 			duration = TickCounter::ElapsedTicks(ref.down, Singleton<SystemTimerCompat>::GetInstance()->Ticks());
 		}
 		else
 		{
-			// —£‚³‚ê‚Ä‚¢‚½‚ç‰Ÿ‰ºŠJn‚Æ—£‚³‚ê‚½ŠÔ‚Ì·‚ğ‹‚ß‚é
+			// é›¢ã•ã‚Œã¦ã„ãŸã‚‰æŠ¼ä¸‹é–‹å§‹æ™‚ã¨é›¢ã•ã‚ŒãŸæ™‚é–“ã®å·®ã‚’æ±‚ã‚ã‚‹
 			duration = TickCounter::ElapsedTicks(ref.down, ref.last);
 		}
 

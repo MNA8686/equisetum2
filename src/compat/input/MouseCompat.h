@@ -1,4 +1,4 @@
-#if !defined(_EQMOUSECOMPAT_H_)
+ï»¿#if !defined(_EQMOUSECOMPAT_H_)
 #define _EQMOUSECOMPAT_H_
 
 #include "system/Singleton.h"
@@ -11,7 +11,7 @@ namespace Equisetum2
 	class MouseCompat final
 	{
 	public:
-		friend Singleton<MouseCompat>;	// ƒVƒ“ƒOƒ‹ƒgƒ“‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ä‚à‚ç‚¦‚é‚æ‚¤‚É‚·‚é
+		friend Singleton<MouseCompat>;	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¦ã‚‚ã‚‰ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 		void Prepare();
 		void Update();
@@ -28,7 +28,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		MouseCompat();	// ƒCƒ“ƒXƒ^ƒ“ƒXì¬••‚¶
+		MouseCompat();	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆå°ã˜
 	};
 }
 

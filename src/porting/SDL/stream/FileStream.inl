@@ -1,4 +1,4 @@
-#include "stream/FileStream.h"
+﻿#include "stream/FileStream.h"
 
 #include "stream/SDLBinderRWops.inl"
 

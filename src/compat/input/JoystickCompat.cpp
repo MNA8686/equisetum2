@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+﻿#include "system/Logger.h"
 #include "input/JoystickCompat.h"
 
 #include "input/JoystickCompatImpl.inl"

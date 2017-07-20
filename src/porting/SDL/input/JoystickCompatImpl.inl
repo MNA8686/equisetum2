@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "input/JoystickCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "timer/TickCounter.h"
@@ -35,7 +35,7 @@ namespace Equisetum2
 	class JoystickCompat::Impl final : public SDLJoystick
 	{
 	public:
-		static const int JoyMax = 4;		// ‚±‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚Åˆµ‚¤Å‘åƒWƒ‡ƒCƒXƒeƒBƒbƒN”
+		static const int JoyMax = 4;		// ã“ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§æ‰±ã†æœ€å¤§ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯æ•°
 
 		Impl()
 		{
@@ -44,7 +44,7 @@ namespace Equisetum2
 				{
 				case SDL_JOYDEVICEADDED:
 					{
-						int32_t joyIndex = e.jdevice.which;		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN”Ô†
+						int32_t joyIndex = e.jdevice.which;		// ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ç•ªå·
 
 						Logger::OutputInfo("SDL_JOYDEVICEADDED %d\n", joyIndex);
 
@@ -61,21 +61,21 @@ namespace Equisetum2
 									}
 								});
 
-								// ²‚Ì”•ÏX•‰Šú‰»
+								// è»¸ã®æ•°å¤‰æ›´ï¼†åˆæœŸåŒ–
 								m_JoyState[joyIndex].vAxes.resize(NumAxes(joyIndex));
 								for (auto& axis : m_JoyState[joyIndex].vAxes)
 								{
 									axis = 0;
 								}
 
-								// ƒ{ƒ^ƒ“‚Ì”•ÏX•‰Šú‰»
+								// ãƒœã‚¿ãƒ³ã®æ•°å¤‰æ›´ï¼†åˆæœŸåŒ–
 								m_JoyState[joyIndex].vKeyState.resize(NumButtons(joyIndex));
 								for (auto& keyState : m_JoyState[joyIndex].vKeyState)
 								{
 									keyState = { "JOY BUTTON" };
 								}
 
-								// ƒnƒbƒg‚Ì”•ÏX•‰Šú‰»
+								// ãƒãƒƒãƒˆã®æ•°å¤‰æ›´ï¼†åˆæœŸåŒ–
 								m_JoyState[joyIndex].vHats.resize(NumHats(joyIndex));
 								for (auto& hat : m_JoyState[joyIndex].vHats)
 								{
@@ -143,7 +143,7 @@ namespace Equisetum2
 						if (inst.JoyInstance != nullptr &&
 							e.jbutton.which == SDL_JoystickInstanceID(inst.JoyInstance.get()))
 						{
-							auto buttonIndex = e.jbutton.button;	// ƒ{ƒ^ƒ“”Ô†
+							auto buttonIndex = e.jbutton.button;	// ãƒœã‚¿ãƒ³ç•ªå·
 							auto& buttonState = inst.vKeyState[buttonIndex];
 
 							if (e.type == SDL_JOYBUTTONDOWN)
@@ -173,7 +173,7 @@ namespace Equisetum2
 						if (inst.JoyInstance != nullptr &&
 							e.jaxis.which == SDL_JoystickInstanceID(inst.JoyInstance.get()))
 						{
-							auto axisIndex = e.jaxis.axis;	// ²”Ô†
+							auto axisIndex = e.jaxis.axis;	// è»¸ç•ªå·
 							inst.vAxes[axisIndex] = e.jaxis.value;
 
 							Logger::OutputInfo("SDL_JOYAXISMOTION %d %d\n", axisIndex, inst.vAxes[axisIndex]);
@@ -189,7 +189,7 @@ namespace Equisetum2
 						if (inst.JoyInstance != nullptr &&
 							e.jaxis.which == SDL_JoystickInstanceID(inst.JoyInstance.get()))
 						{
-							auto hatIndex = e.jhat.hat;	// ƒnƒbƒg”Ô†
+							auto hatIndex = e.jhat.hat;	// ãƒãƒƒãƒˆç•ªå·
 							auto update = [hatIndex, &inst, e](eHatState hatState, int mask)
 							{
 								auto& key = inst.vHats[hatIndex].state[(int)hatState];
@@ -234,17 +234,17 @@ namespace Equisetum2
 		{
 			m_timeStamp = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 
-			// •Ï‰»ƒGƒbƒWƒtƒ‰ƒO‚Í1ƒtƒŒ[ƒ€Œo‰ß‚µ‚½‚çƒNƒŠƒA‚·‚é
+			// å¤‰åŒ–ã‚¨ãƒƒã‚¸ãƒ•ãƒ©ã‚°ã¯1ãƒ•ãƒ¬ãƒ¼ãƒ çµŒéã—ãŸã‚‰ã‚¯ãƒªã‚¢ã™ã‚‹
 			for (auto& inst : m_JoyState)
 			{
-				// ƒ{ƒ^ƒ“
+				// ãƒœã‚¿ãƒ³
 				for (auto& keyState : inst.vKeyState)
 				{
 					keyState.down = false;
 					keyState.up = false;
 				}
 
-				// ƒnƒbƒg
+				// ãƒãƒƒãƒˆ
 				for (auto& keyState : inst.vHats)
 				{
 					for (auto& key : keyState.state)
@@ -260,7 +260,7 @@ namespace Equisetum2
 		{
 			for (auto& inst : m_JoyState)
 			{
-				// ƒ{ƒ^ƒ“
+				// ãƒœã‚¿ãƒ³
 				for (auto& keyState : inst.vKeyState)
 				{
 					if (keyState.press)
@@ -269,7 +269,7 @@ namespace Equisetum2
 					}
 				}
 
-				// ƒnƒbƒg
+				// ãƒãƒƒãƒˆ
 				for (auto& keyState : inst.vHats)
 				{
 					for (auto& keyState_ : keyState.state)
@@ -380,7 +380,7 @@ namespace Equisetum2
 		{
 			if (listener.OnConnected == nullptr && listener.OnRemoved == nullptr)
 			{
-				// íœ
+				// å‰Šé™¤
 				m_JoyState[joyIndex].eventListener.erase(key);
 			}
 			else
@@ -396,10 +396,10 @@ namespace Equisetum2
 
 	private:
 
-		// SDLƒCƒxƒ“ƒgƒŠƒXƒi[
+		// SDLã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 		std::shared_ptr<SDLEventListener> m_listener;
 
-		// ƒnƒbƒgƒXƒCƒbƒ`‚Ì’è‹`
+		// ãƒãƒƒãƒˆã‚¹ã‚¤ãƒƒãƒã®å®šç¾©
 		enum class eHatState : int
 		{
 			Right,
@@ -416,20 +416,20 @@ namespace Equisetum2
 
 		typedef struct
 		{
-			// ƒWƒ‡ƒCƒXƒeƒBƒbƒNƒCƒ“ƒXƒ^ƒ“ƒX
+			// ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 			std::shared_ptr<SDL_Joystick> JoyInstance;
-			// ƒL[ƒoƒbƒtƒ@
+			// ã‚­ãƒ¼ãƒãƒƒãƒ•ã‚¡
 			std::vector<stKeyState> vKeyState;
-			// ²ƒoƒbƒtƒ@
+			// è»¸ãƒãƒƒãƒ•ã‚¡
 			std::vector<int16_t> vAxes;
-			// ƒnƒbƒgƒoƒbƒtƒ@
+			// ãƒãƒƒãƒˆãƒãƒƒãƒ•ã‚¡
 			std::vector<stHatState> vHats;
-			// ƒCƒxƒ“ƒgƒŠƒXƒi[
+			// ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 			std::unordered_map<void*, stJoystickEvent> eventListener;
 		}stJoyState;
 		stJoyState m_JoyState[JoyMax] = {};
 
-		// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+		// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—
 		uint32_t m_timeStamp = 0;
 
 		static const stKeyState m_nullState;

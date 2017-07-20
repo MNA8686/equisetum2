@@ -1,4 +1,4 @@
-#include "system/System.h"
+ï»¿#include "system/System.h"
 #include "system/Singleton.h"
 #include "system/LoggerCompat.h"
 #include "graphic/WindowCompat.h"
@@ -27,18 +27,18 @@ namespace Equisetum2
 		SDL_Event e;
 		bool continueFlag = true;
 
-		// ƒEƒBƒ“ƒhƒEXV€”õ
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æ›´æ–°æº–å‚™
 		Singleton<WindowCompat>::GetInstance()->Prepare();
-		// ƒL[ƒ{[ƒhXV€”õ
+		// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æ›´æ–°æº–å‚™
 		Singleton<KeyboardCompat>::GetInstance()->Prepare();
-		// ƒ}ƒEƒXXV€”õ
+		// ãƒã‚¦ã‚¹æ›´æ–°æº–å‚™
 		Singleton<MouseCompat>::GetInstance()->Prepare();
-		// ƒ^ƒbƒ`ƒpƒlƒ‹XV€”õ
+		// ã‚¿ãƒƒãƒãƒ‘ãƒãƒ«æ›´æ–°æº–å‚™
 		Singleton<TouchCompat>::GetInstance()->Prepare();
-		// ƒWƒ‡ƒCƒXƒeƒBƒbƒNXV€”õ
+		// ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯æ›´æ–°æº–å‚™
 		Singleton<JoystickCompat>::GetInstance()->Prepare();
 
-		// ƒCƒxƒ“ƒgƒ‹[ƒv
+		// ã‚¤ãƒ™ãƒ³ãƒˆãƒ«ãƒ¼ãƒ—
 		while (SDL_PollEvent(&e))
 		{
 			Singleton<SDLEventManager>::GetInstance()->Dispatch(e);
@@ -49,15 +49,15 @@ namespace Equisetum2
 			}
 		}
 
-		// ƒEƒBƒ“ƒhƒE‚Ìó‘Ô‚ğXV
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®çŠ¶æ…‹ã‚’æ›´æ–°
 		Singleton<WindowCompat>::GetInstance()->Update();
-		// ƒL[ƒ{[ƒh‚Ìó‘Ô‚ğXV
+		// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®çŠ¶æ…‹ã‚’æ›´æ–°
 		Singleton<KeyboardCompat>::GetInstance()->Update();
-		// ƒ}ƒEƒX‚Ìó‘Ô‚ğXV
+		// ãƒã‚¦ã‚¹ã®çŠ¶æ…‹ã‚’æ›´æ–°
 		Singleton<MouseCompat>::GetInstance()->Update();
-		// ƒ^ƒbƒ`ƒpƒlƒ‹‚Ìó‘Ô‚ğXV
+		// ã‚¿ãƒƒãƒãƒ‘ãƒãƒ«ã®çŠ¶æ…‹ã‚’æ›´æ–°
 		Singleton<TouchCompat>::GetInstance()->Update();
-		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚Ìó‘Ô‚ğXV
+		// ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®çŠ¶æ…‹ã‚’æ›´æ–°
 		Singleton<JoystickCompat>::GetInstance()->Update();
 
 		return continueFlag;
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	// ƒVƒ“ƒOƒ‹ƒgƒ“‚ÌƒCƒ“ƒXƒ^ƒ“ƒXì¬
+	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆ
 	Singleton<WindowCompat>::GetInstance();
 	Singleton<LoggerCompat>::GetInstance();
 	Singleton<SDLEventManager>::GetInstance();

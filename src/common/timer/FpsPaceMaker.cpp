@@ -1,4 +1,4 @@
-#include "timer/FpsPaceMaker.h"
+﻿#include "timer/FpsPaceMaker.h"
 
 #include "SDL.h"
 
@@ -8,8 +8,8 @@ namespace Equisetum2
 	{
 		class FpsPaceMakerDummy : public FpsPaceMaker
 		{
-			// ���̃t�@�N�g���[�ȊO�ŃC���X�^���X����点�Ȃ��悤�ɃR���X�g���N�^�ƃf�X�g���N�^��
-			// protected�錾���Ă��邪�A���̂܂܂���make_shared�ŃG���[�ɂȂ�̂ň�U�_�~�[�N���X������
+			// このファクトリー以外でインスタンスを作らせないようにコンストラクタとデストラクタを
+			// protected宣言しているが、そのままだとmake_sharedでエラーになるので一旦ダミークラスを挟む
 		};
 
 		std::shared_ptr<FpsPaceMaker> inst;
@@ -45,7 +45,7 @@ namespace Equisetum2
 	{
 		m_TargetFps = fps;
 
-		// 1�t���[��������ǂꂮ�炢�̎��ԑ҂����Z�o(�Œ菬���_)
+		// 1フレームあたりどれぐらいの時間待つかを算出(固定小数点)
 		if (m_TargetFps == 0)
 		{
 			m_fixdWaitTickPerFrame = 0;
@@ -70,22 +70,22 @@ namespace Equisetum2
 
 		if (m_fixdWaitTickPerFrame > 0)
 		{
-			// �K�v���Ԍo�߂��Ă���H
+			// 必要時間経過している？
 			if (fixedElapseTicks + m_fixdCarryTick >= m_fixdWaitTickPerFrame)
 			{
-				// �o�߃t���[�������Z�o(�t���[���X�L�b�v�Ŏg�p����)
+				// 経過フレーム数を算出(フレームスキップで使用する)
 				m_ElapsedFrame = (fixedElapseTicks + m_fixdCarryTick) / m_fixdWaitTickPerFrame;
 
-				// ���̃t���[�����������鎞���ɂȂ���
+				// 次のフレームを処理する時刻になった
 				m_fixdCarryTick = (fixedElapseTicks + m_fixdCarryTick) % m_fixdWaitTickPerFrame;
 				m_TickCounter->Reset();
 			}
 			else
 			{
-				// �܂�1�t���[�����̎��Ԃ��o�߂��Ă��Ȃ�
-				// �c��̎��Ԃ��Z�o
+				// まだ1フレーム分の時間が経過していない
+				// 残りの時間を算出
 				remain = (m_fixdWaitTickPerFrame - (fixedElapseTicks + m_fixdCarryTick)) >> m_FractionalPart;
-				// �E�V�t�g�������ʁA�c�莞�Ԃ�0�ɂȂ�\��������̂ŕ␳
+				// 右シフトした結果、残り時間が0になる可能性があるので補正
 				if (remain == 0)
 				{
 					remain = 1;

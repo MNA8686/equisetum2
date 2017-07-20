@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "input/TouchCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "timer/TickCounter.h"
@@ -14,7 +14,7 @@ namespace Equisetum2
 	class TouchCompat::Impl final
 	{
 	public:
-		static const int FingerMax = 10;		// ‚±‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚Åˆµ‚¤Å‘åƒtƒBƒ“ƒK[”(iOS‚ª5–{‚Ü‚Å‚È‚Ì‚Å”O‚Ì‚½‚ßA‚»‚Ì”{—pˆÓ‚µ‚Æ‚­‚—)
+		static const int FingerMax = 10;		// ã“ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§æ‰±ã†æœ€å¤§ãƒ•ã‚£ãƒ³ã‚¬ãƒ¼æ•°(iOSãŒ5æœ¬ã¾ã§ãªã®ã§å¿µã®ãŸã‚ã€ãã®å€ç”¨æ„ã—ã¨ãï½—)
 
 		Impl()
 		{
@@ -81,7 +81,7 @@ namespace Equisetum2
 				}
 			});
 
-			// ƒ{ƒ^ƒ“‚Ì–¼‘O‚ğ“o˜^
+			// ãƒœã‚¿ãƒ³ã®åå‰ã‚’ç™»éŒ²
 			for (auto& state : m_TouchStateArray)
 			{
 				state = {};
@@ -114,25 +114,25 @@ namespace Equisetum2
 
 		const Point<float>& Pos(int fingerIndex) const
 		{
-			// TODO –³Œø’l”»’è
+			// TODO ç„¡åŠ¹å€¤åˆ¤å®š
 			return m_TouchStateArray[fingerIndex].pos;
 		}
 
 		const Point<float>& Delta(int fingerIndex) const
 		{
-			// TODO –³Œø’l”»’è
+			// TODO ç„¡åŠ¹å€¤åˆ¤å®š
 			return m_TouchStateArray[fingerIndex].delta;
 		}
 
 		const stKeyState& Button(int fingerIndex) const
 		{
-			// TODO –³Œø’l”»’è
+			// TODO ç„¡åŠ¹å€¤åˆ¤å®š
 			return m_TouchStateArray[fingerIndex].touchState;
 		}
 
 		int64_t FingerId(int fingerIndex) const
 		{
-			// TODO –³Œø’l”»’è
+			// TODO ç„¡åŠ¹å€¤åˆ¤å®š
 			return m_TouchStateArray[fingerIndex].id;
 		}
 
@@ -143,26 +143,26 @@ namespace Equisetum2
 
 	private:
 
-		// SDLƒCƒxƒ“ƒgƒŠƒXƒi[
+		// SDLã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 		std::shared_ptr<SDLEventListener> m_listener;
 
 		typedef struct
 		{
-			// ƒtƒBƒ“ƒK[ID
-			// ƒtƒBƒ“ƒK[ƒCƒ“ƒfƒbƒNƒX‚Æ‚ÍˆÙ‚È‚é
-			// ‚±‚ê‚Í‰Ÿ‚³‚ê‚é‚½‚Ñ‚ÉƒCƒ“ƒNƒŠƒƒ“ƒg‚³‚ê‚Ä‚¢‚­(Windows‚Ìê‡)
+			// ãƒ•ã‚£ãƒ³ã‚¬ãƒ¼ID
+			// ãƒ•ã‚£ãƒ³ã‚¬ãƒ¼ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¨ã¯ç•°ãªã‚‹
+			// ã“ã‚Œã¯æŠ¼ã•ã‚Œã‚‹ãŸã³ã«ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã•ã‚Œã¦ã„ã(Windowsã®å ´åˆ)
 			int64_t id;
-			// â‘ÎÀ•W
+			// çµ¶å¯¾åº§æ¨™
 			Point<float> pos;
-			// ‘Š‘ÎÀ•W
+			// ç›¸å¯¾åº§æ¨™
 			Point<float> delta;
-			// ƒ^ƒbƒ`ó‘ÔŠÇ—”z—ñ
+			// ã‚¿ãƒƒãƒçŠ¶æ…‹ç®¡ç†é…åˆ—
 			stKeyState touchState;
 		}stTouchState;
 
 		stTouchState m_TouchStateArray[FingerMax]{};
 
-		// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+		// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—
 		uint32_t m_timeStamp = 0;
 	};
 }

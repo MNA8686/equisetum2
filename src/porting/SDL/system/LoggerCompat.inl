@@ -1,4 +1,4 @@
-#include "SDL.h"
+﻿#include "SDL.h"
 
 namespace Equisetum2
 {
@@ -27,8 +27,8 @@ namespace Equisetum2
 			case LogLevel::Critical:
 				pri = SDL_LOG_PRIORITY_CRITICAL;
 				break;
-            default:
-                break;
+			default:
+				break;
 			}
 
 			return pri;

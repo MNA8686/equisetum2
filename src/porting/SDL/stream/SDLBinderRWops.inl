@@ -1,4 +1,4 @@
-#if !defined(_EQSTREAMIMPL_H_)
+ï»¿#if !defined(_EQSTREAMIMPL_H_)
 #define _EQSTREAMIMPL_H_
 
 #include "SDL.h"
@@ -77,11 +77,11 @@ namespace Equisetum2
 
 	static int close(struct SDL_RWops *context)
 	{
-		// ƒXƒgƒŠ[ƒ€‚ÍƒXƒ}[ƒgƒ|ƒCƒ“ƒ^‚Å‰ğ•ú‚³‚ê‚é‚Í‚¸
+		// ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¯ã‚¹ãƒãƒ¼ãƒˆãƒã‚¤ãƒ³ã‚¿ã§è§£æ”¾ã•ã‚Œã‚‹ã¯ãš
 		return 0;
 	}
 
-	// SDL‚ÌRWopsŠÛ“Š‚°ƒNƒ‰ƒX :p
+	// SDLã®RWopsä¸¸æŠ•ã’ã‚¯ãƒ©ã‚¹ :p
 	class SDLBinderRWops
 	{
 	public:
@@ -153,12 +153,12 @@ namespace Equisetum2
 				[](SDL_RWops* pRWops){
 				if (pRWops != nullptr)
 				{
-					pRWops->close(pRWops);		// ’†‚ÅSDL_FreeRW‚àŒÄ‚Î‚ê‚é
+					pRWops->close(pRWops);		// ä¸­ã§SDL_FreeRWã‚‚å‘¼ã°ã‚Œã‚‹
 				}
 			});
 		}
 
-		// ƒXƒgƒŠ[ƒ€‚©‚çrwops‚ğ¶¬‚·‚é
+		// ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰rwopsã‚’ç”Ÿæˆã™ã‚‹
 		static SDL_RWops CreateFromStream(std::shared_ptr<IStream> stream)
 		{
 			SDL_RWops ops = {};

@@ -1,4 +1,4 @@
-#if !defined(_EQSDLEVENT_H_)
+ï»¿#if !defined(_EQSDLEVENT_H_)
 #define _EQSDLEVENT_H_
 
 #include "SDL.h"
@@ -7,11 +7,11 @@
 
 namespace Equisetum2
 {
-	// SDL‚ÌƒCƒxƒ“ƒgƒ}ƒl[ƒWƒƒ[ƒNƒ‰ƒX(ƒVƒ“ƒOƒ‹ƒgƒ“)
+	// SDLã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚¯ãƒ©ã‚¹(ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³)
 	class SDLEventManager final
 	{
 	public:
-		friend Singleton<SDLEventManager>;	// ƒVƒ“ƒOƒ‹ƒgƒ“‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ä‚à‚ç‚¦‚é‚æ‚¤‚É‚·‚é
+		friend Singleton<SDLEventManager>;	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¦ã‚‚ã‚‰ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 		void AddListener(void* key, std::function<void(SDL_Event e, void* key)>& cb)
 		{
@@ -33,12 +33,12 @@ namespace Equisetum2
 
 	private:
 
-		SDLEventManager(){}	// ƒCƒ“ƒXƒ^ƒ“ƒXì¬••‚¶
+		SDLEventManager(){}	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆå°ã˜
 
 		std::unordered_map<void*, std::function<void(SDL_Event e, void* key)> > m_map;
 	};
 
-	// SDL‚ÌƒCƒxƒ“ƒgƒŠƒXƒi[ƒNƒ‰ƒX
+	// SDLã®ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼ã‚¯ãƒ©ã‚¹
 	class SDLEventListener final
 	{
 	public:

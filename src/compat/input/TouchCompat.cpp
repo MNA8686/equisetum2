@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+﻿#include "system/Logger.h"
 #include "input/TouchCompat.h"
 
 #include "input/TouchCompatImpl.inl"

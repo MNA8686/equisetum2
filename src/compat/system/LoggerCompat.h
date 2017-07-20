@@ -1,4 +1,4 @@
-#if !defined(_EQLOGGERCOMPAT_H_)
+ï»¿#if !defined(_EQLOGGERCOMPAT_H_)
 #define _EQLOGGERCOMPAT_H_
 
 #include "system/Singleton.h"
@@ -10,7 +10,7 @@ namespace Equisetum2
 	class LoggerCompat
 	{
 	public:
-		friend Singleton<LoggerCompat>;	// ƒVƒ“ƒOƒ‹ƒgƒ“‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ä‚à‚ç‚¦‚é‚æ‚¤‚É‚·‚é
+		friend Singleton<LoggerCompat>;	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¦ã‚‚ã‚‰ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 		void SetPriority(LogLevel level);
 		void OutputV(LogLevel level, const char* format, va_list arg);
@@ -19,7 +19,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		LoggerCompat();	// ƒCƒ“ƒXƒ^ƒ“ƒXì¬••‚¶
+		LoggerCompat();	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆå°ã˜
 	};
 }
 

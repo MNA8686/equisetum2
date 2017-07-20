@@ -1,4 +1,4 @@
-#if !defined(_EQSYSTEMTIMERCOMPAT_H_)
+ï»¿#if !defined(_EQSYSTEMTIMERCOMPAT_H_)
 #define _EQSYSTEMTIMERCOMPAT_H_
 
 #include "system/Singleton.h"
@@ -9,7 +9,7 @@ namespace Equisetum2
 	class SystemTimerCompat final
 	{
 	public:
-		friend Singleton<SystemTimerCompat>;	// ƒVƒ“ƒOƒ‹ƒgƒ“‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ä‚à‚ç‚¦‚é‚æ‚¤‚É‚·‚é
+		friend Singleton<SystemTimerCompat>;	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¦ã‚‚ã‚‰ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 
 		uint32_t Ticks() const;
 
@@ -17,7 +17,7 @@ namespace Equisetum2
 
 		class Impl;
 		std::shared_ptr<Impl> m_Impl;
-		SystemTimerCompat();	// ƒCƒ“ƒXƒ^ƒ“ƒXì¬••‚¶
+		SystemTimerCompat();	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ä½œæˆå°ã˜
 	};
 }
 

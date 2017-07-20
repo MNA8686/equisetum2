@@ -1,4 +1,4 @@
-#include "system/Singleton.h"
+﻿#include "system/Singleton.h"
 
 namespace Equisetum2
 {

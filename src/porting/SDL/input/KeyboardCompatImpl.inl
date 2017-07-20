@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "input/KeyboardCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "timer/TickCounter.h"
@@ -18,7 +18,7 @@ namespace Equisetum2
 		const char* name;
 	}stKeyCode;
 
-	// SDL‚ÌƒL[ƒR[ƒh‚Æ‚Ì•ÏŠ·ƒe[ƒuƒ‹
+	// SDLã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã¨ã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«
 	static const stKeyCode keyCodeTbl[] =
 	{
 #define KEYCODE_CONV(internalKeycode, keyCode) { internalKeycode, keyCode, #keyCode }
@@ -202,7 +202,7 @@ namespace Equisetum2
 		{
 			m_timeStamp = Singleton<SystemTimerCompat>::GetInstance()->Ticks();
 
-			// •Ï‰»ƒGƒbƒWƒtƒ‰ƒO‚Í1ƒtƒŒ[ƒ€Œo‰ß‚µ‚½‚çƒNƒŠƒA‚·‚é
+			// å¤‰åŒ–ã‚¨ãƒƒã‚¸ãƒ•ãƒ©ã‚°ã¯1ãƒ•ãƒ¬ãƒ¼ãƒ çµŒéã—ãŸã‚‰ã‚¯ãƒªã‚¢ã™ã‚‹
 			for (auto& keyState : m_keyStateArray)
 			{
 				keyState.down = false;
@@ -233,11 +233,11 @@ namespace Equisetum2
 
 	private:
 
-		// SDLƒCƒxƒ“ƒgƒŠƒXƒi[
+		// SDLã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 		std::shared_ptr<SDLEventListener> m_listener;
-		// ƒL[ƒoƒbƒtƒ@
+		// ã‚­ãƒ¼ãƒãƒƒãƒ•ã‚¡
 		stKeyState m_keyStateArray[(int)KeyCode::KEY_MAX] = {};
-		// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+		// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—
 		uint32_t m_timeStamp = 0;
 	};
 }

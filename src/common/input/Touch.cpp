@@ -1,4 +1,4 @@
-#include "input/Touch.h"
+ï»¿#include "input/Touch.h"
 #include "system/Logger.h"
 #include "input/TouchCompat.h"
 
@@ -79,7 +79,7 @@ namespace Equisetum2
 		{
 			if (auto state = GetStateByFingerIndex(i))
 			{
-				// ‰Ÿ‚³‚ê‚Ä‚¢‚éw‚Æ—£‚³‚ê‚½uŠÔ‚ğ—LŒø‚È‚à‚Ì‚Æ‚µ‚Äˆ—‚·‚é
+				// æŠ¼ã•ã‚Œã¦ã„ã‚‹æŒ‡ã¨é›¢ã•ã‚ŒãŸç¬é–“ã‚’æœ‰åŠ¹ãªã‚‚ã®ã¨ã—ã¦å‡¦ç†ã™ã‚‹
 				if ((*state).IsPress() || (*state).IsUp())
 				{
 					vState.push_back((*state));

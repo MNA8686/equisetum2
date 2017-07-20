@@ -1,4 +1,4 @@
-#include "input/Joystick.h"
+ï»¿#include "input/Joystick.h"
 #include "system/Logger.h"
 #include "input/JoystickCompat.h"
 
@@ -21,7 +21,7 @@ namespace Equisetum2
 
 	Joystick::~Joystick()
 	{
-		// ƒŠƒXƒi[íœ
+		// ãƒªã‚¹ãƒŠãƒ¼å‰Šé™¤
 		Singleton<JoystickCompat>::GetInstance()->SetEventListener(m_Index, {}, this);
 	}
 

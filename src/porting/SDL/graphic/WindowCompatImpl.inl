@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "graphic/WindowCompat.h"
 #include "SDL.h"
 
@@ -10,12 +10,12 @@ namespace Equisetum2
 		Impl()
 		{
 			auto pWindow = SDL_CreateWindow(
-				"",							// ƒEƒBƒ“ƒhƒE‚Ìƒ^ƒCƒgƒ‹
-				SDL_WINDOWPOS_CENTERED,		// XÀ•W‚Ì‰Šú’l
-				SDL_WINDOWPOS_CENTERED,		// YÀ•W‚Ì‰Šú’l
-				640,						// •‚ÌƒsƒNƒZƒ‹”
-				480,						// ‚‚³‚ÌƒsƒNƒZƒ‹”
-				SDL_WINDOW_OPENGL			// ƒtƒ‰ƒO
+				"",							// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒˆãƒ«
+				SDL_WINDOWPOS_CENTERED,		// Xåº§æ¨™ã®åˆæœŸå€¤
+				SDL_WINDOWPOS_CENTERED,		// Yåº§æ¨™ã®åˆæœŸå€¤
+				640,						// å¹…ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
+				480,						// é«˜ã•ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
+				SDL_WINDOW_OPENGL			// ãƒ•ãƒ©ã‚°
 			);
 
 			if (pWindow)

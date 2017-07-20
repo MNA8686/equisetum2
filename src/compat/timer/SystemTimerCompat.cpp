@@ -1,4 +1,4 @@
-#include "timer/SystemTimerCompat.h"
+﻿#include "timer/SystemTimerCompat.h"
 
 #include "timer/SystemTimerCompatImpl.inl"
 

@@ -1,4 +1,4 @@
-#if !defined(_EQSINGLETON_H_)
+﻿#if !defined(_EQSINGLETON_H_)
 #define _EQSINGLETON_H_
 
 #include <mutex>

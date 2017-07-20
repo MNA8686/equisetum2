@@ -1,4 +1,4 @@
-#include "timer/TickCounter.h"
+ï»¿#include "timer/TickCounter.h"
 
 namespace Equisetum2
 {
@@ -6,8 +6,8 @@ namespace Equisetum2
 	{
 		class TickCounterDummy : public TickCounter
 		{
-			// ‚±‚Ìƒtƒ@ƒNƒgƒŠ[ˆÈŠO‚ÅƒCƒ“ƒXƒ^ƒ“ƒX‚ğì‚ç‚¹‚È‚¢‚æ‚¤‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÆƒfƒXƒgƒ‰ƒNƒ^‚ğ
-			// protectedéŒ¾‚µ‚Ä‚¢‚é‚ªA‚»‚Ì‚Ü‚Ü‚¾‚Æmake_shared‚ÅƒGƒ‰[‚É‚È‚é‚Ì‚Åˆê’Uƒ_ƒ~[ƒNƒ‰ƒX‚ğ‹²‚Ş
+			// ã“ã®ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ä»¥å¤–ã§ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œã‚‰ã›ãªã„ã‚ˆã†ã«ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¨ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’
+			// protectedå®£è¨€ã—ã¦ã„ã‚‹ãŒã€ãã®ã¾ã¾ã ã¨make_sharedã§ã‚¨ãƒ©ãƒ¼ã«ãªã‚‹ã®ã§ä¸€æ—¦ãƒ€ãƒŸãƒ¼ã‚¯ãƒ©ã‚¹ã‚’æŒŸã‚€
 		};
 
 		std::shared_ptr<TickCounter> inst;
