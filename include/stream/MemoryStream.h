@@ -24,9 +24,11 @@ namespace Equisetum2
 		virtual int64_t Seek(int64_t offset, SeekOrigin origin) override;
 		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
 		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t size) override;
+		virtual const Optional<size_t> Read(uint8_t *data, size_t size) override;
 		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
 		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t size) override;
 		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray) override;
+		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
 

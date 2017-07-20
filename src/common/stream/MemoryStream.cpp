@@ -146,6 +146,15 @@ namespace Equisetum2
 		return Read(vByteArray, 0, size);
 	}
 
+	const Optional<size_t> MemoryStream::Read(uint8_t *data, size_t size)
+	{
+		Optional<size_t> optSize;
+
+		optSize = m_pImpl->Read(data, size);
+
+		return optSize;
+	}
+
 	const Optional<size_t> MemoryStream::Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
 	{
 		Optional<size_t> optSize;
@@ -166,6 +175,15 @@ namespace Equisetum2
 	const Optional<size_t> MemoryStream::Write(const std::vector<uint8_t>& vByteArray)
 	{
 		return Write(vByteArray, 0, vByteArray.size());
+	}
+
+	const Optional<size_t> MemoryStream::Write(const uint8_t *data, size_t size)
+	{
+		Optional<size_t> optSize;
+
+		optSize = m_pImpl->Write(data, size);
+
+		return optSize;
 	}
 
 	int MemoryStream::ReadByte()

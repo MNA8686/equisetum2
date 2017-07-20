@@ -99,6 +99,14 @@ namespace Equisetum2
 
 		/**
 		* @brief ストリームに書き込む
+		* @param data 読み出しデータ格納バッファ
+		* @param size 読み出しバイト数
+		* @return null:読み出し失敗、>=0:読み出したバイト数
+		*/
+		virtual const Optional<size_t> Read(uint8_t *data, size_t size) = 0;
+
+		/**
+		* @brief ストリームに書き込む
 		* @param vByteArray 書き込みデータ格納バッファ
 		* @param begin 書き込み開始位置
 		* @param size 書き込みバイト数
@@ -120,6 +128,14 @@ namespace Equisetum2
 		* @return null:書き込み失敗、>=0:書き込んだバイト数
 		*/
 		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray) = 0;
+
+		/**
+		* @brief ストリームに書き込む
+		* @param data 書き込みデータ格納バッファ
+		* @param size 書き込みバイト数
+		* @return null:書き込み失敗、>=0:書き込んだバイト数
+		*/
+		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) = 0;
 
 		/**
 		* @brief 1バイト読み出す
