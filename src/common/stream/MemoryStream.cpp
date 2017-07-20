@@ -71,12 +71,14 @@ namespace Equisetum2
 
 	std::shared_ptr<MemoryStream> MemoryStream::CreateFromBuf(const void* buf, int size)
 	{
-		return Create(StreamImpl::OpenFromBuf(buf, size));
+		auto tmp = StreamImpl::OpenFromBuf(buf, size);
+		return Create(tmp);
 	}
 
 	std::shared_ptr<MemoryStream> MemoryStream::CreateFromBuf(void* buf, int size, bool writable)
 	{
-		auto inst = Create(StreamImpl::OpenFromBuf(buf, size, writable));
+		auto tmp = StreamImpl::OpenFromBuf(buf, size, writable);
+		auto inst = Create(tmp);
 		if (inst)
 		{
 			inst->m_writable = writable;

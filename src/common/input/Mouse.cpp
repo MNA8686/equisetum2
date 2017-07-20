@@ -26,9 +26,9 @@ namespace Equisetum2
 
 	const Key Mouse::Button(MouseButton button)
 	{
-		return [button]()->stKeyState{
+		return Key([button]()->stKeyState{
 			return Singleton<MouseCompat>::GetInstance()->Button(button);
-		};
+		});
 	}
 
 	bool Mouse::ShowCursor(bool toggle)
