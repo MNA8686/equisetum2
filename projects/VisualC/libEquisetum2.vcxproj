@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./include;./src/common;./src/compat;./src/porting/SDL;./src/porting/Win32;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -58,7 +58,7 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>./external/dep/win32/SDL2/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
@@ -66,11 +66,11 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy ".\external\dep\win32\SDL2\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_image\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_ttf\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_mixer\dll\*" ".\lib\win32\dll"
-copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
+      <Command>copy "..\..\external\dep\win32\SDL2\dll\*" "..\..\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_mixer\dll\*" "..\..\lib\win32\dll"
+copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,7 +83,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./include;./src/common;./src/compat;./src/porting/SDL;./src/porting/Win32;./external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>./external/dep/win32/SDL2/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
@@ -101,141 +101,141 @@ copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy ".\external\dep\win32\SDL2\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_image\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_ttf\dll\*" ".\lib\win32\dll"
-copy ".\external\dep\win32\SDL2_mixer\dll\*" ".\lib\win32\dll"
-copy "$(SolutionDir)$(Configuration)\*.lib" ".\lib\win32\lib"</Command>
+      <Command>copy "..\..\\external\dep\win32\SDL2\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"
+copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\crypt\HMAC.hpp" />
-    <ClInclude Include="include\crypt\MessageDigest.hpp" />
-    <ClInclude Include="include\Equisetum2.h" />
-    <ClInclude Include="include\fs\Directory.hpp" />
-    <ClInclude Include="include\fs\File.hpp" />
-    <ClInclude Include="include\fs\Path.hpp" />
-    <ClInclude Include="include\graphic\Window.h" />
-    <ClInclude Include="include\input\IKeyState.h" />
-    <ClInclude Include="include\input\Joystick.h" />
-    <ClInclude Include="include\input\Key.h" />
-    <ClInclude Include="include\input\KeyCode.h" />
-    <ClInclude Include="include\input\Mouse.h" />
-    <ClInclude Include="include\input\Touch.h" />
-    <ClInclude Include="include\stream\FileStream.h" />
-    <ClInclude Include="include\stream\IStream.h" />
-    <ClInclude Include="include\stream\MemoryStream.h" />
-    <ClInclude Include="include\stream\TextReader.h" />
-    <ClInclude Include="include\stream\TextWriter.h" />
-    <ClInclude Include="include\system\Exception.hpp" />
-    <ClInclude Include="include\system\Logger.h" />
-    <ClInclude Include="include\system\System.h" />
-    <ClInclude Include="include\timer\SystemTimer.h" />
-    <ClInclude Include="include\timer\FpsCounter.h" />
-    <ClInclude Include="include\timer\FpsPaceMaker.h" />
-    <ClInclude Include="include\timer\ITimer.h" />
-    <ClInclude Include="include\timer\TickCounter.h" />
-    <ClInclude Include="include\type\Optional.h" />
-    <ClInclude Include="include\type\Point.h" />
-    <ClInclude Include="include\type\String.h" />
-    <ClInclude Include="include\util\Regex.hpp" />
-    <ClInclude Include="include\util\SHA256.hpp" />
-    <ClInclude Include="src\common\crypt\MessageDigestSHA256.hpp" />
-    <ClInclude Include="src\common\system\Singleton.h" />
-    <ClInclude Include="src\compat\graphic\WindowCompat.h" />
-    <ClInclude Include="src\compat\input\JoystickCompat.h" />
-    <ClInclude Include="src\compat\input\KeyboardCompat.h" />
-    <ClInclude Include="src\compat\input\MouseCompat.h" />
-    <ClInclude Include="src\compat\input\TouchCompat.h" />
-    <ClInclude Include="src\compat\system\LoggerCompat.h" />
-    <ClInclude Include="src\compat\timer\SystemTimerCompat.h" />
-    <ClInclude Include="src\porting\SDL\system\SDLEvent.h" />
+    <ClInclude Include="..\..\include\crypt\HMAC.hpp" />
+    <ClInclude Include="..\..\include\crypt\MessageDigest.hpp" />
+    <ClInclude Include="..\..\include\Equisetum2.h" />
+    <ClInclude Include="..\..\include\fs\Directory.hpp" />
+    <ClInclude Include="..\..\include\fs\File.hpp" />
+    <ClInclude Include="..\..\include\fs\Path.hpp" />
+    <ClInclude Include="..\..\include\graphic\Window.h" />
+    <ClInclude Include="..\..\include\input\IKeyState.h" />
+    <ClInclude Include="..\..\include\input\Joystick.h" />
+    <ClInclude Include="..\..\include\input\Key.h" />
+    <ClInclude Include="..\..\include\input\KeyCode.h" />
+    <ClInclude Include="..\..\include\input\Mouse.h" />
+    <ClInclude Include="..\..\include\input\Touch.h" />
+    <ClInclude Include="..\..\include\stream\FileStream.h" />
+    <ClInclude Include="..\..\include\stream\IStream.h" />
+    <ClInclude Include="..\..\include\stream\MemoryStream.h" />
+    <ClInclude Include="..\..\include\stream\TextReader.h" />
+    <ClInclude Include="..\..\include\stream\TextWriter.h" />
+    <ClInclude Include="..\..\include\system\Exception.hpp" />
+    <ClInclude Include="..\..\include\system\Logger.h" />
+    <ClInclude Include="..\..\include\system\System.h" />
+    <ClInclude Include="..\..\include\timer\SystemTimer.h" />
+    <ClInclude Include="..\..\include\timer\FpsCounter.h" />
+    <ClInclude Include="..\..\include\timer\FpsPaceMaker.h" />
+    <ClInclude Include="..\..\include\timer\ITimer.h" />
+    <ClInclude Include="..\..\include\timer\TickCounter.h" />
+    <ClInclude Include="..\..\include\type\Optional.h" />
+    <ClInclude Include="..\..\include\type\Point.h" />
+    <ClInclude Include="..\..\include\type\String.h" />
+    <ClInclude Include="..\..\include\util\Regex.hpp" />
+    <ClInclude Include="..\..\include\util\SHA256.hpp" />
+    <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
+    <ClInclude Include="..\..\src\common\system\Singleton.h" />
+    <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
+    <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
+    <ClInclude Include="..\..\src\compat\input\KeyboardCompat.h" />
+    <ClInclude Include="..\..\src\compat\input\MouseCompat.h" />
+    <ClInclude Include="..\..\src\compat\input\TouchCompat.h" />
+    <ClInclude Include="..\..\src\compat\system\LoggerCompat.h" />
+    <ClInclude Include="..\..\src\compat\timer\SystemTimerCompat.h" />
+    <ClInclude Include="..\..\src\porting\SDL\system\SDLEvent.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\common\crypt\HMAC.cpp" />
-    <ClCompile Include="src\common\crypt\MessageDigest.cpp" />
-    <ClCompile Include="src\common\fs\Directory.cpp" />
-    <ClCompile Include="src\common\fs\File.cpp" />
-    <ClCompile Include="src\common\fs\Path.cpp" />
-    <ClCompile Include="src\common\graphic\Window.cpp" />
-    <ClCompile Include="src\common\input\Joystick.cpp" />
-    <ClCompile Include="src\common\input\Key.cpp" />
-    <ClCompile Include="src\common\input\Mouse.cpp" />
-    <ClCompile Include="src\common\input\Touch.cpp" />
-    <ClCompile Include="src\common\stream\FileStream.cpp" />
-    <ClCompile Include="src\common\stream\MemoryStream.cpp" />
-    <ClCompile Include="src\common\stream\TextReader.cpp" />
-    <ClCompile Include="src\common\stream\TextWriter.cpp" />
-    <ClCompile Include="src\common\system\Logger.cpp" />
-    <ClCompile Include="src\common\system\Singleton.cpp" />
-    <ClCompile Include="src\common\timer\FpsCounter.cpp" />
-    <ClCompile Include="src\common\timer\FpsPaceMaker.cpp" />
-    <ClCompile Include="src\common\timer\SystemTimer.cpp" />
-    <ClCompile Include="src\common\timer\TickCounter.cpp" />
-    <ClCompile Include="src\common\util\Regex.cpp" />
-    <ClCompile Include="src\common\util\SHA256.cpp" />
-    <ClCompile Include="src\compat\graphic\WindowCompat.cpp" />
-    <ClCompile Include="src\compat\input\JoystickCompat.cpp" />
-    <ClCompile Include="src\compat\input\KeyboardCompat.cpp" />
-    <ClCompile Include="src\compat\input\MouseCompat.cpp" />
-    <ClCompile Include="src\compat\input\TouchCompat.cpp" />
-    <ClCompile Include="src\compat\system\LoggerCompat.cpp" />
-    <ClCompile Include="src\compat\timer\SystemTimerCompat.cpp" />
-    <ClCompile Include="src\porting\SDL\system\System.cpp" />
+    <ClCompile Include="..\..\src\common\crypt\HMAC.cpp" />
+    <ClCompile Include="..\..\src\common\crypt\MessageDigest.cpp" />
+    <ClCompile Include="..\..\src\common\fs\Directory.cpp" />
+    <ClCompile Include="..\..\src\common\fs\File.cpp" />
+    <ClCompile Include="..\..\src\common\fs\Path.cpp" />
+    <ClCompile Include="..\..\src\common\graphic\Window.cpp" />
+    <ClCompile Include="..\..\src\common\input\Joystick.cpp" />
+    <ClCompile Include="..\..\src\common\input\Key.cpp" />
+    <ClCompile Include="..\..\src\common\input\Mouse.cpp" />
+    <ClCompile Include="..\..\src\common\input\Touch.cpp" />
+    <ClCompile Include="..\..\src\common\stream\FileStream.cpp" />
+    <ClCompile Include="..\..\src\common\stream\MemoryStream.cpp" />
+    <ClCompile Include="..\..\src\common\stream\TextReader.cpp" />
+    <ClCompile Include="..\..\src\common\stream\TextWriter.cpp" />
+    <ClCompile Include="..\..\src\common\system\Logger.cpp" />
+    <ClCompile Include="..\..\src\common\system\Singleton.cpp" />
+    <ClCompile Include="..\..\src\common\timer\FpsCounter.cpp" />
+    <ClCompile Include="..\..\src\common\timer\FpsPaceMaker.cpp" />
+    <ClCompile Include="..\..\src\common\timer\SystemTimer.cpp" />
+    <ClCompile Include="..\..\src\common\timer\TickCounter.cpp" />
+    <ClCompile Include="..\..\src\common\util\Regex.cpp" />
+    <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
+    <ClCompile Include="..\..\src\compat\graphic\WindowCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\input\JoystickCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\input\KeyboardCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\input\MouseCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\input\TouchCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\system\LoggerCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\timer\SystemTimerCompat.cpp" />
+    <ClCompile Include="..\..\src\porting\SDL\system\System.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\porting\SDL\graphic\WindowCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\graphic\WindowCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\input\JoystickCompatImpl.inl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </None>
-    <None Include="src\porting\SDL\input\KeyboardCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\input\JoystickCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\input\MouseCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\input\KeyboardCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\input\TouchCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\input\MouseCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\stream\FileStream.inl">
+    <None Include="..\..\src\porting\SDL\input\TouchCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\stream\MemoryStream.inl">
+    <None Include="..\..\src\porting\SDL\stream\FileStream.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\stream\SDLBinderRWops.inl">
+    <None Include="..\..\src\porting\SDL\stream\MemoryStream.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\system\LoggerCompat.inl">
+    <None Include="..\..\src\porting\SDL\stream\SDLBinderRWops.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\SDL\timer\SystemTimerCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\system\LoggerCompat.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\Win32\fs\DirectoryCompat.inl">
+    <None Include="..\..\src\porting\SDL\timer\SystemTimerCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\Win32\fs\FileCompat.inl">
+    <None Include="..\..\src\porting\Win32\fs\DirectoryCompat.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="src\porting\Win32\fs\PathCompat.inl">
+    <None Include="..\..\src\porting\Win32\fs\FileCompat.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\src\porting\Win32\fs\PathCompat.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
