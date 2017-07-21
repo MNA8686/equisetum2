@@ -31,6 +31,6 @@
 #include "timer/SystemTimer.h"
 #include "timer/TickCounter.h"
 #include "timer/FpsCounter.h"
-#include "timer/FpsPacemaker.h"
+#include "timer/FpsPaceMaker.h"
 
 #endif
