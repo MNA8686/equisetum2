@@ -32,7 +32,7 @@ namespace Equisetum2
 				EQ_THROW(String::Sprintf(u8"すでにディレクトリ[%s]が存在します。", path.c_str()));
 			}
 
-			auto inst = FileStream::CreateFromPath(Path::GetFullPath(path), FileStream::Method::Create);
+			auto inst = FileStream::CreateFromPath(Path::GetFullPath(path), FileStream::Method::Write);
 			if (!inst)
 			{
 				EQ_THROW(String::Sprintf(u8"[%s]の作成に失敗しました。", path.c_str()));
