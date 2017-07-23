@@ -17,7 +17,7 @@ namespace Equisetum2
 		// 1コードポイント書き込み
 		virtual bool Write(const String& code);
 
-		// 1行取得する
+		// 1行出力する
 		virtual bool WriteLine(const String& str);
 
 	protected:
