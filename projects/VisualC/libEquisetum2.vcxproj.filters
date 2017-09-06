@@ -216,6 +216,12 @@
     <ClInclude Include="..\..\include\crypt\HMAC.hpp">
       <Filter>ヘッダー ファイル\crypt</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\stream\CryptStream.hpp">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\stream\PartialStream.hpp">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -307,6 +313,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\porting\SDL\system\System.cpp">
       <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\stream\CryptStream.cpp">
+      <Filter>ソース ファイル\common\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\stream\PartialStream.cpp">
+      <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
