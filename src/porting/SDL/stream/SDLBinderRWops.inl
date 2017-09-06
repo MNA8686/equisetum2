@@ -45,7 +45,7 @@ namespace Equisetum2
 		for (size_t i = 0; i < maxnum; i++)
 		{
 			auto opt = stream->Read(&((uint8_t*)ptr)[size * i], size);
-			if (!opt || *opt == 0)
+			if (!opt || *opt != size)
 			{
 				break;
 			}
@@ -64,7 +64,7 @@ namespace Equisetum2
 		for (size_t i = 0; i < num; i++)
 		{
 			auto opt = stream->Write(&((const uint8_t*)ptr)[size * i], size);
-			if (!opt || *opt == 0)
+			if (!opt || *opt != size)
 			{
 				break;
 			}
