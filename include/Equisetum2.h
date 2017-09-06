@@ -1,4 +1,4 @@
-#if !defined(_EQUISETUM2_H_)
+﻿#if !defined(_EQUISETUM2_H_)
 #define _EQUISETUM2_H_
 
 #include "type/Optional.h"
@@ -6,6 +6,8 @@
 
 #include "util/Regex.hpp"
 #include "util/SHA256.hpp"
+#include "util/ArchiveAccessor.hpp"
+#include "util/ArchivePacker.hpp"
 
 #include "system/Exception.hpp"
 #include "system/System.h"

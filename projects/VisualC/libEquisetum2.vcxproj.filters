@@ -222,6 +222,12 @@
     <ClInclude Include="..\..\include\stream\PartialStream.hpp">
       <Filter>ヘッダー ファイル\stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\util\ArchiveAccessor.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\util\ArchivePacker.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -319,6 +325,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\stream\PartialStream.cpp">
       <Filter>ソース ファイル\common\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\util\ArchiveAccessor.cpp">
+      <Filter>ソース ファイル\common\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\util\ArchivePacker.cpp">
+      <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

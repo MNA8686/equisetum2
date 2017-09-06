@@ -143,6 +143,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\type\Optional.h" />
     <ClInclude Include="..\..\include\type\Point.h" />
     <ClInclude Include="..\..\include\type\String.h" />
+    <ClInclude Include="..\..\include\util\ArchiveAccessor.hpp" />
+    <ClInclude Include="..\..\include\util\ArchivePacker.hpp" />
     <ClInclude Include="..\..\include\util\Regex.hpp" />
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
@@ -179,6 +181,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\timer\FpsPaceMaker.cpp" />
     <ClCompile Include="..\..\src\common\timer\SystemTimer.cpp" />
     <ClCompile Include="..\..\src\common\timer\TickCounter.cpp" />
+    <ClCompile Include="..\..\src\common\util\ArchiveAccessor.cpp" />
+    <ClCompile Include="..\..\src\common\util\ArchivePacker.cpp" />
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
     <ClCompile Include="..\..\src\compat\graphic\WindowCompat.cpp" />
