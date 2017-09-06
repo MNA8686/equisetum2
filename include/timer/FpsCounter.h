@@ -1,4 +1,4 @@
-#if !defined(_EQFPSCOUNTER_H_)
+ï»¿#if !defined(_EQFPSCOUNTER_H_)
 #define _EQFPSCOUNTER_H_
 
 #include "TickCounter.h"
@@ -10,8 +10,8 @@ namespace Equisetum2
 	{
 	public:
 
-		// ƒtƒ@ƒNƒgƒŠ[
-		// “à•”‚ÅƒJƒEƒ“ƒ^[‚ÌƒŠƒZƒbƒg‚È‚Ç‚ğs‚¤‚½‚ßA‚±‚±‚É‚Í‚±‚ÌƒNƒ‰ƒXê—p‚ÌƒJƒEƒ“ƒ^[‚ğİ’è‚·‚é‚±‚Æ
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
+		// å†…éƒ¨ã§ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ã®ãƒªã‚»ãƒƒãƒˆãªã©ã‚’è¡Œã†ãŸã‚ã€ã“ã“ã«ã¯ã“ã®ã‚¯ãƒ©ã‚¹å°‚ç”¨ã®ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ã‚’è¨­å®šã™ã‚‹ã“ã¨
 		static std::shared_ptr<FpsCounter> Create(std::shared_ptr<TickCounter> tickCounter);
 
 		virtual void Reset();
@@ -26,12 +26,12 @@ namespace Equisetum2
 
 	private:
 
-		uint32_t m_NowFps = 0;		// ƒJƒEƒ“ƒg’†‚ÌFPS
-		uint32_t m_RecentFps = 0;		// 1•b‘O‚ÌFPS
+		uint32_t m_NowFps = 0;		// ã‚«ã‚¦ãƒ³ãƒˆä¸­ã®FPS
+		uint32_t m_RecentFps = 0;		// 1ç§’å‰ã®FPS
 		std::shared_ptr<TickCounter> m_TickCounter;
 
-		FpsCounter(const FpsCounter&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		FpsCounter& operator= (const FpsCounter&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		FpsCounter(const FpsCounter&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		FpsCounter& operator= (const FpsCounter&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 	};
 }
 

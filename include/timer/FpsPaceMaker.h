@@ -1,4 +1,4 @@
-#if !defined(_EQFPSPACEMAKER_H_)
+ï»¿#if !defined(_EQFPSPACEMAKER_H_)
 #define _EQFPSPACEMAKER_H_
 
 #include "TickCounter.h"
@@ -10,15 +10,15 @@ namespace Equisetum2
 	{
 	public:
 
-		// ƒtƒ@ƒNƒgƒŠ[
-		// “à•”‚ÅƒJƒEƒ“ƒ^[‚ÌƒŠƒZƒbƒg‚È‚Ç‚ğs‚¤‚½‚ßA‚±‚±‚É‚Í‚±‚ÌƒNƒ‰ƒXê—p‚ÌƒJƒEƒ“ƒ^[‚ğİ’è‚·‚é‚±‚Æ
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
+		// å†…éƒ¨ã§ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ã®ãƒªã‚»ãƒƒãƒˆãªã©ã‚’è¡Œã†ãŸã‚ã€ã“ã“ã«ã¯ã“ã®ã‚¯ãƒ©ã‚¹å°‚ç”¨ã®ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼ã‚’è¨­å®šã™ã‚‹ã“ã¨
 		static std::shared_ptr<FpsPaceMaker> Create(std::shared_ptr<TickCounter> tickCounter, int32_t fps);
 
 		virtual void Reset();
 		virtual void SetTargetFps(uint32_t fps);
 		virtual uint32_t TargetFps() const;
-		virtual uint32_t RemainTicks();	// Ÿ‚ÌƒtƒŒ[ƒ€ŠJn‚Ü‚Å‚Ìc‚èŠÔ‚ğæ“¾‚·‚é(ms)
-		virtual uint32_t ElapsedFrames();	// ‰½ƒtƒŒ[ƒ€Œo‰ß‚µ‚½‚©(RemainTicks‚Ì‚ ‚Æ‚ÅŒÄ‚Ô‚±‚Æ)
+		virtual uint32_t RemainTicks();	// æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ é–‹å§‹ã¾ã§ã®æ®‹ã‚Šæ™‚é–“ã‚’å–å¾—ã™ã‚‹(ms)
+		virtual uint32_t ElapsedFrames();	// ä½•ãƒ•ãƒ¬ãƒ¼ãƒ çµŒéã—ãŸã‹(RemainTicksã®ã‚ã¨ã§å‘¼ã¶ã“ã¨)
 
 	protected:
 
@@ -28,16 +28,16 @@ namespace Equisetum2
 
 	private:
 
-		uint32_t m_TargetFps = 0;		// Œ»İİ’è‚³‚ê‚Ä‚¢‚éFPS
-		uint32_t m_fixdWaitTickPerFrame = 0;	// 1ƒtƒŒ[ƒ€‚ ‚½‚è‚Ì‘Ò‚¿ŠÔ(ms)
-		uint32_t m_fixdCarryTick = 0;	// ŒJ‚è‰z‚³‚ê‚½ŠÔ
-		uint32_t m_ElapsedFrame = 0;	// Œo‰ßƒtƒŒ[ƒ€”
+		uint32_t m_TargetFps = 0;		// ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹FPS
+		uint32_t m_fixdWaitTickPerFrame = 0;	// 1ãƒ•ãƒ¬ãƒ¼ãƒ ã‚ãŸã‚Šã®å¾…ã¡æ™‚é–“(ms)
+		uint32_t m_fixdCarryTick = 0;	// ç¹°ã‚Šè¶Šã•ã‚ŒãŸæ™‚é–“
+		uint32_t m_ElapsedFrame = 0;	// çµŒéãƒ•ãƒ¬ãƒ¼ãƒ æ•°
 		std::shared_ptr<TickCounter> m_TickCounter;
 
-		FpsPaceMaker(const FpsPaceMaker&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		FpsPaceMaker& operator= (const FpsPaceMaker&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		FpsPaceMaker(const FpsPaceMaker&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		FpsPaceMaker& operator= (const FpsPaceMaker&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 
-		const int32_t m_FractionalPart = 16;	// ŒÅ’è¬”“_‚Ì¬”•”•ª‚ÌŒ…”
+		const int32_t m_FractionalPart = 16;	// å›ºå®šå°æ•°ç‚¹ã®å°æ•°éƒ¨åˆ†ã®æ¡æ•°
 	};
 }
 

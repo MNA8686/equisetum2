@@ -1,4 +1,4 @@
-#if !defined(_EQSYSTEMTTIMER_H_)
+ï»¿#if !defined(_EQSYSTEMTTIMER_H_)
 #define _EQSYSTEMTTIMER_H_
 
 #include "ITimer.h"
@@ -10,7 +10,7 @@ namespace Equisetum2
 	{
 	public:
 
-		// ƒtƒ@ƒNƒgƒŠ[
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
 		static std::shared_ptr<SystemTimer> Create();
 
 		virtual bool Update() override;
@@ -22,10 +22,10 @@ namespace Equisetum2
 		virtual ~SystemTimer();
 
 	private:
-		uint32_t m_Ticks = 0;		// Œ»İ‚Ìƒ`ƒbƒN’l
+		uint32_t m_Ticks = 0;		// ç¾åœ¨ã®ãƒãƒƒã‚¯å€¤
 
-		SystemTimer(const SystemTimer&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		SystemTimer& operator= (const SystemTimer&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		SystemTimer(const SystemTimer&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		SystemTimer& operator= (const SystemTimer&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 	};
 }
 

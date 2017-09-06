@@ -1,18 +1,18 @@
-#if !defined(_EQTIMER_H_)
+﻿#if !defined(_EQTIMER_H_)
 #define _EQTIMER_H_
 
 #include <cstdint>
 
 namespace Equisetum2
 {
-	// ���Ԃ����ނ����̃V���v���ȃ^�C�}
-	// Update()���s�����ƂŁA�����ŕێ����Ă��鎞�����X�V�����
-	// ����Update()���s���܂œǂݏo���鎞���̒l�͕ς��Ȃ����Ƃ��ۏ؂���Ă���
+	// 時間を刻むだけのシンプルなタイマ
+	// Update()を行うことで、内部で保持している時刻が更新される
+	// 次のUpdate()を行うまで読み出せる時刻の値は変わらないことが保証されている
 	class ITimer
 	{
 	public:
-		virtual bool Update() = 0;	// 1�t���[���Ɉ�x�^�C�}�̒l���X�V����
-		virtual uint32_t Ticks() const = 0;		// property: �ێ�����Ă��鎞��(ms)
+		virtual bool Update() = 0;	// 1フレームに一度タイマの値を更新する
+		virtual uint32_t Ticks() const = 0;		// property: 保持されている時刻(ms)
 	};
 }
 
