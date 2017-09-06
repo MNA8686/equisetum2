@@ -1,4 +1,4 @@
-#if !defined(_EQSTREAMIMPL_H_)
+﻿#if !defined(_EQSTREAMIMPL_H_)
 #define _EQSTREAMIMPL_H_
 
 #include "SDL.h"
