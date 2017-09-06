@@ -84,6 +84,9 @@ namespace Equisetum2
 				EQ_THROW(String::Sprintf(u8"ファイルのオープンに失敗しました。 name=%s, method=%d", strPath.c_str(), openMethod));
 			}
 
+			// URLを設定
+			inst_->m_url = u8"file://" + strPath;
+
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -173,5 +176,10 @@ namespace Equisetum2
 	int FileStream::WriteByte(uint8_t writeData)
 	{
 		return m_pImpl->WriteByte(writeData);
+	}
+
+	String FileStream::Url()
+	{
+		return m_url;
 	}
 }

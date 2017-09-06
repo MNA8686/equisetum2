@@ -38,6 +38,7 @@ namespace Equisetum2
 		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
+		virtual String Url() override;
 
 	protected:
 		CryptStream(std::shared_ptr<IStream>& stream);
@@ -46,6 +47,7 @@ namespace Equisetum2
 	private:
 		std::shared_ptr<IStream> m_stream;	/// 親ストリーム
 		SHA256Value key;		/// 暗号化キー
+		String m_url;			/// URL
 	};
 }
 

@@ -38,6 +38,7 @@ namespace Equisetum2
 		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
+		virtual String Url() override;
 
 	protected:
 		PartialStream(std::shared_ptr<IStream>& stream);
@@ -47,6 +48,7 @@ namespace Equisetum2
 		int64_t m_beginPos = 0;			/// 親ストリーム内の開始位置
 		int64_t m_length = 0;			/// パーシャルストリームのサイズ
 		std::shared_ptr<IStream> m_stream;	/// 親ストリーム
+		String m_url;			/// URL
 	};
 }
 

@@ -41,6 +41,7 @@ namespace Equisetum2
 		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
+		virtual String Url() override;
 
 	protected:
 
@@ -53,6 +54,7 @@ namespace Equisetum2
 		class StreamImpl;
 		std::shared_ptr<StreamImpl> m_pImpl;
 		int m_method = 0;
+		String m_url;
 
 		FileStream(const FileStream&) = delete;				// コピーコンストラクタ封じ
 		FileStream& operator= (const FileStream&) = delete;	// コピーコンストラクタ封じ

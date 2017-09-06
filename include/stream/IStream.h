@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include "type/Optional.h"
+#include "type/String.h"
 
 namespace Equisetum2
 {
@@ -108,6 +109,12 @@ namespace Equisetum2
 		* @return 1:成功、1以外:失敗
 		*/
 		virtual int WriteByte(uint8_t writeData) = 0;
+
+		/**
+		* @brief URLを取得する
+		* @return URLの文字列 スキーマ+固有のパスなど
+		*/
+		virtual String Url() = 0;
 	};
 }
 

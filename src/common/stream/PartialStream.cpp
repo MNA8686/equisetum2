@@ -119,6 +119,7 @@ namespace Equisetum2
 			inst_->m_stream = stream;
 			inst_->m_beginPos = begin;
 			inst_->m_length = length;
+			inst_->m_url = String::Sprintf(u8"partial://%lld:%lld in %s", begin, length, stream->Url().c_str());
 
 			inst = inst_;
 		}
@@ -239,5 +240,10 @@ namespace Equisetum2
 	int PartialStream::WriteByte(uint8_t writeData)
 	{
 		return -1;
+	}
+
+	String PartialStream::Url()
+	{
+		return m_url;
 	}
 }

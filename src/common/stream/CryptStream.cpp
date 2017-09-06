@@ -109,6 +109,8 @@ namespace Equisetum2
 			// キーを保存
 			inst_->key = *sha256;
 
+			inst_->m_url = String::Sprintf(u8"crypt:// in %s", stream->Url().c_str());
+
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -220,5 +222,10 @@ namespace Equisetum2
 	CryptStream::CryptStream(std::shared_ptr<IStream>& stream)
 	{
 		m_stream = stream;
+	}
+
+	String CryptStream::Url()
+	{
+		return m_url;
 	}
 }

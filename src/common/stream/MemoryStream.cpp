@@ -37,7 +37,7 @@ namespace Equisetum2
 		return result;
 	}
 
-	std::shared_ptr<MemoryStream> MemoryStream::Create(std::shared_ptr<StreamImpl>& impl)
+	std::shared_ptr<MemoryStream> MemoryStream::Create(std::shared_ptr<StreamImpl>& impl, const void* mem)
 	{
 		std::shared_ptr<MemoryStream> inst;
 
@@ -58,6 +58,7 @@ namespace Equisetum2
 			}
 
 			inst_->m_pImpl = impl;
+			inst_->m_url = String::Sprintf(u8"memory://%p", mem);
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -72,13 +73,13 @@ namespace Equisetum2
 	std::shared_ptr<MemoryStream> MemoryStream::CreateFromBuf(const void* buf, int size)
 	{
 		auto tmp = StreamImpl::OpenFromBuf(buf, size);
-		return Create(tmp);
+		return Create(tmp, buf);
 	}
 
 	std::shared_ptr<MemoryStream> MemoryStream::CreateFromBuf(void* buf, int size, bool writable)
 	{
 		auto tmp = StreamImpl::OpenFromBuf(buf, size, writable);
-		auto inst = Create(tmp);
+		auto inst = Create(tmp, buf);
 		if (inst)
 		{
 			inst->m_writable = writable;
@@ -157,5 +158,10 @@ namespace Equisetum2
 	int MemoryStream::WriteByte(uint8_t writeData)
 	{
 		return m_pImpl->WriteByte(writeData);
+	}
+
+	String MemoryStream::Url()
+	{
+		return m_url;
 	}
 }
