@@ -1,4 +1,4 @@
-#if !defined(_EQTOUCH_H_)
+ï»¿#if !defined(_EQTOUCH_H_)
 #define _EQTOUCH_H_
 
 #include "input/IKeyState.h"
@@ -9,9 +9,9 @@
 
 namespace Equisetum2
 {
-	// FingerIndex ‚Æ FingerId ‚ÍˆÙ‚È‚é
-	// FingerIndex : ’Pƒ‚È”z—ñ‚ÌƒCƒ“ƒfƒbƒNƒX 0`Å‘åƒTƒ|[ƒgƒtƒBƒ“ƒK[”
-	// FingerId : V‚µ‚¢w‚ªŒŸo‚³‚ê‚é“x‚ÉŠ„‚èU‚ç‚ê‚é”’l Ä—˜—p‚³‚ê‚é‰Â”\«‚ª‚ ‚é
+	// FingerIndex ã¨ FingerId ã¯ç•°ãªã‚‹
+	// FingerIndex : å˜ç´”ãªé…åˆ—ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ 0ï½æœ€å¤§ã‚µãƒãƒ¼ãƒˆãƒ•ã‚£ãƒ³ã‚¬ãƒ¼æ•°
+	// FingerId : æ–°ã—ã„æŒ‡ãŒæ¤œå‡ºã•ã‚Œã‚‹åº¦ã«å‰²ã‚ŠæŒ¯ã‚‰ã‚Œã‚‹æ•°å€¤ å†åˆ©ç”¨ã•ã‚Œã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹
 
 	class TouchState : public IKeyState
 	{

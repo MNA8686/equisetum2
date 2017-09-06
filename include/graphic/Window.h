@@ -1,4 +1,4 @@
-#if !defined(_EQWINDOW_H_)
+ï»¿#if !defined(_EQWINDOW_H_)
 #define _EQWINDOW_H_
 
 #include "type/Point.h"
@@ -9,11 +9,11 @@ namespace Equisetum2
 {
 	enum class WindowStyle
 	{
-		// ƒTƒCƒY‚ªŒÅ’è‚ÌƒEƒBƒ“ƒhƒE
+		// ã‚µã‚¤ã‚ºãŒå›ºå®šã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 		Fixed,
-		// ƒTƒCƒY‚ª•ÏX‰Â”\‚ÈƒEƒBƒ“ƒhƒE
+		// ã‚µã‚¤ã‚ºãŒå¤‰æ›´å¯èƒ½ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 		Sizeable,
-		// ƒtƒŒ[ƒ€‚ª–³‚¢ƒEƒBƒ“ƒhƒE
+		// ãƒ•ãƒ¬ãƒ¼ãƒ ãŒç„¡ã„ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 //		NonFrame,
 	};
 

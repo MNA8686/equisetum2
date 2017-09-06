@@ -1,4 +1,4 @@
-#if !defined(_EQTEXTWRITER_H_)
+ï»¿#if !defined(_EQTEXTWRITER_H_)
 #define _EQTEXTWRITER_H_
 
 #include "type/String.h"
@@ -11,13 +11,13 @@ namespace Equisetum2
 	{
 	public:
 
-		// ƒtƒ@ƒNƒgƒŠ[
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
 		static std::shared_ptr<TextWriter> CreateFromStream(std::shared_ptr<IStream> stream);
 
-		// 1ƒR[ƒhƒ|ƒCƒ“ƒg‘‚«‚İ
+		// 1ã‚³ãƒ¼ãƒ‰ãƒã‚¤ãƒ³ãƒˆæ›¸ãè¾¼ã¿
 		virtual bool Write(const String& code);
 
-		// 1so—Í‚·‚é
+		// 1è¡Œå‡ºåŠ›ã™ã‚‹
 		virtual bool WriteLine(const String& str);
 
 	protected:
@@ -27,8 +27,8 @@ namespace Equisetum2
 
 	private:
 
-		TextWriter(const TextWriter&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		TextWriter& operator= (const TextWriter&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		TextWriter(const TextWriter&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		TextWriter& operator= (const TextWriter&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 
 		std::shared_ptr<IStream> m_stream;
 	};

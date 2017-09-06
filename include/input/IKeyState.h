@@ -1,4 +1,4 @@
-#if !defined(_EQIKEYSTATE_H_)
+ï»¿#if !defined(_EQIKEYSTATE_H_)
 #define _EQIKEYSTATE_H_
 
 #include "type/String.h"
@@ -8,12 +8,12 @@ namespace Equisetum2
 {
 	typedef struct
 	{
-		const char* name;			// ƒL[‚Ì–¼‘O
-		bool down;					// ‰Ÿ‰º
-		bool up;					// —£‚µ‚½
-		bool press;					// ‰Ÿ‚³‚ê‚Ä‚¢‚éŠÔ
-		uint32_t timeStamp;			// ‰Ÿ‚³‚ê‚½ŠÔ
-		uint32_t pressedDuration;	// ‰Ÿ‚³‚ê‚Ä‚¢‚éŠÔ
+		const char* name;			// ã‚­ãƒ¼ã®åå‰
+		bool down;					// æŠ¼ä¸‹æ™‚
+		bool up;					// é›¢ã—ãŸæ™‚
+		bool press;					// æŠ¼ã•ã‚Œã¦ã„ã‚‹é–“
+		uint32_t timeStamp;			// æŠ¼ã•ã‚ŒãŸæ™‚é–“
+		uint32_t pressedDuration;	// æŠ¼ã•ã‚Œã¦ã„ã‚‹æ™‚é–“
 	}stKeyState;
 
 	class IKeyState

@@ -1,4 +1,4 @@
-#if !defined(_EQKEYCODE_H_)
+Ôªø#if !defined(_EQKEYCODE_H_)
 #define _EQKEYCODE_H_
 
 namespace Equisetum2
@@ -226,11 +226,11 @@ namespace Equisetum2
 		KEY_LCTRL,
 		KEY_LSHIFT,
 		KEY_LALT,
-		KEY_LGUI,		// WindowsÉLÅ[
+		KEY_LGUI,		// Windows„Ç≠„Éº
 		KEY_RCTRL,
 		KEY_RSHIFT,
 		KEY_RALT,
-		KEY_RGUI,		// WindowsÉLÅ[
+		KEY_RGUI,		// Windows„Ç≠„Éº
 
 		KEY_MODE,
 

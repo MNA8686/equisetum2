@@ -1,4 +1,4 @@
-#if !defined(_EQTEXTREADER_H_)
+ï»¿#if !defined(_EQTEXTREADER_H_)
 #define _EQTEXTREADER_H_
 
 #include "type/String.h"
@@ -11,14 +11,14 @@ namespace Equisetum2
 	{
 	public:
 
-		// ƒtƒ@ƒNƒgƒŠ[
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
 		static std::shared_ptr<TextReader> CreateFromStream(std::shared_ptr<IStream> stream);
 
-		// 1ƒR[ƒhƒ|ƒCƒ“ƒgæ“¾
-		// ‰üs‚Í \r\n ‚Æ‚µ‚Äæ“¾‚Å‚«‚é
+		// 1ã‚³ãƒ¼ãƒ‰ãƒã‚¤ãƒ³ãƒˆå–å¾—
+		// æ”¹è¡Œã¯ \r\n ã¨ã—ã¦å–å¾—ã§ãã‚‹
 		virtual String Read();
 
-		// 1sæ“¾‚·‚é
+		// 1è¡Œå–å¾—ã™ã‚‹
 		virtual Optional<String> ReadLine();
 
 	protected:
@@ -28,8 +28,8 @@ namespace Equisetum2
 
 	private:
 
-		TextReader(const TextReader&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		TextReader& operator= (const TextReader&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		TextReader(const TextReader&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		TextReader& operator= (const TextReader&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 
 		std::shared_ptr<IStream> m_stream;
 	};

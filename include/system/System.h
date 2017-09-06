@@ -1,4 +1,4 @@
-#if !defined(_EQSYSTEM_H_)
+﻿#if !defined(_EQSYSTEM_H_)
 #define _EQSYSTEM_H_
 
 #include <cstdint>

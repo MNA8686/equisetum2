@@ -1,4 +1,4 @@
-#if !defined(_EQJOYSTICK_H_)
+﻿#if !defined(_EQJOYSTICK_H_)
 #define _EQJOYSTICK_H_
 
 #include "input/IKeyState.h"
@@ -8,9 +8,9 @@
 
 namespace Equisetum2
 {
-	// �W���C�X�e�B�b�N�̃A�N�Z�X�N���X
-	// ���݂��Ȃ��ԍ��ɃA�N�Z�X���Ă��N���b�V�����Ȃ����Ƃ��ۏ؂���Ă���
-	// �}���������Ă��C���X�^���X����蒼���K�v�͂Ȃ�
+	// ジョイスティックのアクセスクラス
+	// 存在しない番号にアクセスしてもクラッシュしないことが保証されている
+	// 挿抜があってもインスタンスを作り直す必要はない
 
 	typedef struct
 	{
@@ -45,7 +45,7 @@ namespace Equisetum2
 
 	protected:
 
-		Joystick(int index);	// �C���X�^���X�쐬����
+		Joystick(int index);	// インスタンス作成封じ
 
 	private:
 

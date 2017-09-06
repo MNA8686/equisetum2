@@ -1,4 +1,4 @@
-#if !defined(_EQPOINT_H_)
+﻿#if !defined(_EQPOINT_H_)
 #define _EQPOINT_H_
 
 namespace Equisetum2

@@ -1,4 +1,4 @@
-#if !defined(_EQKEY_H_)
+ï»¿#if !defined(_EQKEY_H_)
 #define _EQKEY_H_
 
 #include <vector>
@@ -27,7 +27,7 @@ namespace Equisetum2
 		Key();
 		Key(const std::function<stKeyState()>& listener);
 
-		// TODO “¯ˆêƒL[”»’è
+		// TODO åŒä¸€ã‚­ãƒ¼åˆ¤å®š
 	};
 
 	class CombinationKey : public IKeyState

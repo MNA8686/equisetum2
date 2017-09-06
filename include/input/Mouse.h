@@ -1,4 +1,4 @@
-#if !defined(_EQMOUSE_H_)
+﻿#if !defined(_EQMOUSE_H_)
 #define _EQMOUSE_H_
 
 #include "input/IKeyState.h"

@@ -1,4 +1,4 @@
-#if !defined(_EQEXCEPTION_H_)
+ï»¿#if !defined(_EQEXCEPTION_H_)
 #define _EQEXCEPTION_H_
 
 #include "type/String.h"
@@ -24,17 +24,17 @@ namespace Equisetum2
 
 		operator bool() const
 		{
-			// ‰½‚©İ’è‚³‚ê‚Ä‚¢‚ê‚Î—LŒø‚Æ‚İ‚È‚·
+			// ä½•ã‹è¨­å®šã•ã‚Œã¦ã„ã‚Œã°æœ‰åŠ¹ã¨ã¿ãªã™
 			return m_what.size() > 0;
 		}
 
 	private:
 
 		String m_what;
-		String m_msg;	// ƒGƒ‰[ƒƒbƒZ[ƒW
-		String m_file;	// ƒtƒ@ƒCƒ‹–¼
-		int m_line = 0;	// s”Ô†
-		String m_function;	// ŠÖ”–¼
+		String m_msg;	// ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+		String m_file;	// ãƒ•ã‚¡ã‚¤ãƒ«å
+		int m_line = 0;	// è¡Œç•ªå·
+		String m_function;	// é–¢æ•°å
 	};
 }
 
