@@ -1,4 +1,4 @@
-﻿#if !defined(_EQSTREAMIMPL_H_)
+#if !defined(_EQSTREAMIMPL_H_)
 #define _EQSTREAMIMPL_H_
 
 #include "SDL.h"
@@ -159,19 +159,23 @@ namespace Equisetum2
 		}
 
 		// ストリームからrwopsを生成する
-		static SDL_RWops CreateFromStream(std::shared_ptr<IStream> stream)
+		static SDL_RWops* CreateFromStream(std::shared_ptr<IStream> stream)
 		{
-			SDL_RWops ops = {};
+			SDL_RWops *pOps = SDL_AllocRW();
+			
+			if (pOps)
+			{
+				*pOps = {};
+				pOps->type = SDL_RWOPS_UNKNOWN;
+				pOps->hidden.unknown.data1 = stream.get();
+				pOps->size = size;
+				pOps->read = read;
+				pOps->write = write;
+				pOps->seek = seek;
+				pOps->close = close;
+			}
 
-			ops.type = SDL_RWOPS_UNKNOWN;
-			ops.hidden.unknown.data1 = stream.get();
-			ops.size = size;
-			ops.read = read;
-			ops.write = write;
-			ops.seek = seek;
-			ops.close = close;
-
-			return ops;
+			return pOps;
 		}
 
 	private:
