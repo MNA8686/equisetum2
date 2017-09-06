@@ -80,7 +80,7 @@ namespace Equisetum2
 
 		if (out.size() > 0)
 		{
-			auto optWrite = m_stream->Write(out);
+			auto optWrite = m_stream->Write(&out[0], out.size());
 			if (optWrite &&
 				*optWrite == out.size())
 			{
@@ -103,7 +103,7 @@ namespace Equisetum2
 		out.push_back('\r');
 		out.push_back('\n');
 
-		auto optWrite = m_stream->Write(out);
+		auto optWrite = m_stream->Write(&out[0], out.size());
 		if (optWrite &&
 			*optWrite == out.size())
 		{

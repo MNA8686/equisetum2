@@ -201,11 +201,8 @@ namespace Equisetum2
 				// 入力データを全て処理するまでループ
 				while (remain > 0)
 				{
-					std::vector<uint8_t> v(remain);
-					memcpy(&v[0], pBuf, remain);
-
 					// バッファ埋め
-					auto copiedSize = m_stream->Write(v, remain);
+					auto copiedSize = m_stream->Write(pBuf, remain);
 					if (!copiedSize || *copiedSize == 0)
 					{
 						ret = false;

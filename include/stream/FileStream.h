@@ -1,4 +1,4 @@
-#if !defined(_EQFILESTREAM_H_)
+ï»¿#if !defined(_EQFILESTREAM_H_)
 #define _EQFILESTREAM_H_
 
 #include "type/String.h"
@@ -27,7 +27,7 @@ namespace Equisetum2
 			// Read | Write | Create : "wb+"
 		};
 
-		// ƒtƒ@ƒNƒgƒŠ[
+		// ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼
 		static std::shared_ptr<FileStream> CreateFromPath(const String& strPath, int openMethod = Method::Read);
 
 		virtual bool CanRead() const override;
@@ -37,12 +37,7 @@ namespace Equisetum2
 		virtual int64_t Length() const override;
 		virtual bool CopyTo(std::shared_ptr<IStream> stream) override;
 		virtual int64_t Seek(int64_t offset, SeekOrigin origin) override;
-		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
-		virtual const Optional<size_t> Read(std::vector<uint8_t>& vByteArray, size_t size) override;
 		virtual const Optional<size_t> Read(uint8_t *data, size_t size) override;
-		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size) override;
-		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray, size_t size) override;
-		virtual const Optional<size_t> Write(const std::vector<uint8_t>& vByteArray) override;
 		virtual const Optional<size_t> Write(const uint8_t *data, size_t size) override;
 		virtual int ReadByte() override;
 		virtual int WriteByte(uint8_t writeData) override;
@@ -59,8 +54,8 @@ namespace Equisetum2
 		std::shared_ptr<StreamImpl> m_pImpl;
 		int m_method = 0;
 
-		FileStream(const FileStream&) = delete;				// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
-		FileStream& operator= (const FileStream&) = delete;	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^••‚¶
+		FileStream(const FileStream&) = delete;				// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
+		FileStream& operator= (const FileStream&) = delete;	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿å°ã˜
 	};
 }
 

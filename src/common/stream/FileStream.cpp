@@ -33,9 +33,9 @@ namespace Equisetum2
 				EQ_THROW(u8"書き込み先にライト属性が必要です。");
 			}
 
-			std::vector<uint8_t> buf(40960);
+			std::vector<uint8_t> buf(4096);
 
-			while (auto readSize = pSrc->Read(buf, 0, buf.size()))
+			while (auto readSize = pSrc->Read(&buf[0], buf.size()))
 			{
 				if (*readSize == 0)
 				{
@@ -43,7 +43,7 @@ namespace Equisetum2
 					break;
 				}
 
-				auto writeSize = pDst->Write(buf, 0, *readSize);
+				auto writeSize = pDst->Write(&buf[0], *readSize);
 				if (!writeSize || *writeSize < *readSize)
 				{
 					EQ_THROW(u8"書き込みに失敗しました。");
@@ -147,23 +147,6 @@ namespace Equisetum2
 		return m_pImpl->Seek(offset, origin);
 	}
 
-	const Optional<size_t> FileStream::Read(std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
-	{
-		Optional<size_t> optSize;
-
-		if (begin + size <= vByteArray.size())
-		{
-			optSize = m_pImpl->Read(&vByteArray[begin], size);
-		}
-
-		return optSize;
-	}
-
-	const Optional<size_t> FileStream::Read(std::vector<uint8_t>& vByteArray, size_t size)
-	{
-		return Read(vByteArray, 0, size);
-	}
-
 	const Optional<size_t> FileStream::Read(uint8_t *data, size_t size)
 	{
 		Optional<size_t> optSize;
@@ -171,28 +154,6 @@ namespace Equisetum2
 		optSize = m_pImpl->Read(data, size);
 
 		return optSize;
-	}
-
-	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t begin, size_t size)
-	{
-		Optional<size_t> optSize;
-
-		if (begin + size <= vByteArray.size())
-		{
-			optSize = m_pImpl->Write(&vByteArray[begin], size);
-		}
-
-		return optSize;
-	}
-
-	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray, size_t size)
-	{
-		return Write(vByteArray, 0, size);
-	}
-
-	const Optional<size_t> FileStream::Write(const std::vector<uint8_t>& vByteArray)
-	{
-		return Write(vByteArray, 0, vByteArray.size());
 	}
 
 	const Optional<size_t> FileStream::Write(const uint8_t *data, size_t size)

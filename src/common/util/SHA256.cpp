@@ -71,11 +71,11 @@ namespace Equisetum2
 				EQ_THROW(u8"MessageDigestの作成に失敗しました。");
 			}
 
-			std::vector<uint8_t> buf(4096);
+			std::vector<uint8_t> buf(1 * 1024 * 1024);
 
 			while (1)
 			{
-				auto readResult = stream->Read(buf, buf.size());
+				auto readResult = stream->Read(&buf[0], buf.size());
 				if (!readResult)
 				{
 					EQ_THROW(u8"ストリームの読み出しに失敗しました。");
@@ -135,10 +135,11 @@ namespace Equisetum2
 				EQ_THROW(u8"HMACインスタンスの作成に失敗しました。");
 			}
 
-			std::vector<uint8_t> buf(4096);
+			std::vector<uint8_t> buf(1 * 1024 * 1024);
+			
 			while (1)
 			{
-				auto readResult = stream->Read(buf, buf.size());
+				auto readResult = stream->Read(&buf[0], buf.size());
 				if (!readResult)
 				{
 					EQ_THROW(u8"ストリームの読み出しに失敗しました。");
