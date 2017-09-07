@@ -464,7 +464,7 @@ namespace Equisetum2
 
 		inline int ToSDLVolume(double vol)
 		{
-			return static_cast<int>(static_cast<double>(MIX_MAX_VOLUME) * m_volume);
+			return static_cast<int>(static_cast<double>(MIX_MAX_VOLUME) * vol);
 		}
 	};
 }
