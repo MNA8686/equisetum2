@@ -1,4 +1,4 @@
-﻿#if !defined(_EQUISETUM2_H_)
+#if !defined(_EQUISETUM2_H_)
 #define _EQUISETUM2_H_
 
 #include "type/Optional.h"
@@ -29,6 +29,10 @@
 #include "input/Mouse.h"
 #include "input/Touch.h"
 #include "input/Joystick.h"
+
+#include "audio/Audio.hpp"
+#include "audio/BGM.hpp"
+#include "audio/SE.hpp"
 
 #include "timer/ITimer.h"
 #include "timer/SystemTimer.h"

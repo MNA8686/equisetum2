@@ -50,7 +50,9 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -58,8 +60,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -83,7 +85,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,8 +96,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -112,6 +115,10 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\audio\Audio.hpp" />
+    <ClInclude Include="..\..\include\audio\BGM.hpp" />
+    <ClInclude Include="..\..\include\audio\ISound.hpp" />
+    <ClInclude Include="..\..\include\audio\SE.hpp" />
     <ClInclude Include="..\..\include\crypt\HMAC.hpp" />
     <ClInclude Include="..\..\include\crypt\MessageDigest.hpp" />
     <ClInclude Include="..\..\include\Equisetum2.h" />
@@ -149,6 +156,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
     <ClInclude Include="..\..\src\common\system\Singleton.h" />
+    <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp" />
     <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
     <ClInclude Include="..\..\src\compat\input\KeyboardCompat.h" />
@@ -159,6 +167,9 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\src\porting\SDL\system\SDLEvent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\audio\Audio.cpp" />
+    <ClCompile Include="..\..\src\common\audio\BGM.cpp" />
+    <ClCompile Include="..\..\src\common\audio\SE.cpp" />
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp" />
     <ClCompile Include="..\..\src\common\crypt\MessageDigest.cpp" />
     <ClCompile Include="..\..\src\common\fs\Directory.cpp" />
@@ -185,6 +196,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\util\ArchivePacker.cpp" />
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
+    <ClCompile Include="..\..\src\compat\audio\AudioCompat.cpp" />
     <ClCompile Include="..\..\src\compat\graphic\WindowCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\KeyboardCompat.cpp" />
@@ -195,6 +207,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\porting\SDL\system\System.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl" />
     <None Include="..\..\src\porting\SDL\graphic\WindowCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

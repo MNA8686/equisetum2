@@ -8,6 +8,7 @@
 #include "input/MouseCompat.h"
 #include "input/TouchCompat.h"
 #include "input/JoystickCompat.h"
+#include "audio/AudioCompat.hpp"
 #include "SDL.h"
 #include "SDLEvent.h"
 
@@ -37,6 +38,8 @@ namespace Equisetum2
 		Singleton<TouchCompat>::GetInstance()->Prepare();
 		// ジョイスティック更新準備
 		Singleton<JoystickCompat>::GetInstance()->Prepare();
+		// オーディオ更新準備
+		Singleton<AudioCompat>::GetInstance()->Prepare();
 
 		// イベントループ
 		while (SDL_PollEvent(&e))
@@ -59,6 +62,8 @@ namespace Equisetum2
 		Singleton<TouchCompat>::GetInstance()->Update();
 		// ジョイスティックの状態を更新
 		Singleton<JoystickCompat>::GetInstance()->Update();
+		// オーディオの状態を更新
+		Singleton<AudioCompat>::GetInstance()->Update();
 
 		return continueFlag;
 	}
@@ -92,6 +97,7 @@ int main(int argc, char *argv[])
 	Singleton<MouseCompat>::GetInstance();
 	Singleton<TouchCompat>::GetInstance();
 	Singleton<JoystickCompat>::GetInstance();
+	Singleton<AudioCompat>::GetInstance();
 
 	Main();
 

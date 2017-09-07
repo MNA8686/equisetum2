@@ -88,6 +88,15 @@
     <Filter Include="ソース ファイル\common\crypt">
       <UniqueIdentifier>{80bbc527-46e0-4c2f-9806-3fc1178a746c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\common\audio">
+      <UniqueIdentifier>{8aaaef17-b619-447a-9838-06c5e9f1743c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\audio">
+      <UniqueIdentifier>{b146addd-453e-45e8-9675-e6015e4ae21b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\compat&amp;porting\audio">
+      <UniqueIdentifier>{0467d776-d1d8-4e7f-9e1a-770237f2b0bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -228,6 +237,21 @@
     <ClInclude Include="..\..\include\util\ArchivePacker.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\audio\Audio.hpp">
+      <Filter>ヘッダー ファイル\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp">
+      <Filter>ソース ファイル\compat&amp;porting\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\audio\SE.hpp">
+      <Filter>ヘッダー ファイル\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\audio\BGM.hpp">
+      <Filter>ヘッダー ファイル\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\audio\ISound.hpp">
+      <Filter>ヘッダー ファイル\audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -332,6 +356,18 @@
     <ClCompile Include="..\..\src\common\util\ArchivePacker.cpp">
       <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\audio\Audio.cpp">
+      <Filter>ソース ファイル\common\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\audio\AudioCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\audio\BGM.cpp">
+      <Filter>ソース ファイル\common\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\audio\SE.cpp">
+      <Filter>ソース ファイル\common\audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\Win32\fs\DirectoryCompat.inl">
@@ -372,6 +408,9 @@
     </None>
     <None Include="..\..\src\porting\SDL\timer\SystemTimerCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\timer</Filter>
+    </None>
+    <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\audio</Filter>
     </None>
   </ItemGroup>
 </Project>
