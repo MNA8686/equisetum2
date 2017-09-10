@@ -87,6 +87,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>
+      </RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
