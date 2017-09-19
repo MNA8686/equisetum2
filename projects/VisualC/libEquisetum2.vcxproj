@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -60,8 +60,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -72,6 +72,7 @@
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_mixer\dll\*" "..\..\lib\win32\dll"
+copy "..\..\external\dep\win32\glew\dll\*" "..\..\lib\win32\dll"
 copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -85,7 +86,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
@@ -98,8 +99,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -110,6 +111,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\external\dep\win32\glew\dll\*" "..\..\lib\win32\dll"
 copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
