@@ -22,6 +22,29 @@ mkdir ${DEP_DIR}
 mkdir ${DEP_DIR}/${TARGET_DIR}
 
 ################################
+# glew                         #
+################################
+LIB_NAME=glew
+LIB_DIR=glew-2.1.0
+
+# Make Deploy Directory
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+
+if [ ! -e ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} ]; then
+	unzip ${SRC_DIR}/${LIB_DIR}-win32.zip -d ${BUILD_DIR}/${TARGET_DIR}
+fi
+
+# Deploy
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}
+cp include/GL/*.h ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+cp lib/Release/Win32/glew32.lib ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/lib
+cp bin/Release/Win32/glew32.dll ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/dll
+cd ${CUR_DIR}
+
+################################
 # SDL                          #
 ################################
 LIB_NAME=SDL2
