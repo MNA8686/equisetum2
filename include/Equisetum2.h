@@ -25,6 +25,8 @@
 #include "stream/TextWriter.h"
 
 #include "graphic/Window.h"
+#include "graphic/Image.hpp"
+
 #include "input/Key.h"
 #include "input/Mouse.h"
 #include "input/Touch.h"

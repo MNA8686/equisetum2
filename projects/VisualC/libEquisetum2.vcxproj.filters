@@ -252,6 +252,12 @@
     <ClInclude Include="..\..\include\audio\ISound.hpp">
       <Filter>ヘッダー ファイル\audio</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\Image.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compat\graphic\ImageCompat.hpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -368,6 +374,12 @@
     <ClCompile Include="..\..\src\common\audio\SE.cpp">
       <Filter>ソース ファイル\common\audio</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\graphic\Image.cpp">
+      <Filter>ソース ファイル\common\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\graphic\ImageCompat.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\Win32\fs\DirectoryCompat.inl">
@@ -411,6 +423,9 @@
     </None>
     <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\audio</Filter>
+    </None>
+    <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -129,6 +129,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\Directory.hpp" />
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
+    <ClInclude Include="..\..\include\graphic\Image.hpp" />
     <ClInclude Include="..\..\include\graphic\Window.h" />
     <ClInclude Include="..\..\include\input\IKeyState.h" />
     <ClInclude Include="..\..\include\input\Joystick.h" />
@@ -161,6 +162,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
     <ClInclude Include="..\..\src\common\system\Singleton.h" />
     <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp" />
+    <ClInclude Include="..\..\src\compat\graphic\ImageCompat.hpp" />
     <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
     <ClInclude Include="..\..\src\compat\input\KeyboardCompat.h" />
@@ -179,6 +181,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\fs\Directory.cpp" />
     <ClCompile Include="..\..\src\common\fs\File.cpp" />
     <ClCompile Include="..\..\src\common\fs\Path.cpp" />
+    <ClCompile Include="..\..\src\common\graphic\Image.cpp" />
     <ClCompile Include="..\..\src\common\graphic\Window.cpp" />
     <ClCompile Include="..\..\src\common\input\Joystick.cpp" />
     <ClCompile Include="..\..\src\common\input\Key.cpp" />
@@ -201,6 +204,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
     <ClCompile Include="..\..\src\compat\audio\AudioCompat.cpp" />
+    <ClCompile Include="..\..\src\compat\graphic\ImageCompat.cpp" />
     <ClCompile Include="..\..\src\compat\graphic\WindowCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\KeyboardCompat.cpp" />
@@ -212,6 +216,10 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl" />
+    <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="..\..\src\porting\SDL\graphic\WindowCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
