@@ -76,7 +76,12 @@ namespace Equisetum2
 				EQ_THROW(u8"シーク属性が必要です。");
 			}
 
-			ret = Singleton<ImageCompat>::GetInstance()->SaveToStream(stream);
+			if (!Singleton<ImageCompat>::GetInstance()->SaveToStream(stream))
+			{
+				EQ_THROW(u8"イメージの出力に失敗しました。");
+			}
+
+			ret = true;
 		}
 		EQ_HANDLER
 		{
