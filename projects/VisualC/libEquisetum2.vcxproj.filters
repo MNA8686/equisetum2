@@ -255,9 +255,6 @@
     <ClInclude Include="..\..\include\graphic\Image.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\compat\graphic\ImageCompat.hpp">
-      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -376,9 +373,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\graphic\Image.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\compat\graphic\ImageCompat.cpp">
-      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

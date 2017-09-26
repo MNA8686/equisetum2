@@ -162,7 +162,6 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
     <ClInclude Include="..\..\src\common\system\Singleton.h" />
     <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp" />
-    <ClInclude Include="..\..\src\compat\graphic\ImageCompat.hpp" />
     <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
     <ClInclude Include="..\..\src\compat\input\KeyboardCompat.h" />
@@ -204,7 +203,6 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
     <ClCompile Include="..\..\src\compat\audio\AudioCompat.cpp" />
-    <ClCompile Include="..\..\src\compat\graphic\ImageCompat.cpp" />
     <ClCompile Include="..\..\src\compat\graphic\WindowCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\JoystickCompat.cpp" />
     <ClCompile Include="..\..\src\compat\input\KeyboardCompat.cpp" />

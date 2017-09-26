@@ -1,7 +1,8 @@
 ﻿#include "graphic/Image.hpp"
 #include "system/Logger.h"
 #include "system/Exception.hpp"
-#include "graphic/ImageCompat.hpp"
+
+#include "graphic/ImageCompatImpl.inl"
 
 namespace Equisetum2
 {
@@ -24,17 +25,22 @@ namespace Equisetum2
 			class ImageDummy : public Image
 			{
 			public:
-				explicit ImageDummy() {};
+				explicit ImageDummy(){};
 			};
 
 			auto inst_ = std::make_shared<ImageDummy>();
-
 			if (!inst_)
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
 
-			if (!inst_->InitFromStream(stream))
+			inst_->m_pImpl = std::make_shared<Image::Impl>();
+			if (!inst_->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			if (!inst_->m_pImpl->InitFromStream(stream))
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
@@ -50,9 +56,54 @@ namespace Equisetum2
 		return inst;
 	}
 
-	bool Image::InitFromStream(std::shared_ptr<IStream>& stream)
+	std::shared_ptr<Image> Image::CreateBlank(uint32_t width, uint32_t height)
 	{
-		return Singleton<ImageCompat>::GetInstance()->InitFromStream(stream);
+		std::shared_ptr<Image> inst;
+
+		EQ_DURING
+		{
+			if (width == 0 || width >= 65536)
+			{
+				EQ_THROW(u8"横幅が不正です。");
+			}
+
+			if (height == 0 || height >= 65536)
+			{
+				EQ_THROW(u8"縦幅が不正です。");
+			}
+
+			class ImageDummy : public Image
+			{
+			public:
+				explicit ImageDummy() {};
+			};
+
+			auto inst_ = std::make_shared<ImageDummy>();
+			if (!inst_)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			inst_->m_pImpl = std::make_shared<Image::Impl>();
+			if (!inst_->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			if (!inst_->m_pImpl->InitBlank(width, height))
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			inst = inst_;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return inst;
 	}
 
 	bool Image::SaveToStream(std::shared_ptr<IStream> stream)
@@ -76,7 +127,7 @@ namespace Equisetum2
 				EQ_THROW(u8"シーク属性が必要です。");
 			}
 
-			if (!Singleton<ImageCompat>::GetInstance()->SaveToStream(stream))
+			if (!m_pImpl->SaveToStream(stream))
 			{
 				EQ_THROW(u8"イメージの出力に失敗しました。");
 			}
@@ -94,27 +145,58 @@ namespace Equisetum2
 
 	bool Image::Resize(uint32_t width, uint32_t height)
 	{
-		return Singleton<ImageCompat>::GetInstance()->Resize(width, height);
+		auto ret = false;
+
+		EQ_DURING
+		{
+			if (width == 0 || width >= 65536)
+			{
+				EQ_THROW(u8"横幅が不正です。");
+			}
+
+			if (height == 0 || height >= 65536)
+			{
+				EQ_THROW(u8"縦幅が不正です。");
+			}
+
+			if (m_pImpl->Width() != width ||
+				m_pImpl->Height() != height)
+			{
+				if (!m_pImpl->Resize(width, height))
+				{
+					EQ_THROW(u8"イメージのリサイズに失敗しました。");
+				}
+			}
+
+			ret = true;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return ret;
 	}
 
 	uint32_t Image::Width()
 	{
-		return Singleton<ImageCompat>::GetInstance()->Width();
+		return m_pImpl->Width();
 	}
 
 	uint32_t Image::Height()
 	{
-		return Singleton<ImageCompat>::GetInstance()->Height();
+		return m_pImpl->Height();
 	}
 
 	uint32_t Image::Pitch()
 	{
-		return Singleton<ImageCompat>::GetInstance()->Pitch();
+		return m_pImpl->Pitch();
 	}
 
 	Color* Image::Data()
 	{
-		return Singleton<ImageCompat>::GetInstance()->Data();
+		return m_pImpl->Data();
 	}
 }
 

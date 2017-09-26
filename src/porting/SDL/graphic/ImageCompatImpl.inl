@@ -1,4 +1,4 @@
-﻿#include "graphic/ImageCompat.hpp"
+﻿#include "graphic/Image.hpp"
 #include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "stream/SDLBinderRWops.inl"
@@ -6,7 +6,7 @@
 
 namespace Equisetum2
 {
-	class ImageCompat::Impl final
+	class Image::Impl final
 	{
 	public:
 		Impl()
@@ -56,9 +56,41 @@ namespace Equisetum2
 					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
 				}
 
-				m_width = m_pSurface->w;
-				m_height = m_pSurface->h;
-				m_pitch = m_pSurface->pitch;
+				ret = true;
+			}
+			EQ_HANDLER
+			{
+				Logger::OutputError(EQ_GET_HANDLER().what());
+			}
+			EQ_END_HANDLER
+
+			return ret;
+		}
+
+		bool InitBlank(uint32_t width, uint32_t height)
+		{
+			auto ret = false;
+
+			EQ_DURING
+			{
+				auto pSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+				if (!pSurface)
+				{
+					EQ_THROW(u8"サーフェスの作成に失敗しました。");
+				}
+
+				m_pSurface = std::shared_ptr<SDL_Surface>(pSurface,
+					[](SDL_Surface* pSurface) {
+					if (pSurface != nullptr)
+					{
+						SDL_FreeSurface(pSurface);
+					}
+				});
+
+				if (!m_pSurface)
+				{
+					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
+				}
 
 				ret = true;
 			}
@@ -87,30 +119,22 @@ namespace Equisetum2
 		{
 			auto ret = false;
 
-			if (m_width != width ||
-				m_height != height)
+			auto newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+			if (newSurface)
 			{
-				auto newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
-				if (newSurface)
-				{
-					SDL_BlitScaled(m_pSurface.get(), nullptr, newSurface, nullptr);
+				SDL_BlitScaled(m_pSurface.get(), nullptr, newSurface, nullptr);
 
-					m_pSurface = std::shared_ptr<SDL_Surface>(newSurface,
-						[](SDL_Surface* pSurface) {
-						if (pSurface != nullptr)
-						{
-							SDL_FreeSurface(pSurface);
-						}
-					});
-
-					if (m_pSurface)
+				m_pSurface = std::shared_ptr<SDL_Surface>(newSurface,
+					[](SDL_Surface* pSurface) {
+					if (pSurface != nullptr)
 					{
-						m_width = m_pSurface->w;
-						m_height = m_pSurface->h;
-						m_pitch = m_pSurface->pitch;
-
-						ret = true;
+						SDL_FreeSurface(pSurface);
 					}
+				});
+
+				if (m_pSurface)
+				{
+					ret = true;
 				}
 			}
 
@@ -119,30 +143,26 @@ namespace Equisetum2
 
 		uint32_t Width()
 		{
-			return m_width;
+			return m_pSurface->w;
 		}
 
 		uint32_t Height()
 		{
-			return m_height;
+			return m_pSurface->h;
 		}
 
 		uint32_t Pitch()
 		{
-			return m_pitch;
+			return m_pSurface->pitch;
 		}
 
 		Color* Data()
 		{
-			return nullptr;
+			return reinterpret_cast<Color*>(m_pSurface->pixels);
 		}
 
 	private:
 		std::shared_ptr<SDL_Surface> m_pSurface;
-
-		uint32_t m_width = 0;
-		uint32_t m_height = 0;
-		uint32_t m_pitch = 0;
 	};
 }
 

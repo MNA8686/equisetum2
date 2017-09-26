@@ -8,13 +8,13 @@ namespace Equisetum2
 {
 	union Color
 	{
-		struct rgba
+		struct rgba_t
 		{
-			uint8_t a;
-			uint8_t r;
-			uint8_t g;
 			uint8_t b;
-		};
+			uint8_t g;
+			uint8_t r;
+			uint8_t a;
+		}rgba;
 
 		uint32_t pixel;
 	};
@@ -33,6 +33,14 @@ namespace Equisetum2
 		static std::shared_ptr<Image> CreateFromStream(std::shared_ptr<IStream> stream);
 
 		/**
+		* @brief ブランク画像を作成する
+		* @param width 横幅(1～65535)
+		* @param height 縦幅(1～65535)
+		* @return 成功時イメージのポインタ
+		*/
+		static std::shared_ptr<Image> CreateBlank(uint32_t width, uint32_t height);
+
+		/**
 		* @brief ストリームに対してイメージ(PNG)を出力する
 		* @param stream 出力元ストリーム
 		* @return 成否
@@ -43,8 +51,8 @@ namespace Equisetum2
 
 		/**
 		* @brief イメージのサイズを変更する
-		* @param width 変更後の横サイズ
-		* @param height 変更後の縦サイズ
+		* @param width 変更後の横サイズ(1～65535)
+		* @param height 変更後の縦サイズ(1～65535)
 		* @return 成否
 		*/
 		bool Resize(uint32_t width, uint32_t height);
@@ -79,7 +87,11 @@ namespace Equisetum2
 
 	private:
 
-		bool InitFromStream(std::shared_ptr<IStream>& stream);
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
+
+		Image(const Image&) = delete;				// コピーコンストラクタ封じ
+		Image& operator= (const Image&) = delete;	// コピーコンストラクタ封じ
 	};
 }
 

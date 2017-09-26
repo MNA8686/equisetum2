@@ -29,6 +29,7 @@
     </ClCompile>
     <ClCompile Include="..\..\test\Crypt.cpp" />
     <ClCompile Include="..\..\test\File.cpp" />
+    <ClCompile Include="..\..\test\Image.cpp" />
     <ClCompile Include="..\..\test\Path.cpp" />
     <ClCompile Include="..\..\test\Stream.cpp" />
     <ClCompile Include="..\..\test\String.cpp" />

@@ -47,5 +47,8 @@
     <ClCompile Include="..\..\test\Stream.cpp">
       <Filter>ソース ファイル\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\Image.cpp">
+      <Filter>ソース ファイル\test</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
