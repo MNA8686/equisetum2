@@ -32,9 +32,9 @@ namespace Equisetum2
 				}
 
 				// フォーマットコンバート
-				if (pSurface->format->format != SDL_PIXELFORMAT_ARGB8888)
+				if (pSurface->format->format != SDL_PIXELFORMAT_ABGR8888)
 				{
-					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_ABGR8888, 0);
 					SDL_FreeSurface(pSurface);
 					pSurface = convSurface;
 				}
@@ -73,7 +73,7 @@ namespace Equisetum2
 
 			EQ_DURING
 			{
-				auto pSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+				auto pSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ABGR8888);
 				if (!pSurface)
 				{
 					EQ_THROW(u8"サーフェスの作成に失敗しました。");
@@ -119,7 +119,7 @@ namespace Equisetum2
 		{
 			auto ret = false;
 
-			auto newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+			auto newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ABGR8888);
 			if (newSurface)
 			{
 				SDL_BlitScaled(m_pSurface.get(), nullptr, newSurface, nullptr);

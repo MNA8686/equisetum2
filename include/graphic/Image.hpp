@@ -8,13 +8,13 @@ namespace Equisetum2
 {
 	union Color
 	{
-		struct argb8888_t
+		struct rgba8888_t
 		{
-			uint8_t b;
-			uint8_t g;
 			uint8_t r;
+			uint8_t g;
+			uint8_t b;
 			uint8_t a;
-		}argb8888;
+		}rgba8888;
 
 		uint32_t pixel;
 	};
