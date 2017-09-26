@@ -8,13 +8,13 @@ namespace Equisetum2
 {
 	union Color
 	{
-		struct rgba_t
+		struct argb8888_t
 		{
 			uint8_t b;
 			uint8_t g;
 			uint8_t r;
 			uint8_t a;
-		}rgba;
+		}argb8888;
 
 		uint32_t pixel;
 	};
@@ -59,19 +59,19 @@ namespace Equisetum2
 
 		/**
 		* @brief イメージの横幅を取得する
-		* @return 成否
+		* @return イメージの横幅
 		*/
 		uint32_t Width();
 
 		/**
 		* @brief イメージの縦幅を取得する
-		* @return 成否
+		* @return イメージの縦幅
 		*/
 		uint32_t Height();
 
 		/**
 		* @brief イメージの横幅をバイト数で取得する
-		* @return 成否
+		* @return イメージの横幅のバイト数
 		*/
 		uint32_t Pitch();
 
