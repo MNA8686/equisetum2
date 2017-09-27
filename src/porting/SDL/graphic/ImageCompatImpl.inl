@@ -56,6 +56,9 @@ namespace Equisetum2
 					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
 				}
 
+				// ブレンドモードを設定
+				SDL_SetSurfaceBlendMode(m_pSurface.get(), SDL_BLENDMODE_NONE);
+
 				ret = true;
 			}
 			EQ_HANDLER
@@ -91,6 +94,9 @@ namespace Equisetum2
 				{
 					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
 				}
+
+				// ブレンドモードを設定
+				SDL_SetSurfaceBlendMode(m_pSurface.get(), SDL_BLENDMODE_NONE);
 
 				ret = true;
 			}
@@ -134,6 +140,8 @@ namespace Equisetum2
 
 				if (m_pSurface)
 				{
+					// ブレンドモードを設定
+					SDL_SetSurfaceBlendMode(m_pSurface.get(), SDL_BLENDMODE_NONE);
 					ret = true;
 				}
 			}
