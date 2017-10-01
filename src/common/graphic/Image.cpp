@@ -179,6 +179,43 @@ namespace Equisetum2
 		return ret;
 	}
 
+	bool Image::CopyTo(std::shared_ptr<Image> dstImage)
+	{
+		auto ret = false;
+
+		EQ_DURING
+		{
+			if (!dstImage)
+			{
+				EQ_THROW(u8"コピー先イメージのポインタが不正です。");
+			}
+
+			if (dstImage->Width() == 0 || dstImage->Width() >= 65536)
+			{
+				EQ_THROW(u8"コピー先イメージの横幅が不正です。");
+			}
+
+			if (dstImage->Height() == 0 || dstImage->Height() >= 65536)
+			{
+				EQ_THROW(u8"コピー先イメージの縦幅が不正です。");
+			}
+
+			if (!m_pImpl->CopyTo(dstImage))
+			{
+				EQ_THROW(u8"イメージのコピーに失敗しました。");
+			}
+
+			ret = true;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return ret;
+	}
+
 	uint32_t Image::Width()
 	{
 		return m_pImpl->Width();

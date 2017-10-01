@@ -58,6 +58,15 @@ namespace Equisetum2
 		bool Resize(uint32_t width, uint32_t height);
 
 		/**
+		* @brief イメージをコピーする
+		* @param dstImage コピー先イメージ
+		* @return 成否
+		*
+		* @detail イメージはコピー先イメージのサイズにリサイズされる
+		*/
+		bool CopyTo(std::shared_ptr<Image> dstImage);
+
+		/**
 		* @brief イメージの横幅を取得する
 		* @return イメージの横幅
 		*/
