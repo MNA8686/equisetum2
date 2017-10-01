@@ -91,7 +91,9 @@ namespace Equisetum2
 		return op1.x != op2.x || op1.y != op2.y;
 	}
 
-	using Size = Point<int>;
+	using PointF = Point<float>;
+	using Size = Point<int32_t>;
+	using SizeF = Point<float>;
 }
 
 #endif

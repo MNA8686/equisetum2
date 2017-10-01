@@ -20,9 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\UnitTest.hpp" />
+    <ClInclude Include="..\..\src\Behavior.hpp" />
+    <ClInclude Include="..\..\src\BehaviorTest.hpp" />
+    <ClInclude Include="..\..\src\Component.hpp" />
+    <ClInclude Include="..\..\src\GameObject.hpp" />
+    <ClInclude Include="..\..\src\SpriteRenderer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Behavior.cpp" />
+    <ClCompile Include="..\..\src\BehaviorTest.cpp" />
+    <ClCompile Include="..\..\src\Component.cpp" />
+    <ClCompile Include="..\..\src\GameObject.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\SpriteRenderer.cpp" />
     <ClCompile Include="..\..\src\UnitTest.cpp" />
     <ClCompile Include="..\..\test\Archive.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
