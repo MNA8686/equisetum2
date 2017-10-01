@@ -1,6 +1,8 @@
 ﻿#if !defined(_EQPOINT_H_)
 #define _EQPOINT_H_
 
+#include <cstdint>
+
 namespace Equisetum2
 {
 	template <typename T>
