@@ -190,6 +190,11 @@ namespace Equisetum2
 				EQ_THROW(u8"コピー先イメージのポインタが不正です。");
 			}
 
+			if (this == dstImage.get())
+			{
+				EQ_THROW(u8"コピー元とコピー先のイメージが同じです。");
+			}
+
 			if (dstImage->Width() == 0 || dstImage->Width() >= 65536)
 			{
 				EQ_THROW(u8"コピー先イメージの横幅が不正です。");
