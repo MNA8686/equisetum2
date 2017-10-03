@@ -2,6 +2,8 @@
 #define _EQIMAGE_H_
 
 #include "stream/IStream.h"
+#include "type/Optional.h"
+#include "type/Rect.hpp"
 #include <memory>
 
 namespace Equisetum2
@@ -67,11 +69,11 @@ namespace Equisetum2
 		/**
 		* @brief イメージをコピーする
 		* @param dstImage コピー先イメージ
+		* @param src コピー元イメージの範囲 省略時はコピー元イメージ全体
+		* @param dst コピー先イメージの範囲 省略時はコピー先イメージ全体
 		* @return 成否
-		*
-		* @detail イメージはコピー先イメージのサイズにリサイズされる
 		*/
-		bool CopyTo(std::shared_ptr<Image> dstImage);
+		bool CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src= std::experimental::nullopt, const Optional<Rect> dst = std::experimental::nullopt);
 
 		/**
 		* @brief イメージの横幅を取得する

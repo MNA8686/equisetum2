@@ -149,10 +149,31 @@ namespace Equisetum2
 			return ret;
 		}
 
-		bool CopyTo(std::shared_ptr<Image> dstImage)
+		bool CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src = std::experimental::nullopt, const Optional<Rect> dst = std::experimental::nullopt)
 		{
+			SDL_Rect srcrect;
+			SDL_Rect dstrect;
+
+			if (src)
+			{
+				auto& ref = *src;
+				srcrect.x = ref.x;
+				srcrect.y = ref.y;
+				srcrect.w = ref.width;
+				srcrect.h = ref.height;
+			}
+
+			if (dst)
+			{
+				auto& ref = *dst;
+				dstrect.x = ref.x;
+				dstrect.y = ref.y;
+				dstrect.w = ref.width;
+				dstrect.h = ref.height;
+			}
+
 			auto pDstSurface = dstImage->m_pImpl->GetSurface();
-			return SDL_BlitScaled(m_pSurface.get(), nullptr, pDstSurface.get(), nullptr) == 0;
+			return SDL_BlitScaled(m_pSurface.get(), src ? &srcrect : nullptr, pDstSurface.get(), dst ? &dstrect : nullptr) == 0;
 		}
 
 		bool Replace(std::shared_ptr<Image> srcImage)

@@ -255,6 +255,9 @@
     <ClInclude Include="..\..\include\graphic\Image.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\type\Rect.hpp">
+      <Filter>ヘッダー ファイル\type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">

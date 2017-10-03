@@ -3,6 +3,8 @@
 
 #include "type/Optional.h"
 #include "type/String.h"
+#include "type/Point.h"
+#include "type/Rect.hpp"
 
 #include "util/Regex.hpp"
 #include "util/SHA256.hpp"

@@ -154,6 +154,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\timer\TickCounter.h" />
     <ClInclude Include="..\..\include\type\Optional.h" />
     <ClInclude Include="..\..\include\type\Point.h" />
+    <ClInclude Include="..\..\include\type\Rect.hpp" />
     <ClInclude Include="..\..\include\type\String.h" />
     <ClInclude Include="..\..\include\util\ArchiveAccessor.hpp" />
     <ClInclude Include="..\..\include\util\ArchivePacker.hpp" />

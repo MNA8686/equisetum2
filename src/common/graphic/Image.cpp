@@ -179,7 +179,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	bool Image::CopyTo(std::shared_ptr<Image> dstImage)
+	bool Image::CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src, const Optional<Rect> dst)
 	{
 		auto ret = false;
 
@@ -195,17 +195,35 @@ namespace Equisetum2
 				EQ_THROW(u8"コピー元とコピー先のイメージが同じです。");
 			}
 
-			if (dstImage->Width() == 0 || dstImage->Width() >= 65536)
+			if (src)
 			{
-				EQ_THROW(u8"コピー先イメージの横幅が不正です。");
+				auto& rect = *src;
+				if (rect.x < 0 ||
+					rect.width <= 0 ||
+					rect.x + rect.width > static_cast<int32_t>(Width()) ||
+					rect.y < 0 ||
+					rect.height <= 0 ||
+					rect.y + rect.height > static_cast<int32_t>(Height()))
+				{
+					EQ_THROW(u8"転送元範囲の指定が不正です。");
+				}
 			}
 
-			if (dstImage->Height() == 0 || dstImage->Height() >= 65536)
+			if (dst)
 			{
-				EQ_THROW(u8"コピー先イメージの縦幅が不正です。");
+				auto& rect = *dst;
+				if (rect.x < 0 ||
+					rect.width <= 0 ||
+					rect.x + rect.width > static_cast<int32_t>(dstImage->Width()) ||
+					rect.y < 0 ||
+					rect.height <= 0 ||
+					rect.y + rect.height > static_cast<int32_t>(dstImage->Height()))
+				{
+					EQ_THROW(u8"転送先範囲の指定が不正です。");
+				}
 			}
 
-			if (!m_pImpl->CopyTo(dstImage))
+			if (!m_pImpl->CopyTo(dstImage, src, dst))
 			{
 				EQ_THROW(u8"イメージのコピーに失敗しました。");
 			}
