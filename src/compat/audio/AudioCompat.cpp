@@ -145,6 +145,11 @@ namespace Equisetum2
 		return m_Impl->VolumeSE(id);
 	}
 
+	bool AudioCompat::Replace(AudioHandlerID dstId, AudioHandlerID srcId)
+	{
+		return m_Impl->Replace(dstId, srcId);
+	}
+
 	// ボリューム範囲チェック
 	double AudioCompat::SatVolume(double volume)
 	{

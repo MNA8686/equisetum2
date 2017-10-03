@@ -35,6 +35,13 @@ namespace Equisetum2
 		bool SetVolume(double volume) override;
 		double Volume() const override;
 
+		/**
+		* @brief 新しいインスタンスで現在のインスタンスを置き換える
+		* @param src 置き換え元のインスタンス
+		* @return 成否
+		*/
+		bool Replace(std::shared_ptr<SE> src);
+
 	private:
 		std::shared_ptr<uint32_t> m_id;
 	};

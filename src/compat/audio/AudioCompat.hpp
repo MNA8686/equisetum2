@@ -45,6 +45,7 @@ namespace Equisetum2
 		double VolumeSE(AudioHandlerID id) const;
 		bool IsPlayingSE(AudioHandlerID id) const;
 		bool IsPausedSE(AudioHandlerID id) const;
+		bool Replace(AudioHandlerID dstId, AudioHandlerID srcId);
 
 		// ボリューム範囲チェック
 		static double SatVolume(double volume);

@@ -247,6 +247,28 @@ namespace Equisetum2
 			return id;
 		}
 
+		bool Replace(AudioHandlerID dstId, AudioHandlerID srcId)
+		{
+			// 再生状態復元用
+			auto isPlaying = IsPlayingSE(dstId);
+			auto isPaused = IsPausedSE(dstId);
+				
+			// 置き換え先データを上書き
+			m_se[dstId].m_chunk = m_se[srcId].m_chunk;
+
+			// 再生状態を復元する
+			if (isPlaying)
+			{
+				PlaySE(dstId, m_se[dstId].m_loop);
+			}
+			if (isPaused)
+			{
+				PauseSE(dstId);
+			}
+
+			return true;
+		}
+
 		void DeleteSE(AudioHandlerID id)
 		{
 			if (id >= 0 && id < g_maxChannel)
@@ -267,6 +289,7 @@ namespace Equisetum2
 				auto channel = Mix_PlayChannel(id, m_se[id].m_chunk.get(), loop ? -1 : 0);
 				if (channel == id)
 				{
+					m_se[id].m_loop = loop;
 					ret = true;
 				}
 			}
@@ -454,6 +477,7 @@ namespace Equisetum2
 			std::shared_ptr<Mix_Chunk> m_chunk;
 			int m_pauseRefCount = 0;
 			double m_volume = Audio::MaxVolume;
+			bool m_loop = false;
 		};
 
 		BGM m_bgm[g_maxBGM];

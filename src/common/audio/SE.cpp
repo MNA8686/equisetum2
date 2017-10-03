@@ -97,5 +97,17 @@ namespace Equisetum2
 	{
 		return Singleton<AudioCompat>::GetInstance()->VolumeSE(*m_id);
 	}
+
+	bool SE::Replace(std::shared_ptr<SE> src)
+	{
+		auto ret = false;
+		
+		if(*m_id != *(src->m_id))
+		{
+			ret = Singleton<AudioCompat>::GetInstance()->Replace(*m_id, *(src->m_id));
+		}
+		
+		return ret;
+	}
 }
 
