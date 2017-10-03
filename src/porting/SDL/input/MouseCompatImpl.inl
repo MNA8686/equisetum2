@@ -138,12 +138,12 @@ namespace Equisetum2
 			}
 		}
 
-		const Point<int32_t>& Pos() const
+		const Point& Pos() const
 		{
 			return m_pos;
 		}
 
-		const Point<int32_t>& Delta() const
+		const Point& Delta() const
 		{
 			return m_delta;
 		}
@@ -174,9 +174,9 @@ namespace Equisetum2
 		std::shared_ptr<SDLEventListener> m_listener;
 
 		// 絶対座標
-		Point<int32_t> m_pos = {};
+		Point m_pos = {};
 		// 相対座標
-		Point<int32_t> m_delta = {};
+		Point m_delta = {};
 		// ホイール(垂直)
 		int32_t m_wheel = 0;
 		// ホイール(水平)

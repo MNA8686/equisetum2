@@ -4,12 +4,12 @@
 
 namespace Equisetum2
 {
-	const Point<float> TouchState::Pos() const
+	const PointF TouchState::Pos() const
 	{
 		return m_Pos;
 	}
 
-	const Point<float> TouchState::Delta() const
+	const PointF TouchState::Delta() const
 	{
 		return m_Delta;
 	}

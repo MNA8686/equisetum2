@@ -44,7 +44,7 @@ namespace Equisetum2
 		return Singleton<WindowCompat>::GetInstance()->Size();
 	}
 
-	Point<int> Window::Pos()
+	Point Window::Pos()
 	{
 		return Singleton<WindowCompat>::GetInstance()->Pos();
 	}

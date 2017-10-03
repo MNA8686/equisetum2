@@ -16,8 +16,8 @@ namespace Equisetum2
 	class TouchState : public IKeyState
 	{
 	public:
-		const Point<float> Pos() const;
-		const Point<float> Delta() const;
+		const PointF Pos() const;
+		const PointF Delta() const;
 		int64_t FingerId() const;
 
 		const String Name() const override;
@@ -29,8 +29,8 @@ namespace Equisetum2
 
 	protected:
 
-		Point<float> m_Pos;
-		Point<float> m_Delta;
+		PointF m_Pos;
+		PointF m_Delta;
 		int64_t m_FingerId = 0;
 		stKeyState m_KeyState = {};
 	};

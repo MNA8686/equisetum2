@@ -29,7 +29,7 @@ namespace Equisetum2
 
 		static const String Title();
 		static Size Size();
-		static Point<int> Pos();
+		static Point Pos();
 		static WindowStyle Style();
 	};
 }

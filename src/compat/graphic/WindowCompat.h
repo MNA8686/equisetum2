@@ -25,7 +25,7 @@ namespace Equisetum2
 
 		const String Title();
 		Equisetum2::Size Size();
-		Point<int> Pos();
+		Point Pos();
 		WindowStyle Style();
 
 	private:

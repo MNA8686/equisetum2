@@ -18,8 +18,8 @@ namespace Equisetum2
 	class Mouse
 	{
 	public:
-		static Point<int32_t> Pos();
-		static Point<int32_t> Delta();
+		static Point Pos();
+		static Point Delta();
 		static int32_t Wheel();
 		static int32_t WheelH();
 		static const Key Button(MouseButton button = MouseButton::Left);

@@ -90,7 +90,7 @@ namespace Equisetum2
 			return{ width, height };
 		}
 
-		Point<int> Pos()
+		Point Pos()
 		{
 			int x = 0;
 			int y = 0;

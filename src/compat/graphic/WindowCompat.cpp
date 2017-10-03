@@ -62,7 +62,7 @@ namespace Equisetum2
 		return m_Impl->Size();
 	}
 
-	Point<int> WindowCompat::Pos()
+	Point WindowCompat::Pos()
 	{
 		return m_Impl->Pos();
 	}

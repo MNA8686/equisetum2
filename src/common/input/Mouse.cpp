@@ -4,12 +4,12 @@
 
 namespace Equisetum2
 {
-	Point<int32_t> Mouse::Pos()
+	Point Mouse::Pos()
 	{
 		return Singleton<MouseCompat>::GetInstance()->Pos();
 	}
 
-	Point<int32_t> Mouse::Delta()
+	Point Mouse::Delta()
 	{
 		return Singleton<MouseCompat>::GetInstance()->Delta();
 	}

@@ -112,13 +112,13 @@ namespace Equisetum2
 			}
 		}
 
-		const Point<float>& Pos(int fingerIndex) const
+		const PointF& Pos(int fingerIndex) const
 		{
 			// TODO 無効値判定
 			return m_TouchStateArray[fingerIndex].pos;
 		}
 
-		const Point<float>& Delta(int fingerIndex) const
+		const PointF& Delta(int fingerIndex) const
 		{
 			// TODO 無効値判定
 			return m_TouchStateArray[fingerIndex].delta;
@@ -153,9 +153,9 @@ namespace Equisetum2
 			// これは押されるたびにインクリメントされていく(Windowsの場合)
 			int64_t id;
 			// 絶対座標
-			Point<float> pos;
+			PointF pos;
 			// 相対座標
-			Point<float> delta;
+			PointF delta;
 			// タッチ状態管理配列
 			stKeyState touchState;
 		}stTouchState;

@@ -20,12 +20,12 @@ namespace Equisetum2
 		m_Impl->Update();
 	}
 
-	const Point<float>& TouchCompat::Pos(int fingerIndex) const
+	const PointF& TouchCompat::Pos(int fingerIndex) const
 	{
 		return m_Impl->Pos(fingerIndex);
 	}
 
-	const Point<float>& TouchCompat::Delta(int fingerIndex) const
+	const PointF& TouchCompat::Delta(int fingerIndex) const
 	{
 		return m_Impl->Delta(fingerIndex);
 	}

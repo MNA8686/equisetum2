@@ -16,8 +16,8 @@ namespace Equisetum2
 		void Prepare();
 		void Update();
 
-		const Point<float>& Pos(int fingerIndex) const;
-		const Point<float>& Delta(int fingerIndex) const;
+		const PointF& Pos(int fingerIndex) const;
+		const PointF& Delta(int fingerIndex) const;
 		const stKeyState& Button(int fingerIndex) const;
 		int64_t FingerId(int fingerIndex) const;
 
