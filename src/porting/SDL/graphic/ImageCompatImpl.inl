@@ -152,7 +152,13 @@ namespace Equisetum2
 		bool CopyTo(std::shared_ptr<Image> dstImage)
 		{
 			auto pDstSurface = dstImage->m_pImpl->GetSurface();
-			return SDL_BlitScaled(m_pSurface.get(), nullptr, pDstSurface, nullptr) == 0;
+			return SDL_BlitScaled(m_pSurface.get(), nullptr, pDstSurface.get(), nullptr) == 0;
+		}
+
+		bool Replace(std::shared_ptr<Image> srcImage)
+		{
+			m_pSurface = srcImage->m_pImpl->GetSurface();
+			return true;
 		}
 
 		uint32_t Width()
@@ -175,9 +181,9 @@ namespace Equisetum2
 			return reinterpret_cast<Color*>(m_pSurface->pixels);
 		}
 
-		SDL_Surface* GetSurface()
+		std::shared_ptr<SDL_Surface>& GetSurface()
 		{
-			return m_pSurface.get();
+			return m_pSurface;
 		}
 
 	private:

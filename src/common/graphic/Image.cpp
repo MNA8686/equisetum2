@@ -221,6 +221,11 @@ namespace Equisetum2
 		return ret;
 	}
 
+	bool Image::Replace(std::shared_ptr<Image> src)
+	{
+		return m_pImpl->Replace(src);
+	}
+
 	uint32_t Image::Width()
 	{
 		return m_pImpl->Width();
@@ -239,6 +244,16 @@ namespace Equisetum2
 	Color* Image::Data()
 	{
 		return m_pImpl->Data();
+	}
+
+	void Image::SetIdentify(const String& id)
+	{
+		m_id = id;
+	}
+
+	String Image::Identify() const
+	{
+		return m_id;
 	}
 }
 
