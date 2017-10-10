@@ -42,8 +42,21 @@ namespace Equisetum2
 		*/
 		bool Replace(std::shared_ptr<SE> src);
 
+		/**
+		* @brief イメージのIDを設定する
+		*/
+		virtual void SetIdentify(const String& id);
+
+		/**
+		* @brief イメージのIDを取得する
+		* @return イメージのID
+		*/
+		virtual String Identify() const;
+
 	private:
-		std::shared_ptr<uint32_t> m_id;
+		std::shared_ptr<uint32_t> m_handle;
+
+		String m_id;
 	};
 }
 

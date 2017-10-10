@@ -17,8 +17,8 @@ namespace Equisetum2
 
 		EQ_DURING
 		{
-			auto handler = Singleton<AudioCompat>::GetInstance()->CreateSEFromStream(stream);
-			if (handler < 0)
+			auto seHandler = Singleton<AudioCompat>::GetInstance()->CreateSEFromStream(stream);
+			if (seHandler < 0)
 			{
 				EQ_THROW(u8"SEの作成に失敗しました。");
 			}
@@ -38,7 +38,7 @@ namespace Equisetum2
 				EQ_THROW(u8"デリーターの作成に失敗しました。");
 			}
 
-			*id = handler;
+			*id = seHandler;
 
 			auto inst_ = std::make_shared<SE>();
 			if (!inst_)
@@ -46,7 +46,7 @@ namespace Equisetum2
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
 
-			inst_->m_id = id;
+			inst_->m_handle = id;
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -60,54 +60,64 @@ namespace Equisetum2
 
 	bool SE::Play(bool loop)
 	{
-		return Singleton<AudioCompat>::GetInstance()->PlaySE(*m_id, loop);
+		return Singleton<AudioCompat>::GetInstance()->PlaySE(*m_handle, loop);
 	}
 
 	bool SE::Stop()
 	{
-		return Singleton<AudioCompat>::GetInstance()->StopSE(*m_id);
+		return Singleton<AudioCompat>::GetInstance()->StopSE(*m_handle);
 	}
 
 	void SE::Pause()
 	{
-		Singleton<AudioCompat>::GetInstance()->PauseSE(*m_id);
+		Singleton<AudioCompat>::GetInstance()->PauseSE(*m_handle);
 	}
 
 	void SE::Resume()
 	{
-		Singleton<AudioCompat>::GetInstance()->ResumeSE(*m_id);
+		Singleton<AudioCompat>::GetInstance()->ResumeSE(*m_handle);
 	}
 
 	bool SE::IsPlaying() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->IsPlayingSE(*m_id);
+		return Singleton<AudioCompat>::GetInstance()->IsPlayingSE(*m_handle);
 	}
 
 	bool SE::IsPaused() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->IsPausedSE(*m_id);
+		return Singleton<AudioCompat>::GetInstance()->IsPausedSE(*m_handle);
 	}
 
 	bool SE::SetVolume(double volume)
 	{
-		return Singleton<AudioCompat>::GetInstance()->SetVolumeSE(*m_id, volume);
+		return Singleton<AudioCompat>::GetInstance()->SetVolumeSE(*m_handle, volume);
 	}
 
 	double SE::Volume() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->VolumeSE(*m_id);
+		return Singleton<AudioCompat>::GetInstance()->VolumeSE(*m_handle);
 	}
 
 	bool SE::Replace(std::shared_ptr<SE> src)
 	{
 		auto ret = false;
 		
-		if(*m_id != *(src->m_id))
+		if(*m_handle != *(src->m_handle))
 		{
-			ret = Singleton<AudioCompat>::GetInstance()->Replace(*m_id, *(src->m_id));
+			ret = Singleton<AudioCompat>::GetInstance()->Replace(*m_handle, *(src->m_handle));
 		}
 		
 		return ret;
+	}
+
+	void SE::SetIdentify(const String& id)
+	{
+		m_id = id;
+	}
+
+	String SE::Identify() const
+	{
+		return m_id;
 	}
 }
 
