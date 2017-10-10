@@ -204,9 +204,6 @@
     <ClInclude Include="..\..\include\util\SHA256.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\common\system\Singleton.h">
-      <Filter>ヘッダー ファイル\system</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\system\System.h">
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
@@ -257,6 +254,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\type\Rect.hpp">
       <Filter>ヘッダー ファイル\type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\util\SharedPool.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\system\Singleton.h">
+      <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

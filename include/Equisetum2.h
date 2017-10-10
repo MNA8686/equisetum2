@@ -8,6 +8,7 @@
 
 #include "util/Regex.hpp"
 #include "util/SHA256.hpp"
+#include "util/SharedPool.hpp"
 #include "util/ArchiveAccessor.hpp"
 #include "util/ArchivePacker.hpp"
 

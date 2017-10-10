@@ -146,6 +146,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\stream\TextWriter.h" />
     <ClInclude Include="..\..\include\system\Exception.hpp" />
     <ClInclude Include="..\..\include\system\Logger.h" />
+    <ClInclude Include="..\..\include\system\Singleton.h" />
     <ClInclude Include="..\..\include\system\System.h" />
     <ClInclude Include="..\..\include\timer\SystemTimer.h" />
     <ClInclude Include="..\..\include\timer\FpsCounter.h" />
@@ -160,8 +161,8 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\ArchivePacker.hpp" />
     <ClInclude Include="..\..\include\util\Regex.hpp" />
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
+    <ClInclude Include="..\..\include\util\SharedPool.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
-    <ClInclude Include="..\..\src\common\system\Singleton.h" />
     <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp" />
     <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
