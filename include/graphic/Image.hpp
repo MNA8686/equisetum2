@@ -119,14 +119,15 @@ namespace Equisetum2
 
 	protected:
 
-		Image() {}
+		Image() = default;
+		virtual ~Image() = default;
 
 	private:
 
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
-		String m_id;
+		String m_id;		/// ID
 
 		Image(const Image&) = delete;				// コピーコンストラクタ封じ
 		Image& operator= (const Image&) = delete;	// コピーコンストラクタ封じ
