@@ -100,6 +100,12 @@ namespace Equisetum2
 		virtual Color* Data();
 
 		/**
+		* @brief イメージのデータの先頭ポインタを取得する
+		* @return イメージへのポインタ
+		*/
+		virtual const Color* Data() const;
+
+		/**
 		* @brief 新しいインスタンスで現在のインスタンスを置き換える
 		* @param src 置き換え元のインスタンス
 		* @return 成否

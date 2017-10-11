@@ -264,6 +264,11 @@ namespace Equisetum2
 		return m_pImpl->Data();
 	}
 
+	const Color* Image::Data() const
+	{
+		return m_pImpl->Data();
+	}
+
 	void Image::SetIdentify(const String& id)
 	{
 		m_id = id;
