@@ -26,6 +26,7 @@ namespace Equisetum2
 		{
 			String m_id;	/// ID比較用
 			std::weak_ptr<T> m_weakPtr;		/// リソースへの参照
+			bool m_shared = false;
 		}Info;
 
 		/**
@@ -45,9 +46,6 @@ namespace Equisetum2
 			}
 
 			// 未使用領域削除
-			m_poolShared.remove_if([](Info& info)->bool {
-				return info.m_weakPtr.expired();
-			});
 			m_pool.remove_if([](Info& info)->bool {
 				return info.m_weakPtr.expired();
 			});
@@ -56,24 +54,21 @@ namespace Equisetum2
 			Info info;
 			info.m_weakPtr = ptr;
 			info.m_id = id;
+			info.m_shared = shared;
 
 			if (shared)
 			{
 				// すでに同名のIDが無いか調べる
-				auto result = std::find_if(m_poolShared.begin(), m_poolShared.end(), [&id](Info& info)->bool {
-					return id == info.m_id;
+				auto result = std::find_if(m_pool.begin(), m_pool.end(), [&id](Info& info)->bool {
+					return info.m_shared && (id == info.m_id);
 				});
-				if (result != m_poolShared.end())
+				if (result != m_pool.end())
 				{
 					return false;
 				}
+			}
 
-				m_poolShared.push_back(info);
-			}
-			else
-			{
-				m_pool.push_back(info);
-			}
+			m_pool.push_back(info);
 
 			return true;
 		}
@@ -87,11 +82,12 @@ namespace Equisetum2
 		{
 			std::shared_ptr<T> p;
 
-			auto result = std::find_if(m_poolShared.begin(), m_poolShared.end(), [&id](Info& info)->bool {
+			auto result = std::find_if(m_pool.begin(), m_pool.end(), [&id](Info& info)->bool {
 				return (!info.m_weakPtr.expired() &&
+						info.m_shared && 
 						info.m_id == id);
 			});
-			if (result != m_poolShared.end())
+			if (result != m_pool.end())
 			{
 				p = result->m_weakPtr.lock();
 			}
@@ -99,13 +95,12 @@ namespace Equisetum2
 			return p;
 		}
 
-		const std::list<Info>& GetPool(bool shared)
+		const std::list<Info>& GetPool()
 		{
-			return shared ? m_poolShared : m_pool;
+			return m_pool;
 		}
 
 	private:
-		std::list<Info> m_poolShared;	/// 共有リソース
 		std::list<Info> m_pool;			/// 共有リソース以外(リソースのリロードの為に共有リソースではないものもリストを保持しておく)
 
 		SharedPool() = default;
