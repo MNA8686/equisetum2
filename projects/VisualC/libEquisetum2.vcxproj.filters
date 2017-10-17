@@ -261,6 +261,12 @@
     <ClInclude Include="..\..\include\system\Singleton.h">
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\stream\VariableMemoryStream.h">
+      <Filter>ヘッダー ファイル\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\util\Serialization.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -379,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\graphic\Image.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\stream\VariableMemoryStream.cpp">
+      <Filter>ソース ファイル\common\stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

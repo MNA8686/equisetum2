@@ -6,6 +6,7 @@
 
 namespace Equisetum2
 {
+
 	std::shared_ptr<Image> Image::CreateFromStream(std::shared_ptr<IStream> stream)
 	{
 		std::shared_ptr<Image> inst;
@@ -22,13 +23,13 @@ namespace Equisetum2
 				EQ_THROW(u8"リード属性が必要です。");
 			}
 
-			class ImageDummy : public Image
+			auto rawInst = new (std::nothrow) Image;
+			if (!rawInst)
 			{
-			public:
-				explicit ImageDummy(){};
-			};
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
 
-			auto inst_ = std::make_shared<ImageDummy>();
+			auto inst_ = std::shared_ptr<Image>(rawInst);
 			if (!inst_)
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
@@ -72,13 +73,7 @@ namespace Equisetum2
 				EQ_THROW(u8"縦幅が不正です。");
 			}
 
-			class ImageDummy : public Image
-			{
-			public:
-				explicit ImageDummy() {};
-			};
-
-			auto inst_ = std::make_shared<ImageDummy>();
+			auto inst_ = std::shared_ptr<Image>(new Image);
 			if (!inst_)
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
@@ -106,7 +101,7 @@ namespace Equisetum2
 		return inst;
 	}
 
-	bool Image::SaveToStream(std::shared_ptr<IStream> stream)
+	bool Image::SaveToStream(std::shared_ptr<IStream> stream) const
 	{
 		auto ret = false;
 
@@ -179,7 +174,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	bool Image::CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src, const Optional<Rect> dst)
+	bool Image::CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src, const Optional<Rect> dst) const
 	{
 		auto ret = false;
 
@@ -239,22 +234,26 @@ namespace Equisetum2
 		return ret;
 	}
 
-	bool Image::Replace(std::shared_ptr<Image> src)
+	bool Image::MoveFrom(std::shared_ptr<Image>&& src)
 	{
-		return m_pImpl->Replace(src);
+		m_pImpl = src->m_pImpl;
+		m_id = src->m_id;
+		src->m_id.clear();
+
+		return true;
 	}
 
-	uint32_t Image::Width()
+	uint32_t Image::Width() const
 	{
 		return m_pImpl->Width();
 	}
 
-	uint32_t Image::Height()
+	uint32_t Image::Height() const
 	{
 		return m_pImpl->Height();
 	}
 
-	uint32_t Image::Pitch()
+	uint32_t Image::Pitch() const
 	{
 		return m_pImpl->Pitch();
 	}

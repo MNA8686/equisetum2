@@ -176,12 +176,6 @@ namespace Equisetum2
 			return SDL_BlitScaled(m_pSurface.get(), src ? &srcrect : nullptr, pDstSurface.get(), dst ? &dstrect : nullptr) == 0;
 		}
 
-		bool Replace(std::shared_ptr<Image> srcImage)
-		{
-			m_pSurface = srcImage->m_pImpl->GetSurface();
-			return true;
-		}
-
 		uint32_t Width()
 		{
 			return m_pSurface->w;

@@ -23,6 +23,7 @@
 #include "stream/IStream.h"
 #include "stream/FileStream.h"
 #include "stream/MemoryStream.h"
+#include "stream/VariableMemoryStream.h"
 #include "stream/PartialStream.hpp"
 #include "stream/TextReader.h"
 #include "stream/TextWriter.h"
@@ -44,5 +45,7 @@
 #include "timer/TickCounter.h"
 #include "timer/FpsCounter.h"
 #include "timer/FpsPaceMaker.h"
+
+#include "util/Serialization.hpp"
 
 #endif

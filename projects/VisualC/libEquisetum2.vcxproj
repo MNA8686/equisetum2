@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -86,7 +86,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
@@ -144,6 +144,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\stream\PartialStream.hpp" />
     <ClInclude Include="..\..\include\stream\TextReader.h" />
     <ClInclude Include="..\..\include\stream\TextWriter.h" />
+    <ClInclude Include="..\..\include\stream\VariableMemoryStream.h" />
     <ClInclude Include="..\..\include\system\Exception.hpp" />
     <ClInclude Include="..\..\include\system\Logger.h" />
     <ClInclude Include="..\..\include\system\Singleton.h" />
@@ -160,6 +161,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\ArchiveAccessor.hpp" />
     <ClInclude Include="..\..\include\util\ArchivePacker.hpp" />
     <ClInclude Include="..\..\include\util\Regex.hpp" />
+    <ClInclude Include="..\..\include\util\Serialization.hpp" />
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
     <ClInclude Include="..\..\include\util\SharedPool.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
@@ -194,6 +196,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\stream\PartialStream.cpp" />
     <ClCompile Include="..\..\src\common\stream\TextReader.cpp" />
     <ClCompile Include="..\..\src\common\stream\TextWriter.cpp" />
+    <ClCompile Include="..\..\src\common\stream\VariableMemoryStream.cpp" />
     <ClCompile Include="..\..\src\common\system\Logger.cpp" />
     <ClCompile Include="..\..\src\common\system\Singleton.cpp" />
     <ClCompile Include="..\..\src\common\timer\FpsCounter.cpp" />

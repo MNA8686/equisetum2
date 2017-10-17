@@ -6,6 +6,8 @@
 #include "type/Rect.hpp"
 #include <memory>
 
+#include "cereal/access.hpp"
+
 namespace Equisetum2
 {
 	/**
@@ -56,7 +58,7 @@ namespace Equisetum2
 		*
 		* @detail 出力先ストリームが書き込み及びシーク可能でなければならない
 		*/
-		virtual bool SaveToStream(std::shared_ptr<IStream> stream);
+		virtual bool SaveToStream(std::shared_ptr<IStream> stream) const;
 
 		/**
 		* @brief イメージのサイズを変更する
@@ -73,25 +75,25 @@ namespace Equisetum2
 		* @param dst コピー先イメージの範囲 省略時はコピー先イメージ全体
 		* @return 成否
 		*/
-		bool CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src= std::experimental::nullopt, const Optional<Rect> dst = std::experimental::nullopt);
+		bool CopyTo(std::shared_ptr<Image> dstImage, const Optional<Rect> src= std::experimental::nullopt, const Optional<Rect> dst = std::experimental::nullopt) const;
 
 		/**
 		* @brief イメージの横幅を取得する
 		* @return イメージの横幅
 		*/
-		virtual uint32_t Width();
+		virtual uint32_t Width() const;
 
 		/**
 		* @brief イメージの縦幅を取得する
 		* @return イメージの縦幅
 		*/
-		virtual uint32_t Height();
+		virtual uint32_t Height() const;
 
 		/**
 		* @brief イメージの横幅をバイト数で取得する
 		* @return イメージの横幅のバイト数
 		*/
-		virtual uint32_t Pitch();
+		virtual uint32_t Pitch() const;
 
 		/**
 		* @brief イメージのデータの先頭ポインタを取得する
@@ -110,7 +112,7 @@ namespace Equisetum2
 		* @param src 置き換え元のインスタンス
 		* @return 成否
 		*/
-		virtual bool Replace(std::shared_ptr<Image> src);
+		virtual bool MoveFrom(std::shared_ptr<Image>&& src);
 
 		/**
 		* @brief イメージのIDを設定する
@@ -123,10 +125,12 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
+		virtual ~Image() = default;
+
 	protected:
 
+		friend class cereal::access;
 		Image() = default;
-		virtual ~Image() = default;
 
 	private:
 
@@ -137,6 +141,7 @@ namespace Equisetum2
 
 		Image(const Image&) = delete;				// コピーコンストラクタ封じ
 		Image& operator= (const Image&) = delete;	// コピーコンストラクタ封じ
+		Image& operator= (const Image&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
 	};
 }
 

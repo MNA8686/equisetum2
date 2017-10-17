@@ -152,6 +152,7 @@ TEST(Image, Blank)
 		for (uint32_t x = 0; x < imageBlank->Width(); x++)
 		{
 			blankData[x] = inData[x];
+//			blankData[x].rgba8888.r = 255;
 		}
 
 		blankData = reinterpret_cast<Color*>(reinterpret_cast<uint8_t*>(blankData) + blankPitch);
@@ -161,4 +162,47 @@ TEST(Image, Blank)
 	ASSERT_TRUE(imageBlank->SaveToStream(outStream));
 }
 
+TEST(Image, copy)
+{
+	auto inStream = FileStream::CreateFromPath(Path::GetFullPath("jiki_icon.png"));
+	ASSERT_TRUE(inStream);
 
+	auto outStream = FileStream::CreateFromPath(Path::GetFullPath("jiki_icon_copy.png"), FileStream::Method::Write);
+	ASSERT_TRUE(outStream);
+
+	auto imageIn = Image::CreateFromStream(inStream);
+	ASSERT_TRUE(imageIn);
+
+	auto imageBlank = Image::CreateBlank(128, 128);
+	ASSERT_TRUE(imageBlank);
+
+	ASSERT_TRUE(imageBlank->Width() == 128);
+	ASSERT_TRUE(imageBlank->Height() == 128);
+
+	ASSERT_TRUE(imageIn->CopyTo(imageBlank));
+
+	ASSERT_TRUE(imageBlank->SaveToStream(outStream));
+}
+
+TEST(Image, CopyStretch)
+{
+	auto inStream = FileStream::CreateFromPath(Path::GetFullPath("jiki_icon.png"));
+	ASSERT_TRUE(inStream);
+
+	auto outStream = FileStream::CreateFromPath(Path::GetFullPath("jiki_icon_copystretch.png"), FileStream::Method::Write);
+	ASSERT_TRUE(outStream);
+
+	auto imageIn = Image::CreateFromStream(inStream);
+	ASSERT_TRUE(imageIn);
+
+	auto imageBlank = Image::CreateBlank(128, 128);
+	ASSERT_TRUE(imageBlank);
+
+	ASSERT_TRUE(imageBlank->Width() == 128);
+	ASSERT_TRUE(imageBlank->Height() == 128);
+
+	ASSERT_TRUE(imageIn->CopyTo(imageBlank, Rect{ 16, 0, 16, 16 }, Rect{ 32, 32, 64, 64 }));
+//	ASSERT_TRUE(imageIn->CopyTo(imageBlank, Rect{ 16, 0, 16, 16 }));
+
+	ASSERT_TRUE(imageBlank->SaveToStream(outStream));
+}
