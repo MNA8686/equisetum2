@@ -21,6 +21,26 @@ mkdir ${BUILD_DIR}/${TARGET_DIR}
 mkdir ${DEP_DIR}
 mkdir ${DEP_DIR}/${TARGET_DIR}
 
+
+################################
+# cereal                         #
+################################
+LIB_NAME=cereal
+LIB_DIR=cereal-master
+
+# Make Deploy Directory
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}
+mkdir ${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+
+if [ ! -e ${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR} ]; then
+	unzip ${SRC_DIR}/${LIB_DIR}.zip -d ${BUILD_DIR}/${TARGET_DIR}
+fi
+
+# Deploy
+cd ${CUR_DIR}/${BUILD_DIR}/${TARGET_DIR}/${LIB_DIR}
+cp -a include/* ${CUR_DIR}/${DEP_DIR}/${TARGET_DIR}/${LIB_NAME}/include
+cd ${CUR_DIR}
+
 ################################
 # glew                         #
 ################################
