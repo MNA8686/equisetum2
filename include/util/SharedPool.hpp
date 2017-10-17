@@ -95,7 +95,19 @@ namespace Equisetum2
 			return p;
 		}
 
-		const std::list<Info>& GetPool()
+		/**
+		* @brief ロード済みリソースのリストをクリアする
+		*/
+		void Clear()
+		{
+			m_pool.clear();
+		}
+
+		/**
+		* @brief ロード済みリソースのリストを返す
+		* @return ロード済みのリソースのリスト
+		*/
+		const std::list<Info>& GetPool() const
 		{
 			return m_pool;
 		}
@@ -105,6 +117,9 @@ namespace Equisetum2
 
 		SharedPool() = default;
 		~SharedPool() = default;
+		SharedPool(const SharedPool&) = delete;				// コピーコンストラクタ封じ
+		SharedPool& operator= (const SharedPool&) = delete;	// コピーコンストラクタ封じ
+		SharedPool& operator= (const SharedPool&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
 	};
 }
 
