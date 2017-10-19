@@ -1,3 +1,6 @@
+# UTF-8 for MSBuild 
+chcp 65001
+
 :開発者コマンド プロンプト for VS2013 のパスを設定
 :call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsMSBuildCmd.bat"

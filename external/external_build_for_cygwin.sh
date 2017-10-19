@@ -21,9 +21,6 @@ mkdir ${BUILD_DIR}/${TARGET_DIR}
 mkdir ${DEP_DIR}
 mkdir ${DEP_DIR}/${TARGET_DIR}
 
-# UTF-8 for MSBuild 
-chcp 65001
-
 ################################
 # cereal                         #
 ################################
