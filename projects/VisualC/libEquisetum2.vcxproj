@@ -68,7 +68,9 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy "..\..\external\dep\win32\SDL2\dll\*" "..\..\lib\win32\dll"
+      <Command>md "..\..\lib\win32\dll"
+md "..\..\lib\win32\lib"
+copy "..\..\external\dep\win32\SDL2\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_mixer\dll\*" "..\..\lib\win32\dll"
@@ -107,7 +109,9 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy "..\..\\external\dep\win32\SDL2\dll\*" "..\..\\lib\win32\dll"
+      <Command>md "..\..\lib\win32\dll"
+md "..\..\lib\win32\lib"
+copy "..\..\\external\dep\win32\SDL2\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"

@@ -7,6 +7,6 @@ set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v4.0.30319\
 :cygwin‹N“®
 set HOME=%~dp0
 c:\cygwin\bin\bash --login "./external_build_for_cygwin.sh"
-REM c:\cygwin\bin\bash --login
 
-pause
+echo errorlevel %errorlevel%
+exit /b %errorlevel%
