@@ -145,7 +145,10 @@ namespace Equisetum2
 	{
 		Optional<size_t> optSize;
 
-		optSize = m_pImpl->Write(data, size);
+		if (m_writable)
+		{
+			optSize = m_pImpl->Write(data, size);
+		}
 
 		return optSize;
 	}
