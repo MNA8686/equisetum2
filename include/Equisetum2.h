@@ -13,8 +13,10 @@
 #include "util/ArchivePacker.hpp"
 
 #include "system/Exception.hpp"
-#include "system/System.h"
 #include "system/Logger.h"
+#if !defined(EQUISETUM2_STATIC)
+#include "system/System.h"
+#endif
 
 #include "fs/File.hpp"
 #include "fs/Directory.hpp"
@@ -28,6 +30,7 @@
 #include "stream/TextReader.h"
 #include "stream/TextWriter.h"
 
+#if !defined(EQUISETUM2_STATIC)
 #include "graphic/Window.h"
 #include "graphic/Image.hpp"
 
@@ -45,6 +48,7 @@
 #include "timer/TickCounter.h"
 #include "timer/FpsCounter.h"
 #include "timer/FpsPaceMaker.h"
+#endif
 
 #include "util/Serialization.hpp"
 

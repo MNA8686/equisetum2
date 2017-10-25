@@ -125,6 +125,7 @@ namespace Equisetum2
 		archive.LoadBinary(bin.data, static_cast<std::size_t>(bin.size));
 	}
 
+#if !defined(EQUISETUM2_STATIC)
 	/*****************************************************************
 	*	Image
 	******************************************************************/
@@ -161,6 +162,7 @@ namespace Equisetum2
 		archive(id);
 		image.SetIdentify(id);
 	}
+#endif
 
 	/*****************************************************************
 	*	Point_t
