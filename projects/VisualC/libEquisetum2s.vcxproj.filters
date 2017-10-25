@@ -221,6 +221,9 @@
     <ClInclude Include="..\..\include\Equisetum2s.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\util\Step.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\SDL\stream\MemoryStream.inl">

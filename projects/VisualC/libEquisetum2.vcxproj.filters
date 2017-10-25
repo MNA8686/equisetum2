@@ -267,6 +267,9 @@
     <ClInclude Include="..\..\include\util\Serialization.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\util\Step.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">

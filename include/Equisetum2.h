@@ -6,6 +6,7 @@
 #include "type/Point.h"
 #include "type/Rect.hpp"
 
+#include "util/Step.hpp"
 #include "util/Regex.hpp"
 #include "util/SHA256.hpp"
 #include "util/SharedPool.hpp"

@@ -203,6 +203,7 @@ copy "$(SolutionDir)$(Configuration)s\*.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\Serialization.hpp" />
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
     <ClInclude Include="..\..\include\util\SharedPool.hpp" />
+    <ClInclude Include="..\..\include\util\Step.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
     <ClInclude Include="..\..\src\compat\system\LoggerCompat.h" />
   </ItemGroup>
