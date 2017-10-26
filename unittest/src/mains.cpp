@@ -33,7 +33,5 @@ int main(int argc, char *argv[])
 	});
 
 	// 単体テスト実行
-	UnitTest::GetInstance()->Do();
-
-	return 0;
+	return UnitTest::GetInstance()->Do();
 }

@@ -44,16 +44,40 @@ namespace Equisetum2
 		m_testQueue.push_back(def);
 	}
 
-	void UnitTest::Do()
+	int UnitTest::Do()
 	{
-		for (auto elem : m_testQueue)
+		// 単体テスト実行
+		for (auto&& elem : m_testQueue)
 		{
-			Logger::OutputInfo("BEGIN %s %s", elem->test_case_name.c_str(), elem->test_name.c_str());
+			Logger::OutputInfo("[ RUN    ] %s %s", elem->test_case_name.c_str(), elem->test_name.c_str());
 
-			elem->TestBody();
+			elem->passed = true;
+			elem->TestBody();	// テスト実行
 
-			Logger::OutputInfo("END %s %s", elem->test_case_name.c_str(), elem->test_name.c_str());
+			Logger::OutputInfo("[     %s ] %s %s", elem->passed ? "OK" : "NG", elem->test_case_name.c_str(), elem->test_name.c_str());
 		}
+
+		// エラー発生数算出
+		int error = 0;
+		for (auto&& elem : m_testQueue)
+		{
+			if (!elem->passed)
+			{
+				error++;
+			}
+		}
+
+		// 結果出力
+		if (error)
+		{
+			Logger::OutputInfo("[ FAILED ] %d error of %d tests.", error, m_testQueue.size());
+		}
+		else
+		{
+			Logger::OutputInfo("[ PASSED ] %d tests.", m_testQueue.size());
+		}
+
+		return error;
 	}
 }
 

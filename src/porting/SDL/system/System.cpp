@@ -70,7 +70,7 @@ namespace Equisetum2
 }
 
 using namespace Equisetum2;
-extern void Main();
+extern int Main();
 
 int main(int argc, char *argv[])
 {
@@ -99,11 +99,11 @@ int main(int argc, char *argv[])
 	Singleton<JoystickCompat>::GetInstance();
 	Singleton<AudioCompat>::GetInstance();
 
-	Main();
+	auto ret = Main();
 
 	SingletonFinalizer::Finalize();
 
 	SDL_Quit();
 
-	return 0;
+	return ret;
 }

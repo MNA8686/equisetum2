@@ -3,7 +3,7 @@
 
 using namespace Equisetum2;
 
-void Main()
+int Main()
 {
 	Logger::SetPriority(LogLevel::Info);
 	Logger::SetCallback([](LogLevel level, const char* str)->bool {
@@ -11,7 +11,11 @@ void Main()
 	});
 
 	// 単体テスト実行
-	UnitTest::GetInstance()->Do();
+	auto ret = UnitTest::GetInstance()->Do();
+	if (ret != 0)
+	{
+		return ret;
+	}
 
 	while (true)
 	{
@@ -22,4 +26,6 @@ void Main()
 
 		System::Sleep(1);
 	}
+
+	return 0;
 }

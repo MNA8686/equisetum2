@@ -22,6 +22,7 @@ namespace Equisetum2
 	public:
 		std::string test_case_name;		/// テストケース名
 		std::string test_name;			/// テスト名
+		bool passed = false;			/// テストパスフラグ
 		virtual void TestBody() {}	/// 派生先のクラスで定義したこのメソッドをテスト項目として実装する
 		virtual ~TestDef() {}
 	};
@@ -47,8 +48,9 @@ namespace Equisetum2
 
 		/**
 		* @brief 登録した単体テストを実行する
+		* @return 失敗したテストの数
 		*/
-		void Do();
+		int Do();
 
 		~UnitTest() {}
 
@@ -82,6 +84,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" == " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	} \
 }
@@ -92,6 +95,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" != " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -102,6 +106,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" < " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -112,6 +117,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" <= " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -122,6 +128,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" > " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -132,6 +139,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" >= " #OP2 u8" failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -142,6 +150,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" == true failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
@@ -152,6 +161,7 @@ namespace Equisetum2
 		auto str = String::Sprintf(u8"  %s(%d): error: ", __FILE__, __LINE__); \
 		str += #OP1 u8" == false failed."; \
 		Logger::OutputCritical(str.c_str()); \
+		passed = false; \
 		return; \
 	}\
 }
