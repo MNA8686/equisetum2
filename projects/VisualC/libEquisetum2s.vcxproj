@@ -167,6 +167,7 @@ copy "$(SolutionDir)$(Configuration)s\*.lib" "..\..\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\stream\TextReader.cpp" />
     <ClCompile Include="..\..\src\common\stream\TextWriter.cpp" />
     <ClCompile Include="..\..\src\common\stream\VariableMemoryStream.cpp" />
+    <ClCompile Include="..\..\src\common\system\Argument.cpp" />
     <ClCompile Include="..\..\src\common\system\Logger.cpp" />
     <ClCompile Include="..\..\src\common\system\Singleton.cpp" />
     <ClCompile Include="..\..\src\common\util\ArchiveAccessor.cpp" />
@@ -174,11 +175,12 @@ copy "$(SolutionDir)$(Configuration)s\*.lib" "..\..\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
     <ClCompile Include="..\..\src\compat\system\LoggerCompat.cpp" />
+    <ClCompile Include="..\..\src\porting\Win32\system\System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\crypt\HMAC.hpp" />
     <ClInclude Include="..\..\include\crypt\MessageDigest.hpp" />
-    <ClInclude Include="..\..\include\Equisetum2s.h" />
+    <ClInclude Include="..\..\include\Equisetum2.h" />
     <ClInclude Include="..\..\include\fs\Directory.hpp" />
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
@@ -190,6 +192,7 @@ copy "$(SolutionDir)$(Configuration)s\*.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\stream\TextReader.h" />
     <ClInclude Include="..\..\include\stream\TextWriter.h" />
     <ClInclude Include="..\..\include\stream\VariableMemoryStream.h" />
+    <ClInclude Include="..\..\include\system\Argument.hpp" />
     <ClInclude Include="..\..\include\system\Exception.hpp" />
     <ClInclude Include="..\..\include\system\Logger.h" />
     <ClInclude Include="..\..\include\system\Singleton.h" />
@@ -205,6 +208,7 @@ copy "$(SolutionDir)$(Configuration)s\*.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\SharedPool.hpp" />
     <ClInclude Include="..\..\include\util\Step.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
+    <ClInclude Include="..\..\src\common\system\ArgumentImpl.hpp" />
     <ClInclude Include="..\..\src\compat\system\LoggerCompat.h" />
   </ItemGroup>
   <ItemGroup>

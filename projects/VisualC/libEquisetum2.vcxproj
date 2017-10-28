@@ -149,6 +149,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\stream\TextReader.h" />
     <ClInclude Include="..\..\include\stream\TextWriter.h" />
     <ClInclude Include="..\..\include\stream\VariableMemoryStream.h" />
+    <ClInclude Include="..\..\include\system\Argument.hpp" />
     <ClInclude Include="..\..\include\system\Exception.hpp" />
     <ClInclude Include="..\..\include\system\Logger.h" />
     <ClInclude Include="..\..\include\system\Singleton.h" />
@@ -170,6 +171,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\util\SharedPool.hpp" />
     <ClInclude Include="..\..\include\util\Step.hpp" />
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp" />
+    <ClInclude Include="..\..\src\common\system\ArgumentImpl.hpp" />
     <ClInclude Include="..\..\src\compat\audio\AudioCompat.hpp" />
     <ClInclude Include="..\..\src\compat\graphic\WindowCompat.h" />
     <ClInclude Include="..\..\src\compat\input\JoystickCompat.h" />
@@ -202,6 +204,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\stream\TextReader.cpp" />
     <ClCompile Include="..\..\src\common\stream\TextWriter.cpp" />
     <ClCompile Include="..\..\src\common\stream\VariableMemoryStream.cpp" />
+    <ClCompile Include="..\..\src\common\system\Argument.cpp" />
     <ClCompile Include="..\..\src\common\system\Logger.cpp" />
     <ClCompile Include="..\..\src\common\system\Singleton.cpp" />
     <ClCompile Include="..\..\src\common\timer\FpsCounter.cpp" />

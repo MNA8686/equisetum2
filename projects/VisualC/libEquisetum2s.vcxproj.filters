@@ -132,6 +132,12 @@
     <ClCompile Include="..\..\src\compat\system\LoggerCompat.cpp">
       <Filter>ソース ファイル\compat&amp;porting\system</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\system\Argument.cpp">
+      <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\porting\Win32\system\System.cpp">
+      <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\crypt\MessageDigestSHA256.hpp">
@@ -218,11 +224,17 @@
     <ClInclude Include="..\..\src\compat\system\LoggerCompat.h">
       <Filter>ソース ファイル\compat&amp;porting\system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Equisetum2s.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\util\Step.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\system\ArgumentImpl.hpp">
+      <Filter>ソース ファイル\common\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\system\Argument.hpp">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Equisetum2.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

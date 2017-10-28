@@ -270,6 +270,12 @@
     <ClInclude Include="..\..\include\util\Step.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\common\system\ArgumentImpl.hpp">
+      <Filter>ソース ファイル\common\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\system\Argument.hpp">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -391,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\stream\VariableMemoryStream.cpp">
       <Filter>ソース ファイル\common\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\system\Argument.cpp">
+      <Filter>ソース ファイル\common\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

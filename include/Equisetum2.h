@@ -15,6 +15,7 @@
 
 #include "system/Exception.hpp"
 #include "system/Logger.h"
+#include "system/Argument.hpp"
 #if !defined(EQUISETUM2_STATIC)
 #include "system/System.h"
 #endif

@@ -1,6 +1,7 @@
 ﻿#include "system/System.h"
 #include "system/Singleton.h"
 #include "system/LoggerCompat.h"
+#include "system/ArgumentImpl.hpp"
 #include "graphic/WindowCompat.h"
 #include "timer/SystemTimerCompat.h"
 #include "input/Key.h"
@@ -81,6 +82,9 @@ int main(int argc, char *argv[])
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 	// Use _CrtSetBreakAlloc(n) to find a specific memory leak
 #endif
+
+	// 引数設定
+	Singleton<ArgumentImpl>::GetInstance()->Set(argc, argv);
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
