@@ -262,6 +262,26 @@ namespace Equisetum2
 			sharedPool.Register(id, ptr.lock(), shared);
 		}
 	}
+
+	/*****************************************************************
+	*	String
+	******************************************************************/
+	template <class Archive>
+	inline void save(Archive & archive, const String& str)
+	{
+		const std::string& stdStr = str;
+
+		archive(stdStr);
+	}
+
+	template <class Archive>
+	inline void load(Archive& archive, String& str)
+	{
+		std::string stdStr;
+		archive(stdStr);
+
+		str = std::move(stdStr);
+	}
 }
 
 CEREAL_REGISTER_ARCHIVE(Equisetum2::Serializer)
