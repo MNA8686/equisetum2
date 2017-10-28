@@ -142,6 +142,11 @@ namespace Equisetum2
 		return Step_t<>(count);
 	}
 
+	inline auto Step(int32_t begin, int32_t count)
+	{
+		return Step_t<>({ begin, 0 },  { count, 1 });
+	}
+
 	inline auto Step(int32_t count)
 	{
 		return Step_t<>({ count, 1 });
