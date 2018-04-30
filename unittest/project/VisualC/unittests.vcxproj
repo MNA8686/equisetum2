@@ -82,6 +82,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)s\</IntDir>
     <OutDir>.\tests</OutDir>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -169,6 +170,7 @@
     <ClCompile Include="..\..\test\Archive.cpp" />
     <ClCompile Include="..\..\test\Crypt.cpp" />
     <ClCompile Include="..\..\test\File.cpp" />
+    <ClCompile Include="..\..\test\FixedDec.cpp" />
     <ClCompile Include="..\..\test\Path.cpp" />
     <ClCompile Include="..\..\test\Stream.cpp" />
     <ClCompile Include="..\..\test\String.cpp" />

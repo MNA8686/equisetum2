@@ -276,6 +276,9 @@
     <ClInclude Include="..\..\include\system\Argument.hpp">
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\type\FixedDec.hpp">
+      <Filter>ヘッダー ファイル\type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">

@@ -50,5 +50,8 @@
     <ClCompile Include="..\..\test\Image.cpp">
       <Filter>ソース ファイル\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\FixedDec.cpp">
+      <Filter>ソース ファイル\test</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

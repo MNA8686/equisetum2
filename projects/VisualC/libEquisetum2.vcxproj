@@ -42,6 +42,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -159,6 +162,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\timer\FpsPaceMaker.h" />
     <ClInclude Include="..\..\include\timer\ITimer.h" />
     <ClInclude Include="..\..\include\timer\TickCounter.h" />
+    <ClInclude Include="..\..\include\type\FixedDec.hpp" />
     <ClInclude Include="..\..\include\type\Optional.h" />
     <ClInclude Include="..\..\include\type\Point.h" />
     <ClInclude Include="..\..\include\type\Rect.hpp" />

@@ -5,6 +5,7 @@
 #include "type/String.h"
 #include "type/Point.h"
 #include "type/Rect.hpp"
+#include "type/FixedDec.hpp"
 
 #include "util/Step.hpp"
 #include "util/Regex.hpp"
