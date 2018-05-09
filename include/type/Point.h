@@ -2,6 +2,7 @@
 #define _EQPOINT_H_
 
 #include <cstdint>
+#include <cereal/cereal.hpp>
 
 namespace Equisetum2
 {
@@ -54,6 +55,13 @@ namespace Equisetum2
 			x /= src.x;
 			y /= src.y;
 			return *this;
+		}
+
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(CEREAL_NVP(x));
+			archive(CEREAL_NVP(y));
 		}
 	};
 
