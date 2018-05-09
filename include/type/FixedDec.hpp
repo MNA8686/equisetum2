@@ -2,6 +2,7 @@
 #define _EQFIXEDDEC_H_
 
 #include <cstdint>
+#include <cereal/cereal.hpp>
 
 namespace Equisetum2
 {
@@ -150,6 +151,12 @@ namespace Equisetum2
 		inline int32_t GetRaw()
 		{
 			return m_val;
+		}
+
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(CEREAL_NVP(m_val));
 		}
 
 	private:
