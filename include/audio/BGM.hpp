@@ -35,8 +35,20 @@ namespace Equisetum2
 		bool SetVolume(double volume) override;
 		double Volume() const override;
 
+		/**
+		* @brief イメージのIDを設定する
+		*/
+		virtual void SetIdentify(const String& id);
+
+		/**
+		* @brief イメージのIDを取得する
+		* @return イメージのID
+		*/
+		virtual String Identify() const;
+
 	private:
 		std::shared_ptr<uint32_t> m_id;
+		String m_identify;
 	};
 }
 

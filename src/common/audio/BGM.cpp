@@ -97,5 +97,15 @@ namespace Equisetum2
 	{
 		return Singleton<AudioCompat>::GetInstance()->VolumeBGM();
 	}
+
+	void BGM::SetIdentify(const String& id)
+	{
+		m_identify = id;
+	}
+
+	String BGM::Identify() const
+	{
+		return m_identify;
+	}
 }
 
