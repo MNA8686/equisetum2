@@ -58,7 +58,7 @@ bool Node::Init(std::shared_ptr<Node> pNode, const String& name)
 	// 使用中のオブジェクト数を加算
 	pNodePool->m_numOfObjects++;
 
-	Logger::OutputError("spawn id %d, numOfObjects %d", id, pNodePool->m_numOfObjects);
+	Logger::OutputDebug("spawn id %d, numOfObjects %d", id, pNodePool->m_numOfObjects);
 
 	return true;
 }
@@ -176,7 +176,7 @@ void Node::DestroyThemAll()
 
 	GC();
 
-	Logger::OutputError("obj num %d, destroy %d, free %d, zombi %d", pNodePool->m_numOfObjects, pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
+	Logger::OutputDebug("obj num %d, destroy %d, free %d, zombi %d", pNodePool->m_numOfObjects, pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
 
 	for (auto& zombie : pNodePool->m_listZombie)
 	{
@@ -290,7 +290,7 @@ void Node::SetParent(std::shared_ptr<Node> newParent)
 		// 新しい親をセット
 		m_parentId = newParent->GetID();
 
-		Logger::OutputError("obj %d, new parent %d", m_nodeID, newParent->GetID());
+		Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
 	}
 }
 
@@ -342,7 +342,7 @@ void Node::DetachChildren()
 	auto pNodePool = Singleton<NodePool>::GetInstance();
 
 	// 子を全て解除
-	Logger::OutputError("obj %d, num children %d", m_nodeID, m_listChildren.size());
+	Logger::OutputDebug("obj %d, num children %d", m_nodeID, m_listChildren.size());
 
 	for (auto& nodeID : m_listChildren)
 	{
@@ -353,7 +353,7 @@ void Node::DetachChildren()
 		{
 			pNode->SetParent(nullptr);	// nullptrを設定すると自動的に親はrootノードに設定される
 
-			Logger::OutputError("  nodeID %d, detach childID %d", m_nodeID, pNode->GetID());
+			Logger::OutputDebug("  nodeID %d, detach childID %d", m_nodeID, pNode->GetID());
 		}
 	}
 }

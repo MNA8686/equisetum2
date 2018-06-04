@@ -271,7 +271,7 @@ namespace Equisetum2
 				}
 			}
 
-			Logger::OutputError("  vSpriteAnimAtlas size %d", vSpriteAnimAtlas.size());
+			Logger::OutputDebug("  vSpriteAnimAtlas size %d", vSpriteAnimAtlas.size());
 
 			auto sprite = Sprite::CreateFromTexture(textureIn);
 			if (!sprite)
