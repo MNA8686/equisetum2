@@ -45,16 +45,14 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
-		friend class Renderer;
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
 
 	protected:
 
 		Texture() = default;
 
 	private:
-
-		class Impl;
-		std::shared_ptr<Impl> m_pImpl;
 
 		String m_id;		/// ID
 	

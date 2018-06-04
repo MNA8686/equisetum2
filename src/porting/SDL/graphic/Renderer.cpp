@@ -4,6 +4,7 @@
 #include "graphic/Renderer.hpp"
 #include "graphic/RendererImpl.hpp"
 #include "graphic/TextureImpl.hpp"
+#include "graphic/RenderObject.hpp"
 
 namespace Equisetum2
 {
@@ -141,6 +142,13 @@ namespace Equisetum2
 
 			inst->m_pImpl->m_attachedWindow = pWindow;
 
+			// レンダーキュー領域を確保
+			for (int i = 0; i < LayerMax; i++)
+			{
+				inst->m_vRenderObject[i].reserve(1024);
+			}
+
+			// GLコンテキスト作成
 			auto spGLContext = CreateGLContext(pWindow.get());
 			if (!spGLContext)
 			{
@@ -443,7 +451,7 @@ namespace Equisetum2
 		SDL_GL_MakeCurrent(pWindow.get(), *(m_pImpl->m_GLContext));
 
 		::glActiveTexture(GL_TEXTURE0);
-		::glBindTexture(GL_TEXTURE_2D, *(tex->m_pImpl->m_texID));
+		::glBindTexture(GL_TEXTURE_2D, *(tex->m_pImpl->GetTexID()));
 
 		::glDisable(GL_DEPTH_TEST);
 		::glEnable(GL_BLEND);
@@ -682,5 +690,25 @@ namespace Equisetum2
 		return true;
 	}
 
-}
+	bool Renderer::AddRenderQueue(RenderObject* pRenderObject)
+	{
+		auto layer = pRenderObject->GetLayer();
+		if (layer < LayerMax)
+		{
+			m_vRenderObject[layer].push_back(pRenderObject);
+			return true;
+		}
 
+		return false;
+	}
+
+	void Renderer::SortRenderQueue()
+	{
+		for (auto& layer : m_vRenderObject)
+		{
+			std::sort(std::begin(layer), std::end(layer), [](RenderObject* a, RenderObject* b)->bool {
+				return  a->GetOrderInLayer() > b->GetOrderInLayer();
+			});
+		}
+	}
+}

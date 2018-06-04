@@ -294,6 +294,12 @@
     <ClInclude Include="..\..\include\graphic\Sprite.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\RenderObject.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\porting\SDL\graphic\RenderObjectImpl.hpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -427,6 +433,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\graphic\Sprite.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\porting\SDL\graphic\RenderObject.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

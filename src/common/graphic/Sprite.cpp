@@ -1,4 +1,6 @@
-#include "Sprite.hpp"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
+#include "graphic/Sprite.hpp"
 
 namespace Equisetum2
 {
@@ -44,4 +46,6 @@ namespace Equisetum2
 	{
 		return m_id;
 	}
+
+	const Color Sprite::ZERO{ 128, 128, 128, 128 };
 }

@@ -7,96 +7,54 @@
 #include "graphic/Image.hpp"
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
+//#include "graphic/RenderObject.hpp"
 #include <memory>
 
 namespace Equisetum2
 {
-	class RenderObject
-	{
-	public:
-		enum class Type : int
-		{
-			EMPTY = 0,
-			POINT,
-			LINE,
-			RECT,
-			CIRCLE,
-			SPRITE,
-		};
-
-		virtual ~RenderObject();
-		Type GetType();
-
-	private:
-		Type m_type = Type::EMPTY;
-	};
-
-	class SpriteRenderer : public RenderObject
-	{
-	public:
-		SpriteRenderer();
-		virtual ~SpriteRenderer();
-
-		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite, int atlasNum);
-
-		SpriteRenderer& SetPos(int x, int y);
-
-		SpriteRenderer& SetScale(float x, float y);
-		SpriteRenderer& SetScaleX(float x);
-		SpriteRenderer& SetScaleY(float y);
-		SpriteRenderer& SetColor(Color color);
-
-		SpriteRenderer& SetFlipX(bool isFlip);
-		SpriteRenderer& SetFlipY(bool isFlip);
-
-		SpriteRenderer& SetLayer(int layer);
-		SpriteRenderer& SetOrderInLayer(int orderInLayer);
-
-		SpriteRenderer& SetBlendMode(int blend);
-	};
-
-
 	/**
 	* レンダラクラス
 	*/
+	class RenderObject;
 	class Renderer
 	{
 	public:
 
-		class BlendMode
+		enum class BlendMode : int
 		{
-		public:
-			static const int None = 0;
-			static const int Blend = (1 << 0);
-			static const int Add = (1 << 1);
+			None,		// ブレンドなし
+			Blend,		// アルファブレンド
+			Add,		// 加算ブレンド(アルファ有効)
 		};
+		static const int LayerMax = 64;
 
+		Renderer() = default;
 		virtual ~Renderer() = default;
 
 		static std::shared_ptr<Renderer> Create();
 
-		bool AddCommandQueue(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer, Color color = { 128, 128, 128, 128 });
-
+		bool AddRenderQueue(RenderObject* pRenderObject);
 
 		bool Copy(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer);
 		bool CopyWithColor(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer, Color color);
 		bool Fill(const Rect& dst, int flag, int layer, Color color);
 
 		bool Clear(const Color& color);
-		bool Present(bool waitVsync = true);
-
-		Renderer() = default;
+		bool Present(bool waitVsync = true /* don't work */);
 
 	private:
 
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
+		std::vector<RenderObject*> m_vRenderObject[LayerMax];
 		String m_id;		/// ID
 
 		Renderer(const Renderer&) = delete;					// コピーコンストラクタ封じ
 		Renderer& operator= (const Renderer&) = delete;		// コピーコンストラクタ封じ
 		Renderer& operator= (const Renderer&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
+
+		void SortRenderQueue();
 	};
 }
 

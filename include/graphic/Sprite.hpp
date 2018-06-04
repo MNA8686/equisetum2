@@ -16,6 +16,8 @@ namespace Equisetum2
 	class Sprite
 	{
 	public:
+		static const Color ZERO;
+
 		Sprite() = default;
 		virtual ~Sprite() = default;
 
