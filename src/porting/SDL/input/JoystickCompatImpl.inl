@@ -103,7 +103,7 @@ namespace Equisetum2
 									}
 								}
 
-								Logger::OutputInfo("joy %d opened. Axes %d, Buttons %d, Hats %d\n", joyIndex, NumAxes(joyIndex), NumButtons(joyIndex), NumHats(joyIndex));
+	//							Logger::OutputInfo("joy %d opened. Axes %d, Buttons %d, Hats %d\n", joyIndex, NumAxes(joyIndex), NumButtons(joyIndex), NumHats(joyIndex));
 							}
 						}
 					}
@@ -148,7 +148,7 @@ namespace Equisetum2
 
 							if (e.type == SDL_JOYBUTTONDOWN)
 							{
-								Logger::OutputInfo("SDL_JOYBUTTONDOWN %d\n", buttonIndex);
+//								Logger::OutputInfo("SDL_JOYBUTTONDOWN %d\n", buttonIndex);
 
 								buttonState.down = true;
 								buttonState.press = true;
@@ -156,7 +156,7 @@ namespace Equisetum2
 							}
 							else if (e.type == SDL_JOYBUTTONUP)
 							{
-								Logger::OutputInfo("SDL_JOYBUTTONUP %d\n", buttonIndex);
+//								Logger::OutputInfo("SDL_JOYBUTTONUP %d\n", buttonIndex);
 
 								buttonState.up = true;
 								buttonState.press = false;
@@ -176,7 +176,7 @@ namespace Equisetum2
 							auto axisIndex = e.jaxis.axis;	// 軸番号
 							inst.vAxes[axisIndex] = e.jaxis.value;
 
-							Logger::OutputInfo("SDL_JOYAXISMOTION %d %d\n", axisIndex, inst.vAxes[axisIndex]);
+//							Logger::OutputInfo("SDL_JOYAXISMOTION %d %d\n", axisIndex, inst.vAxes[axisIndex]);
 							break;
 						}
 					}
@@ -216,7 +216,7 @@ namespace Equisetum2
 							update(eHatState::Up, SDL_HAT_UP);
 							update(eHatState::Down, SDL_HAT_DOWN);
 
-							Logger::OutputInfo("SDL_JOYHATMOTION %d %d\n", hatIndex, inst.vHats[hatIndex]);
+//							Logger::OutputInfo("SDL_JOYHATMOTION %d %d\n", hatIndex, inst.vHats[hatIndex]);
 							break;
 						}
 					}
