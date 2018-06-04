@@ -10,7 +10,7 @@ namespace Equisetum2
 {
 	static Sint64 size(struct SDL_RWops *context)
 	{
-		auto stream = (IStream*)context->hidden.unknown.data1;
+		auto stream = reinterpret_cast<IStream*>(context->hidden.unknown.data1);
 		return stream->Length();
 	}
 
@@ -33,24 +33,26 @@ namespace Equisetum2
             return -1;
 		}
 
-		auto stream = (IStream*)context->hidden.unknown.data1;
+		auto stream = reinterpret_cast<IStream*>(context->hidden.unknown.data1);
 		return stream->Seek(offset, origin);
 	}
 
 	static size_t read(struct SDL_RWops *context, void *ptr, size_t size, size_t maxnum)
 	{
-		auto stream = (IStream*)context->hidden.unknown.data1;
+		auto stream = reinterpret_cast<IStream*>(context->hidden.unknown.data1);
 		size_t count = 0;
 
-		for (size_t i = 0; i < maxnum; i++)
+		Optional<size_t> opt = stream->Read(reinterpret_cast<uint8_t*>(ptr), size * maxnum);
+		if (opt && *opt == size * maxnum)
 		{
-			auto opt = stream->Read(&((uint8_t*)ptr)[size * i], size);
-			if (!opt || *opt != size)
-			{
-				break;
-			}
+			count = *opt / size;
 
-			count++;
+			// countは読み出した "件数" である。
+			// もし端数が出た場合、fpを移動させて辻褄を合わせる必要があるが、必要になったら実装する。
+			if ((*opt % size) != 0)
+			{
+				Logger::OutputCritical(u8"readコールバックで端数が発生しました。");
+			}
 		}
 
 		return count;
@@ -58,18 +60,20 @@ namespace Equisetum2
 
 	static size_t write(struct SDL_RWops *context, const void *ptr, size_t size, size_t num)
 	{
-		auto stream = (IStream*)context->hidden.unknown.data1;
+		auto stream = reinterpret_cast<IStream*>(context->hidden.unknown.data1);
 		size_t count = 0;
 
-		for (size_t i = 0; i < num; i++)
+		Optional<size_t> opt = stream->Write(reinterpret_cast<const uint8_t*>(ptr), size);
+		if (opt && *opt == size * num)
 		{
-			auto opt = stream->Write(&((const uint8_t*)ptr)[size * i], size);
-			if (!opt || *opt != size)
-			{
-				break;
-			}
+			count = *opt / size;
 
-			count++;
+			// countは書き込んだ "件数" である。
+			// もし端数が出た場合、fpを移動させて辻褄を合わせる必要があるが、必要になったら実装する。
+			if ((*opt % size) != 0)
+			{
+				Logger::OutputCritical(u8"writeコールバックで端数が発生しました。");
+			}
 		}
 
 		return count;
