@@ -34,6 +34,11 @@ namespace Equisetum2
 		Singleton<WindowCompat>::GetInstance()->ShowAlert(msg);
 	}
 
+	void Window::SetFullscreen(bool fullScreen)
+	{
+		return Singleton<WindowCompat>::GetInstance()->SetFullscreen(fullScreen);
+	}
+
 	const String Window::Title()
 	{
 		return Singleton<WindowCompat>::GetInstance()->Title();

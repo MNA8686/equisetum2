@@ -52,6 +52,11 @@ namespace Equisetum2
 		m_Impl->ShowAlert(msg);
 	}
 
+	void WindowCompat::SetFullscreen(bool fullScreen)
+	{
+		return m_Impl->SetFullscreen(fullScreen);
+	}
+
 	const String WindowCompat::Title()
 	{
 		return m_Impl->Title();

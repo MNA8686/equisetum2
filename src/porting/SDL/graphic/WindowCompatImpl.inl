@@ -70,6 +70,11 @@ namespace Equisetum2
 			SDL_SetWindowPosition(m_pWindow.get(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 
+		void SetFullscreen(bool fullScreen)
+		{
+			SDL_SetWindowFullscreen(m_pWindow.get(), fullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+		}
+
 		void ShowAlert(const String& msg)
 		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", msg.c_str(), m_pWindow.get());

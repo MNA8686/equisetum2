@@ -26,6 +26,7 @@ namespace Equisetum2
 		static void SetPos(int x, int y);
 		static void Centering();
 		static void ShowAlert(const String& msg);
+		static void SetFullscreen(bool fullScreen);
 
 		static const String Title();
 		static Size Size();
