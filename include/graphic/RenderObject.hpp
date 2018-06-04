@@ -23,12 +23,28 @@ namespace Equisetum2
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
 
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(CEREAL_NVP(m_type));
+			archive(CEREAL_NVP(m_layer));
+			archive(CEREAL_NVP(m_orderInLayer));
+			//archive(CEREAL_NVP(m_renderer));
+		}
+
 	protected:
 		Type m_type = Type::EMPTY;
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
 		std::weak_ptr<Renderer> m_renderer;
 	};
+}
+
+#include <cereal/types/base_class.hpp>
+
+namespace Equisetum2
+{
+	using namespace Equisetum2::RenderState;
 
 	class SpriteRenderer : public RenderObject
 	{
@@ -57,6 +73,22 @@ namespace Equisetum2
 
 		bool Calculation();
 
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(cereal::base_class<RenderObject>(this));
+
+//			archive(CEREAL_NVP(m_sprite));		// アセットマネージャーの扱いをどうするか……
+			archive(CEREAL_NVP(m_atlasNum));
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_flipX));
+			archive(CEREAL_NVP(m_flipY));
+			archive(CEREAL_NVP(m_angle));
+		}
+
 	private:
 		friend class Renderer;
 		static std::shared_ptr<SpriteRenderer> Create(std::shared_ptr<Renderer>& renderer);
@@ -81,5 +113,9 @@ namespace Equisetum2
 		std::shared_ptr<Impl> m_pImpl;
 	};
 }
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::SpriteRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::SpriteRenderer)
 
 #endif
