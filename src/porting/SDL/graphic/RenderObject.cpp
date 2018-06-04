@@ -125,5 +125,11 @@ namespace Equisetum2
 		m_blend = blend;
 		return *this;
 	}
+
+	size_t SpriteRenderer::GetVertexCount() const
+	{
+		return 0;
+	}
+
 }
 

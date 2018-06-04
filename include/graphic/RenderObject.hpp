@@ -29,6 +29,8 @@ namespace Equisetum2
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
 
+		virtual size_t GetVertexCount() const = 0;
+
 	protected:
 		Type m_type = Type::EMPTY;
 		int m_layer = 0;			/// 表示レイヤー
@@ -41,7 +43,7 @@ namespace Equisetum2
 	public:
 		std::shared_ptr<SpriteRenderer> Create();
 
-		SpriteRenderer() = default;
+		SpriteRenderer() { m_type = Type::SPRITE; }
 		virtual ~SpriteRenderer() = default;
 
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
@@ -61,6 +63,8 @@ namespace Equisetum2
 		SpriteRenderer& SetOrderInLayer(int32_t orderInLayer);
 
 		SpriteRenderer& SetBlendMode(Renderer::BlendMode blend);
+
+		size_t GetVertexCount() const;
 
 	private:
 		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
