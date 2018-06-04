@@ -286,6 +286,7 @@ namespace Equisetum2
 		// バッファに残っているものを描画する
 		DrawCall();
 
+		// レンダーキューをクリアする
 		for (auto& layer : m_vRenderObject)
 		{
 			layer.clear();

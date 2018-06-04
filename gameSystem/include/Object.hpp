@@ -42,7 +42,7 @@ struct stAsset
 			std::vector<std::string> bgmID;
 			for (auto& p : m_bgm)
 			{
-				//					bgmID.push_back(p ? p->Identify() : "");
+				bgmID.push_back(p ? p->Identify() : "");
 			}
 			archive(CEREAL_NVP(bgmID));
 		}
