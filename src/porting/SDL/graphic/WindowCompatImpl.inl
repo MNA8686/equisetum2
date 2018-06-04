@@ -9,6 +9,14 @@ namespace Equisetum2
 	public:
 		Impl()
 		{
+			//利用するOpenGLのバージョンを設定
+//			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+//			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			//深度バッファの設定
+//			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+			//ダブルバッファの設定
+			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
 			auto pWindow = SDL_CreateWindow(
 				"",							// ウィンドウのタイトル
 				SDL_WINDOWPOS_CENTERED,		// X座標の初期値

@@ -1,7 +1,12 @@
 #if !defined(_EQSPRITE_H_)
 #define _EQSPRITE_H_
 
-#include "Equisetum2.h"
+//#include "Equisetum2.h"
+#include "type/String.h"
+#include "type/Point.h"
+#include "type/Rect.hpp"
+#include "graphic/Texture.hpp"
+#include <memory>
 
 namespace Equisetum2
 {
@@ -23,6 +28,8 @@ namespace Equisetum2
 
 		static std::shared_ptr<Sprite> CreateFromTexture(std::shared_ptr<Texture> texture);
 		bool SetAnimAtlas(const std::vector<stSpriteAnimAtlas>& vAnimAtlas);
+
+		const stSpriteAnimAtlas& GetAtlas(int32_t num);
 
 		/**
 		* @brief 新しいインスタンスで現在のインスタンスを置き換える

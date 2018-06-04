@@ -5,12 +5,16 @@
 #include "graphic/RendererImpl.hpp"
 #include "graphic/TextureImpl.hpp"
 #include "graphic/RenderObject.hpp"
+#include "graphic/RenderObjectImpl.hpp"
+#include <algorithm>
+#include <list>
+
+#include "input/Key.h"
+#include "system/System.h"
 
 namespace Equisetum2
 {
 	static const float inv255f = 1.0f / 255.0f;
-
-#define STRINGIFY(x) #x
 
 	static const char *vertexShaderSrc = R"(#version 120
 		#define IN         in
@@ -25,11 +29,15 @@ namespace Equisetum2
 		attribute vec4 a_color;
 		varying vec2 v_texCoord;
 		varying vec4 v_color;
+		const float inv255f = 1. / 255.;
 		
 		void main(void)
 		{
+			// 光らせたり暗くしたりフェードイン・フェードアウトするための処理。 (128, 128, 128, 128)が中央値。
+			v_color = ((a_color * inv255f) - 0.5) * 2;
+			// UV座標
 			v_texCoord = a_texCoord;
-			v_color = a_color;
+			// 表示座標
 			gl_Position = u_projection * vec4(aVertex, 0, 1.0);
 		}
 	)";
@@ -46,62 +54,33 @@ namespace Equisetum2
 		
 		void main(void)
 		{
-			vec4 color = (v_color - 0.5) * 2;
-			gl_FragColor = color + texture2D(u_texture, v_texCoord);
+			gl_FragColor = v_color + texture2D(u_texture, v_texCoord);
 		}
 	)";
 
-#if 0
+	// シェーダ定義構造体
+	typedef struct
+	{
+		Type m_type;		// シェーダ用途タイプ
+		const char* m_vertexSource;			// バーテックスシェーダのソース
+		const char* m_fragmentSource;		// フラグメントシェーダのソース
+	}stShaderDef;
 
-	static const char *vertexShaderSrc = STRINGIFY(
-		\n#version 120\n
-		\n#define IN         in\n
-		\n#define OUT        varying\n
-		\n#define LOWP\n
-		\n#define MEDIUMP\n
-		\n#define HIGHP\n
-		\n
-		IN HIGHP   vec3 aVertex; \n
-		uniform mat4 u_projection; \n
-		attribute vec2 a_texCoord; \n
-		attribute vec4 a_color; \n
-		varying vec2 v_texCoord; \n
-		varying vec4 v_color; \n
-		\n
-		void main(void)\n
-	{ \n
-		v_texCoord = a_texCoord; \n
-		v_color = a_color; \n
-		gl_Position = u_projection * vec4(aVertex, 1.0); \n
-	}\n
-	);
-
-	static const char *fragmentShaderSrc = STRINGIFY(
-		\n#version 120\n
-		\n#define IN         in\n
-		\n#define LOWP\n
-		\n#define MEDIUMP\n
-		\n#define HIGHP\n
-		\n
-		uniform sampler2D u_texture; \n
-		varying vec2 v_texCoord; \
-		varying vec4 v_color; \n
-		\n
-		void main(void)\n
-		{ \n
-			vec4 color = (v_color - 0.5) * 2; \n
-			gl_FragColor = color + texture2D(u_texture, v_texCoord); \n
-		}\n
-	);
-#endif
-
+	// シェーダ定義テーブル
+	static const stShaderDef gShaderTbl[] =
+	{
+		{
+			Type::SPRITE,
+			vertexShaderSrc,
+			fragmentShaderSrc
+		},
+	};
 
 	static std::shared_ptr<SDL_GLContext> CreateGLContext(SDL_Window* pWindow)
 	{
 		SDL_GLContext* pGLContext = new SDL_GLContext;
 		// GLコンテキストテクスチャのデリーター作成
-		auto spGLContext = std::shared_ptr<SDL_GLContext>(pGLContext,
-			[](SDL_GLContext* pContext) {
+		auto spGLContext = std::shared_ptr<SDL_GLContext>(pGLContext, [](SDL_GLContext* pContext) {
 			SDL_GL_DeleteContext(*pContext);
 			delete pContext;
 		});
@@ -175,159 +154,13 @@ namespace Equisetum2
 			int w, h;
 			SDL_GetWindowSize(pWindow.get(), &w, &h);
 			glViewport(0, 0, w, h);
-			glClearColor((GLfloat)0.4, (GLfloat)0.4, (GLfloat)0.4, (GLfloat)0);
+			inst->m_pImpl->SetProjection(w, h);
+
+			glClearColor((GLfloat)0, (GLfloat)0, (GLfloat)0, (GLfloat)0);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			{
-				GLuint _uiProgramObject;
-				GLuint		uiFragShader, uiVertShader;
-
-				_uiProgramObject = glCreateProgram();
-				uiVertShader = glCreateShader(GL_VERTEX_SHADER);
-				uiFragShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-				{
-					GLint glerr;
-
-					glShaderSource(uiVertShader, 1, &vertexShaderSrc, NULL);
-					glCompileShader(uiVertShader);
-					{
-						int logSize;
-						int length;
-
-#define MAX_SHADER_LOG_SIZE 256
-						static char s_logBuffer[MAX_SHADER_LOG_SIZE];
-
-						/* ログの長さは、最後のNULL文字も含む */
-						glGetShaderiv(uiVertShader, GL_INFO_LOG_LENGTH, &logSize);
-
-						if (logSize > 1)
-						{
-							glGetShaderInfoLog(uiVertShader, MAX_SHADER_LOG_SIZE, &length, s_logBuffer);
-							//							fprintf(stderr, "Shader Info Log\n%s\n", s_logBuffer);
-							Logger::OutputError("Shader Info Log\n%s\n", s_logBuffer);
-						}
-					}
-
-					glerr = glGetError();
-					if (glerr)
-					{
-						printf("<ERROR name=\"initWithFile\" call=\"glShaderSource\" type=\"VertShader\" glerr=\"0x%x\"/>\n", glerr);
-					}
-				}
-
-				printf("frag\n");
-
-				{
-					GLint glerr;
-
-					glShaderSource(uiFragShader, 1, &fragmentShaderSrc, NULL);
-					glCompileShader(uiFragShader);
-					{
-						int logSize;
-						int length;
-
-#define MAX_SHADER_LOG_SIZE 256
-						static char s_logBuffer[MAX_SHADER_LOG_SIZE];
-
-						/* ログの長さは、最後のNULL文字も含む */
-						glGetShaderiv(uiFragShader, GL_INFO_LOG_LENGTH, &logSize);
-
-						if (logSize > 1)
-						{
-							glGetShaderInfoLog(uiFragShader, MAX_SHADER_LOG_SIZE, &length, s_logBuffer);
-							//							fprintf(stderr, "Shader Info Log\n%s\n", s_logBuffer);
-							Logger::OutputError("Shader Info Log\n%s\n", s_logBuffer);
-						}
-					}
-
-					glerr = glGetError();
-					if (glerr)
-					{
-						printf("<ERROR name=\"initWithFile\" call=\"glShaderSource\" type=\"FragShader\" glerr=\"0x%x\"/>\n", glerr);
-					}
-				}
-
-				glAttachShader(_uiProgramObject, uiVertShader);
-				glAttachShader(_uiProgramObject, uiFragShader);
-
-				glBindAttribLocation(_uiProgramObject, 0, "aVertex");
-				glBindAttribLocation(_uiProgramObject, 1, "a_texCoord");
-				glBindAttribLocation(_uiProgramObject, 2, "a_color");
-				//				glBindAttribLocation(_uiProgramObject, 2, "aUv1");
-
-				{
-					glLinkProgram(_uiProgramObject);
-					int linked;
-					glGetProgramiv(_uiProgramObject, GL_LINK_STATUS, &linked);
-					printf("<LINK name=\"link\" glerr=\"0x%x\"/>\n", linked);
-				}
-
-				auto proj = glGetUniformLocation(_uiProgramObject, "u_projection");
-				auto u_texture = glGetUniformLocation(_uiProgramObject, "u_texture");
-
-				glUseProgram(_uiProgramObject);
-				{
-					GLint glerr = glGetError();
-					if (glerr)
-					{
-						printf("<ERROR name=\"use\" glerr=\"0x%x\" %d/>\n", glerr, _uiProgramObject);
-					}
-				}
-
-				{
-					GLfloat projection[4][4];
-
-					projection[0][0] = 2.0f / w;
-					projection[0][1] = 0.0f;
-					projection[0][2] = 0.0f;
-					projection[0][3] = 0.0f;
-
-					projection[1][0] = 0.0f;
-					projection[1][1] = -2.0f / h;
-					projection[1][2] = 0.0f;
-					projection[1][3] = 0.0f;
-
-					projection[2][0] = 0.0f;
-					projection[2][1] = 0.0f;
-					projection[2][2] = 0.0f;
-					projection[2][3] = 0.0f;
-
-					projection[3][0] = -1.0f;
-					projection[3][1] = 1.0f;
-					projection[3][2] = 0.0f;
-					projection[3][3] = 1.0f;
-
-					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)projection);
-				}
-
-				glUniform1i(u_texture, 0);
-
-				inst->m_pImpl->_uiProgramObject = _uiProgramObject;
-			}
-
-			{
-//				GLuint g_vertBuf;
-//				glGenBuffers(1, &g_vertBuf);
-
-//				inst->m_pImpl->m_vertBuf = g_vertBuf;
-
-				auto& data = inst->m_pImpl;
-
-				glGenBuffers(2, inst->m_pImpl->m_VBO);
-
-				glBindBuffer(GL_ARRAY_BUFFER, data->m_VBO[0]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(data->m_vertex[0]) * data->VBO_SIZE, data->m_vertex, GL_DYNAMIC_DRAW);
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inst->m_pImpl->m_VBO[1]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(data->m_index[0]) * data->INDEX_VBO_SIZE, data->m_index, GL_STATIC_DRAW);
-
-
-				// GLエラーチェック
-			}
-
 			// 1:VSYNCを待つ 0:VSYNCを待たない
-			SDL_GL_SetSwapInterval(0);
+			SDL_GL_SetSwapInterval(1);
 
 			return inst;
 		}
@@ -340,336 +173,9 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-#if 0
-	bool Renderer::CopyQueue(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src)
-	{
-		auto vert = &m_pImpl->m_vertex[m_pImpl->m_numVertex];
-		auto idx = &m_pImpl->m_index[m_pImpl->m_numIndex];
-
-		Color color = { 128, 128, 128, 128 };
-		GLfloat r = color.rgba8888.r *inv255f;
-		GLfloat g = color.rgba8888.g *inv255f;
-		GLfloat b = color.rgba8888.b *inv255f;
-		GLfloat a = color.rgba8888.a *inv255f;
-
-		const float divW = 1.f / (float)tex->Width();
-		const float divH = 1.f / (float)tex->Height();
-
-		// 左上
-		{
-			int index = 0;
-
-			// 転送先座標
-			vert[index].vertices[0] = (GLfloat)dst.x;
-			vert[index].vertices[1] = (GLfloat)dst.y;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右上
-		{
-			int index = 1;
-
-			// 転送先座標
-			vert[index].vertices[0] = (GLfloat)(dst.x + dst.width);
-			vert[index].vertices[1] = (GLfloat)dst.y;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 左下
-		{
-			int index = 2;
-
-			// 転送先座標
-			vert[index].vertices[0] = (GLfloat)dst.x;
-			vert[index].vertices[1] = (GLfloat)(dst.y + dst.height);
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右下
-		{
-			int index = 3;
-
-			// 転送先座標
-			vert[index].vertices[0] = (GLfloat)(dst.x + dst.width);
-			vert[index].vertices[1] = (GLfloat)(dst.y + dst.height);
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		idx[0] = m_pImpl->m_numVertex + 0;
-		idx[1] = m_pImpl->m_numVertex + 2;
-		idx[2] = m_pImpl->m_numVertex + 1;
-
-		idx[3] = m_pImpl->m_numVertex + 1;
-		idx[4] = m_pImpl->m_numVertex + 2;
-		idx[5] = m_pImpl->m_numVertex + 3;
-
-		m_pImpl->m_numVertex += 4;
-		m_pImpl->m_numIndex += 6;
-
-		return true;
-	}
-#endif
-
-	bool Renderer::Copy(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer)
-	{
-		return CopyWithColor(tex, dst, src, flag, layer, { 128, 128, 128, 128 });
-	}
-
-	bool Renderer::CopyWithColor(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer, Color color)
-	{
-		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
-//		auto& data = m_pImpl;
-
-		SDL_GL_MakeCurrent(pWindow.get(), *(m_pImpl->m_GLContext));
-
-		::glActiveTexture(GL_TEXTURE0);
-		::glBindTexture(GL_TEXTURE_2D, *(tex->m_pImpl->GetTexID()));
-
-		::glDisable(GL_DEPTH_TEST);
-		::glEnable(GL_BLEND);
-//		::glDisable(GL_BLEND);
-
-		glDisable(GL_CULL_FACE);
-//		glEnable(GL_CULL_FACE);
-
-		::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//		::glBlendFunc(GL_ONE, GL_ONE);
-//		::glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-
-/*
-		SDL_BLENDMODE_NONE	ブレンドしない	dstRGBA = srcRGBA
-			SDL_BLENDMODE_BLEND	αブレンド	dstRGB = (srcRGB * srcA) + (dstRGB * (1 - srcA))
-			dstA = srcA + (dstA * (1 - srcA))
-			SDL_BLENDMODE_ADD	加算ブレンド	dstRGB = (srcRGB * srcA) + dstRGB
-			dstA = dstA
-			*/
-
-#if 0
-		auto& vert = m_pImpl->m_vertex;
-
-		// 左上
-		{
-			int index = 0;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)dst.x;
-			vert[index].vertices[1] = (float)dst.y;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右上
-		{
-			int index = 1;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)(dst.x + dst.width);
-			vert[index].vertices[1] = (float)dst.y;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 左下
-		{
-			int index = 2;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)dst.x;
-			vert[index].vertices[1] = (float)(dst.y + dst.height);
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右下
-		{
-			int index = 3;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)(dst.x + dst.width);
-			vert[index].vertices[1] = (float)(dst.y + dst.height);
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		float offset = 40.f;
-		// 左上
-		{
-			int index = 0 + 4;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)dst.x + offset;
-			vert[index].vertices[1] = (float)dst.y + offset;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右上
-		{
-			int index = 1 + 4;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)(dst.x + dst.width) + offset;
-			vert[index].vertices[1] = (float)dst.y + offset;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = src.y * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 左下
-		{
-			int index = 2 + 4;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)dst.x + offset;
-			vert[index].vertices[1] = (float)(dst.y + dst.height) + offset;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = src.x * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		// 右下
-		{
-			int index = 3 + 4;
-
-			// 転送先座標
-			vert[index].vertices[0] = (float)(dst.x + dst.width) + offset;
-			vert[index].vertices[1] = (float)(dst.y + dst.height) + offset;
-			// テクスチャ読み出し元
-			vert[index].texCoords[0] = (src.x + src.width) * divW;
-			vert[index].texCoords[1] = (src.y + src.height) * divH;
-			// 加減算する色
-			vert[index].colors[0] = r;
-			vert[index].colors[1] = g;
-			vert[index].colors[2] = b;
-			vert[index].colors[3] = a;
-		}
-
-		m_pImpl->m_index[0] = 0;
-		m_pImpl->m_index[1] = 1;
-		m_pImpl->m_index[2] = 2;
-
-		m_pImpl->m_index[3] = 1;
-		m_pImpl->m_index[4] = 2;
-		m_pImpl->m_index[5] = 3;
-
-		m_pImpl->m_index[0 + 6] = 0 + 4;
-		m_pImpl->m_index[1 + 6] = 1 + 4;
-		m_pImpl->m_index[2 + 6] = 2 + 4;
-
-		m_pImpl->m_index[3 + 6] = 1 + 4;
-		m_pImpl->m_index[4 + 6] = 2 + 4;
-		m_pImpl->m_index[5 + 6] = 3 + 4;
-#endif
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_pImpl->m_VBO[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(m_pImpl->m_vertex[0]) * m_pImpl->m_numVertex, m_pImpl->m_vertex, GL_DYNAMIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pImpl->m_VBO[1]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_pImpl->m_index[0]) * m_pImpl->m_numIndex, m_pImpl->m_index, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(m_pImpl->m_vertex[0]), 0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(m_pImpl->m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
-//		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(m_pImpl->m_vertex[0]), (const void*)(4 * sizeof(GLfloat)));
-//		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(m_pImpl->m_vertex[0]), (const void*)(4 * sizeof(GLubyte)));
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(m_pImpl->m_vertex[0]), (const void*)(4 * sizeof(GLfloat)));
-
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-
-		glDrawElements(GL_TRIANGLES, (GLsizei)m_pImpl->m_numIndex, GL_UNSIGNED_SHORT, (GLvoid*)0);
-
-
-		glDisableVertexAttribArray(2);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		m_pImpl->m_numVertex = 0;
-		m_pImpl->m_numIndex = 0;
-
-		return true;
-	}
-
-	bool Renderer::Fill(const Rect& dst, int flag, int layer, Color color)
-	{
-		return false;
-	}
-
 	bool Renderer::Clear(const Color& color)
 	{
 		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
-
 		SDL_GL_MakeCurrent(pWindow.get(), *(m_pImpl->m_GLContext));
 
 		glClearColor(color.rgba8888.r * inv255f,
@@ -707,8 +213,399 @@ namespace Equisetum2
 		for (auto& layer : m_vRenderObject)
 		{
 			std::sort(std::begin(layer), std::end(layer), [](RenderObject* a, RenderObject* b)->bool {
-				return  a->GetOrderInLayer() > b->GetOrderInLayer();
+				return  a->GetOrderInLayer() < b->GetOrderInLayer();
 			});
 		}
+	}
+
+	bool Renderer::Render()
+	{
+		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
+		auto& spriteContext = m_pImpl->m_spriteContext;
+
+		SDL_GL_MakeCurrent(pWindow.get(), *(m_pImpl->m_GLContext));
+
+		// ソートする
+		SortRenderQueue();
+
+		// カレントステートをリセット
+		m_currentStates.type = Type::EMPTY;
+		m_currentStates.blend = BlendMode::None;
+		m_currentStates.pTexture = nullptr;
+
+		spriteContext.m_filledVertexNum = 0;
+		spriteContext.m_filledIndexNum = 0;
+
+		for (auto& layer : m_vRenderObject)
+		{
+			for (auto& renderObject : layer)
+			{
+				if (renderObject->GetType() == Type::SPRITE)
+				{
+					auto spriteRenderer = static_cast<SpriteRenderer*>(renderObject);
+
+					// このスプライトの頂点数
+					auto vertexCount = spriteRenderer->m_pImpl->GetVertexCount();
+					auto blendMode = spriteRenderer->m_blend;
+					auto pTexture = spriteRenderer->m_sprite->GetTexture().get();
+
+					// 頂点配列が全て埋まっている？またはステートが変化した？
+					if (m_currentStates.type != Type::SPRITE ||
+						*(m_currentStates.pTexture->m_pImpl->GetTexID()) != *(pTexture->m_pImpl->GetTexID()) ||
+						m_currentStates.blend != blendMode ||
+						spriteContext.m_filledVertexNum + vertexCount >= spriteContext.VBO_SIZE)
+					{
+						// 描画を行う
+						DrawCall();
+
+						// ステートを更新
+						m_currentStates.type = Type::SPRITE;
+						m_currentStates.blend = blendMode;
+						m_currentStates.pTexture = pTexture;
+					}
+
+					// 頂点配列を埋める
+					auto vertex = spriteRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+					memcpy(&spriteContext.m_vertex[spriteContext.m_filledVertexNum], vertex, sizeof(stVertex) * vertexCount);
+
+					// インデックス配列を埋める
+					auto index = spriteRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+					auto indexCount = spriteRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+					for (decltype(indexCount) i = 0; i < indexCount; i++)
+					{
+						// 頂点の番号を変換しながらコピーする
+						spriteContext.m_index[spriteContext.m_filledIndexNum + i] = static_cast<GLushort>(spriteContext.m_filledVertexNum + index[i]);
+					}
+
+					spriteContext.m_filledVertexNum += vertexCount;
+					spriteContext.m_filledIndexNum += indexCount;
+				}
+			}
+		}
+
+		// バッファに残っているものを描画する
+		DrawCall();
+
+		for (auto& layer : m_vRenderObject)
+		{
+			layer.clear();
+		}
+
+		return true;
+	}
+
+	bool Renderer::DrawCall()
+	{
+		if (m_currentStates.type == Type::SPRITE)
+		{
+			auto& ctx = m_pImpl->m_spriteContext;
+
+			if (m_pImpl->SelectProgram(Type::SPRITE))
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, *(m_currentStates.pTexture->m_pImpl->GetTexID()));
+
+				glDisable(GL_DEPTH_TEST);
+
+				switch (m_currentStates.blend)
+				{
+				case BlendMode::None:
+					glDisable(GL_BLEND);
+					break;
+
+				case BlendMode::Blend:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+
+				case BlendMode::Add:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					break;
+				}
+
+				glDisable(GL_CULL_FACE);
+
+				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(ctx.m_vertex[0]) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ctx.m_index[0]) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
+
+				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
+				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
+				glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(4 * sizeof(GLfloat)));
+
+				glDrawElements(GL_TRIANGLES, (GLsizei)ctx.m_filledIndexNum, GL_UNSIGNED_SHORT, (GLvoid*)0);
+
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			}
+
+			ctx.m_filledVertexNum = 0;
+			ctx.m_filledIndexNum = 0;
+		}
+
+		return true;
+	}
+
+	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(Type type)
+	{
+		std::shared_ptr<RenderObject> obj;
+
+		switch (type)
+		{
+		case Type::SPRITE:
+			obj = SpriteRenderer::Create(shared_from_this());
+			break;
+		}
+
+		return obj;
+	}
+
+
+	std::shared_ptr<stShaderCache> Renderer::Impl::CompileShader(ShaderKind kind, const char* source)
+	{
+		EQ_DURING
+		{
+			// キャッシュから探し、あればそのインスタンスを返す
+			for (auto& cache : m_shaderCache)
+			{
+				if (cache->type == kind &&
+					cache->m_source == source)
+				{
+					return cache;
+				}
+			}
+
+			// シェーダキャッシュを作る
+			auto newShaderCache = std::shared_ptr<stShaderCache>(new stShaderCache, [](stShaderCache* p) {
+				if (p)
+				{
+					if (p->m_id != GL_INVALID_ENUM)
+					{
+						glDeleteShader(p->m_id);
+					}
+
+					delete p;
+				}
+			});
+			// シェーダタイプを設定
+			newShaderCache->type = kind;
+
+			// ソースからシェーダをコンパイルする
+			GLuint newShader = glCreateShader(kind == ShaderKind::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+			glShaderSource(newShader, 1, &source, NULL);
+			glCompileShader(newShader);
+
+			// シェーダを保持する
+			newShaderCache->m_source = source;
+			newShaderCache->m_id = newShader;
+
+			GLint logSize = 0;
+			GLsizei length = 0;
+			std::vector<char> vLog;
+
+			// ログの長さは、最後のNULL文字も含む
+			glGetShaderiv(newShader, GL_INFO_LOG_LENGTH, &logSize);
+			vLog.resize(logSize);
+
+			// エラーが発生している？
+			if (logSize > 1)
+			{
+				glGetShaderInfoLog(newShader, vLog.size(), &length, vLog.data());
+				EQ_THROW(String::Sprintf("shader compile error [%s]", vLog.data()).c_str());
+			}
+			GLint glerr = glGetError();
+			if (glerr)
+			{
+				EQ_THROW(String::Sprintf("glerr 0x%X", glerr).c_str());
+			}
+
+			// キャッシュリストに追加
+			m_shaderCache.push_front(newShaderCache);
+
+			return newShaderCache;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	bool Renderer::Impl::SelectProgram(Type type)
+	{
+		// 同じプログラムなら何もしない
+		if (m_currentProgram == type)
+		{
+			return true;
+		}
+
+		// プログラムがキャッシュされているか探し、キャッシュがあればそのまま使う
+		for (auto& program : m_programCache)
+		{
+			if (program->m_type == type)
+			{
+				glUseProgram(program->m_programID);
+				m_currentProgram = type;
+				return true;
+			}
+		}
+
+		// キャッシュに見つからなかったので、新規にプログラムを作成する
+		EQ_DURING
+		{
+			const stShaderDef* pDef = nullptr;
+
+			// 定義を見つける
+			for (auto& def : gShaderTbl)
+			{
+				if (def.m_type == type)
+				{
+					pDef = &def;
+					break;
+				}
+			}
+
+			if (!pDef)
+			{
+				// エラー
+				EQ_THROW("shader type not found.");
+			}
+
+			// バーテックスシェーダを取得
+			auto vertexShader = CompileShader(ShaderKind::Vertex, pDef->m_vertexSource);
+			if(!vertexShader)
+			{
+				EQ_THROW("vertex shader compile failed.");
+			}
+
+			// フラグメントシェーダを取得
+			auto fragmentShader = CompileShader(ShaderKind::Fragment, pDef->m_fragmentSource);
+			if (!fragmentShader)
+			{
+				EQ_THROW("fragmnt shader compile failed.");
+			}
+
+			// プログラムキャッシュインスタンス作成
+			auto newProgramCache = std::shared_ptr<stProgramCache>(new stProgramCache, [](stProgramCache* p) {
+				if (p)
+				{
+					if (p->m_programID != 0)
+					{
+						glDeleteShader(p->m_programID);
+					}
+					delete p;
+				}
+			});
+			if (!newProgramCache)
+			{
+				EQ_THROW("プログラムキャッシュインスタンスの作成に失敗しました。");
+			}
+
+			// プログラムを作成する
+			GLuint newProgram = glCreateProgram();
+			newProgramCache->m_programID = newProgram;
+			newProgramCache->m_vertexCache = vertexShader;
+			newProgramCache->m_fragmentCache = fragmentShader;
+
+			// シェーダをアタッチ
+			glAttachShader(newProgram, vertexShader->m_id);
+			glAttachShader(newProgram, fragmentShader->m_id);
+
+			switch (type)
+			{
+			case Type::SPRITE:
+				glBindAttribLocation(newProgram, 0, "aVertex");
+				glBindAttribLocation(newProgram, 1, "a_texCoord");
+				glBindAttribLocation(newProgram, 2, "a_color");
+				break;
+			}
+
+			GLint linkSuccessful;
+			glLinkProgram(newProgram);
+			glGetProgramiv(newProgram, GL_LINK_STATUS, &linkSuccessful);
+			if (!linkSuccessful)
+			{
+				EQ_THROW("link program failed.");
+			}
+
+			switch (type)
+			{
+			case Type::SPRITE:
+				{
+					auto proj = glGetUniformLocation(newProgram, "u_projection");
+					auto u_texture = glGetUniformLocation(newProgram, "u_texture");
+
+					glUseProgram(newProgram);
+
+					//-----------------------------------
+					// uniform設定
+					//-----------------------------------
+					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
+					glUniform1i(u_texture, 0);
+
+					//-----------------------------------
+					// VBO作成
+					//-----------------------------------
+					glGenBuffers(2, m_spriteContext.m_VBO);
+
+					glBindBuffer(GL_ARRAY_BUFFER, m_spriteContext.m_VBO[0]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(m_spriteContext.m_vertex[0]) * m_spriteContext.VBO_SIZE, m_spriteContext.m_vertex, GL_DYNAMIC_DRAW);
+
+					glEnableVertexAttribArray(0);
+					glEnableVertexAttribArray(1);
+					glEnableVertexAttribArray(2);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_spriteContext.m_VBO[1]);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_spriteContext.m_index[0]) * m_spriteContext.INDEX_VBO_SIZE, m_spriteContext.m_index, GL_STATIC_DRAW);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					// GLエラーチェック
+				}
+				break;
+			}
+
+			m_programCache.push_front(newProgramCache);
+
+			m_currentProgram = type;
+
+			return true;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return false;
+	}
+
+	void Renderer::Impl::SetProjection(int w, int h)
+	{
+		m_projection[0][0] = 2.0f / w;
+		m_projection[0][1] = 0.0f;
+		m_projection[0][2] = 0.0f;
+		m_projection[0][3] = 0.0f;
+
+		m_projection[1][0] = 0.0f;
+		m_projection[1][1] = -2.0f / h;
+		m_projection[1][2] = 0.0f;
+		m_projection[1][3] = 0.0f;
+
+		m_projection[2][0] = 0.0f;
+		m_projection[2][1] = 0.0f;
+		m_projection[2][2] = 0.0f;
+		m_projection[2][3] = 0.0f;
+
+		m_projection[3][0] = -1.0f;
+		m_projection[3][1] = 1.0f;
+		m_projection[3][2] = 0.0f;
+		m_projection[3][3] = 1.0f;
 	}
 }

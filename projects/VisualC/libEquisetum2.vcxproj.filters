@@ -300,6 +300,9 @@
     <ClInclude Include="..\..\src\porting\SDL\graphic\RenderObjectImpl.hpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\RendererState.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">

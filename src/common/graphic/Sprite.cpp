@@ -18,6 +18,22 @@ namespace Equisetum2
 		return true;
 	}
 
+	const stSpriteAnimAtlas& Sprite::GetAtlas(int32_t num)
+	{
+		// TODO:‰½‚àİ’è‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Ì‚±‚Æ‚àl‚¦‚é
+
+		if (num < 0)
+		{
+			num = 0;
+		}
+		else if (num >= m_vAnimAtlas.size())
+		{
+			num = m_vAnimAtlas.size() - 1;
+		}
+
+		return m_vAnimAtlas[num];
+	}
+
 	bool Sprite::MoveFrom(std::shared_ptr<Sprite>&& src)
 	{
 		m_id = std::move(src->m_id);

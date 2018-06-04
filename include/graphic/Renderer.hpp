@@ -7,7 +7,7 @@
 #include "graphic/Image.hpp"
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
-//#include "graphic/RenderObject.hpp"
+#include "graphic/RenderObject.hpp"
 #include <memory>
 
 namespace Equisetum2
@@ -16,16 +16,10 @@ namespace Equisetum2
 	* レンダラクラス
 	*/
 	class RenderObject;
-	class Renderer
+	class Renderer : public std::enable_shared_from_this<Renderer>
 	{
 	public:
 
-		enum class BlendMode : int
-		{
-			None,		// ブレンドなし
-			Blend,		// アルファブレンド
-			Add,		// 加算ブレンド(アルファ有効)
-		};
 		static const int LayerMax = 64;
 
 		Renderer() = default;
@@ -34,21 +28,23 @@ namespace Equisetum2
 		static std::shared_ptr<Renderer> Create();
 
 		bool AddRenderQueue(RenderObject* pRenderObject);
+		bool Render();
 
-		bool Copy(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer);
-		bool CopyWithColor(const std::shared_ptr<Texture>& tex, const Rect& dst, const Rect& src, int flag, int layer, Color color);
-		bool Fill(const Rect& dst, int flag, int layer, Color color);
+		std::shared_ptr<RenderObject> CreateRenderObject(Type type);
 
 		bool Clear(const Color& color);
 		bool Present(bool waitVsync = true /* don't work */);
 
-	private:
-
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
-		std::vector<RenderObject*> m_vRenderObject[LayerMax];
-		String m_id;		/// ID
+	private:
+
+		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
+		//String m_id;		/// ID
+
+		stState m_currentStates = {};
+		bool DrawCall();
 
 		Renderer(const Renderer&) = delete;					// コピーコンストラクタ封じ
 		Renderer& operator= (const Renderer&) = delete;		// コピーコンストラクタ封じ

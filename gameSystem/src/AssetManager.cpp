@@ -314,7 +314,7 @@ namespace Equisetum2
 				EQ_THROW(String::Sprintf(u8"BGM(%s)‚Ìƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½B", id.c_str()));
 			}
 
-//			bgm->SetIdentify(id);
+			bgm->SetIdentify(id);
 
 			return bgm;
 		}

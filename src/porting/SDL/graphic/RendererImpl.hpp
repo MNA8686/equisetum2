@@ -8,35 +8,83 @@
 
 namespace Equisetum2
 {
+	// シェーダ種類
+	enum class ShaderKind : int
+	{
+		Vertex = 0,
+		Fragment
+	};
+
+	// シェーダキャッシュ
+	typedef struct
+	{
+		ShaderKind type = ShaderKind::Vertex;
+		GLint m_id = GL_INVALID_ENUM;
+		const char* m_source = nullptr;
+	}stShaderCache;
+
+	// プログラムキャッシュ
+	class stProgramCache
+	{
+	public:
+		Type m_type = Type::EMPTY;
+		GLint m_programID = 0;
+		std::shared_ptr<stShaderCache> m_vertexCache;
+		std::shared_ptr<stShaderCache> m_fragmentCache;
+	};
+
+	// 頂点定義
 	typedef struct
 	{
 		GLfloat vertices[2];
 		GLfloat texCoords[2];
-		GLfloat colors[4];
+		GLubyte colors[4];
 	}stVertex;
 
 	class Renderer::Impl final
 	{
 	public:
 
-		static const int VBO_SIZE = 65536;
-		static const int INDEX_VBO_SIZE = VBO_SIZE * 6 / 4;
-
-//		std::shared_ptr<SDL_GLContext> CreateGLContext(SDL_Window* pWindow);
-
 		std::shared_ptr<SDL_Window> m_attachedWindow;		// このレンダラに関連付けされているウィンドウ
 		std::shared_ptr<SDL_GLContext> m_GLContext;			// OpenGLコンテキスト
 
-		GLuint _uiProgramObject;
-//		GLuint m_vertBuf;
-		GLuint m_VBO[2];
+		bool SelectProgram(Type type);
+		void SetProjection(int w, int h);
 
-//		std::vector<stVertex> m_vertex;
-		stVertex m_vertex[VBO_SIZE] = {};
-		GLushort m_index[INDEX_VBO_SIZE] = {};
+		typedef struct
+		{
+			// VBO
+			GLuint m_VBO[2] = {};
 
-		int m_numVertex = 0;
-		int m_numIndex = 0;
+			// 頂点配列
+			static const int VBO_SIZE = 65536;
+			stVertex m_vertex[VBO_SIZE] = {};
+			size_t m_filledVertexNum = 0;
+
+			// インデックス配列
+			static const int INDEX_VBO_SIZE = VBO_SIZE * 6 / 4;
+			GLushort m_index[INDEX_VBO_SIZE] = {};
+			size_t m_filledIndexNum = 0;
+		}SpriteContext;
+		SpriteContext m_spriteContext;
+
+	private:
+
+		// プロジェクションマトリックス
+		GLfloat m_projection[4][4];
+
+		// 現在設定されているプログラム
+		Type m_currentProgram = Type::EMPTY;
+
+		// シェーダをコンパイルし、キャッシュに登録する
+		std::shared_ptr<stShaderCache> CompileShader(ShaderKind kind, const char* source);
+		// シェーダキャッシュ
+		std::list<std::shared_ptr<stShaderCache>> m_shaderCache;
+		// プログラムキャッシュ
+		std::list<std::shared_ptr<stProgramCache>> m_programCache;
+
+		friend class Renderer;
+
 	};
 }
 

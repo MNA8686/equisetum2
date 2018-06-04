@@ -38,6 +38,8 @@
 #include "graphic/Image.hpp"
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
+#include "graphic/Renderer.hpp"
+#include "graphic/RenderObject.hpp"
 
 #include "input/Key.h"
 #include "input/Mouse.h"

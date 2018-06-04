@@ -62,7 +62,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(IntDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
@@ -78,7 +78,7 @@ copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_mixer\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\glew\dll\*" "..\..\lib\win32\dll"
-copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
+copy "debug\libEquisetum2_d.lib" "..\..\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,7 +103,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\lib\win32\lib"</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(IntDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
@@ -119,7 +119,7 @@ copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\external\dep\win32\glew\dll\*" "..\..\lib\win32\dll"
-copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
+copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -138,6 +138,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\Path.hpp" />
     <ClInclude Include="..\..\include\graphic\Image.hpp" />
     <ClInclude Include="..\..\include\graphic\Renderer.hpp" />
+    <ClInclude Include="..\..\include\graphic\RendererState.hpp" />
     <ClInclude Include="..\..\include\graphic\RenderObject.hpp" />
     <ClInclude Include="..\..\include\graphic\Sprite.hpp" />
     <ClInclude Include="..\..\include\graphic\Texture.hpp" />
