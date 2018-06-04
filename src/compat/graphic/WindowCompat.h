@@ -29,6 +29,8 @@ namespace Equisetum2
 		Point Pos();
 		WindowStyle Style();
 
+		friend class Renderer;
+
 	private:
 
 		class Impl;

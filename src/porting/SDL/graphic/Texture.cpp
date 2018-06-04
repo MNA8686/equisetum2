@@ -20,19 +20,18 @@ namespace Equisetum2
 				EQ_THROW(u8"イメージのサイズが不正です。");
 			}
 
-			glActiveTexture(GL_TEXTURE0);
+			::glActiveTexture(GL_TEXTURE0);
 			//glEnable(GL_TEXTURE_2D);
 
-			GLuint* pTexID = new GLuint;
 			// テクスチャのデリーター作成
-			auto spTexID = std::shared_ptr<GLuint>(pTexID, [](GLuint* pID) {
-				glDeleteTextures(1, pID);
+			auto spTexID = std::shared_ptr<GLuint>(new GLuint, [](GLuint* pID) {
+				::glDeleteTextures(1, pID);
 				delete pID;
 			});
 
 			{
 				GLint max = 0;
-				glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max);
+				::glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max);
 				max = 0;
 			}
 
@@ -89,13 +88,12 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			glActiveTexture(GL_TEXTURE0);
+			::glActiveTexture(GL_TEXTURE0);
 
-			GLuint* pTexID = new GLuint;
 			// テクスチャのデリーター作成
-			auto spTexID = std::shared_ptr<GLuint>(pTexID,
+			auto spTexID = std::shared_ptr<GLuint>(new GLuint,
 				[](GLuint* pID) {
-				glDeleteTextures(1, pID);
+				::glDeleteTextures(1, pID);
 				delete pID;
 			});
 

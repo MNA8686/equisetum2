@@ -7,7 +7,7 @@ using namespace Equisetum2;
 #include <cereal/types/base_class.hpp>
 #include "Node.hpp"
 #include "AssetManager.hpp"
-#include "Sprite.hpp"
+//#include "Sprite.hpp"
 #include "Script.hpp"
 //#include "FixedDec.hpp"
 

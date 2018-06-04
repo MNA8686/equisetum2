@@ -116,6 +116,11 @@ namespace Equisetum2
 			return style;
 		}
 
+		std::shared_ptr<SDL_Window>& GetWindowPtr()
+		{
+			return m_pWindow;
+		}
+
 	private:
 
 		std::shared_ptr<SDL_Window> m_pWindow;

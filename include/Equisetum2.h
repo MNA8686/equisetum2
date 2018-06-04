@@ -37,6 +37,7 @@
 #include "graphic/Window.h"
 #include "graphic/Image.hpp"
 #include "graphic/Texture.hpp"
+#include "graphic/Sprite.hpp"
 
 #include "input/Key.h"
 #include "input/Mouse.h"

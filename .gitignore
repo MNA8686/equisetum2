@@ -13,3 +13,5 @@
 /lib
 /projects/VisualC/.vs/libEquisetum2/v14/*.suo
 /projects/VisualC/*.db
+/src/porting/SDL/graphic/*.bak
+/projects/VisualC/*.opendb

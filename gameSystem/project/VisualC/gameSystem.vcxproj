@@ -141,14 +141,12 @@
     <ClCompile Include="..\..\src\Node.cpp" />
     <ClCompile Include="..\..\src\Object.cpp" />
     <ClCompile Include="..\..\src\Script.cpp" />
-    <ClCompile Include="..\..\src\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\AssetManager.hpp" />
     <ClInclude Include="..\..\include\Node.hpp" />
     <ClInclude Include="..\..\include\Object.hpp" />
     <ClInclude Include="..\..\include\Script.hpp" />
-    <ClInclude Include="..\..\include\Sprite.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
