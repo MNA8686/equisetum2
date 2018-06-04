@@ -137,6 +137,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
     <ClInclude Include="..\..\include\graphic\Image.hpp" />
+    <ClInclude Include="..\..\include\graphic\Texture.hpp" />
     <ClInclude Include="..\..\include\graphic\Window.h" />
     <ClInclude Include="..\..\include\input\IKeyState.h" />
     <ClInclude Include="..\..\include\input\Joystick.h" />
@@ -184,6 +185,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClInclude Include="..\..\src\compat\input\TouchCompat.h" />
     <ClInclude Include="..\..\src\compat\system\LoggerCompat.h" />
     <ClInclude Include="..\..\src\compat\timer\SystemTimerCompat.h" />
+    <ClInclude Include="..\..\src\porting\SDL\graphic\TextureImpl.hpp" />
     <ClInclude Include="..\..\src\porting\SDL\system\SDLEvent.h" />
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +229,7 @@ copy "$(SolutionDir)$(Configuration)\*.lib" "..\..\\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\compat\input\TouchCompat.cpp" />
     <ClCompile Include="..\..\src\compat\system\LoggerCompat.cpp" />
     <ClCompile Include="..\..\src\compat\timer\SystemTimerCompat.cpp" />
+    <ClCompile Include="..\..\src\porting\SDL\graphic\Texture.cpp" />
     <ClCompile Include="..\..\src\porting\SDL\system\System.cpp" />
   </ItemGroup>
   <ItemGroup>

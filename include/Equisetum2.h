@@ -36,6 +36,7 @@
 #if !defined(EQUISETUM2_STATIC)
 #include "graphic/Window.h"
 #include "graphic/Image.hpp"
+#include "graphic/Texture.hpp"
 
 #include "input/Key.h"
 #include "input/Mouse.h"

@@ -1,0 +1,15 @@
+/projects/VisualC/Debug
+/projects/VisualC/Debugs
+/projects/VisualC/Release
+/projects/VisualC/Releases
+/unittest/project/VisualC/Debug
+/unittest/project/VisualC/Debugs
+/unittest/project/VisualC/Release
+/unittest/project/VisualC/Releases
+/unittest/project/VisualC/test
+/unittest/project/VisualC/tests
+/gameSystem/project/VisualC/Release
+/gameSystem/project/VisualC/Debug
+/lib
+/projects/VisualC/.vs/libEquisetum2/v14/*.suo
+/projects/VisualC/*.db

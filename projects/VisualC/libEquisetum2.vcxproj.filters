@@ -279,6 +279,12 @@
     <ClInclude Include="..\..\include\type\FixedDec.hpp">
       <Filter>ヘッダー ファイル\type</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\porting\SDL\graphic\TextureImpl.hpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\graphic\Texture.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -403,6 +409,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\system\Argument.cpp">
       <Filter>ソース ファイル\common\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\porting\SDL\graphic\Texture.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
