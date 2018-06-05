@@ -303,6 +303,9 @@
     <ClInclude Include="..\..\include\graphic\RendererState.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\util\AssetManager.hpp">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -439,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\porting\SDL\graphic\RenderObject.cpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\util\AssetManager.cpp">
+      <Filter>ソース ファイル\common\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

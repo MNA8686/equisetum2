@@ -1,5 +1,9 @@
-#include "AssetManager.hpp"
-//#include "Sprite.hpp"
+#include "system/Exception.hpp"
+#include "system/Logger.h"
+#include "util/AssetManager.hpp"
+#include "util/SharedPool.hpp"
+#include "stream/FileStream.h"
+#include "fs/Path.hpp"
 
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
