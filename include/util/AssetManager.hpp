@@ -1,6 +1,7 @@
 #if !defined(_EQASSETMANAGER_H_)
 #define _EQASSETMANAGER_H_
 
+#include "util/SharedPool.hpp"
 #include "system/Singleton.h"
 #include "graphic/Image.hpp"
 #include "graphic/Sprite.hpp"
