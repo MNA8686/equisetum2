@@ -8,12 +8,21 @@
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
 #include "graphic/RendererState.hpp"
+#include "graphic/RenderObject.hpp"
+#include "graphic/Renderer.hpp"
+#include "util/AssetManager.hpp"
 #include <memory>
+
+#include <cereal/cereal.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/memory.hpp>
+//#include <cereal/types/base_class.hpp>
+
+//using namespace Equisetum2;
+using namespace Equisetum2::RenderState;
 
 namespace Equisetum2
 {
-	using namespace Equisetum2::RenderState;
-
 	class Renderer;
 	class RenderObject
 	{
@@ -23,13 +32,36 @@ namespace Equisetum2
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
 
+#if 1
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(CEREAL_NVP(m_type));
+			archive(CEREAL_NVP(m_layer));
+			archive(CEREAL_NVP(m_orderInLayer));
+			//archive(CEREAL_NVP(m_renderer));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			archive(CEREAL_NVP(m_type));
+			archive(CEREAL_NVP(m_layer));
+			archive(CEREAL_NVP(m_orderInLayer));
+			//archive(CEREAL_NVP(m_renderer));
+		}
+#endif
+
 	protected:
 		Type m_type = Type::EMPTY;
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
 		std::weak_ptr<Renderer> m_renderer;
 	};
+}
 
+namespace Equisetum2
+{
 	class SpriteRenderer : public RenderObject
 	{
 	public:
@@ -57,10 +89,52 @@ namespace Equisetum2
 
 		bool Calculation();
 
+		template<class Archive>
+		void save(Archive & archive) const 
+		{
+#if 1
+			archive(cereal::base_class<RenderObject>(this));
+
+			std::string spriteId = m_sprite->Identify();
+			archive(CEREAL_NVP(spriteId));
+
+			archive(CEREAL_NVP(m_atlasNum));
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_flipX));
+			archive(CEREAL_NVP(m_flipY));
+			archive(CEREAL_NVP(m_angle));
+#endif
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+#if 1
+			archive(cereal::base_class<RenderObject>(this));
+			InitTest();
+
+			std::string spriteId;
+			archive(CEREAL_NVP(spriteId));
+			m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
+
+			archive(CEREAL_NVP(m_atlasNum));
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_flipX));
+			archive(CEREAL_NVP(m_flipY));
+			archive(CEREAL_NVP(m_angle));
+#endif
+		}
+
 	private:
 		friend class Renderer;
 		static std::shared_ptr<SpriteRenderer> Create(std::shared_ptr<Renderer>& renderer);
-
+		void InitTest();
 		//
 		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
 		int m_atlasNum = 0;		/// 表示パターン番号
@@ -81,5 +155,9 @@ namespace Equisetum2
 		std::shared_ptr<Impl> m_pImpl;
 	};
 }
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::SpriteRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::SpriteRenderer)
 
 #endif

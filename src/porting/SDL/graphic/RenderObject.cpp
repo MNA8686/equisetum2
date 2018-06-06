@@ -28,6 +28,11 @@ namespace Equisetum2
 		return m_orderInLayer;
 	}
 
+	void SpriteRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<SpriteRenderer::Impl>();
+	}
+
 	std::shared_ptr<SpriteRenderer> SpriteRenderer::Create(std::shared_ptr<Renderer>& renderer)
 	{
 		EQ_DURING

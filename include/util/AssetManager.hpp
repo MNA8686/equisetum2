@@ -1,8 +1,12 @@
 #if !defined(_EQASSETMANAGER_H_)
 #define _EQASSETMANAGER_H_
 
-#include "Equisetum2.h"
-//#include "Sprite.hpp"
+#include "util/SharedPool.hpp"
+#include "system/Singleton.h"
+#include "graphic/Image.hpp"
+#include "graphic/Sprite.hpp"
+#include "audio/BGM.hpp"
+#include "audio/SE.hpp"
 
 namespace Equisetum2
 {

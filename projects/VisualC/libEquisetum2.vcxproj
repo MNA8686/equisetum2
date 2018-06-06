@@ -174,6 +174,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\type\String.h" />
     <ClInclude Include="..\..\include\util\ArchiveAccessor.hpp" />
     <ClInclude Include="..\..\include\util\ArchivePacker.hpp" />
+    <ClInclude Include="..\..\include\util\AssetManager.hpp" />
     <ClInclude Include="..\..\include\util\Regex.hpp" />
     <ClInclude Include="..\..\include\util\Serialization.hpp" />
     <ClInclude Include="..\..\include\util\SHA256.hpp" />
@@ -226,6 +227,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\timer\TickCounter.cpp" />
     <ClCompile Include="..\..\src\common\util\ArchiveAccessor.cpp" />
     <ClCompile Include="..\..\src\common\util\ArchivePacker.cpp" />
+    <ClCompile Include="..\..\src\common\util\AssetManager.cpp" />
     <ClCompile Include="..\..\src\common\util\Regex.cpp" />
     <ClCompile Include="..\..\src\common\util\SHA256.cpp" />
     <ClCompile Include="..\..\src\compat\audio\AudioCompat.cpp" />

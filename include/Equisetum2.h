@@ -13,6 +13,9 @@
 #include "util/SharedPool.hpp"
 #include "util/ArchiveAccessor.hpp"
 #include "util/ArchivePacker.hpp"
+#if !defined(EQUISETUM2_STATIC)
+#include "util/AssetManager.hpp"
+#endif
 
 #include "system/Exception.hpp"
 #include "system/Logger.h"
