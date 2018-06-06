@@ -126,6 +126,42 @@ namespace Equisetum2
 				}
 			}
 
+			// タイプ一致チェック
+			{
+				// type取得
+				auto& type = doc.FindMember("type");
+				if (type == doc.MemberEnd() ||
+					type->value.GetType() != rapidjson::kStringType)
+				{
+					EQ_THROW(u8"typeが見つかりません。");
+				}
+
+				// タイプ一致判定
+				String strType = type->value.GetString();
+				if (strType != "sprite")
+				{
+					EQ_THROW(u8"typeがspriteではありません。");
+				}
+			}
+
+			// ID一致チェック
+			{
+				// id取得
+				auto& id_ = doc.FindMember("id");
+				if (id_ == doc.MemberEnd() ||
+					id_->value.GetType() != rapidjson::kStringType)
+				{
+					EQ_THROW(u8"idが見つかりません。");
+				}
+
+				// ID一致判定
+				String strID = id_->value.GetString();
+				if(strID != id)
+				{
+					EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
+				}
+			}
+
 			// テクスチャ読み込み
 			std::shared_ptr<Texture> textureIn;
 			{
