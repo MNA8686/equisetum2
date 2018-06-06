@@ -12,6 +12,13 @@
 
 namespace Equisetum2
 {
+	static String MakeNativePath(const String& type, const String& id, const String& ext )
+	{
+		// "type/id" の文字列を作る
+		// 入力IDに拡張子が付いていても無視する
+		return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
+	}
+
 	AssetManager::AssetManager()
 	{
 		Singleton<SharedPool<Image>>::GetInstance();
@@ -25,7 +32,8 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			auto inStream = FileStream::CreateFromPath(Path::GetFullPath(id));
+			// TODO: 画像の形式はPNG固定だが、jpgとbmpも見に行くようにする
+			auto inStream = FileStream::CreateFromPath(MakeNativePath("image", id, ".png"));
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
@@ -53,10 +61,11 @@ namespace Equisetum2
 	std::shared_ptr<Texture> AssetManager::_LoadTexture(const String& id)
 	{
 		// 圧縮テクスチャ時の処理はまた考える
+		// 今はpng画像を固定で見に行く
 
 		EQ_DURING
 		{
-			auto imageIn = _Load<Image>(id);
+			auto imageIn = _LoadImage(id);
 			if (!imageIn)
 			{
 				EQ_THROW(u8"テクスチャのロードに失敗しました。");
@@ -88,7 +97,7 @@ namespace Equisetum2
 			// json読み出し
 			rapidjson::Document doc;
 			{
-				auto jsonStream = FileStream::CreateFromPath(Path::GetFullPath(id));
+				auto jsonStream = FileStream::CreateFromPath(MakeNativePath("sprite", id, ".json"));
 				if (!jsonStream)
 				{
 					EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
@@ -306,7 +315,7 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			auto inStream = FileStream::CreateFromPath(Path::GetFullPath(id));
+			auto inStream = FileStream::CreateFromPath(MakeNativePath("bgm", id, ".ogg"));
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
@@ -335,7 +344,7 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			auto inStream = FileStream::CreateFromPath(Path::GetFullPath(id));
+			auto inStream = FileStream::CreateFromPath(MakeNativePath("se", id, ".wav"));
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));

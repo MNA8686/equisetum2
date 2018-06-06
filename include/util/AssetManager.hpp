@@ -72,8 +72,9 @@ namespace Equisetum2
 
 		/*
 		const char* json = R"({
-			"name": "/sprite/subaru.json",
-			"textureid": "/image/jiki_subaru.png",
+			"type": "sprite",
+			"name": "subaru",
+			"textureid": "jiki_subaru",
 			"atlas": [
 				{
 					"pos" : [0, 0],
