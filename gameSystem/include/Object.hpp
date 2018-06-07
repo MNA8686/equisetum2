@@ -6,10 +6,7 @@ using namespace Equisetum2;
 
 #include <cereal/types/base_class.hpp>
 #include "Node.hpp"
-//#include "AssetManager.hpp"
-//#include "Sprite.hpp"
 #include "Script.hpp"
-//#include "FixedDec.hpp"
 
 /**
   アセット管理構造体
@@ -122,7 +119,7 @@ public:
 	Object();
 	virtual ~Object();
 
-	static std::shared_ptr<Object> Create(const String& name);
+	static std::shared_ptr<Object> Create(const String& id);
 
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
@@ -130,7 +127,9 @@ public:
 	void SetLocalPos(const Point_t<FixedDec>& pos);
 	bool GetRelativeParent() const;
 	void SetRelativeParent(bool on);
-
+	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
+	bool OnDraw(std::shared_ptr<Renderer>& renderer);
+	stAsset& GetAsset();
 
 protected:
 
@@ -138,6 +137,7 @@ private:
 
 	// --- serialize begin ---
 	stAsset m_asset;				/// アセット管理構造体
+	std::vector<std::shared_ptr<RenderObject>> m_vRenderObject;	/// レンダーオブジェクト配列
 	Point_t<FixedDec> m_pos;		/// ワールド座標
 	Point_t<FixedDec> m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
 	bool m_relativeParent = true;	/// 親の座標に追従するかどうか
@@ -156,6 +156,7 @@ public:
 	{
 		archive(cereal::base_class<Node>(this));
 		archive(CEREAL_NVP(m_asset));
+		archive(CEREAL_NVP(m_vRenderObject));
 		archive(CEREAL_NVP(m_pos));
 		archive(CEREAL_NVP(m_localPos));
 		archive(CEREAL_NVP(m_relativeParent));

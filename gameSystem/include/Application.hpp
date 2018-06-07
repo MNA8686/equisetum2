@@ -17,7 +17,7 @@ protected:
 	virtual bool OnInit(void) = 0;
 	virtual void OnQuit(void) = 0;
 	virtual bool OnUpdate(void) = 0;
-	virtual bool OnDraw(std::shared_ptr<Renderer>& renderer) = 0;
+	virtual bool OnDraw(void) = 0;
 
 	virtual bool OnActive(bool active);
 

@@ -69,7 +69,7 @@ int Application::Main()
 		if (!isError)
 		{
 			OnUpdate();
-			OnDraw(m_renderer);
+			OnDraw();
 		}
 
 		m_renderer->Present();

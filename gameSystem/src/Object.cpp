@@ -52,6 +52,12 @@ rapidjson::Document JsonParseHelper::CreateFromStream(std::shared_ptr<IStream> i
 	return nullptr;
 }
 
+static String MakeNativePath(const String& type, const String& id, const String& ext)
+{
+	// "type/id" の文字列を作る
+	// 入力IDに拡張子が付いていても無視する
+	return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
+}
 
 Object::Object()
 {
@@ -61,12 +67,10 @@ Object::~Object()
 {
 }
 
-std::shared_ptr<Object> Object::Create(const String& name)
+std::shared_ptr<Object> Object::Create(const String& id)
 {
 	EQ_DURING
 	{
-		String id = "subaru.json";		// テスト用
-
 		// インスタンス作成
 		auto tmpNode = std::make_shared<Object>();
 		if (!tmpNode)
@@ -74,7 +78,7 @@ std::shared_ptr<Object> Object::Create(const String& name)
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		if (!Node::Init(tmpNode, name))
+		if (!Node::Init(tmpNode, id))
 		{
 			EQ_THROW(u8"インスタンスの初期化に失敗しました。");
 		}
@@ -85,13 +89,19 @@ std::shared_ptr<Object> Object::Create(const String& name)
 				"name" : "subaru",
 				"asset" :
 				{
-					"sprite": ["/sprite/subaru.json"],
-					"se" : ["/se/subaru_shot.wav"],
+					"sprite": ["subaru.json"],
+					"se" : ["subaru_shot"],
 					"script" : ["subaru_shot"]
 				}
 			})";
 		*/
-		rapidjson::Document json = JsonParseHelper::CreateFromStream(FileStream::CreateFromPath(id));
+		auto stream = FileStream::CreateFromPath(MakeNativePath("object", id, ".json"));
+		if (!stream)
+		{
+			EQ_THROW(u8"ファイルのオープンに失敗しました。");
+		}
+
+		rapidjson::Document json = JsonParseHelper::CreateFromStream(stream);
 
 		// objectの定義ファイルかどうかチェック
 		{
@@ -109,23 +119,21 @@ std::shared_ptr<Object> Object::Create(const String& name)
 			}
 		}
 
-		// 名前を取得
+		// ID一致チェック
 		{
-			auto& it = json.FindMember("name");
-			if (it == json.MemberEnd() ||
-				!it->value.IsString())
+			// id取得
+			auto& id_ = json.FindMember("id");
+			if (id_ == json.MemberEnd() ||
+				id_->value.GetType() != rapidjson::kStringType)
 			{
-				EQ_THROW(u8"nameが見つかりません。");
+				EQ_THROW(u8"idが見つかりません。");
 			}
 
-			String strName = it->value.GetString();
-			if (strName.empty())
+			// ID一致判定
+			String strID = id_->value.GetString();
+			if (strID != id)
 			{
-				EQ_THROW(u8"nameが設定されていません。");
-			}
-			if (strName != name)
-			{
-//				EQ_THROW(u8"nameが異なります。");
+				EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
 			}
 		}
 
@@ -163,7 +171,7 @@ std::shared_ptr<Object> Object::Create(const String& name)
 
 						tmpNode->m_asset.m_sprite.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "bgm")
@@ -188,7 +196,7 @@ std::shared_ptr<Object> Object::Create(const String& name)
 
 						tmpNode->m_asset.m_bgm.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "se")
@@ -213,7 +221,7 @@ std::shared_ptr<Object> Object::Create(const String& name)
 
 						tmpNode->m_asset.m_se.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "script")
@@ -236,9 +244,12 @@ std::shared_ptr<Object> Object::Create(const String& name)
 							EQ_THROW(u8"スクリプトのロードに失敗しました。");
 						}
 
+						// 所有しているオブジェクトを設定する
+						p->SetOwner(tmpNode);
+
 						tmpNode->m_asset.m_script.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 			}
@@ -404,4 +415,44 @@ void Object::SetRelativeParent(bool on)
 			m_localPos = m_pos;
 		}
 	}
+}
+
+void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+{
+	m_vRenderObject.push_back(renderObject);
+}
+
+bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
+{
+	// アクティブかつ表示状態？
+	if (m_active && m_visible)
+	{
+		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+		for (auto& renderObject : m_vRenderObject)
+		{
+			if (renderObject->IsVisible())
+			{
+				renderer->AddRenderQueue(renderObject.get());
+			}
+		}
+
+		// 子に伝搬させる
+		std::list<NodeID>& children = GetChildrenID();
+		for (auto& id : children)
+		{
+			std::shared_ptr<Node>& child = GetNodeByID(id);
+			if (child)
+			{
+				auto p = static_cast<Object*>(child.get());
+				p->OnDraw(renderer);
+			}
+		}
+	}
+
+	return true;
+}
+
+stAsset& Object::GetAsset()
+{
+	return m_asset;
 }

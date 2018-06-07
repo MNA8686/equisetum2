@@ -2,11 +2,23 @@
 #define _EQSCRIPT_H_
 
 #include "Equisetum2.h"
-using namespace Equisetum2;
 
 #include "Object.hpp"
 #include <cereal/cereal.hpp>
 
+using namespace Equisetum2;
+
+// スクリプトテーブル型定義
+class Script;
+using funcCreateScript = std::function<std::shared_ptr<Script>()>;
+typedef struct
+{
+	String id;				// スクリプトID
+	funcCreateScript func;	// スクリプトオブジェクト取得メソッド
+}stScriptTbl;
+#define EQ_SCRIPT_DEFINE(id) { String(#id), []()->std::shared_ptr<Script> { return std::make_shared<id>(); } }
+
+class Object;
 class Script
 {
 public:
@@ -16,22 +28,27 @@ public:
 	virtual bool OnCreate();
 	virtual bool OnStart();
 	virtual bool FixedUpdate();
-	virtual bool Render();
+//	virtual bool Render();
 
-	static std::shared_ptr<Script> Create(const String& name);
+	void SetOwner(std::shared_ptr<Object>& ownerObject);
+
+	static void SetScriptTbl(const std::vector<stScriptTbl>& tbl);
+	static std::shared_ptr<Script> Create(const String& id);
+	static std::shared_ptr<Renderer>& GetRenderer(void);
+	static std::shared_ptr<Renderer> m_renderer;		// 暫定
 
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
-		archive(CEREAL_NVP(m_base));
+		archive(CEREAL_NVP(m_isStarted));
+		archive(CEREAL_NVP(m_ownerObject));
 	}
 
-	int m_base = 0;
+private:
+	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
+protected:
+	std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
 };
 
-// ここにインクルード
-//#include "script/ScriptTest1.hpp"
-//#include "script/ScriptTest2.hpp"
-//#include "script/ScriptMain.hpp"
 
 #endif
