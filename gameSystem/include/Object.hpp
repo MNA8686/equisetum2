@@ -130,6 +130,8 @@ public:
 	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset& GetAsset();
+	virtual bool AddScheduler() override;
+	virtual bool OnSchedule() override;
 
 protected:
 

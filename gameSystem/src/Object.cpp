@@ -424,6 +424,30 @@ void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
+#if 1
+	std::shared_ptr<Node> pThis = Self();
+
+	Visit(pThis, [this, &renderer](std::shared_ptr<Node>& node, int32_t nestDepth)->bool {
+		auto obj = static_cast<Object*>(node.get());
+
+		// アクティブかつ表示状態でなければこの先のノードは処理しない
+		if (!obj->m_active || !obj->m_visible)
+		{
+			return false;
+		}
+
+		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+		for (auto& renderObject : obj->m_vRenderObject)
+		{
+			if (renderObject->IsVisible())
+			{
+				renderer->AddRenderQueue(renderObject.get());
+			}
+		}
+
+		return true;
+	});
+#else
 	// アクティブかつ表示状態？
 	if (m_active && m_visible)
 	{
@@ -448,6 +472,7 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 			}
 		}
 	}
+#endif
 
 	return true;
 }
@@ -455,4 +480,24 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 stAsset& Object::GetAsset()
 {
 	return m_asset;
+}
+
+bool Object::AddScheduler()
+{
+	// アクティブなノードをスケジュールに登録する
+	// アクティブではないノードはそのノードの子も登録しない
+	return m_active;
+}
+
+bool Object::OnSchedule()
+{
+	for (auto& script : m_asset.m_script)
+	{
+		if (script->Start())
+		{
+			script->FixedUpdate();
+		}
+	}
+
+	return true;
 }

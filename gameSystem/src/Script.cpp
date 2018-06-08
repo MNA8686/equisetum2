@@ -58,3 +58,18 @@ void Script::SetOwner(std::shared_ptr<Object>& ownerObject)
 {
 	m_ownerObject = ownerObject;
 }
+
+bool Script::Start()
+{
+	bool ret = true;
+
+	// スクリプトが開始してない？
+	if (!m_isStarted)
+	{
+		// スクリプトを開始する
+		ret = OnStart();
+		m_isStarted = true;
+	}
+
+	return ret;
+}

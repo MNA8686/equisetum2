@@ -66,9 +66,14 @@ int Application::Main()
 			continue;
 		}
 
+		Node::MakeScheduler();
+
 		if (!isError)
 		{
 			OnUpdate();
+
+			Node::ProcScheduler();
+
 			OnDraw();
 		}
 

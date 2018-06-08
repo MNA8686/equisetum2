@@ -35,12 +35,16 @@ public:
 	std::vector<std::shared_ptr<Node>> GetChildren() const;
 	int32_t GetChildCount() const;
 	bool HasParent() const;
+	virtual bool AddScheduler();
+	virtual bool OnSchedule();
 
 	static std::shared_ptr<Node> Create(const String& objectName);
 	static void GC();
 	static void DestroyThemAll();
 	static int32_t NumOfObjects();
 	static void Dump();
+	static void MakeScheduler();
+	static void ProcScheduler();
 
 	template<class Archive>
 	void serialize(Archive & archive)
@@ -60,6 +64,10 @@ protected:
 	std::list<NodeID>& GetChildrenID();
 	std::shared_ptr<Node>& GetNodeByID(NodeID nodeID);
 	NodeID GetParentID() const;
+	std::shared_ptr<Node>& Self();
+
+	// cbでfalseを返すとvisitを終了する
+	static bool Visit(std::shared_ptr<Node> beginNode, const std::function<bool(std::shared_ptr<Node>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0);
 
 private:
 
@@ -71,8 +79,6 @@ private:
 	bool m_destroyed = false;	// 破棄フラグ trueにするとGC対象となる
 	// --- serialize end ---
 
-	// cbでfalseを返すとvisitを終了する
-	static bool Visit(std::shared_ptr<Node> beginNode, const std::function<bool(std::shared_ptr<Node>&, int32_t nestDepth)>& cb, int32_t nestDepth=0);
 	void DetachParent();
 };
 
@@ -103,7 +109,9 @@ protected:
 	std::list<std::weak_ptr<Node>> m_listZombie;		// ゾンビノードリスト
 	// --- serialize end ---
 
-	std::vector<NodeID> m_vGcQueue;					// GC対象となるノードのIDを格納した配列
+	std::vector<NodeID> m_vGcQueue;							// GC対象となるノードのIDを格納した配列
+	bool m_dirty = true;									// スケジュール配列の再構築が必要かどうか
+	std::vector<std::shared_ptr<Node>> m_vNodeScheduler;	// スケジュール配列
 
 	NodePool()	// インスタンス作成封じ
 	{

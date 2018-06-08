@@ -58,6 +58,9 @@ bool Node::Init(std::shared_ptr<Node> pNode, const String& name)
 	// 使用中のオブジェクト数を加算
 	pNodePool->m_numOfObjects++;
 
+	// 再構築フラグセット
+	pNodePool->m_dirty = true;
+
 	Logger::OutputDebug("spawn id %d, numOfObjects %d", id, pNodePool->m_numOfObjects);
 
 	return true;
@@ -78,6 +81,8 @@ std::shared_ptr<Node> Node::Create(const String& objectName)
 
 bool Node::Visit(std::shared_ptr<Node> beginNode, const std::function<bool(std::shared_ptr<Node>&, int32_t)>& cb, int32_t nestDepth)
 {
+	auto pNodePool = Singleton<NodePool>::GetInstance();
+
 	if (!cb(beginNode, nestDepth))
 	{
 		return false;
@@ -85,10 +90,10 @@ bool Node::Visit(std::shared_ptr<Node> beginNode, const std::function<bool(std::
 
 	if (beginNode->GetChildCount() > 0)
 	{
-		const std::vector<std::shared_ptr<Node>> children = beginNode->GetChildren();
+		const std::list<NodeID> children = beginNode->GetChildrenID();
 		for (auto& child : children)
 		{
-			if (!Visit(child, cb, nestDepth + 1))
+			if (!Visit(pNodePool->m_vNodeSlot[child], cb, nestDepth + 1))
 			{
 				return false;
 			}
@@ -135,6 +140,12 @@ void Node::Dump()
 void Node::GC()
 {
 	auto pNodePool = Singleton<NodePool>::GetInstance();
+
+	if (pNodePool->m_dirty)
+	{
+		// スケジュール配列を削除
+		pNodePool->m_vNodeScheduler.clear();
+	}
 
 	// 削除対象リストを元にオブジェクトの削除を行う
 	for (auto& nodeID : pNodePool->m_vGcQueue)
@@ -221,6 +232,9 @@ void Node::Destroy()
 
 		// 削除キューに入れる(後のGCでこのオブジェクトは破棄される)
 		pNodePool->m_vGcQueue.push_back(m_nodeID);
+
+		// 再構築フラグセット
+		pNodePool->m_dirty = true;
 	}
 }
 
@@ -260,6 +274,9 @@ void Node::DetachParent()
 		}
 
 		m_parentId = -1;
+
+		// 再構築フラグセット
+		pNodePool->m_dirty = true;
 	}
 }
 
@@ -291,6 +308,9 @@ void Node::SetParent(std::shared_ptr<Node> newParent)
 		m_parentId = newParent->GetID();
 
 		Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
+
+		// 再構築フラグセット
+		pNodePool->m_dirty = true;
 	}
 }
 
@@ -397,3 +417,55 @@ String Node::GetName()
 	return m_name;
 }
 
+void Node::MakeScheduler()
+{
+	auto pNodePool = Singleton<NodePool>::GetInstance();
+
+	if (pNodePool->m_dirty)
+	{
+		// スケジュール配列をクリア
+		pNodePool->m_vNodeScheduler.clear();
+
+		// ルートノード取得
+		if (auto pThisNode = pNodePool->m_vNodeSlot[0])
+		{
+			// ノードを辿り、スケジュール配列に追加していく
+			Visit(pThisNode, [](std::shared_ptr<Node>& node, int32_t nestDepth)->bool {
+				bool add = node->AddScheduler();		// 追加条件判定
+				if (add)
+				{
+					// スケジュール配列にノードを追加
+					Singleton<NodePool>::GetInstance()->m_vNodeScheduler.push_back(node);
+				}
+				return add;
+			});
+		}
+
+		pNodePool->m_dirty = false;
+	}
+}
+
+void Node::ProcScheduler()
+{
+	auto pNodePool = Singleton<NodePool>::GetInstance();
+
+	for (auto& node : pNodePool->m_vNodeScheduler)
+	{
+		node->OnSchedule();
+	}
+}
+
+bool Node::AddScheduler()
+{
+	return true;
+}
+
+bool Node::OnSchedule()
+{
+	return true;
+}
+
+std::shared_ptr<Node>& Node::Self()
+{
+	return GetNodeByID(GetID());
+}

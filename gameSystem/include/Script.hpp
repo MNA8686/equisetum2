@@ -31,6 +31,7 @@ public:
 //	virtual bool Render();
 
 	void SetOwner(std::shared_ptr<Object>& ownerObject);
+	bool Start();
 
 	static void SetScriptTbl(const std::vector<stScriptTbl>& tbl);
 	static std::shared_ptr<Script> Create(const String& id);
