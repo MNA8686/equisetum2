@@ -21,6 +21,9 @@
     <ClInclude Include="..\..\include\UnitTest.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -52,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="..\..\test\FixedDec.cpp">
       <Filter>ソース ファイル\test</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

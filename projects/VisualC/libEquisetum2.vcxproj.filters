@@ -306,6 +306,9 @@
     <ClInclude Include="..\..\include\util\AssetManager.hpp">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -445,6 +448,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\util\AssetManager.cpp">
       <Filter>ソース ファイル\common\util</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
