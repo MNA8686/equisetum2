@@ -1,4 +1,5 @@
 #include "Object.hpp"
+#include "Node.hpp"
 #include "Script.hpp"
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
@@ -6,6 +7,8 @@
 #include "cereal/external/rapidjson/error/en.h"
 
 using namespace Equisetum2;
+
+static std::shared_ptr<Object> nullObject;
 
 class JsonParseHelper
 {
@@ -326,7 +329,7 @@ void Object::SetPosForChild()
 	{
 		for (auto& child : thisNode->GetChildrenID())
 		{
-			if (auto& childObject = Node<Object>::GetNodeByID(child)->GetAttach())
+			if (auto& childObject = GetObjectByID(child))
 			{
 				// 子は親に追従する？
 				if (childObject->GetRelativeParent())
@@ -355,14 +358,12 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 		// ワールド座標更新
 		//-------------------------------------
 		{
-			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
 			// 親に追従する設定 && 親を持っている？
 			if (m_relativeParent &&
-				thisNode->HasParent())
+				HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				if (auto& parentObject = thisNode->GetParent()->GetAttach())
+				if (auto& parentObject = GetParent())
 				{
 					// 親との相対座標からワールド座標を算出
 					m_pos = parentObject->GetPos() + m_localPos;
@@ -395,14 +396,12 @@ void Object::SetRelativeParent(bool on)
 	// ローカル座標更新
 	//-------------------------------------
 	{
-		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
 		// 親に追従する設定 && 親を持っている？
 		if (m_relativeParent &&
-			thisNode->HasParent())
+			HasParent())
 		{
 			// 親ノードに関連付けられたObjectを取得	
-			if (auto& parentObject = thisNode->GetParent()->GetAttach())
+			if (auto& parentObject = GetParent())
 			{
 				// 親との相対座標を算出
 				m_localPos = m_pos - parentObject->GetPos();
@@ -454,28 +453,6 @@ stAsset& Object::GetAsset()
 	return m_asset;
 }
 
-#if 0
-bool Object::AddScheduler()
-{
-	// アクティブなノードをスケジュールに登録する
-	// アクティブではないノードはそのノードの子も登録しない
-	return m_active;
-}
-
-bool Object::OnSchedule()
-{
-	for (auto& script : m_asset.m_script)
-	{
-		if (script->Start())
-		{
-			script->FixedUpdate();
-		}
-	}
-
-	return true;
-}
-#endif
-
 void Object::SetNodeID(NodeID id)
 {
 	m_nodeID = id;
@@ -484,4 +461,34 @@ void Object::SetNodeID(NodeID id)
 NodeID Object::GetNodeID() const
 {
 	return m_nodeID;
+}
+
+std::shared_ptr<Object>& Object::GetObjectByID(NodeID id)
+{
+	if (auto& node = Node<Object>::GetNodeByID(id))
+	{
+		return node->GetAttach();
+	}
+
+	return nullObject;
+}
+
+std::shared_ptr<Object>& Object::Self()
+{
+	return GetObjectByID(m_nodeID);
+}
+
+bool Object::HasParent() const
+{
+	return Node<Object>::GetNodeByID(m_nodeID)->HasParent();
+}
+
+std::shared_ptr<Object>& Object::GetParent()
+{
+	if (auto parentNode = Node<Object>::GetNodeByID(m_nodeID)->GetParent())
+	{
+		return parentNode->GetAttach();
+	}
+
+	return nullObject;
 }

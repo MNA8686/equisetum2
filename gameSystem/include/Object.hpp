@@ -4,8 +4,11 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/list.hpp>
 //#include <cereal/types/base_class.hpp>
-#include "Node.hpp"
+#include "INodeAttachment.hpp"
 #include "Script.hpp"
 
 /**
@@ -130,8 +133,11 @@ public:
 	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset& GetAsset();
-//	virtual bool AddScheduler() override;
-//	virtual bool OnSchedule() override;
+
+	static std::shared_ptr<Object>& GetObjectByID(NodeID id);
+	std::shared_ptr<Object>& Self();
+	bool HasParent() const;
+	std::shared_ptr<Object>& GetParent();
 
 	void SetNodeID(NodeID id) override;
 	NodeID GetNodeID() const override;

@@ -2,6 +2,7 @@
 #include "Application.hpp"
 
 #include "Object.hpp"
+#include "Node.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>

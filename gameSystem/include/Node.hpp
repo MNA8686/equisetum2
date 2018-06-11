@@ -2,6 +2,7 @@
 #define _EQNODE_H_
 
 #include "Equisetum2.h"
+#include "INodeAttachment.hpp"
 using namespace Equisetum2;
 
 #include <queue>
@@ -13,6 +14,7 @@ using namespace Equisetum2;
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
 
+#if 0
 using NodeID = int32_t;
 
 class INodeAttachment
@@ -21,6 +23,7 @@ public:
 	virtual void SetNodeID(NodeID id) = 0;
 	virtual NodeID GetNodeID() const = 0;
 };
+#endif
 
 template<class T>
 class Node
@@ -73,7 +76,7 @@ public:
 			pNodePool->m_vGcQueue.push_back(m_nodeID);
 
 			// 再構築フラグセット
-			pNodePool->m_dirty = true;
+			//pNodePool->m_dirty = true;
 		}
 	}
 
@@ -127,7 +130,7 @@ public:
 			Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
 
 			// 再構築フラグセット
-			pNodePool->m_dirty = true;
+			//pNodePool->m_dirty = true;
 		}
 	}
 
@@ -214,11 +217,13 @@ public:
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 
+#if 0
 		if (pNodePool->m_dirty)
 		{
 			// スケジュール配列を削除
 			pNodePool->m_vNodeScheduler.clear();
 		}
+#endif
 
 		// 削除対象リストを元にオブジェクトの削除を行う
 		for (auto& nodeID : pNodePool->m_vGcQueue)
@@ -359,6 +364,7 @@ public:
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 
+#if 0
 		if (pNodePool->m_dirty)
 		{
 			// スケジュール配列をクリア
@@ -381,16 +387,18 @@ public:
 
 			pNodePool->m_dirty = false;
 		}
+#endif
 	}
 
 	static void ProcScheduler()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-
+#if 0
 		for (auto& node : pNodePool->m_vNodeScheduler)
 		{
 			node->OnSchedule();
 		}
+#endif
 	}
 
 	template<class Archive>
@@ -444,7 +452,7 @@ protected:
 		pNodePool->m_numOfObjects++;
 
 		// 再構築フラグセット
-		pNodePool->m_dirty = true;
+//		pNodePool->m_dirty = true;
 
 		Logger::OutputDebug("spawn id %d, numOfObjects %d", id, pNodePool->m_numOfObjects);
 
@@ -510,7 +518,7 @@ private:
 			m_parentId = -1;
 
 			// 再構築フラグセット
-			pNodePool->m_dirty = true;
+//			pNodePool->m_dirty = true;
 		}
 	}
 };
@@ -544,8 +552,8 @@ protected:
 	// --- serialize end ---
 
 	std::vector<NodeID> m_vGcQueue;							// GC対象となるノードのIDを格納した配列
-	bool m_dirty = true;									// スケジュール配列の再構築が必要かどうか
-	std::vector<std::shared_ptr<Node<T>>> m_vNodeScheduler;	// スケジュール配列
+//	bool m_dirty = true;									// スケジュール配列の再構築が必要かどうか
+//	std::vector<std::shared_ptr<Node<T>>> m_vNodeScheduler;	// スケジュール配列
 
 	NodePool()	// インスタンス作成封じ
 	{
