@@ -4,7 +4,7 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
-#include <cereal/types/base_class.hpp>
+//#include <cereal/types/base_class.hpp>
 #include "Node.hpp"
 #include "Script.hpp"
 
@@ -112,7 +112,7 @@ struct stAsset
 	}
 };
 
-class Object : public Node
+class Object : public INodeAttachment
 {
 public:
 
@@ -130,8 +130,11 @@ public:
 	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset& GetAsset();
-	virtual bool AddScheduler() override;
-	virtual bool OnSchedule() override;
+//	virtual bool AddScheduler() override;
+//	virtual bool OnSchedule() override;
+
+	void SetNodeID(NodeID id) override;
+	NodeID GetNodeID() const override;
 
 protected:
 
@@ -146,6 +149,7 @@ private:
 //	int32_t m_angle = 0;
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない
+	NodeID m_nodeID = -1;			/// アタッチしているノードのID
 	// --- serialize end ---
 
 	/// 子に親の座標移動を反映させる
@@ -156,7 +160,7 @@ public:
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
-		archive(cereal::base_class<Node>(this));
+//		archive(cereal::base_class<Node>(this));
 		archive(CEREAL_NVP(m_asset));
 		archive(CEREAL_NVP(m_vRenderObject));
 		archive(CEREAL_NVP(m_pos));
@@ -164,11 +168,12 @@ public:
 		archive(CEREAL_NVP(m_relativeParent));
 		archive(CEREAL_NVP(m_active));
 		archive(CEREAL_NVP(m_visible));
+		archive(CEREAL_NVP(m_nodeID));
 	}
 };
 
-#include <cereal/types/polymorphic.hpp>
-CEREAL_REGISTER_TYPE(Object);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Node, Object)
+//#include <cereal/types/polymorphic.hpp>
+//CEREAL_REGISTER_TYPE(Object);
+//CEREAL_REGISTER_POLYMORPHIC_RELATION(Node, Object)
 
 #endif

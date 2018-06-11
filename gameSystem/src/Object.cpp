@@ -72,17 +72,12 @@ std::shared_ptr<Object> Object::Create(const String& id)
 	EQ_DURING
 	{
 		// インスタンス作成
-		auto tmpNode = std::make_shared<Object>();
-		if (!tmpNode)
+		auto tmpObject = std::make_shared<Object>();
+		if (!tmpObject)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
-
-		if (!Node::Init(tmpNode, id))
-		{
-			EQ_THROW(u8"インスタンスの初期化に失敗しました。");
-		}
-
+	
 		/*
 			R"({
 				"type" : "object",
@@ -169,7 +164,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"spriteのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_sprite.push_back(p);
+						tmpObject->m_asset.m_sprite.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -194,7 +189,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"bgmのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_bgm.push_back(p);
+						tmpObject->m_asset.m_bgm.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -219,7 +214,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"seのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_se.push_back(p);
+						tmpObject->m_asset.m_se.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -245,9 +240,9 @@ std::shared_ptr<Object> Object::Create(const String& id)
 						}
 
 						// 所有しているオブジェクトを設定する
-						p->SetOwner(tmpNode);
+						p->SetOwner(tmpObject);
 
-						tmpNode->m_asset.m_script.push_back(p);
+						tmpObject->m_asset.m_script.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -256,12 +251,12 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : tmpNode->m_asset.m_script)
+		for (auto& script : tmpObject->m_asset.m_script)
 		{
 			script->OnCreate();
 		}
 
-		return tmpNode;
+		return tmpObject;
 	}
 	EQ_HANDLER
 	{
@@ -295,16 +290,17 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 		// ローカル座標更新
 		//-------------------------------------
 		{
+			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
 			// 親に追従する設定 && 親を持っている？
 			if (m_relativeParent &&
-				HasParent())
+				thisNode->HasParent())
 			{
-				// 親ノード取得	
-				std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-				if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+				// 親ノードに関連付けられたObjectを取得	
+				if(auto& parentObject = thisNode->GetParent()->GetAttach())
 				{
 					// 親との相対座標を算出
-					m_localPos = m_pos - p->GetPos();
+					m_localPos = m_pos - parentObject->GetPos();
 				}
 			}
 			else
@@ -324,21 +320,22 @@ void Object::SetPosForChild()
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
 	// よって、子のワールド座標は確実に更新が発生する。
 
-	if (GetChildCount() > 0)
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	if (thisNode->GetChildCount() > 0)
 	{
-		for (auto& child : GetChildrenID())
+		for (auto& child : thisNode->GetChildrenID())
 		{
-			std::shared_ptr<Node>& childNode = GetNodeByID(child);
-			if (auto p = std::dynamic_pointer_cast<Object>(childNode))
+			if (auto& childObject = Node<Object>::GetNodeByID(child)->GetAttach())
 			{
 				// 子は親に追従する？
-				if (p->GetRelativeParent())
+				if (childObject->GetRelativeParent())
 				{
 					// 子のワールド座標更新
-					p->m_pos = m_pos + p->GetLocalPos();
+					childObject->m_pos = m_pos + childObject->GetLocalPos();
 
 					// ワールド座標が変化したので子に伝搬する
-					p->SetPosForChild();
+					childObject->SetPosForChild();
 				}
 			}
 		}
@@ -358,16 +355,17 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 		// ワールド座標更新
 		//-------------------------------------
 		{
+			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
 			// 親に追従する設定 && 親を持っている？
 			if (m_relativeParent &&
-				HasParent())
+				thisNode->HasParent())
 			{
-				// 親ノード取得	
-				std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-				if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+				// 親ノードに関連付けられたObjectを取得	
+				if (auto& parentObject = thisNode->GetParent()->GetAttach())
 				{
 					// 親との相対座標からワールド座標を算出
-					m_pos = p->GetPos() + m_localPos;
+					m_pos = parentObject->GetPos() + m_localPos;
 				}
 			}
 			else
@@ -397,16 +395,17 @@ void Object::SetRelativeParent(bool on)
 	// ローカル座標更新
 	//-------------------------------------
 	{
+		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
 		// 親に追従する設定 && 親を持っている？
 		if (m_relativeParent &&
-			HasParent())
+			thisNode->HasParent())
 		{
-			// 親ノード取得	
-			std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-			if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+			// 親ノードに関連付けられたObjectを取得	
+			if (auto& parentObject = thisNode->GetParent()->GetAttach())
 			{
 				// 親との相対座標を算出
-				m_localPos = m_pos - p->GetPos();
+				m_localPos = m_pos - parentObject->GetPos();
 			}
 		}
 		else
@@ -424,11 +423,10 @@ void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
-#if 1
-	std::shared_ptr<Node> pThis = Self();
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	Visit(pThis, [this, &renderer](std::shared_ptr<Node>& node, int32_t nestDepth)->bool {
-		auto obj = static_cast<Object*>(node.get());
+	Node<Object>::Visit(thisNode, [this, &renderer](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
+		auto& obj = node->GetAttach();
 
 		// アクティブかつ表示状態でなければこの先のノードは処理しない
 		if (!obj->m_active || !obj->m_visible)
@@ -447,32 +445,6 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 
 		return true;
 	});
-#else
-	// アクティブかつ表示状態？
-	if (m_active && m_visible)
-	{
-		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
-		for (auto& renderObject : m_vRenderObject)
-		{
-			if (renderObject->IsVisible())
-			{
-				renderer->AddRenderQueue(renderObject.get());
-			}
-		}
-
-		// 子に伝搬させる
-		std::list<NodeID>& children = GetChildrenID();
-		for (auto& id : children)
-		{
-			std::shared_ptr<Node>& child = GetNodeByID(id);
-			if (child)
-			{
-				auto p = static_cast<Object*>(child.get());
-				p->OnDraw(renderer);
-			}
-		}
-	}
-#endif
 
 	return true;
 }
@@ -482,6 +454,7 @@ stAsset& Object::GetAsset()
 	return m_asset;
 }
 
+#if 0
 bool Object::AddScheduler()
 {
 	// アクティブなノードをスケジュールに登録する
@@ -500,4 +473,15 @@ bool Object::OnSchedule()
 	}
 
 	return true;
+}
+#endif
+
+void Object::SetNodeID(NodeID id)
+{
+	m_nodeID = id;
+}
+
+NodeID Object::GetNodeID() const
+{
+	return m_nodeID;
 }
