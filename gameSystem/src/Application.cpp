@@ -66,20 +66,20 @@ int Application::Main()
 			continue;
 		}
 
-		Node::MakeScheduler();
+		Node<Object>::MakeScheduler();
 
 		if (!isError)
 		{
 			OnUpdate();
 
-			Node::ProcScheduler();
+			Node<Object>::ProcScheduler();
 
 			OnDraw();
 		}
 
 		m_renderer->Present();
 
-		Node::GC();
+		Node<Object>::GC();
 
 		// ‹K’èŽžŠÔ‘Ò‚¿
 		while (true)
@@ -104,7 +104,7 @@ int Application::Main()
 
 	OnQuit();
 
-	Object::DestroyThemAll();
+	Node<Object>::DestroyThemAll();
 
 	return 0;
 }
