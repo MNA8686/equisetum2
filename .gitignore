@@ -15,3 +15,7 @@
 /projects/VisualC/*.db
 /src/porting/SDL/graphic/*.bak
 /projects/VisualC/*.opendb
+/src/common/fs/*.bak
+/unittest/src/*.bak
+/unittest/test/*.bak
+/projects/VisualC/ipch
