@@ -73,3 +73,13 @@ bool Script::Start()
 
 	return ret;
 }
+
+void Script::SetIdentify(const String& id)
+{
+	m_identify = id;
+}
+
+String Script::Identify() const
+{
+	return m_identify;
+}

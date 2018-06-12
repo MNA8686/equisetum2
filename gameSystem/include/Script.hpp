@@ -28,7 +28,6 @@ public:
 	virtual bool OnCreate();
 	virtual bool OnStart();
 	virtual bool FixedUpdate();
-//	virtual bool Render();
 
 	void SetOwner(std::shared_ptr<Object>& ownerObject);
 	bool Start();
@@ -37,6 +36,18 @@ public:
 	static std::shared_ptr<Script> Create(const String& id);
 	static std::shared_ptr<Renderer>& GetRenderer(void);
 	static std::shared_ptr<Renderer> m_renderer;		// 暫定
+
+	/**
+	* @brief イメージのIDを設定する
+	*/
+	void SetIdentify(const String& id);
+
+	/**
+	* @brief イメージのIDを取得する
+	* @return イメージのID
+	*/
+	String Identify() const;
+
 
 	template<class Archive>
 	void serialize(Archive & archive)
@@ -47,6 +58,7 @@ public:
 
 private:
 	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
+	String m_identify;
 protected:
 	std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
 };

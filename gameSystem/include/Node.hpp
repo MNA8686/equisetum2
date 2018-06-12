@@ -138,7 +138,7 @@ public:
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 
-		if (m_parentId > 0)
+		if (m_parentId >= 0)
 		{
 			if (std::shared_ptr<Node<T>> pParent = pNodePool->m_vNodeSlot[m_parentId])
 			{

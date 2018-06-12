@@ -152,6 +152,8 @@ public:
 	int32_t GetChildCount() const;
 	const std::list<NodeID>& GetChildrenID() const;
 
+	std::shared_ptr<Object> Fork();
+
 	bool IsActive() const;
 	bool IsVisible() const;
 

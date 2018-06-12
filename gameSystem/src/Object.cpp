@@ -82,7 +82,16 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
-	
+
+		// ノード作成
+		auto tmpNode = Node<Object>::Create(id);
+		if (!tmpNode)
+		{
+			EQ_THROW(u8"ノードの作成に失敗しました。");
+		}
+		// オブジェクトをアタッチ
+		tmpNode->SetAttach(tmpObject);
+
 		/*
 			R"({
 				"type" : "object",
@@ -246,6 +255,8 @@ std::shared_ptr<Object> Object::Create(const String& id)
 
 						// 所有しているオブジェクトを設定する
 						p->SetOwner(tmpObject);
+						// IDを設定する
+						p->SetIdentify(v.GetString());
 
 						tmpObject->m_asset.m_script.push_back(p);
 
@@ -260,15 +271,6 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		{
 			script->OnCreate();
 		}
-
-		// ノード作成
-		auto tmpNode = Node<Object>::Create(id);
-		if (!tmpNode)
-		{
-			EQ_THROW(u8"ノードの作成に失敗しました。");
-		}
-		// オブジェクトをアタッチ
-		tmpNode->SetAttach(tmpObject);
 
 		// 再構築フラグセット
 		m_dirty = true;
@@ -660,4 +662,77 @@ void Object::SetActive(bool active)
 void Object::SetVisible(bool visible)
 {
 	m_visible = visible;
+}
+
+std::shared_ptr<Object> Object::Fork()
+{
+	EQ_DURING
+	{
+		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+		// インスタンス作成
+		auto tmpObject = std::make_shared<Object>();
+		if (!tmpObject)
+		{
+			EQ_THROW(u8"インスタンスの作成に失敗しました。");
+		}
+
+		// ノード作成
+		auto tmpNode = Node<Object>::Create(thisNode->GetName());
+		if (!tmpNode)
+		{
+			EQ_THROW(u8"ノードの作成に失敗しました。");
+		}
+		// オブジェクトをアタッチ
+		tmpNode->SetAttach(tmpObject);
+
+		tmpObject->m_asset.m_bgm = m_asset.m_bgm;			/// アセット管理構造体
+		tmpObject->m_asset.m_se = m_asset.m_se;				/// アセット管理構造体
+		tmpObject->m_asset.m_sprite = m_asset.m_sprite;		/// アセット管理構造体
+//		std::vector<std::shared_ptr<RenderObject>> m_vRenderObject;	/// レンダーオブジェクト配列
+		tmpObject->m_pos = m_pos;		/// ワールド座標
+		tmpObject->m_localPos = m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
+		tmpObject->m_relativeParent = m_relativeParent;	/// 親の座標に追従するかどうか
+										//	int32_t m_angle = 0;
+		tmpObject->m_active = m_active;			/// falseの場合、スクリプトなどが呼び出されない
+		tmpObject->m_visible = m_visible;			/// falseの場合、レンダリング対象とならない
+
+		tmpObject->SetParent(GetParent());
+
+		// スクリプトを取得
+		for (auto& script : m_asset.m_script)
+		{
+			auto p = Script::Create(script->Identify());
+			if (!p)
+			{
+				EQ_THROW(u8"スクリプトのロードに失敗しました。");
+			}
+
+			// 所有しているオブジェクトを設定する
+			p->SetOwner(tmpObject);
+			p->SetIdentify(script->Identify());
+
+			tmpObject->m_asset.m_script.push_back(p);
+
+			Logger::OutputDebug(script->Identify().c_str());
+		}
+
+		// スクリプトのOnCreate呼び出し
+		for (auto& script : tmpObject->m_asset.m_script)
+		{
+			script->OnCreate();
+		}
+
+		// 再構築フラグセット
+		m_dirty = true;
+
+		return tmpObject;
+	}
+	EQ_HANDLER
+	{
+		Logger::OutputError(EQ_GET_HANDLER().what());
+	}
+	EQ_END_HANDLER
+
+	return nullptr;
 }
