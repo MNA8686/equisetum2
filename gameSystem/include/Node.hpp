@@ -13,6 +13,7 @@ using namespace Equisetum2;
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
+#include <cereal/types/queue.hpp>
 
 #if 0
 using NodeID = int32_t;
@@ -256,8 +257,9 @@ public:
 		for (auto& node : pNodePool->m_vNodeSlot)
 		{
 			// ルートノード以外なら破棄する
-			if (node &&
-				node->GetID() != 0)
+//			if (node &&
+//				node->GetID() != 0)
+			if (node)
 			{
 				node->Destroy();
 			}

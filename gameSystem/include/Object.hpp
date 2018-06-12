@@ -182,10 +182,11 @@ private:
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
 
-	static bool m_dirty;		/// スケジュール配列再構築フラグ
+//	static bool m_dirty;		/// スケジュール配列再構築フラグ
 	static std::vector<NodeID> m_vUpdate;		/// スケジュール配列
 
 public:
+	static bool m_dirty;		/// スケジュール配列再構築フラグ
 
 	template<class Archive>
 	void serialize(Archive & archive)
