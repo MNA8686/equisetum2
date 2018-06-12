@@ -142,6 +142,16 @@ public:
 	void SetNodeID(NodeID id) override;
 	NodeID GetNodeID() const override;
 
+	void Destroy();
+	bool IsDestroyed() const;
+	void SetParent(std::shared_ptr<Object>& newParent);
+	std::shared_ptr<Object>& GetParent() const;
+	void DetachChildren();
+	std::vector<std::shared_ptr<Object>> GetChildren() const;
+	int32_t GetChildCount() const;
+	const std::list<NodeID>& GetChildrenID() const;
+
+
 protected:
 
 private:

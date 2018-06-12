@@ -296,7 +296,7 @@ public:
 		return pNodePool->m_vNodeSlot[nodeID];
 	}
 
-	std::list<NodeID>& GetChildrenID()
+	const std::list<NodeID>& GetChildrenID() const
 	{
 		return m_listChildren;
 	}

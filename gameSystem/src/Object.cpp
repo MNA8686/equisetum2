@@ -259,6 +259,15 @@ std::shared_ptr<Object> Object::Create(const String& id)
 			script->OnCreate();
 		}
 
+		// ノード作成
+		auto tmpNode = Node<Object>::Create(id);
+		if (!tmpNode)
+		{
+			EQ_THROW(u8"ノードの作成に失敗しました。");
+		}
+		// オブジェクトをアタッチ
+		tmpNode->SetAttach(tmpObject);
+
 		return tmpObject;
 	}
 	EQ_HANDLER
@@ -491,4 +500,83 @@ std::shared_ptr<Object>& Object::GetParent()
 	}
 
 	return nullObject;
+}
+
+void Object::Destroy()
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	if (!IsDestroyed())
+	{
+		thisNode->Destroy();
+
+		// 再構築フラグセット
+		//pNodePool->m_dirty = true;
+	}
+}
+
+bool Object::IsDestroyed() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	return thisNode->IsDestroyed();
+}
+
+void Object::SetParent(std::shared_ptr<Object>& newParent)
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
+
+	thisNode->SetParent(newParentNode);
+}
+
+std::shared_ptr<Object>& Object::GetParent() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	if (auto& parentObject = thisNode->GetParent())
+	{
+		return parentObject->GetAttach();
+	}
+
+	return nullObject;
+}
+
+void Object::DetachChildren()
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	thisNode->DetachChildren();
+}
+
+std::vector<std::shared_ptr<Object>> Object::GetChildren() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	std::vector<std::shared_ptr<Object>> vChildren;
+	vChildren.reserve(thisNode->GetChildCount());
+
+	for (auto& nodeID : thisNode->GetChildrenID())
+	{
+		auto& childNode = Node<Object>::GetNodeByID(nodeID);
+
+		if (childNode &&
+			!childNode->IsDestroyed() &&
+			childNode->GetAttach())
+		{
+			vChildren.push_back(childNode->GetAttach());
+		}
+	}
+
+	return vChildren;
+}
+
+const std::list<NodeID>& Object::GetChildrenID() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	return thisNode->GetChildrenID();
+}
+
+int32_t Object::GetChildCount() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	return thisNode->GetChildCount();
 }
