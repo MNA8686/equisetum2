@@ -9,6 +9,8 @@
 using namespace Equisetum2;
 
 static std::shared_ptr<Object> nullObject;
+bool Object::m_dirty = true;
+std::vector<NodeID> Object::m_vUpdate;
 
 class JsonParseHelper
 {
@@ -268,6 +270,9 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		// オブジェクトをアタッチ
 		tmpNode->SetAttach(tmpObject);
 
+		// 再構築フラグセット
+		m_dirty = true;
+
 		return tmpObject;
 	}
 	EQ_HANDLER
@@ -424,6 +429,53 @@ void Object::SetRelativeParent(bool on)
 	}
 }
 
+bool Object::OnFixedUpdate()
+{
+	auto& vScript = m_asset.m_script;
+	for (auto& script : vScript)
+	{
+		script->FixedUpdate();
+	}
+
+	return true;
+}
+
+void Object::Update()
+{
+	if (m_dirty)
+	{
+		// スケジュール配列をクリア
+		m_vUpdate.clear();
+
+		// ルートノード取得
+		auto& rootNode = Node<Object>::GetNodeByID(0);
+
+		// ルートオブジェクト取得
+		if (auto rootObject = rootNode->GetAttach())
+		{
+			// ノードを辿り、スケジュール配列に追加していく
+			Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
+				auto object = node->GetAttach();		// 追加条件判定
+				if (object && object->IsActive())
+				{
+					// スケジュール配列にノードを追加
+					m_vUpdate.push_back(object->GetNodeID());
+					return true;
+				}
+				return false;
+			});
+		}
+
+		m_dirty = false;
+	}
+
+	for (auto& id : m_vUpdate)
+	{
+		auto& obj = GetObjectByID(id);
+		obj->OnFixedUpdate();
+	}
+}
+
 void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 {
 	m_vRenderObject.push_back(renderObject);
@@ -506,12 +558,12 @@ void Object::Destroy()
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	if (!IsDestroyed())
+	if (!thisNode->IsDestroyed())
 	{
 		thisNode->Destroy();
 
 		// 再構築フラグセット
-		//pNodePool->m_dirty = true;
+		m_dirty = true;
 	}
 }
 
@@ -528,6 +580,8 @@ void Object::SetParent(std::shared_ptr<Object>& newParent)
 	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
 
 	thisNode->SetParent(newParentNode);
+
+	m_dirty = true;
 }
 
 std::shared_ptr<Object>& Object::GetParent() const
@@ -545,6 +599,8 @@ void Object::DetachChildren()
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 	thisNode->DetachChildren();
+
+	m_dirty = true;
 }
 
 std::vector<std::shared_ptr<Object>> Object::GetChildren() const
@@ -579,4 +635,29 @@ int32_t Object::GetChildCount() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 	return thisNode->GetChildCount();
+}
+
+bool Object::IsActive() const
+{
+	return m_active;
+}
+
+bool Object::IsVisible() const
+{
+	return m_visible;
+}
+
+void Object::SetActive(bool active)
+{
+	if (m_active != active)
+	{
+		m_dirty = true;
+	}
+
+	m_active = active;
+}
+
+void Object::SetVisible(bool visible)
+{
+	m_visible = visible;
 }

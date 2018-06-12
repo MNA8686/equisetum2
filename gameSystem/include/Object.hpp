@@ -133,6 +133,7 @@ public:
 	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset& GetAsset();
+	bool OnFixedUpdate();
 
 	static std::shared_ptr<Object>& GetObjectByID(NodeID id);
 	std::shared_ptr<Object>& Self();
@@ -151,6 +152,14 @@ public:
 	int32_t GetChildCount() const;
 	const std::list<NodeID>& GetChildrenID() const;
 
+	bool IsActive() const;
+	bool IsVisible() const;
+
+	void SetActive(bool active);
+	void SetVisible(bool visible);
+
+	// スケジュール実行
+	static void Update();
 
 protected:
 
@@ -170,6 +179,9 @@ private:
 
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
+
+	static bool m_dirty;		/// スケジュール配列再構築フラグ
+	static std::vector<NodeID> m_vUpdate;		/// スケジュール配列
 
 public:
 

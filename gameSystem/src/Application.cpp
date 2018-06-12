@@ -67,13 +67,13 @@ int Application::Main()
 			continue;
 		}
 
-		Node<Object>::MakeScheduler();
+//		Node<Object>::MakeScheduler();
 
 		if (!isError)
 		{
 			OnUpdate();
 
-			Node<Object>::ProcScheduler();
+//			Node<Object>::ProcScheduler();
 
 			OnDraw();
 		}
