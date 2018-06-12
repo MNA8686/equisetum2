@@ -474,8 +474,10 @@ void Object::Update()
 
 	for (auto& id : m_vUpdate)
 	{
-		auto& obj = GetObjectByID(id);
-		obj->OnFixedUpdate();
+		if (auto& obj = GetObjectByID(id))
+		{
+			obj->OnFixedUpdate();
+		}
 	}
 }
 
