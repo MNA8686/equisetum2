@@ -450,25 +450,26 @@ void Object::Update()
 		m_vUpdate.clear();
 
 		// ルートノード取得
-		auto& rootNode = Node<Object>::GetNodeByID(0);
-
-		// ルートオブジェクト取得
-		if (auto rootObject = rootNode->GetAttach())
+		if (auto& rootNode = Node<Object>::GetNodeByID(0))
 		{
-			// ノードを辿り、スケジュール配列に追加していく
-			Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
-				auto object = node->GetAttach();		// 追加条件判定
-				if (object && object->IsActive())
-				{
-					// スケジュール配列にノードを追加
-					m_vUpdate.push_back(object->GetNodeID());
-					return true;
-				}
-				return false;
-			});
-		}
+			// ルートオブジェクト取得
+			if (auto rootObject = rootNode->GetAttach())
+			{
+				// ノードを辿り、スケジュール配列に追加していく
+				Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
+					auto object = node->GetAttach();		// 追加条件判定
+					if (object && object->IsActive())
+					{
+						// スケジュール配列にノードを追加
+						m_vUpdate.push_back(object->GetNodeID());
+						return true;
+					}
+					return false;
+				});
 
-		m_dirty = false;
+				m_dirty = false;
+			}
+		}
 	}
 
 	for (auto& id : m_vUpdate)
@@ -705,7 +706,7 @@ std::shared_ptr<Object> Object::Fork()
 			auto p = Script::Create(script->Identify());
 			if (!p)
 			{
-				EQ_THROW(u8"スクリプトのロードに失敗しました。");
+				EQ_THROW(String::Sprintf(u8"スクリプト(%s)のロードに失敗しました。", script->Identify().c_str()));
 			}
 
 			// 所有しているオブジェクトを設定する
@@ -714,7 +715,7 @@ std::shared_ptr<Object> Object::Fork()
 
 			tmpObject->m_asset.m_script.push_back(p);
 
-			Logger::OutputDebug(script->Identify().c_str());
+			Logger::OutputDebug(String::Sprintf(u8"スクリプト(%s)ロード成功。", script->Identify().c_str()).c_str());
 		}
 
 		// スクリプトのOnCreate呼び出し

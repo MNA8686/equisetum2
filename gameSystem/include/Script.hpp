@@ -54,6 +54,9 @@ public:
 	{
 		archive(CEREAL_NVP(m_isStarted));
 		archive(CEREAL_NVP(m_ownerObject));
+
+		std::string& str = m_identify;
+		archive(CEREAL_NVP(str));
 	}
 
 private:
