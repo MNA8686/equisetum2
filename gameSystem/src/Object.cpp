@@ -286,6 +286,17 @@ std::shared_ptr<Object> Object::Create(const String& id)
 	return nullptr;
 }
 
+std::shared_ptr<Object> Object::CreateChild(const String& id)
+{
+	auto childObject = Object::Create(id);
+	if (childObject)
+	{
+		childObject->SetParent(Self());
+	}
+
+	return childObject;
+}
+
 const Point_t<FixedDec>& Object::GetPos() const
 {
 	return m_pos;

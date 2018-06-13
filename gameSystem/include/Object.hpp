@@ -123,6 +123,7 @@ public:
 	virtual ~Object();
 
 	static std::shared_ptr<Object> Create(const String& id);
+	std::shared_ptr<Object> CreateChild(const String & id);
 
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
