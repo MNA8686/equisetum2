@@ -306,21 +306,21 @@ public:
 	// cb‚Åfalse‚ğ•Ô‚·‚Ævisit‚ğI—¹‚·‚é
 	static bool Visit(std::shared_ptr<Node<T>> beginNode, const std::function<bool(std::shared_ptr<Node<T>>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-
-		if (!cb(beginNode, nestDepth))
+		if (!cb)
 		{
 			return false;
 		}
 
-		if (beginNode->GetChildCount() > 0)
+		if (cb(beginNode, nestDepth))
 		{
-			const std::list<NodeID> children = beginNode->GetChildrenID();
-			for (auto& child : children)
+			if (beginNode->GetChildCount() > 0)
 			{
-				if (!Visit(pNodePool->m_vNodeSlot[child], cb, nestDepth + 1))
+				auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+
+				const std::list<NodeID> children = beginNode->GetChildrenID();
+				for (auto& child : children)
 				{
-					return false;
+					Visit(pNodePool->m_vNodeSlot[child], cb, nestDepth + 1);
 				}
 			}
 		}
