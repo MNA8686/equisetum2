@@ -32,6 +32,7 @@ namespace Equisetum2
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
 		bool IsVisible() const;
+		void SetVisible(bool visible);
 
 #if 1
 		template<class Archive>
