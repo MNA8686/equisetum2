@@ -35,6 +35,7 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
+#include <cereal/types/queue.hpp>
 
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"

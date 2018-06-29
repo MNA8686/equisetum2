@@ -31,6 +31,8 @@ namespace Equisetum2
 		Type GetType() const;
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
+		bool IsVisible() const;
+		void SetVisible(bool visible);
 
 #if 1
 		template<class Archive>
@@ -39,6 +41,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_type));
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
+			archive(CEREAL_NVP(m_visible));
 			//archive(CEREAL_NVP(m_renderer));
 		}
 
@@ -48,15 +51,19 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_type));
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
+			archive(CEREAL_NVP(m_visible));
 			//archive(CEREAL_NVP(m_renderer));
 		}
 #endif
 
 	protected:
+		// --- serialize begin ---
 		Type m_type = Type::EMPTY;
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
+		bool m_visible = true;		/// 表示属性
 		std::weak_ptr<Renderer> m_renderer;
+		// --- serialize end ---
 	};
 }
 

@@ -1,37 +1,33 @@
 
 #include "Script.hpp"
 
-#define EQ_SCRIPT_DEFINE(name) { #name, []()->std::shared_ptr<Script> { return std::make_shared<name>(); } }
 
-using funcCreateScript = std::function<std::shared_ptr<Script>()>;
-typedef struct
-{
-	String name;
-	funcCreateScript func;
-}stScriptTbl;
+static std::vector<stScriptTbl> g_scriptTbl;
 
-#if 0
-static const stScriptTbl g_scriptTbl[] =
+void Script::SetScriptTbl(const std::vector<stScriptTbl>& tbl)
 {
-	EQ_SCRIPT_DEFINE(ScriptTest1),
-	EQ_SCRIPT_DEFINE(ScriptTest2),
-	EQ_SCRIPT_DEFINE(ScriptMain),
-};
-#endif
+	g_scriptTbl = tbl;
+}
 
-std::shared_ptr<Script> Script::Create(const String& name)
+std::shared_ptr<Script> Script::Create(const String& id)
 {
-#if 0
 	for (auto& e : g_scriptTbl)
 	{
-		if (e.name == name)
+		if (e.id == id)
 		{
 			return e.func();
 		}
 	}
-#endif
+
 	return nullptr;
 }
+
+std::shared_ptr<Renderer>& Script::GetRenderer(void)
+{
+	return m_renderer;
+}
+
+std::shared_ptr<Renderer> Script::m_renderer;
 
 Script::Script()
 {
@@ -58,7 +54,32 @@ bool Script::FixedUpdate()
 	return true;
 }
 
-bool Script::Render()
+void Script::SetOwner(std::shared_ptr<Object>& ownerObject)
 {
-	return true;
+	m_ownerObject = ownerObject;
+}
+
+bool Script::Start()
+{
+	bool ret = true;
+
+	// スクリプトが開始してない？
+	if (!m_isStarted)
+	{
+		// スクリプトを開始する
+		ret = OnStart();
+		m_isStarted = true;
+	}
+
+	return ret;
+}
+
+void Script::SetIdentify(const String& id)
+{
+	m_identify = id;
+}
+
+String Script::Identify() const
+{
+	return m_identify;
 }

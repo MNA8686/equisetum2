@@ -1,4 +1,5 @@
 #include "Object.hpp"
+#include "Node.hpp"
 #include "Script.hpp"
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
@@ -6,6 +7,10 @@
 #include "cereal/external/rapidjson/error/en.h"
 
 using namespace Equisetum2;
+
+static std::shared_ptr<Object> nullObject;
+bool Object::m_dirty = true;
+std::vector<NodeID> Object::m_vUpdate;
 
 class JsonParseHelper
 {
@@ -52,6 +57,12 @@ rapidjson::Document JsonParseHelper::CreateFromStream(std::shared_ptr<IStream> i
 	return nullptr;
 }
 
+static String MakeNativePath(const String& type, const String& id, const String& ext)
+{
+	// "type/id" の文字列を作る
+	// 入力IDに拡張子が付いていても無視する
+	return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
+}
 
 Object::Object()
 {
@@ -61,23 +72,25 @@ Object::~Object()
 {
 }
 
-std::shared_ptr<Object> Object::Create(const String& name)
+std::shared_ptr<Object> Object::Create(const String& id)
 {
 	EQ_DURING
 	{
-		String id = "subaru.json";		// テスト用
-
 		// インスタンス作成
-		auto tmpNode = std::make_shared<Object>();
-		if (!tmpNode)
+		auto tmpObject = std::make_shared<Object>();
+		if (!tmpObject)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		if (!Node::Init(tmpNode, name))
+		// ノード作成
+		auto tmpNode = Node<Object>::Create(id);
+		if (!tmpNode)
 		{
-			EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			EQ_THROW(u8"ノードの作成に失敗しました。");
 		}
+		// オブジェクトをアタッチ
+		tmpNode->SetAttach(tmpObject);
 
 		/*
 			R"({
@@ -85,13 +98,19 @@ std::shared_ptr<Object> Object::Create(const String& name)
 				"name" : "subaru",
 				"asset" :
 				{
-					"sprite": ["/sprite/subaru.json"],
-					"se" : ["/se/subaru_shot.wav"],
+					"sprite": ["subaru.json"],
+					"se" : ["subaru_shot"],
 					"script" : ["subaru_shot"]
 				}
 			})";
 		*/
-		rapidjson::Document json = JsonParseHelper::CreateFromStream(FileStream::CreateFromPath(id));
+		auto stream = FileStream::CreateFromPath(MakeNativePath("object", id, ".json"));
+		if (!stream)
+		{
+			EQ_THROW(u8"ファイルのオープンに失敗しました。");
+		}
+
+		rapidjson::Document json = JsonParseHelper::CreateFromStream(stream);
 
 		// objectの定義ファイルかどうかチェック
 		{
@@ -109,23 +128,21 @@ std::shared_ptr<Object> Object::Create(const String& name)
 			}
 		}
 
-		// 名前を取得
+		// ID一致チェック
 		{
-			auto& it = json.FindMember("name");
-			if (it == json.MemberEnd() ||
-				!it->value.IsString())
+			// id取得
+			auto& id_ = json.FindMember("id");
+			if (id_ == json.MemberEnd() ||
+				id_->value.GetType() != rapidjson::kStringType)
 			{
-				EQ_THROW(u8"nameが見つかりません。");
+				EQ_THROW(u8"idが見つかりません。");
 			}
 
-			String strName = it->value.GetString();
-			if (strName.empty())
+			// ID一致判定
+			String strID = id_->value.GetString();
+			if (strID != id)
 			{
-				EQ_THROW(u8"nameが設定されていません。");
-			}
-			if (strName != name)
-			{
-//				EQ_THROW(u8"nameが異なります。");
+				EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
 			}
 		}
 
@@ -161,9 +178,9 @@ std::shared_ptr<Object> Object::Create(const String& name)
 							EQ_THROW(u8"spriteのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_sprite.push_back(p);
+						tmpObject->m_asset.m_sprite.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "bgm")
@@ -186,9 +203,9 @@ std::shared_ptr<Object> Object::Create(const String& name)
 							EQ_THROW(u8"bgmのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_bgm.push_back(p);
+						tmpObject->m_asset.m_bgm.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "se")
@@ -211,9 +228,9 @@ std::shared_ptr<Object> Object::Create(const String& name)
 							EQ_THROW(u8"seのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_se.push_back(p);
+						tmpObject->m_asset.m_se.push_back(p);
 
-						Logger::OutputError(v.GetString());
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 				else if (obj.name == "script")
@@ -236,21 +253,29 @@ std::shared_ptr<Object> Object::Create(const String& name)
 							EQ_THROW(u8"スクリプトのロードに失敗しました。");
 						}
 
-						tmpNode->m_asset.m_script.push_back(p);
+						// 所有しているオブジェクトを設定する
+						p->SetOwner(tmpObject);
+						// IDを設定する
+						p->SetIdentify(v.GetString());
 
-						Logger::OutputError(v.GetString());
+						tmpObject->m_asset.m_script.push_back(p);
+
+						Logger::OutputDebug(v.GetString());
 					}
 				}
 			}
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : tmpNode->m_asset.m_script)
+		for (auto& script : tmpObject->m_asset.m_script)
 		{
 			script->OnCreate();
 		}
 
-		return tmpNode;
+		// 再構築フラグセット
+		m_dirty = true;
+
+		return tmpObject;
 	}
 	EQ_HANDLER
 	{
@@ -259,6 +284,17 @@ std::shared_ptr<Object> Object::Create(const String& name)
 	EQ_END_HANDLER
 
 	return nullptr;
+}
+
+std::shared_ptr<Object> Object::CreateChild(const String& id)
+{
+	auto childObject = Object::Create(id);
+	if (childObject)
+	{
+		childObject->SetParent(Self());
+	}
+
+	return childObject;
 }
 
 const Point_t<FixedDec>& Object::GetPos() const
@@ -284,16 +320,17 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 		// ローカル座標更新
 		//-------------------------------------
 		{
+			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
 			// 親に追従する設定 && 親を持っている？
 			if (m_relativeParent &&
-				HasParent())
+				thisNode->HasParent())
 			{
-				// 親ノード取得	
-				std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-				if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+				// 親ノードに関連付けられたObjectを取得	
+				if(auto& parentObject = thisNode->GetParent()->GetAttach())
 				{
 					// 親との相対座標を算出
-					m_localPos = m_pos - p->GetPos();
+					m_localPos = m_pos - parentObject->GetPos();
 				}
 			}
 			else
@@ -313,21 +350,22 @@ void Object::SetPosForChild()
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
 	// よって、子のワールド座標は確実に更新が発生する。
 
-	if (GetChildCount() > 0)
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	if (thisNode->GetChildCount() > 0)
 	{
-		for (auto& child : GetChildrenID())
+		for (auto& child : thisNode->GetChildrenID())
 		{
-			std::shared_ptr<Node>& childNode = GetNodeByID(child);
-			if (auto p = std::dynamic_pointer_cast<Object>(childNode))
+			if (auto& childObject = GetObjectByID(child))
 			{
 				// 子は親に追従する？
-				if (p->GetRelativeParent())
+				if (childObject->GetRelativeParent())
 				{
 					// 子のワールド座標更新
-					p->m_pos = m_pos + p->GetLocalPos();
+					childObject->m_pos = m_pos + childObject->GetLocalPos();
 
 					// ワールド座標が変化したので子に伝搬する
-					p->SetPosForChild();
+					childObject->SetPosForChild();
 				}
 			}
 		}
@@ -351,12 +389,11 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 			if (m_relativeParent &&
 				HasParent())
 			{
-				// 親ノード取得	
-				std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-				if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+				// 親ノードに関連付けられたObjectを取得	
+				if (auto& parentObject = GetParent())
 				{
 					// 親との相対座標からワールド座標を算出
-					m_pos = p->GetPos() + m_localPos;
+					m_pos = parentObject->GetPos() + m_localPos;
 				}
 			}
 			else
@@ -390,12 +427,11 @@ void Object::SetRelativeParent(bool on)
 		if (m_relativeParent &&
 			HasParent())
 		{
-			// 親ノード取得	
-			std::shared_ptr<Node>& parentNode = GetNodeByID(GetParentID());
-			if (auto p = std::dynamic_pointer_cast<Object>(parentNode))
+			// 親ノードに関連付けられたObjectを取得	
+			if (auto& parentObject = GetParent())
 			{
 				// 親との相対座標を算出
-				m_localPos = m_pos - p->GetPos();
+				m_localPos = m_pos - parentObject->GetPos();
 			}
 		}
 		else
@@ -404,4 +440,313 @@ void Object::SetRelativeParent(bool on)
 			m_localPos = m_pos;
 		}
 	}
+}
+
+bool Object::OnFixedUpdate()
+{
+	auto& vScript = m_asset.m_script;
+	for (auto& script : vScript)
+	{
+		script->FixedUpdate();
+	}
+
+	return true;
+}
+
+void Object::Update()
+{
+	if (m_dirty)
+	{
+		// スケジュール配列をクリア
+		m_vUpdate.clear();
+
+		// ルートノード取得
+		if (auto& rootNode = Node<Object>::GetNodeByID(0))
+		{
+			// ルートオブジェクト取得
+			if (auto rootObject = rootNode->GetAttach())
+			{
+				// ノードを辿り、スケジュール配列に追加していく
+				Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
+					auto object = node->GetAttach();		// 追加条件判定
+					if (object && object->IsActive())
+					{
+						// スケジュール配列にノードを追加
+						m_vUpdate.push_back(object->GetNodeID());
+						return true;
+					}
+					return false;
+				});
+
+				m_dirty = false;
+			}
+		}
+	}
+
+	for (auto& id : m_vUpdate)
+	{
+		if (auto& obj = GetObjectByID(id))
+		{
+			obj->OnFixedUpdate();
+		}
+	}
+}
+
+void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+{
+	m_vRenderObject.push_back(renderObject);
+}
+
+bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	Node<Object>::Visit(thisNode, [this, &renderer](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
+		auto& obj = node->GetAttach();
+
+		// アクティブかつ表示状態でなければこの先のノードは処理しない
+		if (!obj->m_active || !obj->m_visible)
+		{
+			return false;
+		}
+
+		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+		for (auto& renderObject : obj->m_vRenderObject)
+		{
+			if (renderObject->IsVisible())
+			{
+				renderer->AddRenderQueue(renderObject.get());
+			}
+		}
+
+		return true;
+	});
+
+	return true;
+}
+
+stAsset& Object::GetAsset()
+{
+	return m_asset;
+}
+
+void Object::SetNodeID(NodeID id)
+{
+	m_nodeID = id;
+}
+
+NodeID Object::GetNodeID() const
+{
+	return m_nodeID;
+}
+
+std::shared_ptr<Object>& Object::GetObjectByID(NodeID id)
+{
+	if (auto& node = Node<Object>::GetNodeByID(id))
+	{
+		return node->GetAttach();
+	}
+
+	return nullObject;
+}
+
+std::shared_ptr<Object>& Object::Self()
+{
+	return GetObjectByID(m_nodeID);
+}
+
+bool Object::HasParent() const
+{
+	return Node<Object>::GetNodeByID(m_nodeID)->HasParent();
+}
+
+std::shared_ptr<Object>& Object::GetParent()
+{
+	if (auto parentNode = Node<Object>::GetNodeByID(m_nodeID)->GetParent())
+	{
+		return parentNode->GetAttach();
+	}
+
+	return nullObject;
+}
+
+void Object::Destroy()
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	if (!thisNode->IsDestroyed())
+	{
+		thisNode->Destroy();
+
+		// 再構築フラグセット
+		m_dirty = true;
+	}
+}
+
+bool Object::IsDestroyed() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	return thisNode->IsDestroyed();
+}
+
+void Object::SetParent(std::shared_ptr<Object>& newParent)
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
+
+	thisNode->SetParent(newParentNode);
+
+	m_dirty = true;
+}
+
+std::shared_ptr<Object>& Object::GetParent() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	if (auto& parentObject = thisNode->GetParent())
+	{
+		return parentObject->GetAttach();
+	}
+
+	return nullObject;
+}
+
+void Object::DetachChildren()
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	thisNode->DetachChildren();
+
+	m_dirty = true;
+}
+
+std::vector<std::shared_ptr<Object>> Object::GetChildren() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+	std::vector<std::shared_ptr<Object>> vChildren;
+	vChildren.reserve(thisNode->GetChildCount());
+
+	for (auto& nodeID : thisNode->GetChildrenID())
+	{
+		auto& childNode = Node<Object>::GetNodeByID(nodeID);
+
+		if (childNode &&
+			!childNode->IsDestroyed() &&
+			childNode->GetAttach())
+		{
+			vChildren.push_back(childNode->GetAttach());
+		}
+	}
+
+	return vChildren;
+}
+
+const std::list<NodeID>& Object::GetChildrenID() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	return thisNode->GetChildrenID();
+}
+
+int32_t Object::GetChildCount() const
+{
+	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	return thisNode->GetChildCount();
+}
+
+bool Object::IsActive() const
+{
+	return m_active;
+}
+
+bool Object::IsVisible() const
+{
+	return m_visible;
+}
+
+void Object::SetActive(bool active)
+{
+	if (m_active != active)
+	{
+		m_dirty = true;
+	}
+
+	m_active = active;
+}
+
+void Object::SetVisible(bool visible)
+{
+	m_visible = visible;
+}
+
+std::shared_ptr<Object> Object::Fork()
+{
+	EQ_DURING
+	{
+		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+
+		// インスタンス作成
+		auto tmpObject = std::make_shared<Object>();
+		if (!tmpObject)
+		{
+			EQ_THROW(u8"インスタンスの作成に失敗しました。");
+		}
+
+		// ノード作成
+		auto tmpNode = Node<Object>::Create(thisNode->GetName());
+		if (!tmpNode)
+		{
+			EQ_THROW(u8"ノードの作成に失敗しました。");
+		}
+		// オブジェクトをアタッチ
+		tmpNode->SetAttach(tmpObject);
+
+		tmpObject->m_asset.m_bgm = m_asset.m_bgm;			/// アセット管理構造体
+		tmpObject->m_asset.m_se = m_asset.m_se;				/// アセット管理構造体
+		tmpObject->m_asset.m_sprite = m_asset.m_sprite;		/// アセット管理構造体
+//		std::vector<std::shared_ptr<RenderObject>> m_vRenderObject;	/// レンダーオブジェクト配列
+		tmpObject->m_pos = m_pos;		/// ワールド座標
+		tmpObject->m_localPos = m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
+		tmpObject->m_relativeParent = m_relativeParent;	/// 親の座標に追従するかどうか
+										//	int32_t m_angle = 0;
+		tmpObject->m_active = m_active;			/// falseの場合、スクリプトなどが呼び出されない
+		tmpObject->m_visible = m_visible;			/// falseの場合、レンダリング対象とならない
+
+		tmpObject->SetParent(GetParent());
+
+		// スクリプトを取得
+		for (auto& script : m_asset.m_script)
+		{
+			auto p = Script::Create(script->Identify());
+			if (!p)
+			{
+				EQ_THROW(String::Sprintf(u8"スクリプト(%s)のロードに失敗しました。", script->Identify().c_str()));
+			}
+
+			// 所有しているオブジェクトを設定する
+			p->SetOwner(tmpObject);
+			p->SetIdentify(script->Identify());
+
+			tmpObject->m_asset.m_script.push_back(p);
+
+			Logger::OutputDebug(String::Sprintf(u8"スクリプト(%s)ロード成功。", script->Identify().c_str()).c_str());
+		}
+
+		// スクリプトのOnCreate呼び出し
+		for (auto& script : tmpObject->m_asset.m_script)
+		{
+			script->OnCreate();
+		}
+
+		// 再構築フラグセット
+		m_dirty = true;
+
+		return tmpObject;
+	}
+	EQ_HANDLER
+	{
+		Logger::OutputError(EQ_GET_HANDLER().what());
+	}
+	EQ_END_HANDLER
+
+	return nullptr;
 }

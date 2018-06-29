@@ -2,6 +2,7 @@
 #include "Application.hpp"
 
 #include "Object.hpp"
+#include "Node.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
@@ -66,15 +67,20 @@ int Application::Main()
 			continue;
 		}
 
+//		Node<Object>::MakeScheduler();
+
 		if (!isError)
 		{
 			OnUpdate();
-			OnDraw(m_renderer);
+
+//			Node<Object>::ProcScheduler();
+
+			OnDraw();
 		}
 
 		m_renderer->Present();
 
-		Node::GC();
+		Node<Object>::GC();
 
 		// ‹K’èŽžŠÔ‘Ò‚¿
 		while (true)
@@ -99,7 +105,7 @@ int Application::Main()
 
 	OnQuit();
 
-	Object::DestroyThemAll();
+	Node<Object>::DestroyThemAll();
 
 	return 0;
 }

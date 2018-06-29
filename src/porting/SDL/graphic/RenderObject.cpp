@@ -28,6 +28,16 @@ namespace Equisetum2
 		return m_orderInLayer;
 	}
 
+	bool RenderObject::IsVisible() const
+	{
+		return m_visible;
+	}
+
+	void RenderObject::SetVisible(bool visible)
+	{
+		m_visible = visible;
+	}
+
 	void SpriteRenderer::InitTest()
 	{
 		m_pImpl = std::make_shared<SpriteRenderer::Impl>();
@@ -67,7 +77,10 @@ namespace Equisetum2
 
 	SpriteRenderer& SpriteRenderer::SetSprite(const std::shared_ptr<Sprite>& sprite)
 	{
-		m_sprite = sprite;
+		if (m_sprite != sprite)
+		{
+			m_sprite = sprite;
+		}
 		m_atlasNum = 0;
 
 		m_dirtyTexCoords = true;
