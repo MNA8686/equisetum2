@@ -17,6 +17,8 @@
 #include "util/AssetManager.hpp"
 #endif
 
+#include "math/Math.hpp"
+
 #include "system/Exception.hpp"
 #include "system/Logger.h"
 #include "system/Argument.hpp"

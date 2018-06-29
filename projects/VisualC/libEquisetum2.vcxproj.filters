@@ -97,6 +97,12 @@
     <Filter Include="ソース ファイル\compat&amp;porting\audio">
       <UniqueIdentifier>{0467d776-d1d8-4e7f-9e1a-770237f2b0bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\math">
+      <UniqueIdentifier>{5d982135-e3d4-4bb5-8eaa-3501b1270082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\math">
+      <UniqueIdentifier>{219ca437-552b-481f-93ec-af6ba69fe309}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -309,6 +315,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\math\Math.hpp">
+      <Filter>ヘッダー ファイル\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -451,6 +460,9 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\math\Math.cpp">
+      <Filter>ソース ファイル\common\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
