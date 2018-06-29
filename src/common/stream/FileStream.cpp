@@ -98,6 +98,11 @@ namespace Equisetum2
 		return inst;
 	}
 
+	std::shared_ptr<FileStream> FileStream::NewFileFromPath(const String& strPath)
+	{
+		return CreateFromPath(strPath, Method::Create | Method::Write);
+	}
+
 	FileStream::FileStream()
 	{
 	}

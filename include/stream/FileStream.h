@@ -29,6 +29,7 @@ namespace Equisetum2
 
 		// ファクトリー
 		static std::shared_ptr<FileStream> CreateFromPath(const String& strPath, int openMethod = Method::Read);
+		static std::shared_ptr<FileStream> NewFileFromPath(const String& strPath);
 
 		virtual bool CanRead() const override;
 		virtual bool CanSeek() const override;
