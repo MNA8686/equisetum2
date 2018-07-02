@@ -54,6 +54,7 @@ int Application::Main()
 			full = !full;
 		}
 
+#if 0
 		// É|Å[ÉYêÿÇËë÷Ç¶
 		if (KB::KeyP.IsDown())
 		{
@@ -66,14 +67,12 @@ int Application::Main()
 			System::Sleep(1);
 			continue;
 		}
-
-//		Node<Object>::MakeScheduler();
+#endif
 
 		if (!isError)
 		{
 			OnUpdate();
 
-//			Node<Object>::ProcScheduler();
 
 			OnDraw();
 		}
