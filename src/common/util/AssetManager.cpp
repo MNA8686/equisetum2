@@ -46,6 +46,17 @@ namespace Equisetum2
 			}
 
 			imageIn->SetIdentify(id);
+			
+			auto data = imageIn->Data();
+			for (int i = 0; i < imageIn->Width() * imageIn->Height(); i++)
+			{
+				if (data[i].rgba8888.r == 0 &&
+					data[i].rgba8888.g == 0xff &&
+					data[i].rgba8888.b == 0)
+				{
+					data[i].rgba8888.a = 0;
+				}
+			}
 
 			return imageIn;
 		}
