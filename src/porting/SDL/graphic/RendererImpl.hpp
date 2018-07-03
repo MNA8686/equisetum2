@@ -41,6 +41,13 @@ namespace Equisetum2
 		GLubyte colors[4];
 	}stVertex;
 
+	// 頂点定義
+	typedef struct
+	{
+		GLfloat vertices[2];
+		GLubyte colors[4];
+	}stVertexSolid;
+
 	class Renderer::Impl final
 	{
 	public:
@@ -67,6 +74,23 @@ namespace Equisetum2
 			size_t m_filledIndexNum = 0;
 		}SpriteContext;
 		SpriteContext m_spriteContext;
+
+		typedef struct
+		{
+			// VBO
+			GLuint m_VBO[2] = {};
+
+			// 頂点配列
+			static const int VBO_SIZE = 8192;
+			stVertexSolid m_vertex[VBO_SIZE] = {};
+			size_t m_filledVertexNum = 0;
+
+			// インデックス配列
+			static const int INDEX_VBO_SIZE = VBO_SIZE;
+			GLushort m_index[INDEX_VBO_SIZE] = {};
+			size_t m_filledIndexNum = 0;
+		}LineContext;
+		LineContext m_lineContext;
 
 	private:
 

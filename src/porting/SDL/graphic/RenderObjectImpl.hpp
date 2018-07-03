@@ -41,6 +41,40 @@ namespace Equisetum2
 		stVertex m_vertex[4] = {};		/// 頂点配列
 		GLushort m_index[6] = { 0, 1, 2, 1, 2, 3 };		/// インデックス配列
 	};
+
+	class LineRenderer::Impl final
+	{
+	public:
+
+#if 0
+		inline const stVertex* GetVertex() const
+		{
+			return m_vertex;
+		}
+
+		inline const GLushort* GetIndex() const
+		{
+			return m_index;
+		}
+
+		inline size_t GetVertexCount() const
+		{
+			return sizeof(m_vertex) / sizeof(m_vertex[0]);
+		}
+
+		inline size_t GetIndexCount() const
+		{
+			return sizeof(m_index) / sizeof(m_index[0]);
+		}
+#endif
+
+	private:
+
+		friend class LineRenderer;
+
+//		stVertex m_vertex[4] = {};		/// 頂点配列
+//		GLushort m_index[6] = { 0, 1, 2, 1, 2, 3 };		/// インデックス配列
+	};
 }
 
 #endif

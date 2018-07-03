@@ -309,5 +309,42 @@ namespace Equisetum2
 
 		return true;
 	}
+
+	void LineRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<LineRenderer::Impl>();
+	}
+
+	std::shared_ptr<LineRenderer> LineRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	{
+		EQ_DURING
+		{
+			// インスタンス作成
+			auto inst = std::make_shared<LineRenderer>();
+			if (!inst)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			// レンダラを保持
+			inst->m_renderer = renderer;
+
+			// インスタンス初期化
+			inst->m_pImpl = std::make_shared<LineRenderer::Impl>();
+			if (!inst->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			}
+
+			return inst;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
 }
 

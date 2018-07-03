@@ -99,7 +99,6 @@ namespace Equisetum2
 		template<class Archive>
 		void save(Archive & archive) const 
 		{
-#if 1
 			archive(cereal::base_class<RenderObject>(this));
 
 			std::string spriteId = m_sprite->Identify();
@@ -113,13 +112,11 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
-#endif
 		}
 
 		template<class Archive>
 		void load(Archive & archive)
 		{
-#if 1
 			archive(cereal::base_class<RenderObject>(this));
 			InitTest();
 
@@ -135,7 +132,6 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
-#endif
 		}
 
 	private:
@@ -166,5 +162,82 @@ namespace Equisetum2
 #include <cereal/types/polymorphic.hpp>
 CEREAL_REGISTER_TYPE(Equisetum2::SpriteRenderer);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::SpriteRenderer)
+
+namespace Equisetum2
+{
+	class LineRenderer : public RenderObject
+	{
+	public:
+		LineRenderer() { m_type = Type::LINE; }
+		virtual ~LineRenderer() {}
+
+#if 0
+		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
+		SpriteRenderer& SetAtlasNum(int atlasNum);
+
+		SpriteRenderer& SetPos(Point pos);
+
+		SpriteRenderer& SetScale(float x, float y);
+		SpriteRenderer& SetScaleX(float x);
+		SpriteRenderer& SetScaleY(float y);
+		SpriteRenderer& SetColor(Color color);
+		SpriteRenderer& SetAngle(float angle);
+
+		SpriteRenderer& SetFlipX(bool isFlip);
+		SpriteRenderer& SetFlipY(bool isFlip);
+
+		SpriteRenderer& SetLayer(int layer);
+		SpriteRenderer& SetOrderInLayer(int32_t orderInLayer);
+
+		SpriteRenderer& SetBlendMode(BlendMode blend);
+
+		bool Calculation();
+#endif
+
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(cereal::base_class<RenderObject>(this));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			archive(cereal::base_class<RenderObject>(this));
+			InitTest();
+		}
+
+	private:
+		friend class Renderer;
+		static std::shared_ptr<LineRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		void InitTest();
+
+#if 0
+		//
+		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
+		int m_atlasNum = 0;		/// 表示パターン番号
+		Point m_pos;			/// 表示位置
+		SizeF m_scale{ 1.f, 1.f };	/// 表示倍率
+		Color m_color = Sprite::ZERO;	/// 表示色
+		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+		bool m_flipX = false;	/// X方向反転
+		bool m_flipY = false;	/// Y方向反転
+		float m_angle = 0;		/// 回転角度
+#endif
+
+//		float m_angleRad = 0;
+//		bool m_dirtyTexCoords = true;
+//		bool m_dirtyColor = true;
+
+		Color m_color = Sprite::ZERO;	/// 表示色
+
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
+	};
+}
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::LineRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::LineRenderer)
 
 #endif

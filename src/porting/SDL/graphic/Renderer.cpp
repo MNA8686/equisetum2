@@ -58,6 +58,40 @@ namespace Equisetum2
 		}
 	)";
 
+	static const char *vertexShaderSolidSrc = R"(#version 120
+		#define IN         in
+		#define OUT        varying
+		#define LOWP
+		#define MEDIUMP
+		#define HIGHP
+		
+		IN HIGHP   vec2 aVertex;
+		uniform mat4 u_projection;
+		attribute vec4 a_color;
+		varying vec4 v_color;
+		
+		void main(void)
+		{
+			v_color = a_color;
+			// 表示座標
+			gl_Position = u_projection * vec4(aVertex, 0, 1.0);
+		}
+	)";
+
+	static const char *fragmentShaderSolidSrc = R"(#version 120
+		#define IN         in
+		#define LOWP
+		#define MEDIUMP
+		#define HIGHP
+		
+		varying vec4 v_color;
+		
+		void main(void)
+		{
+			gl_FragColor = v_color;
+		}
+	)";
+
 	// シェーダ定義構造体
 	typedef struct
 	{
@@ -73,6 +107,11 @@ namespace Equisetum2
 			Type::SPRITE,
 			vertexShaderSrc,
 			fragmentShaderSrc
+		},
+		{
+			Type::LINE,
+			vertexShaderSolidSrc,
+			fragmentShaderSolidSrc
 		},
 	};
 
@@ -161,6 +200,8 @@ namespace Equisetum2
 
 			// 1:VSYNCを待つ 0:VSYNCを待たない
 			SDL_GL_SetSwapInterval(1);
+
+//			inst->m_pImpl->SelectProgram(Type::LINE);
 
 			return inst;
 		}
@@ -524,6 +565,10 @@ namespace Equisetum2
 				glBindAttribLocation(newProgram, 1, "a_texCoord");
 				glBindAttribLocation(newProgram, 2, "a_color");
 				break;
+			case Type::LINE:
+				glBindAttribLocation(newProgram, 0, "aVertex");
+				glBindAttribLocation(newProgram, 1, "a_color");
+				break;
 			}
 
 			GLint linkSuccessful;
@@ -563,6 +608,37 @@ namespace Equisetum2
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_spriteContext.m_VBO[1]);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_spriteContext.m_index[0]) * m_spriteContext.INDEX_VBO_SIZE, m_spriteContext.m_index, GL_STATIC_DRAW);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					// GLエラーチェック
+				}
+				break;
+			case Type::LINE:
+				{
+					auto proj = glGetUniformLocation(newProgram, "u_projection");
+
+					glUseProgram(newProgram);
+
+					//-----------------------------------
+					// uniform設定
+					//-----------------------------------
+					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
+
+					//-----------------------------------
+					// VBO作成
+					//-----------------------------------
+					glGenBuffers(2, m_lineContext.m_VBO);
+
+					glBindBuffer(GL_ARRAY_BUFFER, m_lineContext.m_VBO[0]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(m_lineContext.m_vertex[0]) * m_lineContext.VBO_SIZE, m_lineContext.m_vertex, GL_DYNAMIC_DRAW);
+
+					glEnableVertexAttribArray(0);
+					glEnableVertexAttribArray(1);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineContext.m_VBO[1]);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_lineContext.m_index[0]) * m_lineContext.INDEX_VBO_SIZE, m_lineContext.m_index, GL_STATIC_DRAW);
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
