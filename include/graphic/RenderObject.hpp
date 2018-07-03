@@ -78,12 +78,12 @@ namespace Equisetum2
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
 		SpriteRenderer& SetAtlasNum(int atlasNum);
 		
-		SpriteRenderer& SetPos(Point pos);
+		SpriteRenderer& SetPos(const Point& pos);
 
 		SpriteRenderer& SetScale(float x, float y);
 		SpriteRenderer& SetScaleX(float x);
 		SpriteRenderer& SetScaleY(float y);
-		SpriteRenderer& SetColor(Color color);
+		SpriteRenderer& SetColor(const Color& color);
 		SpriteRenderer& SetAngle(float angle);
 
 		SpriteRenderer& SetFlipX(bool isFlip);

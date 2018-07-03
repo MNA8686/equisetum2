@@ -95,7 +95,7 @@ namespace Equisetum2
 		return *this;
 	}
 
-	SpriteRenderer& SpriteRenderer::SetPos(Point pos)
+	SpriteRenderer& SpriteRenderer::SetPos(const Point& pos)
 	{
 		m_pos = pos;
 		return *this;
@@ -120,7 +120,7 @@ namespace Equisetum2
 		return *this;
 	}
 
-	SpriteRenderer& SpriteRenderer::SetColor(Color color)
+	SpriteRenderer& SpriteRenderer::SetColor(const Color& color)
 	{
 		m_color = color;
 
