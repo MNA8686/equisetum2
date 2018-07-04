@@ -214,4 +214,56 @@ namespace Equisetum2
 CEREAL_REGISTER_TYPE(Equisetum2::LineRenderer);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::LineRenderer)
 
+namespace Equisetum2
+{
+	class CircleRenderer : public RenderObject
+	{
+	public:
+		CircleRenderer() { m_type = Type::CIRCLE; }
+		virtual ~CircleRenderer() {}
+
+		CircleRenderer& SetCircle(const Point& centerPos, int32_t radius, bool solid=true);
+
+		CircleRenderer& SetColor(const Color& color);
+
+		CircleRenderer& SetLayer(int layer);
+		CircleRenderer& SetOrderInLayer(int32_t orderInLayer);
+
+		CircleRenderer& SetBlendMode(BlendMode blend);
+
+		bool Calculation();
+
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(cereal::base_class<RenderObject>(this));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			archive(cereal::base_class<RenderObject>(this));
+			InitTest();
+		}
+
+	private:
+		friend class Renderer;
+		static std::shared_ptr<CircleRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		void InitTest();
+
+		Point m_pos{};			/// 表示位置
+//		Size m_size{};
+		int32_t m_radius = 0;		/// 半径
+		Color m_color = Sprite::ZERO;	/// 表示色
+		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
+	};
+}
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::CircleRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::CircleRenderer)
+
 #endif

@@ -92,6 +92,23 @@ namespace Equisetum2
 		}LineContext;
 		LineContext m_lineContext;
 
+		typedef struct
+		{
+			// VBO
+			GLuint m_VBO[2] = {};
+
+			// 頂点配列
+			static const int VBO_SIZE = 512;
+			stVertexSolid m_vertex[VBO_SIZE] = {};
+			size_t m_filledVertexNum = 0;
+
+			// インデックス配列
+			static const int INDEX_VBO_SIZE = VBO_SIZE;
+			GLushort m_index[INDEX_VBO_SIZE] = {};
+			size_t m_filledIndexNum = 0;
+		}CircleContext;
+		CircleContext m_circleContext;
+
 	private:
 
 		// プロジェクションマトリックス

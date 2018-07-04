@@ -114,6 +114,11 @@ namespace Equisetum2
 			vertexShaderSolidSrc,
 			fragmentShaderSolidSrc
 		},
+		{
+			Type::CIRCLE,
+			vertexShaderSolidSrc,
+			fragmentShaderSolidSrc
+		},
 	};
 
 	static std::shared_ptr<SDL_GLContext> CreateGLContext(SDL_Window* pWindow)
@@ -202,8 +207,6 @@ namespace Equisetum2
 			// 1:VSYNCを待つ 0:VSYNCを待たない
 			SDL_GL_SetSwapInterval(1);
 
-//			inst->m_pImpl->SelectProgram(Type::LINE);
-
 			return inst;
 		}
 		EQ_HANDLER
@@ -267,6 +270,7 @@ namespace Equisetum2
 		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
 		auto& spriteContext = m_pImpl->m_spriteContext;
 		auto& lineContext = m_pImpl->m_lineContext;
+		auto& circleContext = m_pImpl->m_circleContext;
 
 		gDrawCallCount = 0;
 
@@ -284,6 +288,8 @@ namespace Equisetum2
 		spriteContext.m_filledIndexNum = 0;
 		lineContext.m_filledVertexNum = 0;
 		lineContext.m_filledIndexNum = 0;
+		circleContext.m_filledVertexNum = 0;
+		circleContext.m_filledIndexNum = 0;
 
 		for (auto& layer : m_vRenderObject)
 		{
@@ -368,6 +374,49 @@ namespace Equisetum2
 						lineContext.m_filledVertexNum += vertexCount;
 						lineContext.m_filledIndexNum += indexCount;
 					}
+				}
+				else if (renderObject->GetType() == Type::CIRCLE)
+				{
+					auto circleRenderer = static_cast<CircleRenderer*>(renderObject);
+
+					// このスプライトの頂点数
+					auto vertexCount = circleRenderer->m_pImpl->GetVertexCount();
+					auto blendMode = circleRenderer->m_blend;
+
+#if 1
+					if (vertexCount > 0)
+					{
+						// 描画を行う
+						DrawCall();
+
+						// ステートを更新
+						m_currentStates.type = Type::CIRCLE;
+						m_currentStates.blend = blendMode;
+
+						// 頂点配列を埋める
+						auto vertex = circleRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+						memcpy(&circleContext.m_vertex[circleContext.m_filledVertexNum], vertex, sizeof(stVertexSolid) * vertexCount);
+
+						// インデックス配列を埋める
+						auto index = circleRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+						auto indexCount = circleRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+						for (decltype(indexCount) i = 0; i < indexCount; i++)
+						{
+							// 頂点の番号を変換しながらコピーする
+							circleContext.m_index[circleContext.m_filledIndexNum + i] = static_cast<GLushort>(circleContext.m_filledVertexNum + index[i]);
+						}
+
+#if 1
+						circleContext.m_filledVertexNum += vertexCount;
+						circleContext.m_filledIndexNum += indexCount;
+#endif
+
+						// 描画を行う
+						DrawCall();
+
+						m_currentStates.type = Type::EMPTY;
+					}
+#endif
 				}
 			}
 		}
@@ -486,6 +535,54 @@ namespace Equisetum2
 			ctx.m_filledVertexNum = 0;
 			ctx.m_filledIndexNum = 0;
 		}
+		else if (m_currentStates.type == Type::CIRCLE)
+		{
+			auto& ctx = m_pImpl->m_circleContext;
+
+			if (m_pImpl->SelectProgram(Type::CIRCLE))
+			{
+				glDisable(GL_DEPTH_TEST);
+
+				switch (m_currentStates.blend)
+				{
+				case BlendMode::None:
+					glDisable(GL_BLEND);
+					break;
+
+				case BlendMode::Blend:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+
+				case BlendMode::Add:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					break;
+				}
+
+				glDisable(GL_CULL_FACE);
+
+				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(ctx.m_vertex[0]) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ctx.m_index[0]) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
+
+				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
+				glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
+
+				glDrawArrays(GL_TRIANGLE_FAN, 0, (GLsizei)ctx.m_filledIndexNum);
+//				glDrawArrays(GL_LINE_STRIP/*GL_TRIANGLE_FAN*/, 0, (GLsizei)ctx.m_filledIndexNum);
+
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+				gDrawCallCount++;
+			}
+
+			ctx.m_filledVertexNum = 0;
+			ctx.m_filledIndexNum = 0;
+		}
 
 		return true;
 	}
@@ -501,6 +598,9 @@ namespace Equisetum2
 			break;
 		case Type::LINE:
 			obj = LineRenderer::Create(shared_from_this());
+			break;
+		case Type::CIRCLE:
+			obj = CircleRenderer::Create(shared_from_this());
 			break;
 		}
 
@@ -655,6 +755,7 @@ namespace Equisetum2
 			newProgramCache->m_programID = newProgram;
 			newProgramCache->m_vertexCache = vertexShader;
 			newProgramCache->m_fragmentCache = fragmentShader;
+			newProgramCache->m_type = type;
 
 			// シェーダをアタッチ
 			glAttachShader(newProgram, vertexShader->m_id);
@@ -668,6 +769,10 @@ namespace Equisetum2
 				glBindAttribLocation(newProgram, 2, "a_color");
 				break;
 			case Type::LINE:
+				glBindAttribLocation(newProgram, 0, "aVertex");
+				glBindAttribLocation(newProgram, 1, "a_color");
+				break;
+			case Type::CIRCLE:
 				glBindAttribLocation(newProgram, 0, "aVertex");
 				glBindAttribLocation(newProgram, 1, "a_color");
 				break;
@@ -717,6 +822,7 @@ namespace Equisetum2
 					// GLエラーチェック
 				}
 				break;
+
 			case Type::LINE:
 				{
 					auto proj = glGetUniformLocation(newProgram, "u_projection");
@@ -741,6 +847,38 @@ namespace Equisetum2
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineContext.m_VBO[1]);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_lineContext.m_index[0]) * m_lineContext.INDEX_VBO_SIZE, m_lineContext.m_index, GL_STATIC_DRAW);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					// GLエラーチェック
+				}
+				break;
+
+			case Type::CIRCLE:
+				{
+					auto proj = glGetUniformLocation(newProgram, "u_projection");
+
+					glUseProgram(newProgram);
+
+					//-----------------------------------
+					// uniform設定
+					//-----------------------------------
+					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
+
+					//-----------------------------------
+					// VBO作成
+					//-----------------------------------
+					glGenBuffers(2, m_circleContext.m_VBO);
+
+					glBindBuffer(GL_ARRAY_BUFFER, m_circleContext.m_VBO[0]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(m_circleContext.m_vertex[0]) * m_circleContext.VBO_SIZE, m_circleContext.m_vertex, GL_DYNAMIC_DRAW);
+
+					glEnableVertexAttribArray(0);
+					glEnableVertexAttribArray(1);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_circleContext.m_VBO[1]);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_circleContext.m_index[0]) * m_circleContext.INDEX_VBO_SIZE, m_circleContext.m_index, GL_STATIC_DRAW);
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);

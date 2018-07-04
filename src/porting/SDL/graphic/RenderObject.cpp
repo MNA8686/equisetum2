@@ -66,13 +66,13 @@ namespace Equisetum2
 
 			return inst;
 		}
-			EQ_HANDLER
+		EQ_HANDLER
 		{
 			Logger::OutputError(EQ_GET_HANDLER().what());
 		}
-			EQ_END_HANDLER
+		EQ_END_HANDLER
 
-			return nullptr;
+		return nullptr;
 	}
 
 	SpriteRenderer& SpriteRenderer::SetSprite(const std::shared_ptr<Sprite>& sprite)
@@ -338,13 +338,13 @@ namespace Equisetum2
 
 			return inst;
 		}
-			EQ_HANDLER
+		EQ_HANDLER
 		{
 			Logger::OutputError(EQ_GET_HANDLER().what());
 		}
-			EQ_END_HANDLER
+		EQ_END_HANDLER
 
-			return nullptr;
+		return nullptr;
 	}
 
 	LineRenderer& LineRenderer::Clear()
@@ -390,6 +390,7 @@ namespace Equisetum2
 		auto& index = m_pImpl->m_index;
 
 		vert.clear();
+		index.clear();
 
 		const uint32_t color = m_color.pixel;
 		for (size_t i = 0; i < m_vPos.size(); i += 2)
@@ -412,6 +413,123 @@ namespace Equisetum2
 
 			vert.push_back(endLine);
 			index.push_back(static_cast<GLushort>(i+1));
+		}
+
+		return true;
+	}
+
+
+
+	void CircleRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<CircleRenderer::Impl>();
+	}
+
+	std::shared_ptr<CircleRenderer> CircleRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	{
+		EQ_DURING
+		{
+			// インスタンス作成
+			auto inst = std::make_shared<CircleRenderer>();
+			if (!inst)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			// レンダラを保持
+			inst->m_renderer = renderer;
+
+			// インスタンス初期化
+			inst->m_pImpl = std::make_shared<CircleRenderer::Impl>();
+			if (!inst->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			}
+
+			return inst;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	CircleRenderer& CircleRenderer::SetCircle(const Point& centerPos, int32_t radius, bool solid)
+	{
+		m_pos = centerPos;
+		//m_size = size;
+		m_radius = radius;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetColor(const Color& color)
+	{
+		m_color = color;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetLayer(int layer)
+	{
+		m_layer = layer;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetOrderInLayer(int32_t orderInLayer)
+	{
+		m_orderInLayer = orderInLayer;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetBlendMode(BlendMode blend)
+	{
+		m_blend = blend;
+		return *this;
+	}
+
+	bool CircleRenderer::Calculation()
+	{
+		auto& vert = m_pImpl->m_vertex;
+		auto& index = m_pImpl->m_index;
+		const int32_t segments = 32;
+		const float coef = 2.0f * 3.14159265358979323846f / segments;
+
+		vert.clear();
+		index.clear();
+
+		const uint32_t color = m_color.pixel;
+		for (int32_t i = 0; i <= segments; i++)
+		{
+			stVertexSolid newVertex;
+			float rads = i * coef;
+
+			newVertex.vertices[0] = m_radius * cosf(rads) + m_pos.x;
+			newVertex.vertices[1] = m_radius * sinf(rads) + m_pos.y;
+
+			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
+			*vertexColor = color;
+
+			vert.push_back(newVertex);
+
+			index.push_back(static_cast<GLushort>(i));
+		}
+
+		// 最後の頂点
+		if(0)
+		{
+			stVertexSolid newVertex;
+
+			newVertex.vertices[0] = m_pos.x;
+			newVertex.vertices[1] = m_pos.y;
+
+			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
+			*vertexColor = color;
+
+			vert.push_back(newVertex);
+
+			index.push_back(static_cast<GLushort>(segments + 1));
 		}
 
 		return true;

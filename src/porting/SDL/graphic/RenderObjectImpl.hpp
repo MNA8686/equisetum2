@@ -73,6 +73,38 @@ namespace Equisetum2
 		std::vector<stVertexSolid> m_vertex;		/// 頂点配列
 		std::vector<GLushort> m_index;				/// インデックス配列
 	};
+
+	class CircleRenderer::Impl final
+	{
+	public:
+
+		inline const stVertexSolid* GetVertex() const
+		{
+			return m_vertex.data();
+		}
+
+		inline const GLushort* GetIndex() const
+		{
+			return m_index.data();
+		}
+
+		inline size_t GetVertexCount() const
+		{
+			return m_vertex.size();
+		}
+
+		inline size_t GetIndexCount() const
+		{
+			return m_index.size();
+		}
+
+	private:
+
+		friend class CircleRenderer;
+
+		std::vector<stVertexSolid> m_vertex;		/// 頂点配列
+		std::vector<GLushort> m_index;				/// インデックス配列
+	};
 }
 
 #endif
