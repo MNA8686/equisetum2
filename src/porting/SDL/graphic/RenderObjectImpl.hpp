@@ -46,34 +46,32 @@ namespace Equisetum2
 	{
 	public:
 
-#if 0
-		inline const stVertex* GetVertex() const
+		inline const stVertexSolid* GetVertex() const
 		{
-			return m_vertex;
+			return m_vertex.data();
 		}
 
 		inline const GLushort* GetIndex() const
 		{
-			return m_index;
+			return m_index.data();
 		}
 
 		inline size_t GetVertexCount() const
 		{
-			return sizeof(m_vertex) / sizeof(m_vertex[0]);
+			return m_vertex.size();
 		}
 
 		inline size_t GetIndexCount() const
 		{
-			return sizeof(m_index) / sizeof(m_index[0]);
+			return m_index.size();
 		}
-#endif
 
 	private:
 
 		friend class LineRenderer;
 
-//		stVertex m_vertex[4] = {};		/// 頂点配列
-//		GLushort m_index[6] = { 0, 1, 2, 1, 2, 3 };		/// インデックス配列
+		std::vector<stVertexSolid> m_vertex;		/// 頂点配列
+		std::vector<GLushort> m_index;				/// インデックス配列
 	};
 }
 

@@ -171,28 +171,17 @@ namespace Equisetum2
 		LineRenderer() { m_type = Type::LINE; }
 		virtual ~LineRenderer() {}
 
-#if 0
-		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
-		SpriteRenderer& SetAtlasNum(int atlasNum);
+		LineRenderer& Clear();
+		LineRenderer& PushLine(const Point& m_beginPos, const Point& m_endPos);
 
-		SpriteRenderer& SetPos(Point pos);
+		LineRenderer& SetColor(const Color& color);
 
-		SpriteRenderer& SetScale(float x, float y);
-		SpriteRenderer& SetScaleX(float x);
-		SpriteRenderer& SetScaleY(float y);
-		SpriteRenderer& SetColor(Color color);
-		SpriteRenderer& SetAngle(float angle);
+		LineRenderer& SetLayer(int layer);
+		LineRenderer& SetOrderInLayer(int32_t orderInLayer);
 
-		SpriteRenderer& SetFlipX(bool isFlip);
-		SpriteRenderer& SetFlipY(bool isFlip);
-
-		SpriteRenderer& SetLayer(int layer);
-		SpriteRenderer& SetOrderInLayer(int32_t orderInLayer);
-
-		SpriteRenderer& SetBlendMode(BlendMode blend);
+		LineRenderer& SetBlendMode(BlendMode blend);
 
 		bool Calculation();
-#endif
 
 		template<class Archive>
 		void save(Archive & archive) const
@@ -212,24 +201,9 @@ namespace Equisetum2
 		static std::shared_ptr<LineRenderer> Create(std::shared_ptr<Renderer>& renderer);
 		void InitTest();
 
-#if 0
-		//
-		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
-		int m_atlasNum = 0;		/// 表示パターン番号
-		Point m_pos;			/// 表示位置
-		SizeF m_scale{ 1.f, 1.f };	/// 表示倍率
+		std::vector<Point> m_vPos;			/// 表示位置
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
-		bool m_flipX = false;	/// X方向反転
-		bool m_flipY = false;	/// Y方向反転
-		float m_angle = 0;		/// 回転角度
-#endif
-
-//		float m_angleRad = 0;
-//		bool m_dirtyTexCoords = true;
-//		bool m_dirtyColor = true;
-
-		Color m_color = Sprite::ZERO;	/// 表示色
 
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;

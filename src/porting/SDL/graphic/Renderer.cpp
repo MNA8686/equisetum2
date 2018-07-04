@@ -69,10 +69,11 @@ namespace Equisetum2
 		uniform mat4 u_projection;
 		attribute vec4 a_color;
 		varying vec4 v_color;
+		const float inv255f = 1. / 255.;
 		
 		void main(void)
 		{
-			v_color = a_color;
+			v_color = a_color * inv255f;
 			// 表示座標
 			gl_Position = u_projection * vec4(aVertex, 0, 1.0);
 		}
@@ -259,10 +260,15 @@ namespace Equisetum2
 		}
 	}
 
+	static int gDrawCallCount = 0;
+
 	bool Renderer::Render()
 	{
 		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
 		auto& spriteContext = m_pImpl->m_spriteContext;
+		auto& lineContext = m_pImpl->m_lineContext;
+
+		gDrawCallCount = 0;
 
 		SDL_GL_MakeCurrent(pWindow.get(), *(m_pImpl->m_GLContext));
 
@@ -276,6 +282,8 @@ namespace Equisetum2
 
 		spriteContext.m_filledVertexNum = 0;
 		spriteContext.m_filledIndexNum = 0;
+		lineContext.m_filledVertexNum = 0;
+		lineContext.m_filledIndexNum = 0;
 
 		for (auto& layer : m_vRenderObject)
 		{
@@ -321,6 +329,46 @@ namespace Equisetum2
 					spriteContext.m_filledVertexNum += vertexCount;
 					spriteContext.m_filledIndexNum += indexCount;
 				}
+				else if (renderObject->GetType() == Type::LINE)
+				{
+					auto lineRenderer = static_cast<LineRenderer*>(renderObject);
+
+					// このスプライトの頂点数
+					auto vertexCount = lineRenderer->m_pImpl->GetVertexCount();
+					auto blendMode = lineRenderer->m_blend;
+
+					if (vertexCount > 0)
+					{
+						// 頂点配列が全て埋まっている？またはステートが変化した？
+						if (m_currentStates.type != Type::LINE ||
+							m_currentStates.blend != blendMode ||
+							lineContext.m_filledVertexNum + vertexCount >= lineContext.VBO_SIZE)
+						{
+							// 描画を行う
+							DrawCall();
+
+							// ステートを更新
+							m_currentStates.type = Type::LINE;
+							m_currentStates.blend = blendMode;
+						}
+
+						// 頂点配列を埋める
+						auto vertex = lineRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+						memcpy(&lineContext.m_vertex[lineContext.m_filledVertexNum], vertex, sizeof(stVertexSolid) * vertexCount);
+
+						// インデックス配列を埋める
+						auto index = lineRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+						auto indexCount = lineRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+						for (decltype(indexCount) i = 0; i < indexCount; i++)
+						{
+							// 頂点の番号を変換しながらコピーする
+							lineContext.m_index[lineContext.m_filledIndexNum + i] = static_cast<GLushort>(lineContext.m_filledVertexNum + index[i]);
+						}
+
+						lineContext.m_filledVertexNum += vertexCount;
+						lineContext.m_filledIndexNum += indexCount;
+					}
+				}
 			}
 		}
 
@@ -332,6 +380,8 @@ namespace Equisetum2
 		{
 			layer.clear();
 		}
+
+		Logger::OutputDebug("draw call %d", gDrawCallCount);
 
 		return true;
 	}
@@ -386,6 +436,55 @@ namespace Equisetum2
 
 			ctx.m_filledVertexNum = 0;
 			ctx.m_filledIndexNum = 0;
+
+			gDrawCallCount++;
+		}
+		else if (m_currentStates.type == Type::LINE)
+		{
+			auto& ctx = m_pImpl->m_lineContext;
+
+			if (m_pImpl->SelectProgram(Type::LINE))
+			{
+				glDisable(GL_DEPTH_TEST);
+
+				switch (m_currentStates.blend)
+				{
+				case BlendMode::None:
+					glDisable(GL_BLEND);
+					break;
+
+				case BlendMode::Blend:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+
+				case BlendMode::Add:
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					break;
+				}
+
+				glDisable(GL_CULL_FACE);
+
+				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(ctx.m_vertex[0]) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ctx.m_index[0]) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
+
+				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
+				glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
+
+				glDrawArrays(GL_LINES, 0, (GLsizei)ctx.m_filledIndexNum);
+
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+				gDrawCallCount++;
+			}
+
+			ctx.m_filledVertexNum = 0;
+			ctx.m_filledIndexNum = 0;
 		}
 
 		return true;
@@ -399,6 +498,9 @@ namespace Equisetum2
 		{
 		case Type::SPRITE:
 			obj = SpriteRenderer::Create(shared_from_this());
+			break;
+		case Type::LINE:
+			obj = LineRenderer::Create(shared_from_this());
 			break;
 		}
 

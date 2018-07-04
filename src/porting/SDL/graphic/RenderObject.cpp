@@ -66,13 +66,13 @@ namespace Equisetum2
 
 			return inst;
 		}
-		EQ_HANDLER
+			EQ_HANDLER
 		{
 			Logger::OutputError(EQ_GET_HANDLER().what());
 		}
-		EQ_END_HANDLER
+			EQ_END_HANDLER
 
-		return nullptr;
+			return nullptr;
 	}
 
 	SpriteRenderer& SpriteRenderer::SetSprite(const std::shared_ptr<Sprite>& sprite)
@@ -127,7 +127,7 @@ namespace Equisetum2
 		m_dirtyColor = true;
 		return *this;
 	}
-	
+
 	SpriteRenderer& SpriteRenderer::SetAngle(float angle)
 	{
 		m_angle = fmod(angle, 360.f);
@@ -270,7 +270,7 @@ namespace Equisetum2
 				const auto cosVal = cos(rad);
 				const auto sinVal = -sin(rad);
 
-				for(int index=0; index < 4; index++)
+				for (int index = 0; index < 4; index++)
 				{
 					float offsetX;
 					float offsetY;
@@ -278,22 +278,22 @@ namespace Equisetum2
 					// 原点からの相対座標を算出
 					switch (index)
 					{
-					// 左上
+						// 左上
 					case 0:
 						offsetX = posX - baseX;
 						offsetY = posY - baseY;
 						break;
-					// 右上
+						// 右上
 					case 1:
 						offsetX = (posX + width) - baseX;
 						offsetY = posY - baseY;
 						break;
-					// 左下
+						// 左下
 					case 2:
 						offsetX = posX - baseX;
 						offsetY = (posY + height) - baseY;
 						break;
-					// 右下
+						// 右下
 					case 3:
 						offsetX = (posX + width) - baseX;
 						offsetY = (posY + height) - baseY;
@@ -338,13 +338,83 @@ namespace Equisetum2
 
 			return inst;
 		}
-		EQ_HANDLER
+			EQ_HANDLER
 		{
 			Logger::OutputError(EQ_GET_HANDLER().what());
 		}
-		EQ_END_HANDLER
+			EQ_END_HANDLER
 
-		return nullptr;
+			return nullptr;
+	}
+
+	LineRenderer& LineRenderer::Clear()
+	{
+		m_vPos.clear();
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::PushLine(const Point& m_beginPos, const Point& m_endPos)
+	{
+		m_vPos.push_back(m_beginPos);
+		m_vPos.push_back(m_endPos);
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetColor(const Color& color)
+	{
+		m_color = color;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetLayer(int layer)
+	{
+		m_layer = layer;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetOrderInLayer(int32_t orderInLayer)
+	{
+		m_orderInLayer = orderInLayer;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetBlendMode(BlendMode blend)
+	{
+		m_blend = blend;
+		return *this;
+	}
+
+	bool LineRenderer::Calculation()
+	{
+		auto& vert = m_pImpl->m_vertex;
+		auto& index = m_pImpl->m_index;
+
+		vert.clear();
+
+		const uint32_t color = m_color.pixel;
+		for (size_t i = 0; i < m_vPos.size(); i += 2)
+		{
+			stVertexSolid beginLine;
+			stVertexSolid endLine;
+
+			beginLine.vertices[0] = static_cast<float>(m_vPos[i].x);
+			beginLine.vertices[1] = static_cast<float>(m_vPos[i].y);
+			auto beginColor = reinterpret_cast<uint32_t*>(beginLine.colors);
+			*beginColor = color;
+
+			endLine.vertices[0] = static_cast<float>(m_vPos[i + 1].x);
+			endLine.vertices[1] = static_cast<float>(m_vPos[i + 1].y);
+			auto endColor = reinterpret_cast<uint32_t*>(endLine.colors);
+			*endColor = color;
+
+			vert.push_back(beginLine);
+			index.push_back(static_cast<GLushort>(i));
+
+			vert.push_back(endLine);
+			index.push_back(static_cast<GLushort>(i+1));
+		}
+
+		return true;
 	}
 }
 
