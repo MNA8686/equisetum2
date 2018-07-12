@@ -16,7 +16,7 @@ namespace Equisetum2
 {
 	static const float inv255f = 1.0f / 255.0f;
 
-	static const char *vertexShaderSrc = R"(#version 120
+	static const char *vertexShaderSpriteSrc = R"(#version 120
 		#define IN         in
 		#define OUT        varying
 		#define LOWP
@@ -42,7 +42,7 @@ namespace Equisetum2
 		}
 	)";
 
-	static const char *fragmentShaderSrc = R"(#version 120
+	static const char *fragmentShaderSpriteSrc = R"(#version 120
 		#define IN         in
 		#define LOWP
 		#define MEDIUMP
@@ -58,7 +58,7 @@ namespace Equisetum2
 		}
 	)";
 
-	static const char *vertexShaderSolidSrc = R"(#version 120
+	static const char *vertexShaderPrimitiveSrc = R"(#version 120
 		#define IN         in
 		#define OUT        varying
 		#define LOWP
@@ -79,7 +79,7 @@ namespace Equisetum2
 		}
 	)";
 
-	static const char *fragmentShaderSolidSrc = R"(#version 120
+	static const char *fragmentShaderPrimitiveSrc = R"(#version 120
 		#define IN         in
 		#define LOWP
 		#define MEDIUMP
@@ -106,18 +106,13 @@ namespace Equisetum2
 	{
 		{
 			Type::SPRITE,
-			vertexShaderSrc,
-			fragmentShaderSrc
+			vertexShaderSpriteSrc,
+			fragmentShaderSpriteSrc
 		},
 		{
-			Type::LINE,
-			vertexShaderSolidSrc,
-			fragmentShaderSolidSrc
-		},
-		{
-			Type::CIRCLE,
-			vertexShaderSolidSrc,
-			fragmentShaderSolidSrc
+			Type::PRIMITIVE,
+			vertexShaderPrimitiveSrc,
+			fragmentShaderPrimitiveSrc
 		},
 	};
 
@@ -269,8 +264,7 @@ namespace Equisetum2
 	{
 		auto& pWindow = Singleton<WindowCompat>::GetInstance()->m_Impl->GetWindowPtr();
 		auto& spriteContext = m_pImpl->m_spriteContext;
-		auto& lineContext = m_pImpl->m_lineContext;
-		auto& circleContext = m_pImpl->m_circleContext;
+		auto& primitiveContext = m_pImpl->m_primitiveContext;
 
 		gDrawCallCount = 0;
 
@@ -286,10 +280,8 @@ namespace Equisetum2
 
 		spriteContext.m_filledVertexNum = 0;
 		spriteContext.m_filledIndexNum = 0;
-		lineContext.m_filledVertexNum = 0;
-		lineContext.m_filledIndexNum = 0;
-		circleContext.m_filledVertexNum = 0;
-		circleContext.m_filledIndexNum = 0;
+		primitiveContext.m_filledVertexNum = 0;
+		primitiveContext.m_filledIndexNum = 0;
 
 		for (auto& layer : m_vRenderObject)
 		{
@@ -315,13 +307,14 @@ namespace Equisetum2
 
 						// ステートを更新
 						m_currentStates.type = Type::SPRITE;
+						m_currentStates.subType = 0;
 						m_currentStates.blend = blendMode;
 						m_currentStates.pTexture = pTexture;
 					}
 
 					// 頂点配列を埋める
 					auto vertex = spriteRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-					memcpy(&spriteContext.m_vertex[spriteContext.m_filledVertexNum], vertex, sizeof(stVertex) * vertexCount);
+					memcpy(&spriteContext.m_vertex[spriteContext.m_filledVertexNum], vertex, sizeof(stVertexSprite) * vertexCount);
 
 					// インデックス配列を埋める
 					auto index = spriteRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
@@ -335,88 +328,62 @@ namespace Equisetum2
 					spriteContext.m_filledVertexNum += vertexCount;
 					spriteContext.m_filledIndexNum += indexCount;
 				}
-				else if (renderObject->GetType() == Type::LINE)
+				else if (renderObject->GetType() == Type::PRIMITIVE)
 				{
-					auto lineRenderer = static_cast<LineRenderer*>(renderObject);
+					auto primitiveRenderer = static_cast<PrimitiveRenderer*>(renderObject);
 
 					// このスプライトの頂点数
-					auto vertexCount = lineRenderer->m_pImpl->GetVertexCount();
-					auto blendMode = lineRenderer->m_blend;
+					auto vertexCount = primitiveRenderer->m_pImpl->GetVertexCount();
+					auto blendMode = primitiveRenderer->m_pImpl->GetBlendMode();
 
-					if (vertexCount > 0)
-					{
-						// 頂点配列が全て埋まっている？またはステートが変化した？
-						if (m_currentStates.type != Type::LINE ||
-							m_currentStates.blend != blendMode ||
-							lineContext.m_filledVertexNum + vertexCount >= lineContext.VBO_SIZE)
-						{
-							// 描画を行う
-							DrawCall();
-
-							// ステートを更新
-							m_currentStates.type = Type::LINE;
-							m_currentStates.blend = blendMode;
-						}
-
-						// 頂点配列を埋める
-						auto vertex = lineRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-						memcpy(&lineContext.m_vertex[lineContext.m_filledVertexNum], vertex, sizeof(stVertexSolid) * vertexCount);
-
-						// インデックス配列を埋める
-						auto index = lineRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
-						auto indexCount = lineRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
-						for (decltype(indexCount) i = 0; i < indexCount; i++)
-						{
-							// 頂点の番号を変換しながらコピーする
-							lineContext.m_index[lineContext.m_filledIndexNum + i] = static_cast<GLushort>(lineContext.m_filledVertexNum + index[i]);
-						}
-
-						lineContext.m_filledVertexNum += vertexCount;
-						lineContext.m_filledIndexNum += indexCount;
-					}
-				}
-				else if (renderObject->GetType() == Type::CIRCLE)
-				{
-					auto circleRenderer = static_cast<CircleRenderer*>(renderObject);
-
-					// このスプライトの頂点数
-					auto vertexCount = circleRenderer->m_pImpl->GetVertexCount();
-					auto blendMode = circleRenderer->m_blend;
-
-#if 1
 					if (vertexCount > 0)
 					{
 						// 描画を行う
 						DrawCall();
 
 						// ステートを更新
-						m_currentStates.type = Type::CIRCLE;
+						m_currentStates.type = renderObject->GetType();
+						m_currentStates.subType = renderObject->GetSubType();
 						m_currentStates.blend = blendMode;
-
+#if 0
 						// 頂点配列を埋める
-						auto vertex = circleRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-						memcpy(&circleContext.m_vertex[circleContext.m_filledVertexNum], vertex, sizeof(stVertexSolid) * vertexCount);
+						auto vertex = primitiveRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+						memcpy(&primitiveContext.m_vertex[primitiveContext.m_filledVertexNum], vertex, sizeof(stVertexPrimitive) * vertexCount);
 
 						// インデックス配列を埋める
-						auto index = circleRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
-						auto indexCount = circleRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+						auto index = primitiveRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+						auto indexCount = primitiveRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
 						for (decltype(indexCount) i = 0; i < indexCount; i++)
 						{
 							// 頂点の番号を変換しながらコピーする
-							circleContext.m_index[circleContext.m_filledIndexNum + i] = static_cast<GLushort>(circleContext.m_filledVertexNum + index[i]);
+							primitiveContext.m_index[primitiveContext.m_filledIndexNum + i] = static_cast<GLushort>(primitiveContext.m_filledVertexNum + index[i]);
 						}
 
-#if 1
-						circleContext.m_filledVertexNum += vertexCount;
-						circleContext.m_filledIndexNum += indexCount;
+						primitiveContext.m_filledVertexNum += vertexCount;
+						primitiveContext.m_filledIndexNum += indexCount;
 #endif
+						// 頂点配列を埋める
+						primitiveContext.m_vertex = primitiveRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+//						memcpy(&primitiveContext.m_vertex[primitiveContext.m_filledVertexNum], vertex, sizeof(stVertexPrimitive) * vertexCount);
+
+						// インデックス配列を埋める
+						primitiveContext.m_index = primitiveRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+						auto indexCount = primitiveRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+//						for (decltype(indexCount) i = 0; i < indexCount; i++)
+//						{
+//							// 頂点の番号を変換しながらコピーする
+//							primitiveContext.m_index[primitiveContext.m_filledIndexNum + i] = static_cast<GLushort>(primitiveContext.m_filledVertexNum + index[i]);
+//						}
+
+						primitiveContext.m_filledVertexNum = vertexCount;
+						primitiveContext.m_filledIndexNum = indexCount;
 
 						// 描画を行う
 						DrawCall();
 
 						m_currentStates.type = Type::EMPTY;
+						m_currentStates.subType = 0;
 					}
-#endif
 				}
 			}
 		}
@@ -488,11 +455,11 @@ namespace Equisetum2
 
 			gDrawCallCount++;
 		}
-		else if (m_currentStates.type == Type::LINE)
+		else if (m_currentStates.type == Type::PRIMITIVE)
 		{
-			auto& ctx = m_pImpl->m_lineContext;
+			auto& ctx = m_pImpl->m_primitiveContext;
 
-			if (m_pImpl->SelectProgram(Type::LINE))
+			if (m_pImpl->SelectProgram(m_currentStates.type))
 			{
 				glDisable(GL_DEPTH_TEST);
 
@@ -516,63 +483,26 @@ namespace Equisetum2
 				glDisable(GL_CULL_FACE);
 
 				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(ctx.m_vertex[0]) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
 
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ctx.m_index[0]) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
 
-				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
-				glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
-
-				glDrawArrays(GL_LINES, 0, (GLsizei)ctx.m_filledIndexNum);
-
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-				gDrawCallCount++;
-			}
-
-			ctx.m_filledVertexNum = 0;
-			ctx.m_filledIndexNum = 0;
-		}
-		else if (m_currentStates.type == Type::CIRCLE)
-		{
-			auto& ctx = m_pImpl->m_circleContext;
-
-			if (m_pImpl->SelectProgram(Type::CIRCLE))
-			{
-				glDisable(GL_DEPTH_TEST);
-
-				switch (m_currentStates.blend)
+				if (m_currentStates.subType == PrimitiveType::LINE)
 				{
-				case BlendMode::None:
-					glDisable(GL_BLEND);
-					break;
+					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
+					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
 
-				case BlendMode::Blend:
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					break;
-
-				case BlendMode::Add:
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-					break;
+					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(ctx.m_filledIndexNum));
 				}
+				else if (m_currentStates.subType == PrimitiveType::CIRCLE)
+				{
+					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
+					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
 
-				glDisable(GL_CULL_FACE);
-
-				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(ctx.m_vertex[0]) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ctx.m_index[0]) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
-
-				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
-				glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
-
-				glDrawArrays(GL_TRIANGLE_FAN, 0, (GLsizei)ctx.m_filledIndexNum);
-//				glDrawArrays(GL_LINE_STRIP/*GL_TRIANGLE_FAN*/, 0, (GLsizei)ctx.m_filledIndexNum);
+					glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(ctx.m_filledIndexNum));
+					//glDrawArrays(GL_LINE_STRIP/*GL_TRIANGLE_FAN*/, 0, (GLsizei)ctx.m_filledIndexNum);
+				}
 
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -587,7 +517,7 @@ namespace Equisetum2
 		return true;
 	}
 
-	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(Type type)
+	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(Type type, int32_t subType)
 	{
 		std::shared_ptr<RenderObject> obj;
 
@@ -596,11 +526,18 @@ namespace Equisetum2
 		case Type::SPRITE:
 			obj = SpriteRenderer::Create(shared_from_this());
 			break;
-		case Type::LINE:
-			obj = LineRenderer::Create(shared_from_this());
-			break;
-		case Type::CIRCLE:
-			obj = CircleRenderer::Create(shared_from_this());
+
+		case Type::PRIMITIVE:
+
+			switch(subType)
+			{
+			case PrimitiveType::LINE:
+				obj = LineRenderer::Create(shared_from_this());
+				break;
+			case PrimitiveType::CIRCLE:
+				obj = CircleRenderer::Create(shared_from_this());
+				break;
+			}
 			break;
 		}
 
@@ -768,11 +705,7 @@ namespace Equisetum2
 				glBindAttribLocation(newProgram, 1, "a_texCoord");
 				glBindAttribLocation(newProgram, 2, "a_color");
 				break;
-			case Type::LINE:
-				glBindAttribLocation(newProgram, 0, "aVertex");
-				glBindAttribLocation(newProgram, 1, "a_color");
-				break;
-			case Type::CIRCLE:
+			case Type::PRIMITIVE:
 				glBindAttribLocation(newProgram, 0, "aVertex");
 				glBindAttribLocation(newProgram, 1, "a_color");
 				break;
@@ -823,9 +756,13 @@ namespace Equisetum2
 				}
 				break;
 
-			case Type::LINE:
+			case Type::PRIMITIVE:
 				{
+					auto& ctx = m_primitiveContext;
 					auto proj = glGetUniformLocation(newProgram, "u_projection");
+					const int len = 8192;
+					std::vector<stVertexPrimitive> vVertex(len);
+					std::vector<GLushort> vIndex(len);
 
 					glUseProgram(newProgram);
 
@@ -837,48 +774,16 @@ namespace Equisetum2
 					//-----------------------------------
 					// VBO作成
 					//-----------------------------------
-					glGenBuffers(2, m_lineContext.m_VBO);
+					glGenBuffers(2, ctx.m_VBO);
 
-					glBindBuffer(GL_ARRAY_BUFFER, m_lineContext.m_VBO[0]);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(m_lineContext.m_vertex[0]) * m_lineContext.VBO_SIZE, m_lineContext.m_vertex, GL_DYNAMIC_DRAW);
-
-					glEnableVertexAttribArray(0);
-					glEnableVertexAttribArray(1);
-
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineContext.m_VBO[1]);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_lineContext.m_index[0]) * m_lineContext.INDEX_VBO_SIZE, m_lineContext.m_index, GL_STATIC_DRAW);
-
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-					// GLエラーチェック
-				}
-				break;
-
-			case Type::CIRCLE:
-				{
-					auto proj = glGetUniformLocation(newProgram, "u_projection");
-
-					glUseProgram(newProgram);
-
-					//-----------------------------------
-					// uniform設定
-					//-----------------------------------
-					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
-
-					//-----------------------------------
-					// VBO作成
-					//-----------------------------------
-					glGenBuffers(2, m_circleContext.m_VBO);
-
-					glBindBuffer(GL_ARRAY_BUFFER, m_circleContext.m_VBO[0]);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(m_circleContext.m_vertex[0]) * m_circleContext.VBO_SIZE, m_circleContext.m_vertex, GL_DYNAMIC_DRAW);
+					glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * len, vVertex.data(), GL_DYNAMIC_DRAW);
 
 					glEnableVertexAttribArray(0);
 					glEnableVertexAttribArray(1);
 
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_circleContext.m_VBO[1]);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_circleContext.m_index[0]) * m_circleContext.INDEX_VBO_SIZE, m_circleContext.m_index, GL_STATIC_DRAW);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * len, vIndex.data(), GL_STATIC_DRAW);
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -18,6 +18,11 @@ namespace Equisetum2
 		return m_type;
 	}
 
+	int32_t RenderObject::GetSubType() const
+	{
+		return m_subType;
+	}
+
 	int RenderObject::GetLayer() const
 	{
 		return m_layer;
@@ -388,15 +393,17 @@ namespace Equisetum2
 	{
 		auto& vert = m_pImpl->m_vertex;
 		auto& index = m_pImpl->m_index;
+		auto& blend = m_pImpl->m_blend;
 
 		vert.clear();
 		index.clear();
+		blend = m_blend;
 
 		const uint32_t color = m_color.pixel;
 		for (size_t i = 0; i < m_vPos.size(); i += 2)
 		{
-			stVertexSolid beginLine;
-			stVertexSolid endLine;
+			stVertexPrimitive beginLine;
+			stVertexPrimitive endLine;
 
 			beginLine.vertices[0] = static_cast<float>(m_vPos[i].x);
 			beginLine.vertices[1] = static_cast<float>(m_vPos[i].y);
@@ -493,16 +500,18 @@ namespace Equisetum2
 	{
 		auto& vert = m_pImpl->m_vertex;
 		auto& index = m_pImpl->m_index;
+		auto& blend = m_pImpl->m_blend;
 		const int32_t segments = 32;
 		const float coef = 2.0f * 3.14159265358979323846f / segments;
 
 		vert.clear();
 		index.clear();
+		blend = m_blend;
 
 		const uint32_t color = m_color.pixel;
 		for (int32_t i = 0; i <= segments; i++)
 		{
-			stVertexSolid newVertex;
+			stVertexPrimitive newVertex;
 			float rads = i * coef;
 
 			newVertex.vertices[0] = m_radius * cosf(rads) + m_pos.x;
@@ -519,7 +528,7 @@ namespace Equisetum2
 		// 最後の頂点
 		if(0)
 		{
-			stVertexSolid newVertex;
+			stVertexPrimitive newVertex;
 
 			newVertex.vertices[0] = m_pos.x;
 			newVertex.vertices[1] = m_pos.y;

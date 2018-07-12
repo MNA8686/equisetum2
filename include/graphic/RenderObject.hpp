@@ -16,9 +16,7 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/memory.hpp>
-//#include <cereal/types/base_class.hpp>
 
-//using namespace Equisetum2;
 using namespace Equisetum2::RenderState;
 
 namespace Equisetum2
@@ -29,6 +27,7 @@ namespace Equisetum2
 	public:
 		virtual ~RenderObject();
 		Type GetType() const;
+		int32_t GetSubType() const;
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
 		bool IsVisible() const;
@@ -39,6 +38,7 @@ namespace Equisetum2
 		void save(Archive & archive) const
 		{
 			archive(CEREAL_NVP(m_type));
+			archive(CEREAL_NVP(m_subType));
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
@@ -49,6 +49,7 @@ namespace Equisetum2
 		void load(Archive & archive)
 		{
 			archive(CEREAL_NVP(m_type));
+			archive(CEREAL_NVP(m_subType));
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
@@ -59,6 +60,7 @@ namespace Equisetum2
 	protected:
 		// --- serialize begin ---
 		Type m_type = Type::EMPTY;
+		int32_t m_subType = 0;
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
 		bool m_visible = true;		/// 表示属性
@@ -117,8 +119,8 @@ namespace Equisetum2
 		template<class Archive>
 		void load(Archive & archive)
 		{
-			archive(cereal::base_class<RenderObject>(this));
 			InitTest();
+			archive(cereal::base_class<RenderObject>(this));
 
 			std::string spriteId;
 			archive(CEREAL_NVP(spriteId));
@@ -133,6 +135,9 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
 		}
+
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
 
 	private:
 		friend class Renderer;
@@ -153,9 +158,6 @@ namespace Equisetum2
 		float m_angleRad = 0;
 		bool m_dirtyTexCoords = true;
 		bool m_dirtyColor = true;
-
-		class Impl;
-		std::shared_ptr<Impl> m_pImpl;
 	};
 }
 
@@ -165,10 +167,39 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::Sprit
 
 namespace Equisetum2
 {
-	class LineRenderer : public RenderObject
+	class PrimitiveRenderer : public RenderObject
 	{
 	public:
-		LineRenderer() { m_type = Type::LINE; }
+		PrimitiveRenderer() { m_type = Type::PRIMITIVE; }
+		virtual ~PrimitiveRenderer() {}
+
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(cereal::base_class<RenderObject>(this));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			archive(cereal::base_class<RenderObject>(this));
+		}
+
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
+	};
+}
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::PrimitiveRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::PrimitiveRenderer)
+
+namespace Equisetum2
+{
+	class LineRenderer : public PrimitiveRenderer
+	{
+	public:
+		LineRenderer() { m_subType = PrimitiveType::LINE; }
 		virtual ~LineRenderer() {}
 
 		LineRenderer& Clear();
@@ -186,14 +217,22 @@ namespace Equisetum2
 		template<class Archive>
 		void save(Archive & archive) const
 		{
-			archive(cereal::base_class<RenderObject>(this));
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_vPos));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
 		}
 
 		template<class Archive>
 		void load(Archive & archive)
 		{
-			archive(cereal::base_class<RenderObject>(this));
 			InitTest();
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_vPos));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
 		}
 
 	private:
@@ -204,22 +243,19 @@ namespace Equisetum2
 		std::vector<Point> m_vPos;			/// 表示位置
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
-
-		class Impl;
-		std::shared_ptr<Impl> m_pImpl;
 	};
 }
 
 #include <cereal/types/polymorphic.hpp>
 CEREAL_REGISTER_TYPE(Equisetum2::LineRenderer);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::LineRenderer)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::PrimitiveRenderer, Equisetum2::LineRenderer)
 
 namespace Equisetum2
 {
-	class CircleRenderer : public RenderObject
+	class CircleRenderer : public PrimitiveRenderer
 	{
 	public:
-		CircleRenderer() { m_type = Type::CIRCLE; }
+		CircleRenderer() { m_subType = PrimitiveType::CIRCLE; }
 		virtual ~CircleRenderer() {}
 
 		CircleRenderer& SetCircle(const Point& centerPos, int32_t radius, bool solid=true);
@@ -236,14 +272,24 @@ namespace Equisetum2
 		template<class Archive>
 		void save(Archive & archive) const
 		{
-			archive(cereal::base_class<RenderObject>(this));
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_radius));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
 		}
 
 		template<class Archive>
 		void load(Archive & archive)
 		{
-			archive(cereal::base_class<RenderObject>(this));
 			InitTest();
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_radius));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
 		}
 
 	private:
@@ -256,14 +302,11 @@ namespace Equisetum2
 		int32_t m_radius = 0;		/// 半径
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
-
-		class Impl;
-		std::shared_ptr<Impl> m_pImpl;
 	};
 }
 
 #include <cereal/types/polymorphic.hpp>
 CEREAL_REGISTER_TYPE(Equisetum2::CircleRenderer);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::CircleRenderer)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::PrimitiveRenderer, Equisetum2::CircleRenderer)
 
 #endif

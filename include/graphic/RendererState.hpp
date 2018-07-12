@@ -15,16 +15,24 @@ namespace Equisetum2
 		enum class Type : int
 		{
 			EMPTY = 0,
-			POINT,
-			LINE,
-			RECT,
-			CIRCLE,
+			PRIMITIVE,
 			SPRITE,
+		};
+
+		class PrimitiveType
+		{
+		public:
+			static const int EMPTY  = 0;
+			static const int POINT  = (1 << 0);
+			static const int LINE   = (1 << 1);
+			static const int RECT   = (1 << 2);
+			static const int CIRCLE = (1 << 3);
 		};
 
 		typedef struct
 		{
 			Type type;
+			int32_t subType;
 			BlendMode blend;
 			Texture *pTexture;
 		}stState;
