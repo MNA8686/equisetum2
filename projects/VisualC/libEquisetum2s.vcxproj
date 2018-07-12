@@ -84,7 +84,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);EQUISETUM2_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);EQUISETUM2_STATIC;_ITERATOR_DEBUG_LEVEL=0</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/Win32;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
