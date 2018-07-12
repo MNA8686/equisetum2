@@ -345,35 +345,13 @@ namespace Equisetum2
 						m_currentStates.type = renderObject->GetType();
 						m_currentStates.subType = renderObject->GetSubType();
 						m_currentStates.blend = blendMode;
-#if 0
-						// 頂点配列を埋める
-						auto vertex = primitiveRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-						memcpy(&primitiveContext.m_vertex[primitiveContext.m_filledVertexNum], vertex, sizeof(stVertexPrimitive) * vertexCount);
 
-						// インデックス配列を埋める
-						auto index = primitiveRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
-						auto indexCount = primitiveRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
-						for (decltype(indexCount) i = 0; i < indexCount; i++)
-						{
-							// 頂点の番号を変換しながらコピーする
-							primitiveContext.m_index[primitiveContext.m_filledIndexNum + i] = static_cast<GLushort>(primitiveContext.m_filledVertexNum + index[i]);
-						}
-
-						primitiveContext.m_filledVertexNum += vertexCount;
-						primitiveContext.m_filledIndexNum += indexCount;
-#endif
 						// 頂点配列を埋める
 						primitiveContext.m_vertex = primitiveRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-//						memcpy(&primitiveContext.m_vertex[primitiveContext.m_filledVertexNum], vertex, sizeof(stVertexPrimitive) * vertexCount);
 
 						// インデックス配列を埋める
 						primitiveContext.m_index = primitiveRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
 						auto indexCount = primitiveRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
-//						for (decltype(indexCount) i = 0; i < indexCount; i++)
-//						{
-//							// 頂点の番号を変換しながらコピーする
-//							primitiveContext.m_index[primitiveContext.m_filledIndexNum + i] = static_cast<GLushort>(primitiveContext.m_filledVertexNum + index[i]);
-//						}
 
 						primitiveContext.m_filledVertexNum = vertexCount;
 						primitiveContext.m_filledIndexNum = indexCount;
