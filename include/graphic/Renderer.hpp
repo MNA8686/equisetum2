@@ -30,7 +30,7 @@ namespace Equisetum2
 		bool AddRenderQueue(RenderObject* pRenderObject);
 		bool Render();
 
-		std::shared_ptr<RenderObject> CreateRenderObject(Type type);
+		std::shared_ptr<RenderObject> CreateRenderObject(Type type, int32_t subType=0);
 
 		bool Clear(const Color& color);
 		bool Present(bool waitVsync = true /* don't work */);

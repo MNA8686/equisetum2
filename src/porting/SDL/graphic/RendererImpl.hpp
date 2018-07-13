@@ -33,13 +33,20 @@ namespace Equisetum2
 		std::shared_ptr<stShaderCache> m_fragmentCache;
 	};
 
-	// 頂点定義
+	// 頂点定義 for スプライト
 	typedef struct
 	{
 		GLfloat vertices[2];
 		GLfloat texCoords[2];
 		GLubyte colors[4];
-	}stVertex;
+	}stVertexSprite;
+
+	// 頂点定義 for プリミティブ
+	typedef struct
+	{
+		GLfloat vertices[2];
+		GLubyte colors[4];
+	}stVertexPrimitive;
 
 	class Renderer::Impl final
 	{
@@ -58,7 +65,7 @@ namespace Equisetum2
 
 			// 頂点配列
 			static const int VBO_SIZE = 65536;
-			stVertex m_vertex[VBO_SIZE] = {};
+			stVertexSprite m_vertex[VBO_SIZE] = {};
 			size_t m_filledVertexNum = 0;
 
 			// インデックス配列
@@ -67,6 +74,21 @@ namespace Equisetum2
 			size_t m_filledIndexNum = 0;
 		}SpriteContext;
 		SpriteContext m_spriteContext;
+
+		typedef struct
+		{
+			// VBO
+			GLuint m_VBO[2] = {};
+
+			// 頂点配列
+			const stVertexPrimitive* m_vertex = nullptr;
+			size_t m_filledVertexNum = 0;
+
+			// インデックス配列
+			const GLushort* m_index = nullptr;
+			size_t m_filledIndexNum = 0;
+		}PrimitiveContext;
+		PrimitiveContext m_primitiveContext;
 
 	private:
 

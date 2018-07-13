@@ -18,6 +18,11 @@ namespace Equisetum2
 		return m_type;
 	}
 
+	int32_t RenderObject::GetSubType() const
+	{
+		return m_subType;
+	}
+
 	int RenderObject::GetLayer() const
 	{
 		return m_layer;
@@ -95,7 +100,7 @@ namespace Equisetum2
 		return *this;
 	}
 
-	SpriteRenderer& SpriteRenderer::SetPos(Point pos)
+	SpriteRenderer& SpriteRenderer::SetPos(const Point& pos)
 	{
 		m_pos = pos;
 		return *this;
@@ -120,14 +125,14 @@ namespace Equisetum2
 		return *this;
 	}
 
-	SpriteRenderer& SpriteRenderer::SetColor(Color color)
+	SpriteRenderer& SpriteRenderer::SetColor(const Color& color)
 	{
 		m_color = color;
 
 		m_dirtyColor = true;
 		return *this;
 	}
-	
+
 	SpriteRenderer& SpriteRenderer::SetAngle(float angle)
 	{
 		m_angle = fmod(angle, 360.f);
@@ -270,7 +275,7 @@ namespace Equisetum2
 				const auto cosVal = cos(rad);
 				const auto sinVal = -sin(rad);
 
-				for(int index=0; index < 4; index++)
+				for (int index = 0; index < 4; index++)
 				{
 					float offsetX;
 					float offsetY;
@@ -278,22 +283,22 @@ namespace Equisetum2
 					// 原点からの相対座標を算出
 					switch (index)
 					{
-					// 左上
+						// 左上
 					case 0:
 						offsetX = posX - baseX;
 						offsetY = posY - baseY;
 						break;
-					// 右上
+						// 右上
 					case 1:
 						offsetX = (posX + width) - baseX;
 						offsetY = posY - baseY;
 						break;
-					// 左下
+						// 左下
 					case 2:
 						offsetX = posX - baseX;
 						offsetY = (posY + height) - baseY;
 						break;
-					// 右下
+						// 右下
 					case 3:
 						offsetX = (posX + width) - baseX;
 						offsetY = (posY + height) - baseY;
@@ -305,6 +310,235 @@ namespace Equisetum2
 					vert[index].vertices[1] = (offsetX * sinVal + offsetY * cosVal) + baseY;
 				}
 			}
+		}
+
+		return true;
+	}
+
+	void LineRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<LineRenderer::Impl>();
+	}
+
+	std::shared_ptr<LineRenderer> LineRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	{
+		EQ_DURING
+		{
+			// インスタンス作成
+			auto inst = std::make_shared<LineRenderer>();
+			if (!inst)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			// レンダラを保持
+			inst->m_renderer = renderer;
+
+			// インスタンス初期化
+			inst->m_pImpl = std::make_shared<LineRenderer::Impl>();
+			if (!inst->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			}
+
+			return inst;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	LineRenderer& LineRenderer::Clear()
+	{
+		m_vPos.clear();
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::PushLine(const Point& m_beginPos, const Point& m_endPos)
+	{
+		m_vPos.push_back(m_beginPos);
+		m_vPos.push_back(m_endPos);
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetColor(const Color& color)
+	{
+		m_color = color;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetLayer(int layer)
+	{
+		m_layer = layer;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetOrderInLayer(int32_t orderInLayer)
+	{
+		m_orderInLayer = orderInLayer;
+		return *this;
+	}
+
+	LineRenderer& LineRenderer::SetBlendMode(BlendMode blend)
+	{
+		m_blend = blend;
+		return *this;
+	}
+
+	bool LineRenderer::Calculation()
+	{
+		auto& vert = m_pImpl->m_vertex;
+		auto& index = m_pImpl->m_index;
+		auto& blend = m_pImpl->m_blend;
+
+		vert.clear();
+		index.clear();
+		blend = m_blend;
+
+		const uint32_t color = m_color.pixel;
+		for (size_t i = 0; i < m_vPos.size(); i += 2)
+		{
+			stVertexPrimitive beginLine;
+			stVertexPrimitive endLine;
+
+			beginLine.vertices[0] = static_cast<float>(m_vPos[i].x);
+			beginLine.vertices[1] = static_cast<float>(m_vPos[i].y);
+			auto beginColor = reinterpret_cast<uint32_t*>(beginLine.colors);
+			*beginColor = color;
+
+			endLine.vertices[0] = static_cast<float>(m_vPos[i + 1].x);
+			endLine.vertices[1] = static_cast<float>(m_vPos[i + 1].y);
+			auto endColor = reinterpret_cast<uint32_t*>(endLine.colors);
+			*endColor = color;
+
+			vert.push_back(beginLine);
+			index.push_back(static_cast<GLushort>(i));
+
+			vert.push_back(endLine);
+			index.push_back(static_cast<GLushort>(i+1));
+		}
+
+		return true;
+	}
+
+
+
+	void CircleRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<CircleRenderer::Impl>();
+	}
+
+	std::shared_ptr<CircleRenderer> CircleRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	{
+		EQ_DURING
+		{
+			// インスタンス作成
+			auto inst = std::make_shared<CircleRenderer>();
+			if (!inst)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			// レンダラを保持
+			inst->m_renderer = renderer;
+
+			// インスタンス初期化
+			inst->m_pImpl = std::make_shared<CircleRenderer::Impl>();
+			if (!inst->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			}
+
+			return inst;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	CircleRenderer& CircleRenderer::SetCircle(const Point& centerPos, int32_t radius, bool solid)
+	{
+		m_pos = centerPos;
+		//m_size = size;
+		m_radius = radius;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetColor(const Color& color)
+	{
+		m_color = color;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetLayer(int layer)
+	{
+		m_layer = layer;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetOrderInLayer(int32_t orderInLayer)
+	{
+		m_orderInLayer = orderInLayer;
+		return *this;
+	}
+
+	CircleRenderer& CircleRenderer::SetBlendMode(BlendMode blend)
+	{
+		m_blend = blend;
+		return *this;
+	}
+
+	bool CircleRenderer::Calculation()
+	{
+		auto& vert = m_pImpl->m_vertex;
+		auto& index = m_pImpl->m_index;
+		auto& blend = m_pImpl->m_blend;
+		const int32_t segments = 32;
+		const float coef = 2.0f * 3.14159265358979323846f / segments;
+
+		vert.clear();
+		index.clear();
+		blend = m_blend;
+
+		const uint32_t color = m_color.pixel;
+		for (int32_t i = 0; i <= segments; i++)
+		{
+			stVertexPrimitive newVertex;
+			float rads = i * coef;
+
+			newVertex.vertices[0] = m_radius * cosf(rads) + m_pos.x;
+			newVertex.vertices[1] = m_radius * sinf(rads) + m_pos.y;
+
+			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
+			*vertexColor = color;
+
+			vert.push_back(newVertex);
+
+			index.push_back(static_cast<GLushort>(i));
+		}
+
+		// 最後の頂点
+		if(0)
+		{
+			stVertexPrimitive newVertex;
+
+			newVertex.vertices[0] = m_pos.x;
+			newVertex.vertices[1] = m_pos.y;
+
+			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
+			*vertexColor = color;
+
+			vert.push_back(newVertex);
+
+			index.push_back(static_cast<GLushort>(segments + 1));
 		}
 
 		return true;

@@ -14,7 +14,7 @@ namespace Equisetum2
 	{
 	public:
 
-		inline const stVertex* GetVertex() const
+		inline const stVertexSprite* GetVertex() const
 		{
 			return m_vertex;
 		}
@@ -38,8 +38,49 @@ namespace Equisetum2
 
 		friend class SpriteRenderer;
 
-		stVertex m_vertex[4] = {};		/// 頂点配列
+		stVertexSprite m_vertex[4] = {};		/// 頂点配列
 		GLushort m_index[6] = { 0, 1, 2, 1, 2, 3 };		/// インデックス配列
+	};
+
+	class PrimitiveRenderer::Impl final
+	{
+	public:
+
+		inline const stVertexPrimitive* GetVertex() const
+		{
+			return m_vertex.data();
+		}
+
+		inline const GLushort* GetIndex() const
+		{
+			return m_index.data();
+		}
+
+		inline size_t GetVertexCount() const
+		{
+			return m_vertex.size();
+		}
+
+		inline size_t GetIndexCount() const
+		{
+			return m_index.size();
+		}
+
+		inline BlendMode GetBlendMode() const
+		{
+			return m_blend;
+		}
+
+	private:
+
+		friend class PrimitiveRenderer;
+		friend class LineRenderer;
+		friend class CircleRenderer;
+
+		std::vector<stVertexPrimitive> m_vertex;	/// 頂点配列
+		std::vector<GLushort> m_index;				/// インデックス配列
+
+		BlendMode m_blend = BlendMode::None;		/// ブレンドモード
 	};
 }
 
