@@ -594,25 +594,6 @@ namespace Equisetum2
 			indexSize++;
 		}
 
-#if 0
-		const uint32_t color = m_color.pixel;
-		for (int32_t i = 0; i <= segments; i++)
-		{
-			stVertexPrimitive newVertex;
-			float rads = i * coef;
-
-			newVertex.vertices[0] = m_radius * cosf(rads) + m_pos.x;
-			newVertex.vertices[1] = m_radius * sinf(rads) + m_pos.y;
-
-			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
-			*vertexColor = color;
-
-			vert.push_back(newVertex);
-
-			index.push_back(static_cast<GLushort>(i));
-		}
-#endif
-
 		// 最後の頂点
 		if(0)
 		{
