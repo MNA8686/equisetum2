@@ -58,12 +58,12 @@ namespace Equisetum2
 
 		inline size_t GetVertexCount() const
 		{
-			return m_vertex.size();
+			return m_vertexSize;
 		}
 
 		inline size_t GetIndexCount() const
 		{
-			return m_index.size();
+			return m_indexSize;
 		}
 
 		inline BlendMode GetBlendMode() const
@@ -81,6 +81,9 @@ namespace Equisetum2
 		std::vector<GLushort> m_index;				/// インデックス配列
 
 		BlendMode m_blend = BlendMode::None;		/// ブレンドモード
+
+		int32_t m_vertexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
+		int32_t m_indexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
 	};
 }
 

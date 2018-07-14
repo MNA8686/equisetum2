@@ -222,6 +222,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_vPos));
 			archive(CEREAL_NVP(m_color.pixel));
 			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_vPosSize));
 		}
 
 		template<class Archive>
@@ -233,6 +234,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_vPos));
 			archive(CEREAL_NVP(m_color.pixel));
 			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_vPosSize));
 		}
 
 	private:
@@ -243,6 +245,7 @@ namespace Equisetum2
 		std::vector<Point> m_vPos;			/// 表示位置
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+		int32_t m_vPosSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
 	};
 }
 

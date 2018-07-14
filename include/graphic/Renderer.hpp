@@ -41,6 +41,7 @@ namespace Equisetum2
 	private:
 
 		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
+		int32_t m_renderObjectIndex[LayerMax]{0};					/// レンダーキューのサイズ
 		//String m_id;		/// ID
 
 		stState m_currentStates = {};

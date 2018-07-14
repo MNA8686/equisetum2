@@ -164,7 +164,7 @@ namespace Equisetum2
 			// レンダーキュー領域を確保
 			for (int i = 0; i < LayerMax; i++)
 			{
-				inst->m_vRenderObject[i].reserve(1024);
+				inst->m_vRenderObject[i].resize(1024);
 			}
 
 			// GLコンテキスト作成
@@ -241,7 +241,18 @@ namespace Equisetum2
 		auto layer = pRenderObject->GetLayer();
 		if (layer < LayerMax)
 		{
-			m_vRenderObject[layer].push_back(pRenderObject);
+			auto& obj = m_vRenderObject[layer];
+			auto& index = m_renderObjectIndex[layer];
+
+			// サイズが足りない場合は拡張する
+			if (index + 1 >= obj.size())
+			{
+				obj.resize(obj.size() * 2);
+			}
+
+
+			obj[index] = pRenderObject;
+			index++;
 			return true;
 		}
 
@@ -250,11 +261,16 @@ namespace Equisetum2
 
 	void Renderer::SortRenderQueue()
 	{
-		for (auto& layer : m_vRenderObject)
+		int layer = 0;
+
+		for (auto& objectsInLayer : m_vRenderObject)
 		{
-			std::sort(std::begin(layer), std::end(layer), [](RenderObject* a, RenderObject* b)->bool {
+			auto& index = m_renderObjectIndex[layer];
+			std::sort(std::begin(objectsInLayer), std::begin(objectsInLayer) + index, [](RenderObject* a, RenderObject* b)->bool {
 				return  a->GetOrderInLayer() < b->GetOrderInLayer();
 			});
+
+			layer++;
 		}
 	}
 
@@ -283,10 +299,14 @@ namespace Equisetum2
 		primitiveContext.m_filledVertexNum = 0;
 		primitiveContext.m_filledIndexNum = 0;
 
-		for (auto& layer : m_vRenderObject)
+		int layer = 0;
+		for (auto& objectsInLayer : m_vRenderObject)
 		{
-			for (auto& renderObject : layer)
+			int32_t objectMax = m_renderObjectIndex[layer++];
+			for (int i = 0; i < objectMax; i++)
 			{
+				auto& renderObject = objectsInLayer[i];
+
 				if (renderObject->GetType() == Type::SPRITE)
 				{
 					auto spriteRenderer = static_cast<SpriteRenderer*>(renderObject);
@@ -370,9 +390,9 @@ namespace Equisetum2
 		DrawCall();
 
 		// レンダーキューをクリアする
-		for (auto& layer : m_vRenderObject)
+		for (auto& index : m_renderObjectIndex)
 		{
-			layer.clear();
+			index = 0;
 		}
 
 		Logger::OutputDebug("draw call %d", gDrawCallCount);
