@@ -245,7 +245,7 @@ namespace Equisetum2
 			auto& index = m_renderObjectIndex[layer];
 
 			// サイズが足りない場合は拡張する
-			if (index + 1 >= obj.size())
+			if (static_cast<size_t>(index + 1) >= obj.size())
 			{
 				obj.resize(obj.size() * 2);
 			}
