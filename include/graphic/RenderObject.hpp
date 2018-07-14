@@ -281,6 +281,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_radius));
 			archive(CEREAL_NVP(m_color.pixel));
 			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_solid));
 		}
 
 		template<class Archive>
@@ -293,6 +294,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_radius));
 			archive(CEREAL_NVP(m_color.pixel));
 			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_solid));
 		}
 
 	private:
@@ -305,6 +307,7 @@ namespace Equisetum2
 		int32_t m_radius = 0;		/// 半径
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+		bool m_solid = false;		/// 塗りつぶしフラグ
 	};
 }
 

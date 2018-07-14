@@ -80,13 +80,8 @@ namespace Equisetum2
 			// VBO
 			GLuint m_VBO[2] = {};
 
-			// 頂点配列
-			const stVertexPrimitive* m_vertex = nullptr;
-			size_t m_filledVertexNum = 0;
-
-			// インデックス配列
-			const GLushort* m_index = nullptr;
-			size_t m_filledIndexNum = 0;
+			// レンダーオブジェクトを直接参照する
+			PrimitiveRenderer* pPrimitiveRender = nullptr;
 		}PrimitiveContext;
 		PrimitiveContext m_primitiveContext;
 

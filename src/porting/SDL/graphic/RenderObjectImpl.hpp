@@ -71,6 +71,11 @@ namespace Equisetum2
 			return m_blend;
 		}
 
+		inline bool GetSolid() const
+		{
+			return m_solid;
+		}
+
 	private:
 
 		friend class PrimitiveRenderer;
@@ -80,10 +85,11 @@ namespace Equisetum2
 		std::vector<stVertexPrimitive> m_vertex;	/// 頂点配列
 		std::vector<GLushort> m_index;				/// インデックス配列
 
-		BlendMode m_blend = BlendMode::None;		/// ブレンドモード
-
 		int32_t m_vertexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
 		int32_t m_indexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
+
+		BlendMode m_blend = BlendMode::None;		/// ブレンドモード
+		bool m_solid = false;		/// 塗りつぶしモード
 	};
 }
 
