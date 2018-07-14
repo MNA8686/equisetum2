@@ -318,6 +318,10 @@ namespace Equisetum2
 	void LineRenderer::InitTest()
 	{
 		m_pImpl = std::make_shared<LineRenderer::Impl>();
+
+		const int32_t defaultSize = 32;
+		m_pImpl->m_vertex.resize(defaultSize);
+		m_pImpl->m_index.resize(defaultSize);
 	}
 
 	std::shared_ptr<LineRenderer> LineRenderer::Create(std::shared_ptr<Renderer>& renderer)
@@ -341,6 +345,8 @@ namespace Equisetum2
 				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
 			}
 
+			// 予めある程度確保しておく
+			inst->m_vPos.resize(16);
 			return inst;
 		}
 		EQ_HANDLER
@@ -354,14 +360,23 @@ namespace Equisetum2
 
 	LineRenderer& LineRenderer::Clear()
 	{
-		m_vPos.clear();
+		m_vPosSize = 0;
 		return *this;
 	}
 
 	LineRenderer& LineRenderer::PushLine(const Point& m_beginPos, const Point& m_endPos)
 	{
-		m_vPos.push_back(m_beginPos);
-		m_vPos.push_back(m_endPos);
+		// サイズが足りない場合は拡張する
+		if (static_cast<size_t>(m_vPosSize + 2) >= m_vPos.size())
+		{
+			m_vPos.resize(m_vPos.size() * 2);
+		}
+
+		// 始点と終点を追加する
+		m_vPos[m_vPosSize] = m_beginPos;
+		m_vPos[m_vPosSize+1] = m_endPos;
+		m_vPosSize += 2;
+
 		return *this;
 	}
 
@@ -392,34 +407,65 @@ namespace Equisetum2
 	bool LineRenderer::Calculation()
 	{
 		auto& vert = m_pImpl->m_vertex;
+		auto& vertSize = m_pImpl->m_vertexSize;
 		auto& index = m_pImpl->m_index;
+		auto& indexSize = m_pImpl->m_indexSize;
 		auto& blend = m_pImpl->m_blend;
 
-		vert.clear();
-		index.clear();
+		// サイズをクリア
+		vertSize = 0;
+		indexSize = 0;
+
+		// ブレンドモードを設定する
 		blend = m_blend;
 
-		const uint32_t color = m_color.pixel;
-		for (size_t i = 0; i < m_vPos.size(); i += 2)
+		// サイズが足りない場合は拡張する
+		if (static_cast<size_t>(m_vPosSize) > vert.size())
 		{
-			stVertexPrimitive beginLine;
-			stVertexPrimitive endLine;
+			vert.resize(m_vPosSize);
+		}
+		if (static_cast<size_t>(m_vPosSize) > index.size())
+		{
+			index.resize(m_vPosSize);
+		}
 
-			beginLine.vertices[0] = static_cast<float>(m_vPos[i].x);
-			beginLine.vertices[1] = static_cast<float>(m_vPos[i].y);
-			auto beginColor = reinterpret_cast<uint32_t*>(beginLine.colors);
-			*beginColor = color;
+		// 頂点とインデックスを作成する
+		const uint32_t color = m_color.pixel;
+		for (int32_t i = 0; i < m_vPosSize; i += 2)
+		{
 
-			endLine.vertices[0] = static_cast<float>(m_vPos[i + 1].x);
-			endLine.vertices[1] = static_cast<float>(m_vPos[i + 1].y);
-			auto endColor = reinterpret_cast<uint32_t*>(endLine.colors);
-			*endColor = color;
+			// 始点
+			{
+				auto& curentVert = vert[vertSize];
+				auto& curentIndex = index[vertSize];
 
-			vert.push_back(beginLine);
-			index.push_back(static_cast<GLushort>(i));
+				// 頂点
+				curentVert.vertices[0] = static_cast<float>(m_vPos[i].x);
+				curentVert.vertices[1] = static_cast<float>(m_vPos[i].y);
+				auto dstColor = reinterpret_cast<uint32_t*>(curentVert.colors);
+				*dstColor = color;
 
-			vert.push_back(endLine);
-			index.push_back(static_cast<GLushort>(i+1));
+				// インデックス
+				curentIndex = static_cast<GLushort>(i);
+			}
+
+			// 終点
+			{
+				auto& curentVert = vert[vertSize + 1];
+				auto& curentIndex = index[vertSize + 1];
+
+				// 頂点
+				curentVert.vertices[0] = static_cast<float>(m_vPos[i + 1].x);
+				curentVert.vertices[1] = static_cast<float>(m_vPos[i + 1].y);
+				auto dstColor = reinterpret_cast<uint32_t*>(curentVert.colors);
+				*dstColor = color;
+
+				// インデックス
+				curentIndex = static_cast<GLushort>(i + 1);
+			}
+
+			vertSize += 2;
+			indexSize += 2;
 		}
 
 		return true;
@@ -430,6 +476,10 @@ namespace Equisetum2
 	void CircleRenderer::InitTest()
 	{
 		m_pImpl = std::make_shared<CircleRenderer::Impl>();
+
+		const int32_t defaultSize = 64;
+		m_pImpl->m_vertex.resize(defaultSize);
+		m_pImpl->m_index.resize(defaultSize);
 	}
 
 	std::shared_ptr<CircleRenderer> CircleRenderer::Create(std::shared_ptr<Renderer>& renderer)
@@ -467,7 +517,6 @@ namespace Equisetum2
 	CircleRenderer& CircleRenderer::SetCircle(const Point& centerPos, int32_t radius, bool solid)
 	{
 		m_pos = centerPos;
-		//m_size = size;
 		m_radius = radius;
 		return *this;
 	}
@@ -499,30 +548,50 @@ namespace Equisetum2
 	bool CircleRenderer::Calculation()
 	{
 		auto& vert = m_pImpl->m_vertex;
+		auto& vertSize = m_pImpl->m_vertexSize;
 		auto& index = m_pImpl->m_index;
+		auto& indexSize = m_pImpl->m_indexSize;
 		auto& blend = m_pImpl->m_blend;
 		const int32_t segments = 32;
 		const float coef = 2.0f * 3.14159265358979323846f / segments;
 
-		vert.clear();
-		index.clear();
+		// サイズをクリア
+		vertSize = 0;
+		indexSize = 0;
+
+		// ブレンドモードを設定する
 		blend = m_blend;
 
+		// サイズが足りない場合は拡張する
+		if (segments + 1 > vert.size())
+		{
+			vert.resize(segments + 1);
+		}
+		if (segments + 1 > index.size())
+		{
+			index.resize(segments + 1);
+		}
+
+		// 頂点とインデックスを作成する
 		const uint32_t color = m_color.pixel;
 		for (int32_t i = 0; i <= segments; i++)
 		{
-			stVertexPrimitive newVertex;
-			float rads = i * coef;
+			// 頂点
+			{
+				float rads = i * coef;
+	
+				vert[vertSize].vertices[0] = m_radius * cosf(rads) + m_pos.x;
+				vert[vertSize].vertices[1] = m_radius * sinf(rads) + m_pos.y;
+	
+				auto vertexColor = reinterpret_cast<uint32_t*>(vert[vertSize].colors);
+				*vertexColor = color;
+			}
 
-			newVertex.vertices[0] = m_radius * cosf(rads) + m_pos.x;
-			newVertex.vertices[1] = m_radius * sinf(rads) + m_pos.y;
+			// インデックス
+			index[indexSize] = static_cast<GLushort>(i);
 
-			auto vertexColor = reinterpret_cast<uint32_t*>(newVertex.colors);
-			*vertexColor = color;
-
-			vert.push_back(newVertex);
-
-			index.push_back(static_cast<GLushort>(i));
+			vertSize++;
+			indexSize++;
 		}
 
 		// 最後の頂点
