@@ -20,3 +20,4 @@
 /unittest/test/*.bak
 /projects/VisualC/ipch
 /gameSystem/include/*.bak
+/include/graphic/*.bak
