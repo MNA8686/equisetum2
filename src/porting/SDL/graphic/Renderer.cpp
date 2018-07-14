@@ -296,8 +296,7 @@ namespace Equisetum2
 
 		spriteContext.m_filledVertexNum = 0;
 		spriteContext.m_filledIndexNum = 0;
-		primitiveContext.m_filledVertexNum = 0;
-		primitiveContext.m_filledIndexNum = 0;
+		primitiveContext.pPrimitiveRender = nullptr;
 
 		int layer = 0;
 		for (auto& objectsInLayer : m_vRenderObject)
@@ -312,9 +311,9 @@ namespace Equisetum2
 					auto spriteRenderer = static_cast<SpriteRenderer*>(renderObject);
 
 					// このスプライトの頂点数
-					auto vertexCount = spriteRenderer->m_pImpl->GetVertexCount();
-					auto blendMode = spriteRenderer->m_blend;
-					auto pTexture = spriteRenderer->m_sprite->GetTexture().get();
+					size_t vertexCount = spriteRenderer->m_pImpl->GetVertexCount();
+					RenderState::BlendMode blendMode = spriteRenderer->m_blend;
+					Texture* pTexture = spriteRenderer->m_sprite->GetTexture().get();
 
 					// 頂点配列が全て埋まっている？またはステートが変化した？
 					if (m_currentStates.type != Type::SPRITE ||
@@ -333,12 +332,12 @@ namespace Equisetum2
 					}
 
 					// 頂点配列を埋める
-					auto vertex = spriteRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+					const stVertexSprite* vertex = spriteRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
 					memcpy(&spriteContext.m_vertex[spriteContext.m_filledVertexNum], vertex, sizeof(stVertexSprite) * vertexCount);
 
 					// インデックス配列を埋める
-					auto index = spriteRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
-					auto indexCount = spriteRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
+					const GLushort* index = spriteRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+					size_t indexCount = spriteRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
 					for (decltype(indexCount) i = 0; i < indexCount; i++)
 					{
 						// 頂点の番号を変換しながらコピーする
@@ -352,9 +351,9 @@ namespace Equisetum2
 				{
 					auto primitiveRenderer = static_cast<PrimitiveRenderer*>(renderObject);
 
-					// このスプライトの頂点数
-					auto vertexCount = primitiveRenderer->m_pImpl->GetVertexCount();
-					auto blendMode = primitiveRenderer->m_pImpl->GetBlendMode();
+					// このオブジェクトの頂点数
+					size_t vertexCount = primitiveRenderer->m_pImpl->GetVertexCount();
+					RenderState::BlendMode blendMode = primitiveRenderer->m_pImpl->GetBlendMode();
 
 					if (vertexCount > 0)
 					{
@@ -366,15 +365,8 @@ namespace Equisetum2
 						m_currentStates.subType = renderObject->GetSubType();
 						m_currentStates.blend = blendMode;
 
-						// 頂点配列を埋める
-						primitiveContext.m_vertex = primitiveRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
-
-						// インデックス配列を埋める
-						primitiveContext.m_index = primitiveRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
-						auto indexCount = primitiveRenderer->m_pImpl->GetIndexCount();		// このスプライトのインデックス数
-
-						primitiveContext.m_filledVertexNum = vertexCount;
-						primitiveContext.m_filledIndexNum = indexCount;
+						// Primitiveの場合はレンダーオブジェクトの構造体を直接参照すれば事足りる
+						primitiveContext.pPrimitiveRender = primitiveRenderer;
 
 						// 描画を行う
 						DrawCall();
@@ -480,26 +472,32 @@ namespace Equisetum2
 
 				glDisable(GL_CULL_FACE);
 
+				const auto& inst = ctx.pPrimitiveRender->m_pImpl;
+				const stVertexPrimitive* pVertex = inst->GetVertex();
+				size_t filledVertexNum = inst->GetVertexCount();
+				const GLushort* pIndex = inst->GetIndex();
+				size_t filledIndexNum = inst->GetIndexCount();
+				bool solid = inst->GetSolid();
+
 				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * ctx.m_filledVertexNum, ctx.m_vertex, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * filledVertexNum, pVertex, GL_DYNAMIC_DRAW);
 
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * ctx.m_filledIndexNum, ctx.m_index, GL_STATIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * filledIndexNum, pIndex, GL_STATIC_DRAW);
 
 				if (m_currentStates.subType == PrimitiveType::LINE)
 				{
-					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
-					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
+					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(stVertexPrimitive), 0);
+					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(stVertexPrimitive), (const void*)(2 * sizeof(GLfloat)));
 
-					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(ctx.m_filledIndexNum));
+					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(filledIndexNum));
 				}
 				else if (m_currentStates.subType == PrimitiveType::CIRCLE)
 				{
-					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ctx.m_vertex[0]), 0);
-					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ctx.m_vertex[0]), (const void*)(2 * sizeof(GLfloat)));
+					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(stVertexPrimitive), 0);
+					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(stVertexPrimitive), (const void*)(2 * sizeof(GLfloat)));
 
-					glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(ctx.m_filledIndexNum));
-					//glDrawArrays(GL_LINE_STRIP/*GL_TRIANGLE_FAN*/, 0, (GLsizei)ctx.m_filledIndexNum);
+					glDrawArrays(solid ? GL_TRIANGLE_FAN : GL_LINE_STRIP, 0, static_cast<GLsizei>(filledIndexNum));
 				}
 
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -507,9 +505,6 @@ namespace Equisetum2
 
 				gDrawCallCount++;
 			}
-
-			ctx.m_filledVertexNum = 0;
-			ctx.m_filledIndexNum = 0;
 		}
 
 		return true;

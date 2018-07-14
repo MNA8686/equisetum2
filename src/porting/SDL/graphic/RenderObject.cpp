@@ -518,6 +518,7 @@ namespace Equisetum2
 	{
 		m_pos = centerPos;
 		m_radius = radius;
+		m_solid = solid;
 		return *this;
 	}
 
@@ -552,6 +553,7 @@ namespace Equisetum2
 		auto& index = m_pImpl->m_index;
 		auto& indexSize = m_pImpl->m_indexSize;
 		auto& blend = m_pImpl->m_blend;
+		auto& solid = m_pImpl->m_solid;
 		const int32_t segments = 32;
 		const float coef = 2.0f * 3.14159265358979323846f / segments;
 
@@ -559,8 +561,9 @@ namespace Equisetum2
 		vertSize = 0;
 		indexSize = 0;
 
-		// ブレンドモードを設定する
+		// 描画モードを設定する
 		blend = m_blend;
+		solid = m_solid;
 
 		// サイズが足りない場合は拡張する
 		if (segments + 1 > vert.size())

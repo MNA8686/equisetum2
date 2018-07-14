@@ -80,6 +80,8 @@ namespace Equisetum2
 			// VBO
 			GLuint m_VBO[2] = {};
 
+			PrimitiveRenderer* pPrimitiveRender = nullptr;
+#if 0
 			// 頂点配列
 			const stVertexPrimitive* m_vertex = nullptr;
 			size_t m_filledVertexNum = 0;
@@ -87,6 +89,10 @@ namespace Equisetum2
 			// インデックス配列
 			const GLushort* m_index = nullptr;
 			size_t m_filledIndexNum = 0;
+
+			// 塗りつぶしを行うかどうか
+			bool m_solid = false;
+#endif
 		}PrimitiveContext;
 		PrimitiveContext m_primitiveContext;
 
