@@ -300,6 +300,8 @@ namespace Equisetum2
 		static std::shared_ptr<RectRenderer> Create(std::shared_ptr<Renderer>& renderer);
 		void InitTest();
 
+		static const int vertexMax = 4;
+
 		Rect m_rect{};			/// 表示位置
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
