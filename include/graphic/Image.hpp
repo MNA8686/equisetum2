@@ -6,7 +6,7 @@
 #include "type/Rect.hpp"
 #include <memory>
 
-#include "cereal/access.hpp"
+#include <cereal/cereal.hpp>
 
 namespace Equisetum2
 {
@@ -25,6 +25,12 @@ namespace Equisetum2
 		}rgba8888;
 
 		uint32_t pixel;
+
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(CEREAL_NVP(pixel));
+		}
 	};
 
 	/**

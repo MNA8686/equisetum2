@@ -621,7 +621,19 @@ namespace Equisetum2
 
 	RectRenderer& RectRenderer::SetColor(const Color& color)
 	{
-		m_color = color;
+		for (auto& outColor : m_colors)
+		{
+			outColor = color;
+		}
+		return *this;
+	}
+
+	RectRenderer& RectRenderer::SetColor(const Color& leftTop, const Color& rightTop, const Color& leftBottom, const Color& rightBottom)
+	{
+		m_colors[0] = leftTop;
+		m_colors[2] = rightTop;
+		m_colors[1] = leftBottom;
+		m_colors[3] = rightBottom;
 		return *this;
 	}
 
@@ -657,9 +669,6 @@ namespace Equisetum2
 		blend = m_blend;
 		solid = m_solid;
 
-		// 頂点を作成する
-		const uint32_t color = m_color.pixel;
-
 		// 頂点
 		{
 			const int32_t cur = 0;
@@ -668,7 +677,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[cur].pixel;
 		}
 		{
 			const int32_t cur = 1;
@@ -677,7 +686,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[cur].pixel;
 		}
 		{
 			const int32_t cur = solid ? 2 : 3;
@@ -686,7 +695,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[solid ? cur : cur - 1].pixel;
 		}
 		{
 			const int32_t cur = solid ? 3 : 2;
@@ -695,7 +704,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[solid ? cur : cur + 1].pixel;
 		}
 
 		return true;

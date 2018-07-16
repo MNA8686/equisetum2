@@ -109,7 +109,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
@@ -220,7 +220,7 @@ namespace Equisetum2
 			archive(cereal::base_class<PrimitiveRenderer>(this));
 
 			archive(CEREAL_NVP(m_vPos));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_vPosSize));
 		}
@@ -232,7 +232,7 @@ namespace Equisetum2
 			archive(cereal::base_class<PrimitiveRenderer>(this));
 
 			archive(CEREAL_NVP(m_vPos));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_vPosSize));
 		}
@@ -264,6 +264,7 @@ namespace Equisetum2
 		RectRenderer& SetRect(const Rect& rect, bool solid = true);
 
 		RectRenderer& SetColor(const Color& color);
+		RectRenderer& SetColor(const Color& leftTop, const Color& rightTop, const Color& leftBottom, const Color& rightBottom);
 
 		RectRenderer& SetLayer(int layer);
 		RectRenderer& SetOrderInLayer(int32_t orderInLayer);
@@ -278,7 +279,7 @@ namespace Equisetum2
 			archive(cereal::base_class<PrimitiveRenderer>(this));
 
 			archive(CEREAL_NVP(m_rect));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_colors));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_solid));
 		}
@@ -290,7 +291,7 @@ namespace Equisetum2
 			archive(cereal::base_class<PrimitiveRenderer>(this));
 
 			archive(CEREAL_NVP(m_rect));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_colors));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_solid));
 		}
@@ -303,7 +304,7 @@ namespace Equisetum2
 		static const int vertexMax = 4;
 
 		Rect m_rect{};			/// 表示位置
-		Color m_color = Sprite::ZERO;	/// 表示色
+		Color m_colors[vertexMax]{ Sprite::ZERO, Sprite::ZERO, Sprite::ZERO, Sprite::ZERO };	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
 		bool m_solid = false;		/// 塗りつぶしフラグ
 	};
@@ -339,7 +340,7 @@ namespace Equisetum2
 
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_radius));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_solid));
 		}
@@ -352,7 +353,7 @@ namespace Equisetum2
 
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_radius));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_solid));
 		}
