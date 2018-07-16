@@ -421,11 +421,10 @@ namespace Equisetum2
 			vert.resize(m_vPosSize);
 		}
 
-		// 頂点とインデックスを作成する
+		// 頂点を作成する
 		const uint32_t color = m_color.pixel;
 		for (int32_t i = 0; i < m_vPosSize; i += 2)
 		{
-
 			// 始点
 			{
 				auto& curentVert = vert[vertSize];
@@ -551,22 +550,17 @@ namespace Equisetum2
 			vert.resize(segments + 1);
 		}
 
-		// 頂点とインデックスを作成する
+		// 頂点を作成する
 		const uint32_t color = m_color.pixel;
 		for (int32_t i = 0; i <= segments; i++)
 		{
-			// 頂点
-			{
-				float rads = i * coef;
+			float rads = i * coef;
 	
-				vert[vertSize].vertices[0] = m_radius * cosf(rads) + m_pos.x;
-				vert[vertSize].vertices[1] = m_radius * sinf(rads) + m_pos.y;
+			vert[vertSize].vertices[0] = m_radius * cosf(rads) + m_pos.x;
+			vert[vertSize].vertices[1] = m_radius * sinf(rads) + m_pos.y;
 	
-				auto vertexColor = reinterpret_cast<uint32_t*>(vert[vertSize].colors);
-				*vertexColor = color;
-			}
-
-			// インデックス
+			auto vertexColor = reinterpret_cast<uint32_t*>(vert[vertSize].colors);
+			*vertexColor = color;
 
 			vertSize++;
 		}
@@ -580,8 +574,7 @@ namespace Equisetum2
 		m_pImpl = std::make_shared<RectRenderer::Impl>();
 
 		// 予めある程度確保しておく
-		const int32_t defaultSize = 4;
-		m_pImpl->m_vertex.resize(defaultSize);
+		m_pImpl->m_vertex.resize(vertexMax);
 	}
 
 	std::shared_ptr<RectRenderer> RectRenderer::Create(std::shared_ptr<Renderer>& renderer)
@@ -606,8 +599,7 @@ namespace Equisetum2
 			}
 
 			// 予めある程度確保しておく
-			const int32_t defaultSize = 4;
-			inst->m_pImpl->m_vertex.resize(defaultSize);
+			inst->m_pImpl->m_vertex.resize(vertexMax);
 
 			return inst;
 		}
@@ -629,7 +621,19 @@ namespace Equisetum2
 
 	RectRenderer& RectRenderer::SetColor(const Color& color)
 	{
-		m_color = color;
+		for (auto& outColor : m_colors)
+		{
+			outColor = color;
+		}
+		return *this;
+	}
+
+	RectRenderer& RectRenderer::SetColor(const Color& leftTop, const Color& rightTop, const Color& leftBottom, const Color& rightBottom)
+	{
+		m_colors[0] = leftTop;
+		m_colors[2] = rightTop;
+		m_colors[1] = leftBottom;
+		m_colors[3] = rightBottom;
 		return *this;
 	}
 
@@ -659,14 +663,11 @@ namespace Equisetum2
 		auto& solid = m_pImpl->m_solid;
 
 		// サイズをクリア
-		vertSize = 4;
+		vertSize = vertexMax;
 
 		// 描画モードを設定する
 		blend = m_blend;
 		solid = m_solid;
-
-		// 頂点とインデックスを作成する
-		const uint32_t color = m_color.pixel;
 
 		// 頂点
 		{
@@ -676,7 +677,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[cur].pixel;
 		}
 		{
 			const int32_t cur = 1;
@@ -685,7 +686,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[cur].pixel;
 		}
 		{
 			const int32_t cur = solid ? 2 : 3;
@@ -694,7 +695,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[solid ? cur : cur - 1].pixel;
 		}
 		{
 			const int32_t cur = solid ? 3 : 2;
@@ -703,7 +704,7 @@ namespace Equisetum2
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height);
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
-			*vertexColor = color;
+			*vertexColor = m_colors[solid ? cur : cur + 1].pixel;
 		}
 
 		return true;
