@@ -34,6 +34,19 @@ namespace Equisetum2
 	};
 
 	/**
+	* カラー定義<br>
+	* よく使う色を予め定義しておく。
+	*/
+	namespace ColorDef
+	{
+		const Color White = { 255, 255, 255, 255 };
+		const Color Red   = { 255,   0,   0, 255 };
+		const Color Green = {   0, 255,   0, 255 };
+		const Color Blue  = {   0,   0, 255, 255 };
+		const Color Black = {   0,   0,   0, 255 };
+	}
+
+	/**
 	* イメージクラス
 	*/
 	class Image

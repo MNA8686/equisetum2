@@ -243,7 +243,7 @@ namespace Equisetum2
 		void InitTest();
 
 		std::vector<Point> m_vPos;			/// 表示位置
-		Color m_color = Sprite::ZERO;	/// 表示色
+		Color m_color = ColorDef::White;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
 		int32_t m_vPosSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
 	};
@@ -304,7 +304,7 @@ namespace Equisetum2
 		static const int vertexMax = 4;
 
 		Rect m_rect{};			/// 表示位置
-		Color m_colors[vertexMax]{ Sprite::ZERO, Sprite::ZERO, Sprite::ZERO, Sprite::ZERO };	/// 表示色
+		Color m_colors[vertexMax]{ ColorDef::White, ColorDef::White, ColorDef::White, ColorDef::White };	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
 		bool m_solid = false;		/// 塗りつぶしフラグ
 	};
@@ -365,7 +365,7 @@ namespace Equisetum2
 
 		Point m_pos{};			/// 表示位置
 		int32_t m_radius = 0;		/// 半径
-		Color m_color = Sprite::ZERO;	/// 表示色
+		Color m_color = ColorDef::White;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
 		bool m_solid = false;		/// 塗りつぶしフラグ
 	};
