@@ -475,29 +475,32 @@ namespace Equisetum2
 				const auto& inst = ctx.pPrimitiveRender->m_pImpl;
 				const stVertexPrimitive* pVertex = inst->GetVertex();
 				size_t filledVertexNum = inst->GetVertexCount();
-				const GLushort* pIndex = inst->GetIndex();
-				size_t filledIndexNum = inst->GetIndexCount();
 				bool solid = inst->GetSolid();
 
-				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+				glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * filledVertexNum, pVertex, GL_DYNAMIC_DRAW);
 
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * filledIndexNum, pIndex, GL_STATIC_DRAW);
 
 				if (m_currentStates.subType == PrimitiveType::LINE)
 				{
 					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(stVertexPrimitive), 0);
 					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(stVertexPrimitive), (const void*)(2 * sizeof(GLfloat)));
 
-					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(filledIndexNum));
+					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(filledVertexNum));
+				}
+				else if (m_currentStates.subType == PrimitiveType::RECT)
+				{
+					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(stVertexPrimitive), 0);
+					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(stVertexPrimitive), (const void*)(2 * sizeof(GLfloat)));
+
+					glDrawArrays(solid ? GL_TRIANGLE_STRIP : GL_LINE_LOOP, 0, static_cast<GLsizei>(filledVertexNum));
 				}
 				else if (m_currentStates.subType == PrimitiveType::CIRCLE)
 				{
 					glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(stVertexPrimitive), 0);
 					glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(stVertexPrimitive), (const void*)(2 * sizeof(GLfloat)));
 
-					glDrawArrays(solid ? GL_TRIANGLE_FAN : GL_LINE_STRIP, 0, static_cast<GLsizei>(filledIndexNum));
+					glDrawArrays(solid ? GL_TRIANGLE_FAN : GL_LINE_STRIP, 0, static_cast<GLsizei>(filledVertexNum));
 				}
 
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -526,6 +529,9 @@ namespace Equisetum2
 			{
 			case PrimitiveType::LINE:
 				obj = LineRenderer::Create(shared_from_this());
+				break;
+			case PrimitiveType::RECT:
+				obj = RectRenderer::Create(shared_from_this());
 				break;
 			case PrimitiveType::CIRCLE:
 				obj = CircleRenderer::Create(shared_from_this());
@@ -767,19 +773,15 @@ namespace Equisetum2
 					//-----------------------------------
 					// VBO作成
 					//-----------------------------------
-					glGenBuffers(2, ctx.m_VBO);
+					glGenBuffers(1, &ctx.m_VBO);
 
-					glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, ctx.m_VBO);
 					glBufferData(GL_ARRAY_BUFFER, sizeof(stVertexPrimitive) * len, vVertex.data(), GL_DYNAMIC_DRAW);
 
 					glEnableVertexAttribArray(0);
 					glEnableVertexAttribArray(1);
 
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.m_VBO[1]);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * len, vIndex.data(), GL_STATIC_DRAW);
-
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 					// GLエラーチェック
 				}
