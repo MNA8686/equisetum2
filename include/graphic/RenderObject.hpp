@@ -255,6 +255,64 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::PrimitiveRenderer, Equisetum2::
 
 namespace Equisetum2
 {
+	class RectRenderer : public PrimitiveRenderer
+	{
+	public:
+		RectRenderer() { m_subType = PrimitiveType::RECT; }
+		virtual ~RectRenderer() {}
+
+		RectRenderer& SetRect(const Rect& rect, bool solid = true);
+
+		RectRenderer& SetColor(const Color& color);
+
+		RectRenderer& SetLayer(int layer);
+		RectRenderer& SetOrderInLayer(int32_t orderInLayer);
+
+		RectRenderer& SetBlendMode(BlendMode blend);
+
+		bool Calculation();
+
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_rect));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_solid));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			InitTest();
+			archive(cereal::base_class<PrimitiveRenderer>(this));
+
+			archive(CEREAL_NVP(m_rect));
+			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_solid));
+		}
+
+	private:
+		friend class Renderer;
+		static std::shared_ptr<RectRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		void InitTest();
+
+		Rect m_rect{};			/// 表示位置
+		Color m_color = Sprite::ZERO;	/// 表示色
+		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+		bool m_solid = false;		/// 塗りつぶしフラグ
+	};
+}
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::RectRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::PrimitiveRenderer, Equisetum2::RectRenderer)
+
+namespace Equisetum2
+{
 	class CircleRenderer : public PrimitiveRenderer
 	{
 	public:
@@ -303,7 +361,6 @@ namespace Equisetum2
 		void InitTest();
 
 		Point m_pos{};			/// 表示位置
-//		Size m_size{};
 		int32_t m_radius = 0;		/// 半径
 		Color m_color = Sprite::ZERO;	/// 表示色
 		BlendMode m_blend = BlendMode::None;	/// ブレンドモード

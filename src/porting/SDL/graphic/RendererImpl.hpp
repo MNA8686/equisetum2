@@ -78,7 +78,7 @@ namespace Equisetum2
 		typedef struct
 		{
 			// VBO
-			GLuint m_VBO[2] = {};
+			GLuint m_VBO = {};
 
 			// レンダーオブジェクトを直接参照する
 			PrimitiveRenderer* pPrimitiveRender = nullptr;
