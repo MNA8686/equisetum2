@@ -2,6 +2,7 @@
 #define _EQRECT_H_
 
 #include <cstdint>
+#include <cereal/cereal.hpp>
 
 namespace Equisetum2
 {
@@ -32,6 +33,15 @@ namespace Equisetum2
 			y = src.y;
 			width = src.width;
 			height = src.height;
+		}
+
+		template<class Archive>
+		void serialize(Archive & archive)
+		{
+			archive(CEREAL_NVP(x));
+			archive(CEREAL_NVP(y));
+			archive(CEREAL_NVP(width));
+			archive(CEREAL_NVP(height));
 		}
 	};
 
