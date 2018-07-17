@@ -11,8 +11,16 @@ namespace Equisetum2
 	class Texture
 	{
 	public:
+		class AccessFlag
+		{
+		public:
+			static const int Static       = (1 << 0);
+			static const int Stream       = (1 << 1);		// don't work
+			static const int RenderTarget = (1 << 2);
+		};
+
 		static std::shared_ptr<Texture> CreateFromImage(const std::shared_ptr<Image> image);
-		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int flag);
+		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int32_t flag);
 		virtual bool Update(const Point& pos, const std::shared_ptr<Image> image);
 
 		/**
@@ -55,6 +63,7 @@ namespace Equisetum2
 	private:
 
 		String m_id;		/// ID
+		int32_t m_flag = AccessFlag::Static;		/// テクスチャアクセスフラグ
 	
 		Texture(const Texture&) = delete;				// コピーコンストラクタ封じ
 		Texture& operator= (const Texture&) = delete;	// コピーコンストラクタ封じ

@@ -84,7 +84,7 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int flag)
+	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag)
 	{
 		EQ_DURING
 		{
@@ -131,9 +131,22 @@ namespace Equisetum2
 				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
 			}
 
+			inst->m_flag = flag;
 			inst->m_pImpl->m_width = width;
 			inst->m_pImpl->m_height = height;
 			inst->m_pImpl->m_texID = spTexID;
+
+			if (inst->m_flag & AccessFlag::RenderTarget)
+			{
+				auto spFBO = std::shared_ptr<GLuint>(new GLuint,
+					[](GLuint* pID) {
+					::glDeleteFramebuffers(1, pID);
+					delete pID;
+				});
+
+				glGenFramebuffers(1, spFBO.get());
+				inst->m_pImpl->m_FBO = spFBO;
+			}
 
 			return inst;
 		}

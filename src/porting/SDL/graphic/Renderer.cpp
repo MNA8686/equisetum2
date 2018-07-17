@@ -191,11 +191,19 @@ namespace Equisetum2
 			}
 #endif
 
+			// フレームバッファを取得
+			GLint framebuffer = -1;
+			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+			inst->m_pImpl->m_framebuffer = static_cast<GLuint>(framebuffer);
+
+			inst->SetRenderTarget(nullptr);
+
+			// ビューポートを設定
 			int w, h;
 			SDL_GetWindowSize(pWindow.get(), &w, &h);
-			glViewport(0, 0, w, h);
-			inst->m_pImpl->SetProjection(w, h);
+			inst->SetViewport({ 0, 0, w, h });
 
+			// 画面をクリア
 			glClearColor((GLfloat)0, (GLfloat)0, (GLfloat)0, (GLfloat)0);
 			glClear(GL_COLOR_BUFFER_BIT);
 
@@ -211,6 +219,19 @@ namespace Equisetum2
 		EQ_END_HANDLER
 
 		return nullptr;
+	}
+
+	bool Renderer::SetViewport(const Rect& rect)
+	{
+		glViewport(rect.x, rect.y, rect.width, rect.height);
+		m_viewport = rect;
+
+		if (m_pImpl->m_currentProgramType != Type::EMPTY)
+		{
+			SetProjection();
+		}
+
+		return true;
 	}
 
 	bool Renderer::Clear(const Color& color)
@@ -398,7 +419,7 @@ namespace Equisetum2
 		{
 			auto& ctx = m_pImpl->m_spriteContext;
 
-			if (m_pImpl->SelectProgram(Type::SPRITE))
+			if (SelectProgram(Type::SPRITE))
 			{
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, *(m_currentStates.pTexture->m_pImpl->GetTexID()));
@@ -449,7 +470,7 @@ namespace Equisetum2
 		{
 			auto& ctx = m_pImpl->m_primitiveContext;
 
-			if (m_pImpl->SelectProgram(m_currentStates.type))
+			if (SelectProgram(m_currentStates.type))
 			{
 				glDisable(GL_DEPTH_TEST);
 
@@ -616,21 +637,22 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	bool Renderer::Impl::SelectProgram(Type type)
+	bool Renderer::SelectProgram(Type type)
 	{
 		// 同じプログラムなら何もしない
-		if (m_currentProgram == type)
+		if (m_pImpl->m_currentProgramType == type)
 		{
 			return true;
 		}
 
 		// プログラムがキャッシュされているか探し、キャッシュがあればそのまま使う
-		for (auto& program : m_programCache)
+		for (auto& program : m_pImpl->m_programCache)
 		{
 			if (program->m_type == type)
 			{
 				glUseProgram(program->m_programID);
-				m_currentProgram = type;
+				m_pImpl->m_currentProgramType = type;
+				SetProjection();
 				return true;
 			}
 		}
@@ -657,14 +679,14 @@ namespace Equisetum2
 			}
 
 			// バーテックスシェーダを取得
-			auto vertexShader = CompileShader(ShaderKind::Vertex, pDef->m_vertexSource);
+			auto vertexShader = m_pImpl->CompileShader(ShaderKind::Vertex, pDef->m_vertexSource);
 			if(!vertexShader)
 			{
 				EQ_THROW("vertex shader compile failed.");
 			}
 
 			// フラグメントシェーダを取得
-			auto fragmentShader = CompileShader(ShaderKind::Fragment, pDef->m_fragmentSource);
+			auto fragmentShader = m_pImpl->CompileShader(ShaderKind::Fragment, pDef->m_fragmentSource);
 			if (!fragmentShader)
 			{
 				EQ_THROW("fragmnt shader compile failed.");
@@ -722,7 +744,6 @@ namespace Equisetum2
 			{
 			case Type::SPRITE:
 				{
-					auto proj = glGetUniformLocation(newProgram, "u_projection");
 					auto u_texture = glGetUniformLocation(newProgram, "u_texture");
 
 					glUseProgram(newProgram);
@@ -730,23 +751,22 @@ namespace Equisetum2
 					//-----------------------------------
 					// uniform設定
 					//-----------------------------------
-					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
 					glUniform1i(u_texture, 0);
 
 					//-----------------------------------
 					// VBO作成
 					//-----------------------------------
-					glGenBuffers(2, m_spriteContext.m_VBO);
+					glGenBuffers(2, m_pImpl->m_spriteContext.m_VBO);
 
-					glBindBuffer(GL_ARRAY_BUFFER, m_spriteContext.m_VBO[0]);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(m_spriteContext.m_vertex[0]) * m_spriteContext.VBO_SIZE, m_spriteContext.m_vertex, GL_DYNAMIC_DRAW);
+					glBindBuffer(GL_ARRAY_BUFFER, m_pImpl->m_spriteContext.m_VBO[0]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(m_pImpl->m_spriteContext.m_vertex[0]) * m_pImpl->m_spriteContext.VBO_SIZE, m_pImpl->m_spriteContext.m_vertex, GL_DYNAMIC_DRAW);
 
 					glEnableVertexAttribArray(0);
 					glEnableVertexAttribArray(1);
 					glEnableVertexAttribArray(2);
 
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_spriteContext.m_VBO[1]);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_spriteContext.m_index[0]) * m_spriteContext.INDEX_VBO_SIZE, m_spriteContext.m_index, GL_STATIC_DRAW);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pImpl->m_spriteContext.m_VBO[1]);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_pImpl->m_spriteContext.m_index[0]) * m_pImpl->m_spriteContext.INDEX_VBO_SIZE, m_pImpl->m_spriteContext.m_index, GL_STATIC_DRAW);
 
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -757,8 +777,7 @@ namespace Equisetum2
 
 			case Type::PRIMITIVE:
 				{
-					auto& ctx = m_primitiveContext;
-					auto proj = glGetUniformLocation(newProgram, "u_projection");
+					auto& ctx = m_pImpl->m_primitiveContext;
 					const int len = 8192;
 					std::vector<stVertexPrimitive> vVertex(len);
 					std::vector<GLushort> vIndex(len);
@@ -768,7 +787,6 @@ namespace Equisetum2
 					//-----------------------------------
 					// uniform設定
 					//-----------------------------------
-					glUniformMatrix4fv(proj, 1, GL_FALSE, (GLfloat *)m_projection);
 
 					//-----------------------------------
 					// VBO作成
@@ -788,9 +806,10 @@ namespace Equisetum2
 				break;
 			}
 
-			m_programCache.push_front(newProgramCache);
+			m_pImpl->m_programCache.push_front(newProgramCache);
 
-			m_currentProgram = type;
+			m_pImpl->m_currentProgramType = type;
+			SetProjection();
 
 			return true;
 		}
@@ -803,26 +822,81 @@ namespace Equisetum2
 		return false;
 	}
 
-	void Renderer::Impl::SetProjection(int w, int h)
+	void Renderer::SetProjection()
 	{
-		m_projection[0][0] = 2.0f / w;
-		m_projection[0][1] = 0.0f;
-		m_projection[0][2] = 0.0f;
-		m_projection[0][3] = 0.0f;
+		if (m_viewport.width == 0 || m_viewport.height == 0)
+		{
+			return;
+		}
 
-		m_projection[1][0] = 0.0f;
-		m_projection[1][1] = -2.0f / h;
-		m_projection[1][2] = 0.0f;
-		m_projection[1][3] = 0.0f;
+		for (auto& program : m_pImpl->m_programCache)
+		{
+			if (program->m_type == m_pImpl->m_currentProgramType)
+			{
+				GLfloat projection[4][4];
 
-		m_projection[2][0] = 0.0f;
-		m_projection[2][1] = 0.0f;
-		m_projection[2][2] = 0.0f;
-		m_projection[2][3] = 0.0f;
+				projection[0][0] = 2.0f / m_viewport.width;
+				projection[0][1] = 0.0f;
+				projection[0][2] = 0.0f;
+				projection[0][3] = 0.0f;
 
-		m_projection[3][0] = -1.0f;
-		m_projection[3][1] = 1.0f;
-		m_projection[3][2] = 0.0f;
-		m_projection[3][3] = 1.0f;
+				projection[1][0] = 0.0f;
+				projection[1][1] = (m_renderTarget ? 2.0f : -2.0f) / m_viewport.height;
+				projection[1][2] = 0.0f;
+				projection[1][3] = 0.0f;
+
+				projection[2][0] = 0.0f;
+				projection[2][1] = 0.0f;
+				projection[2][2] = 0.0f;
+				projection[2][3] = 0.0f;
+
+				projection[3][0] = -1.0f;
+				projection[3][1] = m_renderTarget ? -1.0f : 1.0f;
+				projection[3][2] = 0.0f;
+				projection[3][3] = 1.0f;
+
+				if (memcmp(projection, program->m_projection, sizeof(projection)) != 0)
+				{
+					GLint programID = program->m_programID;
+					GLint proj = glGetUniformLocation(programID, "u_projection");
+
+					glUniformMatrix4fv(proj, 1, GL_FALSE, reinterpret_cast<GLfloat*>(projection));
+
+					memcpy(program->m_projection, projection, sizeof(projection));
+				}
+				break;
+			}
+		}
 	}
+
+	bool Renderer::SetRenderTarget(std::shared_ptr<Texture> texture)
+	{
+		bool ret = false;
+
+		if (texture)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, *(texture->m_pImpl->GetFBO()));
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(texture->m_pImpl->GetTexID()), 0);
+
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status == GL_FRAMEBUFFER_COMPLETE)
+			{
+				m_renderTarget = texture;
+				ret = true;
+			}
+			else
+			{
+				Logger::OutputError("レンダーターゲットの切り替えに失敗しました。");
+			}
+		}
+		else
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_pImpl->m_framebuffer);
+			m_renderTarget = nullptr;
+			ret = true;
+		}
+
+		return ret;
+	}
+
 }

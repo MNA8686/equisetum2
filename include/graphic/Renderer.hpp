@@ -29,6 +29,8 @@ namespace Equisetum2
 
 		bool AddRenderQueue(RenderObject* pRenderObject);
 		bool Render();
+		bool SetRenderTarget(std::shared_ptr<Texture> texture);
+		bool SetViewport(const Rect& rect);
 
 		std::shared_ptr<RenderObject> CreateRenderObject(Type type, int32_t subType=0);
 
@@ -43,6 +45,8 @@ namespace Equisetum2
 		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
 		int32_t m_renderObjectIndex[LayerMax]{0};					/// レンダーキューのサイズ
 		//String m_id;		/// ID
+		std::shared_ptr<Texture> m_renderTarget;					/// レンダーターゲット
+		Rect m_viewport;		/// ビューポート
 
 		stState m_currentStates = {};
 		bool DrawCall();
@@ -52,6 +56,8 @@ namespace Equisetum2
 		Renderer& operator= (const Renderer&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
 
 		void SortRenderQueue();
+		void SetProjection();
+		bool SelectProgram(Type type);
 	};
 }
 

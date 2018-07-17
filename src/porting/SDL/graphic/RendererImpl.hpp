@@ -29,6 +29,7 @@ namespace Equisetum2
 	public:
 		Type m_type = Type::EMPTY;
 		GLint m_programID = 0;
+		GLfloat m_projection[4][4]{};	// プロジェクションマトリックス
 		std::shared_ptr<stShaderCache> m_vertexCache;
 		std::shared_ptr<stShaderCache> m_fragmentCache;
 	};
@@ -54,9 +55,6 @@ namespace Equisetum2
 
 		std::shared_ptr<SDL_Window> m_attachedWindow;		// このレンダラに関連付けされているウィンドウ
 		std::shared_ptr<SDL_GLContext> m_GLContext;			// OpenGLコンテキスト
-
-		bool SelectProgram(Type type);
-		void SetProjection(int w, int h);
 
 		typedef struct
 		{
@@ -87,11 +85,11 @@ namespace Equisetum2
 
 	private:
 
-		// プロジェクションマトリックス
-		GLfloat m_projection[4][4];
-
 		// 現在設定されているプログラム
-		Type m_currentProgram = Type::EMPTY;
+		Type m_currentProgramType = Type::EMPTY;
+
+		// ウィンドウに関連付けられたフレームバッファ
+		GLuint m_framebuffer = 0;
 
 		// シェーダをコンパイルし、キャッシュに登録する
 		std::shared_ptr<stShaderCache> CompileShader(ShaderKind kind, const char* source);
