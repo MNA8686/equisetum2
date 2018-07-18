@@ -146,6 +146,15 @@ namespace Equisetum2
 
 				glGenFramebuffers(1, spFBO.get());
 				inst->m_pImpl->m_FBO = spFBO;
+
+				glBindFramebuffer(GL_FRAMEBUFFER, *(inst->m_pImpl->GetFBO()));
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(inst->m_pImpl->GetTexID()), 0);
+
+				GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+				if (status != GL_FRAMEBUFFER_COMPLETE)
+				{
+					EQ_THROW(u8"レンダーターゲットの切り替えに失敗しました。");
+				}
 			}
 
 			return inst;

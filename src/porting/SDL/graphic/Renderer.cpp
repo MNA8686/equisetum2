@@ -196,8 +196,6 @@ namespace Equisetum2
 			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
 			inst->m_pImpl->m_framebuffer = static_cast<GLuint>(framebuffer);
 
-			inst->SetRenderTarget(nullptr);
-
 			// ビューポートを設定
 			int w, h;
 			SDL_GetWindowSize(pWindow.get(), &w, &h);
@@ -223,9 +221,52 @@ namespace Equisetum2
 
 	bool Renderer::SetViewport(const Rect& rect)
 	{
-		glViewport(rect.x, rect.y, rect.width, rect.height);
-		m_viewport = rect;
+		if (rect.width == 0 || rect.height == 0)
+		{
+			return false;
+		}
 
+		// ビューポートを設定
+		glViewport(rect.x, rect.y, rect.width, rect.height);
+
+		// ウィンドウのビューポートを保存
+		if (!m_renderTarget)
+		{
+			m_viewport = rect;
+		}
+
+		// プロジェクションマトリックス更新
+		{
+			auto& proj = m_pImpl->m_projection;
+
+			proj[0][0] = 2.0f / rect.width;
+			proj[0][1] = 0.0f;
+			proj[0][2] = 0.0f;
+			proj[0][3] = 0.0f;
+
+			proj[1][0] = 0.0f;
+			proj[1][1] = (m_renderTarget ? 2.0f : -2.0f) / rect.height;
+			proj[1][2] = 0.0f;
+			proj[1][3] = 0.0f;
+
+			proj[2][0] = 0.0f;
+			proj[2][1] = 0.0f;
+			proj[2][2] = 0.0f;
+			proj[2][3] = 0.0f;
+
+			proj[3][0] = -1.0f;
+			proj[3][1] = m_renderTarget ? -1.0f : 1.0f;
+			proj[3][2] = 0.0f;
+			proj[3][3] = 1.0f;
+		}
+
+		for (auto& program : m_pImpl->m_programCache)
+		{
+			// 現在存在しているプログラムに更新をかける
+			program->m_projectionDirty = true;
+		}
+
+		// 現在設定されているプログラムにプロジェクションをセット
 		if (m_pImpl->m_currentProgramType != Type::EMPTY)
 		{
 			SetProjection();
@@ -652,6 +693,8 @@ namespace Equisetum2
 			{
 				glUseProgram(program->m_programID);
 				m_pImpl->m_currentProgramType = type;
+
+				// プロジェクションが更新されているかもしれないのでプロジェクションの設定を実行
 				SetProjection();
 				return true;
 			}
@@ -806,9 +849,13 @@ namespace Equisetum2
 				break;
 			}
 
+			// プログラムキャッシュに追加
 			m_pImpl->m_programCache.push_front(newProgramCache);
 
+			// 現在設定されているプログラムの種類を保持
 			m_pImpl->m_currentProgramType = type;
+
+			// プロジェクションを設定
 			SetProjection();
 
 			return true;
@@ -824,45 +871,17 @@ namespace Equisetum2
 
 	void Renderer::SetProjection()
 	{
-		if (m_viewport.width == 0 || m_viewport.height == 0)
-		{
-			return;
-		}
-
 		for (auto& program : m_pImpl->m_programCache)
 		{
 			if (program->m_type == m_pImpl->m_currentProgramType)
 			{
-				GLfloat projection[4][4];
-
-				projection[0][0] = 2.0f / m_viewport.width;
-				projection[0][1] = 0.0f;
-				projection[0][2] = 0.0f;
-				projection[0][3] = 0.0f;
-
-				projection[1][0] = 0.0f;
-				projection[1][1] = (m_renderTarget ? 2.0f : -2.0f) / m_viewport.height;
-				projection[1][2] = 0.0f;
-				projection[1][3] = 0.0f;
-
-				projection[2][0] = 0.0f;
-				projection[2][1] = 0.0f;
-				projection[2][2] = 0.0f;
-				projection[2][3] = 0.0f;
-
-				projection[3][0] = -1.0f;
-				projection[3][1] = m_renderTarget ? -1.0f : 1.0f;
-				projection[3][2] = 0.0f;
-				projection[3][3] = 1.0f;
-
-				if (memcmp(projection, program->m_projection, sizeof(projection)) != 0)
+				if (program->m_projectionDirty)
 				{
-					GLint programID = program->m_programID;
-					GLint proj = glGetUniformLocation(programID, "u_projection");
+					GLint projID = glGetUniformLocation(program->m_programID, "u_projection");
 
-					glUniformMatrix4fv(proj, 1, GL_FALSE, reinterpret_cast<GLfloat*>(projection));
+					glUniformMatrix4fv(projID, 1, GL_FALSE, reinterpret_cast<GLfloat*>(m_pImpl->m_projection));
 
-					memcpy(program->m_projection, projection, sizeof(projection));
+					program->m_projectionDirty = false;
 				}
 				break;
 			}
@@ -871,29 +890,15 @@ namespace Equisetum2
 
 	bool Renderer::SetRenderTarget(std::shared_ptr<Texture> texture)
 	{
-		bool ret = false;
+		bool ret = true;
 
-		if (texture)
+		if (m_renderTarget != texture)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, *(texture->m_pImpl->GetFBO()));
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(texture->m_pImpl->GetTexID()), 0);
-
-			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			if (status == GL_FRAMEBUFFER_COMPLETE)
-			{
-				m_renderTarget = texture;
-				ret = true;
-			}
-			else
-			{
-				Logger::OutputError("レンダーターゲットの切り替えに失敗しました。");
-			}
-		}
-		else
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, m_pImpl->m_framebuffer);
-			m_renderTarget = nullptr;
-			ret = true;
+			glBindFramebuffer(GL_FRAMEBUFFER, texture ? *(texture->m_pImpl->GetFBO()) : m_pImpl->m_framebuffer);
+			m_renderTarget = texture;
+			ret = SetViewport(texture ? 
+								Rect{ 0, 0, static_cast<int32_t>(texture->Width()), static_cast<int32_t>(texture->Height()) }
+								: m_viewport);
 		}
 
 		return ret;

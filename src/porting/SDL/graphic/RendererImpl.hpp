@@ -29,7 +29,7 @@ namespace Equisetum2
 	public:
 		Type m_type = Type::EMPTY;
 		GLint m_programID = 0;
-		GLfloat m_projection[4][4]{};	// プロジェクションマトリックス
+		bool m_projectionDirty = true;		/// プロジェクション更新フラグ
 		std::shared_ptr<stShaderCache> m_vertexCache;
 		std::shared_ptr<stShaderCache> m_fragmentCache;
 	};
@@ -90,6 +90,9 @@ namespace Equisetum2
 
 		// ウィンドウに関連付けられたフレームバッファ
 		GLuint m_framebuffer = 0;
+
+		// プロジェクションマトリックス
+		GLfloat m_projection[4][4]{};
 
 		// シェーダをコンパイルし、キャッシュに登録する
 		std::shared_ptr<stShaderCache> CompileShader(ShaderKind kind, const char* source);

@@ -45,7 +45,8 @@ namespace Equisetum2
 		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
 		int32_t m_renderObjectIndex[LayerMax]{0};					/// レンダーキューのサイズ
 		//String m_id;		/// ID
-		std::shared_ptr<Texture> m_renderTarget;					/// レンダーターゲット
+		std::shared_ptr<Texture> m_renderTarget;					/// レンダーターゲット nullptrの場合、ウィンドウに描画。 <br>
+																	///                    nullptr以外の場合、設定されたテクスチャに描画。
 		Rect m_viewport;		/// ビューポート
 
 		stState m_currentStates = {};
