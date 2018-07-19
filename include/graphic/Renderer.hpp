@@ -32,6 +32,7 @@ namespace Equisetum2
 		bool Render();
 		bool SetRenderTarget(std::shared_ptr<Texture> texture);
 		bool SetViewport(const Rect& rect);
+		void SetClipRect(const Rect& rect = {});
 
 		std::shared_ptr<RenderObject> CreateRenderObject(Type type, int32_t subType=0);
 
@@ -50,6 +51,10 @@ namespace Equisetum2
 																	///                    nullptr以外の場合、設定されたテクスチャに描画。
 		Rect m_viewport;		/// 現在のビューポート
 		Rect m_viewportBak;		/// ウィンドウのビューポート退避用
+		Rect m_clipRect;		/// 現在のクリップ領域
+		Rect m_clipRectBak;		/// ウィンドウのクリップ領域退避用
+		bool m_clippingEnabled = false;		/// 現在のクリッピング設定
+		bool m_clippingEnabledBak = false;	/// ウィンドウのクリッピング設定退避用
 
 		stState m_currentStates = {};
 		bool DrawCall();

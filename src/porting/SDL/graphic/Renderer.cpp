@@ -226,8 +226,19 @@ namespace Equisetum2
 			return false;
 		}
 
-		// ビューポートを設定
-		glViewport(rect.x, rect.y, rect.width, rect.height);
+		if (m_renderTarget)
+		{
+			// ビューポートを設定
+			glViewport(rect.x, rect.y, rect.width, rect.height);
+		}
+		else
+		{
+			int w, h;
+			SDL_GetWindowSize(m_pImpl->m_attachedWindow.get(), &w, &h);
+
+			// ビューポートを設定
+			glViewport(rect.x, h - rect.y - rect.height, rect.width, rect.height);
+		}
 
 		// ウィンドウのビューポートを保存
 		if (!m_renderTarget)
@@ -904,25 +915,35 @@ namespace Equisetum2
 			if (texture && !m_renderTarget)
 			{
 				m_viewportBak = m_viewport;
+				m_clipRectBak = m_clipRect;
+				m_clippingEnabledBak = m_clippingEnabled;
 			}
 
 			if (texture)
 			{
 				// テクスチャのサイズを設定
-				m_viewport = {  0, 
-								0, 
-								static_cast<int32_t>(texture->Width()), 
+				m_viewport = { 0,
+								0,
+								static_cast<int32_t>(texture->Width()),
 								static_cast<int32_t>(texture->Height()) };
+				m_clipRect = {};
+				m_clippingEnabled = false;
 			}
 			else
 			{
 				// ウィンドウの設定を復元
 				m_viewport = m_viewportBak;
+				m_clipRect = m_clipRectBak;
+				m_clippingEnabled = m_clippingEnabledBak;
 			}
 
 			glBindFramebuffer(GL_FRAMEBUFFER, texture ? *(texture->m_pImpl->GetFBO()) : m_pImpl->m_framebuffer);
 			m_renderTarget = texture;
 			ret = SetViewport(m_viewport);
+			if (ret)
+			{
+				SetClipRect(m_clipRect);
+			}
 
 			// レンダーキュークリア
 			ClearRenderQueue();
@@ -931,4 +952,38 @@ namespace Equisetum2
 		return ret;
 	}
 
+	void Renderer::SetClipRect(const Rect& rect)
+	{
+		if (rect.width == 0 ||
+			rect.height == 0)
+		{
+			m_clippingEnabled = false;
+			glDisable(GL_SCISSOR_TEST);
+		}
+		else
+		{
+			m_clippingEnabled = true;
+			m_clipRect = rect;
+
+			glEnable(GL_SCISSOR_TEST);
+
+			if (m_renderTarget)
+			{
+				glScissor(m_viewport.x + rect.x,
+					m_viewport.y + rect.y,
+					rect.width,
+					rect.height);
+			}
+			else
+			{
+				int w, h;
+				SDL_GetWindowSize(m_pImpl->m_attachedWindow.get(), &w, &h);
+
+				glScissor(m_viewport.x + rect.x,
+					h - m_viewport.y - rect.y - rect.height,
+					rect.width,
+					rect.height);
+			}
+		}
+	}
 }
