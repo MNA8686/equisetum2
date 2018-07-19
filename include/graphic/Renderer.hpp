@@ -28,6 +28,7 @@ namespace Equisetum2
 		static std::shared_ptr<Renderer> Create();
 
 		bool AddRenderQueue(RenderObject* pRenderObject);
+		void ClearRenderQueue();
 		bool Render();
 		bool SetRenderTarget(std::shared_ptr<Texture> texture);
 		bool SetViewport(const Rect& rect);
@@ -47,7 +48,8 @@ namespace Equisetum2
 		//String m_id;		/// ID
 		std::shared_ptr<Texture> m_renderTarget;					/// レンダーターゲット nullptrの場合、ウィンドウに描画。 <br>
 																	///                    nullptr以外の場合、設定されたテクスチャに描画。
-		Rect m_viewport;		/// ビューポート
+		Rect m_viewport;		/// 現在のビューポート
+		Rect m_viewportBak;		/// ウィンドウのビューポート退避用
 
 		stState m_currentStates = {};
 		bool DrawCall();
@@ -57,7 +59,7 @@ namespace Equisetum2
 		Renderer& operator= (const Renderer&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
 
 		void SortRenderQueue();
-		void SetProjection();
+		void SetOrthographicProjection();
 		bool SelectProgram(Type type);
 	};
 }

@@ -269,7 +269,7 @@ namespace Equisetum2
 		// 現在設定されているプログラムにプロジェクションをセット
 		if (m_pImpl->m_currentProgramType != Type::EMPTY)
 		{
-			SetProjection();
+			SetOrthographicProjection();
 		}
 
 		return true;
@@ -444,10 +444,7 @@ namespace Equisetum2
 		DrawCall();
 
 		// レンダーキューをクリアする
-		for (auto& index : m_renderObjectIndex)
-		{
-			index = 0;
-		}
+		ClearRenderQueue();
 
 		Logger::OutputDebug("draw call %d", gDrawCallCount);
 
@@ -575,6 +572,15 @@ namespace Equisetum2
 		return true;
 	}
 
+	void Renderer::ClearRenderQueue()
+	{
+		// レンダーキューをクリアする
+		for (auto& index : m_renderObjectIndex)
+		{
+			index = 0;
+		}
+	}
+
 	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(Type type, int32_t subType)
 	{
 		std::shared_ptr<RenderObject> obj;
@@ -695,7 +701,7 @@ namespace Equisetum2
 				m_pImpl->m_currentProgramType = type;
 
 				// プロジェクションが更新されているかもしれないのでプロジェクションの設定を実行
-				SetProjection();
+				SetOrthographicProjection();
 				return true;
 			}
 		}
@@ -856,7 +862,7 @@ namespace Equisetum2
 			m_pImpl->m_currentProgramType = type;
 
 			// プロジェクションを設定
-			SetProjection();
+			SetOrthographicProjection();
 
 			return true;
 		}
@@ -869,7 +875,7 @@ namespace Equisetum2
 		return false;
 	}
 
-	void Renderer::SetProjection()
+	void Renderer::SetOrthographicProjection()
 	{
 		for (auto& program : m_pImpl->m_programCache)
 		{
@@ -894,11 +900,32 @@ namespace Equisetum2
 
 		if (m_renderTarget != texture)
 		{
+			// レンダリング先がテクスチャになるときにウィンドウの設定を保存
+			if (texture && !m_renderTarget)
+			{
+				m_viewportBak = m_viewport;
+			}
+
+			if (texture)
+			{
+				// テクスチャのサイズを設定
+				m_viewport = {  0, 
+								0, 
+								static_cast<int32_t>(texture->Width()), 
+								static_cast<int32_t>(texture->Height()) };
+			}
+			else
+			{
+				// ウィンドウの設定を復元
+				m_viewport = m_viewportBak;
+			}
+
 			glBindFramebuffer(GL_FRAMEBUFFER, texture ? *(texture->m_pImpl->GetFBO()) : m_pImpl->m_framebuffer);
 			m_renderTarget = texture;
-			ret = SetViewport(texture ? 
-								Rect{ 0, 0, static_cast<int32_t>(texture->Width()), static_cast<int32_t>(texture->Height()) }
-								: m_viewport);
+			ret = SetViewport(m_viewport);
+
+			// レンダーキュークリア
+			ClearRenderQueue();
 		}
 
 		return ret;
