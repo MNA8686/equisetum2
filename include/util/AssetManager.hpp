@@ -103,6 +103,12 @@ namespace Equisetum2
 		}
 
 		template<>
+		static std::shared_ptr<BGM> _Load(const String& id)
+		{
+			return _LoadBGM(id);
+		}
+
+		template<>
 		static std::shared_ptr<Texture> _Load(const String& id)
 		{
 			return _LoadTexture(id);

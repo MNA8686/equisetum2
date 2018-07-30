@@ -80,6 +80,7 @@ namespace Equisetum2
 			
 				auto& bgm = m_bgm[0];
 				bgm.m_music = nullptr;
+				bgm.m_stream = stream;
 
 				auto pMusic = Mix_LoadMUS_RW(rwops, 1);
 				if (!pMusic)
@@ -470,6 +471,7 @@ namespace Equisetum2
 			std::shared_ptr<Mix_Music> m_music;
 			int m_pauseRefCount = 0;
 			double m_volume = Audio::MaxVolume;
+			std::shared_ptr<IStream> m_stream;
 		};
 
 		struct SE
