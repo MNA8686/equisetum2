@@ -13,11 +13,17 @@ namespace Equisetum2
 		uint32_t m_width = 0;		/// テクスチャの横幅
 		uint32_t m_height = 0;		/// テクスチャの縦幅
 		std::shared_ptr<GLuint> m_texID;		/// テクスチャID
+		std::shared_ptr<GLuint> m_FBO = 0;		/// フレームバッファオブジェクト
 
 	public:
 		std::shared_ptr<GLuint>& GetTexID()
 		{
 			return m_texID;
+		}
+
+		std::shared_ptr<GLuint>& GetFBO()
+		{
+			return m_FBO;
 		}
 	};
 }

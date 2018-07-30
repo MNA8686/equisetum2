@@ -28,7 +28,11 @@ namespace Equisetum2
 		static std::shared_ptr<Renderer> Create();
 
 		bool AddRenderQueue(RenderObject* pRenderObject);
+		void ClearRenderQueue();
 		bool Render();
+		bool SetRenderTarget(std::shared_ptr<Texture> texture);
+		bool SetViewport(const Rect& rect);
+		void SetClipRect(const Rect& rect = {});
 
 		std::shared_ptr<RenderObject> CreateRenderObject(Type type, int32_t subType=0);
 
@@ -43,6 +47,14 @@ namespace Equisetum2
 		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
 		int32_t m_renderObjectIndex[LayerMax]{0};					/// レンダーキューのサイズ
 		//String m_id;		/// ID
+		std::shared_ptr<Texture> m_renderTarget;					/// レンダーターゲット nullptrの場合、ウィンドウに描画。 <br>
+																	///                    nullptr以外の場合、設定されたテクスチャに描画。
+		Rect m_viewport;		/// 現在のビューポート
+		Rect m_viewportBak;		/// ウィンドウのビューポート退避用
+		Rect m_clipRect;		/// 現在のクリップ領域
+		Rect m_clipRectBak;		/// ウィンドウのクリップ領域退避用
+		bool m_clippingEnabled = false;		/// 現在のクリッピング設定
+		bool m_clippingEnabledBak = false;	/// ウィンドウのクリッピング設定退避用
 
 		stState m_currentStates = {};
 		bool DrawCall();
@@ -52,6 +64,8 @@ namespace Equisetum2
 		Renderer& operator= (const Renderer&&) = delete;	// ムーブセマンティクスコンストラクタ封じ
 
 		void SortRenderQueue();
+		void SetOrthographicProjection();
+		bool SelectProgram(Type type);
 	};
 }
 
