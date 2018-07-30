@@ -55,6 +55,8 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_visible));
 			//archive(CEREAL_NVP(m_renderer));
 		}
+
+		virtual bool Calculation() = 0;
 #endif
 
 	protected:
@@ -129,7 +131,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
-			archive(CEREAL_NVP(m_color.pixel));
+			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
