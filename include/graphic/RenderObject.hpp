@@ -10,6 +10,7 @@
 #include "graphic/RendererState.hpp"
 #include "graphic/RenderObject.hpp"
 #include "graphic/Renderer.hpp"
+#include "graphic/BitmapFont.hpp"
 #include "util/AssetManager.hpp"
 #include <memory>
 
@@ -26,7 +27,7 @@ namespace Equisetum2
 	{
 	public:
 		virtual ~RenderObject();
-		Type GetType() const;
+		RenderType GetType() const;
 		int32_t GetSubType() const;
 		int GetLayer() const;
 		int32_t GetOrderInLayer() const;
@@ -61,7 +62,7 @@ namespace Equisetum2
 
 	protected:
 		// --- serialize begin ---
-		Type m_type = Type::EMPTY;
+		RenderType m_type = RenderType::EMPTY;
 		int32_t m_subType = 0;
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
@@ -76,7 +77,7 @@ namespace Equisetum2
 	class SpriteRenderer : public RenderObject
 	{
 	public:
-		SpriteRenderer() { m_type = Type::SPRITE; }
+		SpriteRenderer() { m_type = RenderType::SPRITE; }
 		virtual ~SpriteRenderer() {}
 
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
@@ -169,10 +170,134 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::Sprit
 
 namespace Equisetum2
 {
+	enum class TextHAlignment  : int
+	{
+		Left,
+		Center,
+		Right
+	};
+
+	class TextRenderer : public RenderObject
+	{
+	public:
+		TextRenderer() { m_type = RenderType::TEXT; }
+		virtual ~TextRenderer() {}
+
+		TextRenderer& SetBitmapFont(const std::shared_ptr<BitmapFont>& bitmapFont);
+		TextRenderer& SetText(const String& text);
+
+		TextRenderer& SetPos(const Point& pos);
+
+		TextRenderer& SetScale(float x, float y);
+		TextRenderer& SetScaleX(float x);
+		TextRenderer& SetScaleY(float y);
+		TextRenderer& SetColor(const Color& color);
+		TextRenderer& SetAngle(float angle);
+
+		TextRenderer& SetFlipX(bool isFlip);
+		TextRenderer& SetFlipY(bool isFlip);
+		TextRenderer& SetTextHAlignment(TextHAlignment textHAlignment);
+		TextRenderer& SetPivot(PointF pivot);
+
+		TextRenderer& SetLayer(int layer);
+		TextRenderer& SetOrderInLayer(int32_t orderInLayer);
+
+		TextRenderer& SetBlendMode(BlendMode blend);
+
+		std::shared_ptr<SpriteRenderer> GetLetter(size_t letterNum);
+		size_t GetLetterSize() const;
+		Size GetBoxSize() const;
+
+		bool Calculation();
+
+		template<class Archive>
+		void save(Archive & archive) const
+		{
+			archive(cereal::base_class<RenderObject>(this));
+
+//			std::string spriteId = m_sprite->Identify();
+//			archive(CEREAL_NVP(spriteId));
+
+//			archive(CEREAL_NVP(m_atlasNum));
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_color));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_flipX));
+			archive(CEREAL_NVP(m_flipY));
+			archive(CEREAL_NVP(m_angle));
+		}
+
+		template<class Archive>
+		void load(Archive & archive)
+		{
+			InitTest();
+			archive(cereal::base_class<RenderObject>(this));
+
+//			std::string spriteId;
+//			archive(CEREAL_NVP(spriteId));
+//			m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
+
+//			archive(CEREAL_NVP(m_atlasNum));
+			archive(CEREAL_NVP(m_pos));
+			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_color));
+			archive(CEREAL_NVP(m_blend));
+			archive(CEREAL_NVP(m_flipX));
+			archive(CEREAL_NVP(m_flipY));
+			archive(CEREAL_NVP(m_angle));
+		}
+
+		class Impl;
+		std::shared_ptr<Impl> m_pImpl;
+
+	private:
+		friend class Renderer;
+		static std::shared_ptr<TextRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		void InitTest();
+
+		void MeasurementBoxSize();
+
+		//
+		std::shared_ptr<BitmapFont> m_bitmapFont;
+		Point m_pos;			/// 表示位置
+		SizeF m_scale{ 1.f, 1.f };	/// 表示倍率
+		PointF m_pivot{ 0, 0 };	/// ピボット
+		Color m_color = Sprite::ZERO;	/// 表示色
+		BlendMode m_blend = BlendMode::None;	/// ブレンドモード
+		bool m_flipX = false;	/// X方向反転
+		bool m_flipY = false;	/// Y方向反転
+		float m_angle = 0;		/// 回転角度
+		TextHAlignment m_textHAlignment = TextHAlignment::Left;
+		//
+
+		float m_angleRad = 0;
+		std::vector<std::shared_ptr<SpriteRenderer>> m_vSpriteRenderer;
+		std::u32string m_text;		/// コードポイント配列
+		int32_t m_height = 0;		/// フォントの高さ
+
+		typedef struct
+		{
+			int32_t x = -1;
+			int atlas = -1;
+		}stCodeMap;
+
+		std::vector<stCodeMap> m_vCodeMap;
+		std::vector<int> m_vWidth;	/// 行ごとの横幅
+		Size m_boxSize;		/// 文字列が収まるボックスのサイズ
+	};
+}
+
+#include <cereal/types/polymorphic.hpp>
+CEREAL_REGISTER_TYPE(Equisetum2::TextRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Equisetum2::RenderObject, Equisetum2::TextRenderer)
+
+namespace Equisetum2
+{
 	class PrimitiveRenderer : public RenderObject
 	{
 	public:
-		PrimitiveRenderer() { m_type = Type::PRIMITIVE; }
+		PrimitiveRenderer() { m_type = RenderType::PRIMITIVE; }
 		virtual ~PrimitiveRenderer() {}
 
 		template<class Archive>

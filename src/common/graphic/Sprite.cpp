@@ -18,7 +18,7 @@ namespace Equisetum2
 		return true;
 	}
 
-	const stSpriteAnimAtlas& Sprite::GetAtlas(int32_t num)
+	const stSpriteAnimAtlas& Sprite::GetAtlas(int32_t num) const
 	{
 		// TODO:‰½‚àİ’è‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Ì‚±‚Æ‚àl‚¦‚é
 

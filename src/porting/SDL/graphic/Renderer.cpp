@@ -96,7 +96,7 @@ namespace Equisetum2
 	// シェーダ定義構造体
 	typedef struct
 	{
-		Type m_type;		// シェーダ用途タイプ
+		ShaderType m_type;		// シェーダ用途タイプ
 		const char* m_vertexSource;			// バーテックスシェーダのソース
 		const char* m_fragmentSource;		// フラグメントシェーダのソース
 	}stShaderDef;
@@ -105,12 +105,12 @@ namespace Equisetum2
 	static const stShaderDef gShaderTbl[] =
 	{
 		{
-			Type::SPRITE,
+			ShaderType::SPRITE,
 			vertexShaderSpriteSrc,
 			fragmentShaderSpriteSrc
 		},
 		{
-			Type::PRIMITIVE,
+			ShaderType::PRIMITIVE,
 			vertexShaderPrimitiveSrc,
 			fragmentShaderPrimitiveSrc
 		},
@@ -278,7 +278,7 @@ namespace Equisetum2
 		}
 
 		// 現在設定されているプログラムにプロジェクションをセット
-		if (m_pImpl->m_currentProgramType != Type::EMPTY)
+		if (m_pImpl->m_currentProgramType != ShaderType::EMPTY)
 		{
 			SetOrthographicProjection();
 		}
@@ -363,7 +363,7 @@ namespace Equisetum2
 		SortRenderQueue();
 
 		// カレントステートをリセット
-		m_currentStates.type = Type::EMPTY;
+		m_currentStates.type = RenderType::EMPTY;
 		m_currentStates.blend = BlendMode::None;
 		m_currentStates.pTexture = nullptr;
 
@@ -382,7 +382,7 @@ namespace Equisetum2
 				// 表示内容を算出する
 				renderObject->Calculation();
 
-				if (renderObject->GetType() == Type::SPRITE)
+				if (renderObject->GetType() == RenderType::SPRITE)
 				{
 					auto spriteRenderer = static_cast<SpriteRenderer*>(renderObject);
 
@@ -392,7 +392,7 @@ namespace Equisetum2
 					Texture* pTexture = spriteRenderer->m_sprite->GetTexture().get();
 
 					// 頂点配列が全て埋まっている？またはステートが変化した？
-					if (m_currentStates.type != Type::SPRITE ||
+					if (m_currentStates.type != RenderType::SPRITE ||
 						*(m_currentStates.pTexture->m_pImpl->GetTexID()) != *(pTexture->m_pImpl->GetTexID()) ||
 						m_currentStates.blend != blendMode ||
 						spriteContext.m_filledVertexNum + vertexCount >= spriteContext.VBO_SIZE)
@@ -401,7 +401,7 @@ namespace Equisetum2
 						DrawCall();
 
 						// ステートを更新
-						m_currentStates.type = Type::SPRITE;
+						m_currentStates.type = RenderType::SPRITE;
 						m_currentStates.subType = 0;
 						m_currentStates.blend = blendMode;
 						m_currentStates.pTexture = pTexture;
@@ -423,7 +423,7 @@ namespace Equisetum2
 					spriteContext.m_filledVertexNum += vertexCount;
 					spriteContext.m_filledIndexNum += indexCount;
 				}
-				else if (renderObject->GetType() == Type::PRIMITIVE)
+				else if (renderObject->GetType() == RenderType::PRIMITIVE)
 				{
 					auto primitiveRenderer = static_cast<PrimitiveRenderer*>(renderObject);
 
@@ -447,7 +447,48 @@ namespace Equisetum2
 						// 描画を行う
 						DrawCall();
 
-						m_currentStates.type = Type::EMPTY;
+						m_currentStates.type = RenderType::EMPTY;
+						m_currentStates.subType = 0;
+					}
+				}
+				else if (renderObject->GetType() == RenderType::TEXT)
+				{
+					// 実質スプライトの描画と同じなので、コンテキストはスプライトのものを使用する
+
+					auto textRenderer = static_cast<TextRenderer*>(renderObject);
+
+					// このオブジェクトの頂点数
+					size_t vertexCount = textRenderer->m_pImpl->GetVertexCount();
+					size_t indexCount = textRenderer->m_pImpl->GetIndexCount();
+					RenderState::BlendMode blendMode = textRenderer->m_blend;
+					Texture* pTexture = textRenderer->m_bitmapFont->GetSprite()->GetTexture().get();
+
+					if (vertexCount > 0)
+					{
+						// 描画を行う
+						DrawCall();
+
+						// ステートを更新
+						m_currentStates.type = RenderType::TEXT;
+						m_currentStates.subType = 0;
+						m_currentStates.blend = blendMode;
+						m_currentStates.pTexture = pTexture;
+
+						// 頂点配列を埋める
+						const stVertexSprite* vertex = textRenderer->m_pImpl->GetVertex();		// このスプライトの頂点バッファ
+						memcpy(spriteContext.m_vertex, vertex, sizeof(stVertexSprite) * vertexCount);
+
+						// インデックス配列を埋める
+						const GLushort* index = textRenderer->m_pImpl->GetIndex();		// このスプライトのインデックスバッファ
+						memcpy(spriteContext.m_index, index, sizeof(GLushort) * indexCount);
+
+						spriteContext.m_filledVertexNum += vertexCount;
+						spriteContext.m_filledIndexNum += indexCount;
+
+						// 描画を行う
+						DrawCall();
+
+						m_currentStates.type = RenderType::EMPTY;
 						m_currentStates.subType = 0;
 					}
 				}
@@ -467,11 +508,12 @@ namespace Equisetum2
 
 	bool Renderer::DrawCall()
 	{
-		if (m_currentStates.type == Type::SPRITE)
+		if (m_currentStates.type == RenderType::SPRITE ||
+			m_currentStates.type == RenderType::TEXT)
 		{
 			auto& ctx = m_pImpl->m_spriteContext;
 
-			if (SelectProgram(Type::SPRITE))
+			if (SelectProgram(ShaderType::SPRITE))
 			{
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, *(m_currentStates.pTexture->m_pImpl->GetTexID()));
@@ -518,11 +560,11 @@ namespace Equisetum2
 
 			gDrawCallCount++;
 		}
-		else if (m_currentStates.type == Type::PRIMITIVE)
+		else if (m_currentStates.type == RenderType::PRIMITIVE)
 		{
 			auto& ctx = m_pImpl->m_primitiveContext;
 
-			if (SelectProgram(m_currentStates.type))
+			if (SelectProgram(ShaderType::PRIMITIVE))
 			{
 				glDisable(GL_DEPTH_TEST);
 
@@ -595,17 +637,21 @@ namespace Equisetum2
 		}
 	}
 
-	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(Type type, int32_t subType)
+	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(RenderType type, int32_t subType)
 	{
 		std::shared_ptr<RenderObject> obj;
 
 		switch (type)
 		{
-		case Type::SPRITE:
+		case RenderType::SPRITE:
 			obj = SpriteRenderer::Create(shared_from_this());
 			break;
 
-		case Type::PRIMITIVE:
+		case RenderType::TEXT:
+			obj = TextRenderer::Create(shared_from_this());
+			break;
+
+		case RenderType::PRIMITIVE:
 
 			switch(subType)
 			{
@@ -698,7 +744,7 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	bool Renderer::SelectProgram(Type type)
+	bool Renderer::SelectProgram(ShaderType type)
 	{
 		// 同じプログラムなら何もしない
 		if (m_pImpl->m_currentProgramType == type)
@@ -784,12 +830,12 @@ namespace Equisetum2
 
 			switch (type)
 			{
-			case Type::SPRITE:
+			case ShaderType::SPRITE:
 				glBindAttribLocation(newProgram, 0, "aVertex");
 				glBindAttribLocation(newProgram, 1, "a_texCoord");
 				glBindAttribLocation(newProgram, 2, "a_color");
 				break;
-			case Type::PRIMITIVE:
+			case ShaderType::PRIMITIVE:
 				glBindAttribLocation(newProgram, 0, "aVertex");
 				glBindAttribLocation(newProgram, 1, "a_color");
 				break;
@@ -805,7 +851,7 @@ namespace Equisetum2
 
 			switch (type)
 			{
-			case Type::SPRITE:
+			case ShaderType::SPRITE:
 				{
 					auto u_texture = glGetUniformLocation(newProgram, "u_texture");
 
@@ -838,7 +884,7 @@ namespace Equisetum2
 				}
 				break;
 
-			case Type::PRIMITIVE:
+			case ShaderType::PRIMITIVE:
 				{
 					auto& ctx = m_pImpl->m_primitiveContext;
 					const int len = 8192;

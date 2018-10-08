@@ -42,6 +42,41 @@ namespace Equisetum2
 		GLushort m_index[6] = { 0, 1, 2, 1, 2, 3 };		/// インデックス配列
 	};
 
+	class TextRenderer::Impl final
+	{
+	public:
+
+		inline const stVertexSprite* GetVertex() const
+		{
+			return m_vertex.data();
+		}
+
+		inline const GLushort* GetIndex() const
+		{
+			return m_index.data();
+		}
+
+		inline size_t GetVertexCount() const
+		{
+			return m_vertexSize;
+		}
+
+		inline size_t GetIndexCount() const
+		{
+			return m_indexSize;
+		}
+
+	private:
+
+		friend class TextRenderer;
+
+		std::vector<stVertexSprite> m_vertex;	/// 頂点配列
+		int32_t m_vertexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
+
+		std::vector<GLushort> m_index;	/// 頂点配列
+		int32_t m_indexSize = 0;		/// vectorにpush_backするとdebug不能な遅さになるため、vectorはただの可変長配列として扱う
+	};
+
 	class PrimitiveRenderer::Impl final
 	{
 	public:

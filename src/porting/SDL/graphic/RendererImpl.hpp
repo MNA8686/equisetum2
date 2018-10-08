@@ -27,7 +27,7 @@ namespace Equisetum2
 	class stProgramCache
 	{
 	public:
-		Type m_type = Type::EMPTY;
+		ShaderType m_type = ShaderType::EMPTY;
 		GLint m_programID = 0;
 		bool m_projectionDirty = true;		/// プロジェクション更新フラグ
 		std::shared_ptr<stShaderCache> m_vertexCache;
@@ -86,7 +86,7 @@ namespace Equisetum2
 	private:
 
 		// 現在設定されているプログラム
-		Type m_currentProgramType = Type::EMPTY;
+		ShaderType m_currentProgramType = ShaderType::EMPTY;
 
 		// ウィンドウに関連付けられたフレームバッファ
 		GLuint m_framebuffer = 0;

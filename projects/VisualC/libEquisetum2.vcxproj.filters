@@ -318,6 +318,9 @@
     <ClInclude Include="..\..\include\math\Math.hpp">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\BitmapFont.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -463,6 +466,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\math\Math.cpp">
       <Filter>ソース ファイル\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\graphic\BitmapFont.cpp">
+      <Filter>ソース ファイル\common\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

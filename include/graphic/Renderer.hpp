@@ -34,7 +34,7 @@ namespace Equisetum2
 		bool SetViewport(const Rect& rect);
 		void SetClipRect(const Rect& rect = {});
 
-		std::shared_ptr<RenderObject> CreateRenderObject(Type type, int32_t subType=0);
+		std::shared_ptr<RenderObject> CreateRenderObject(RenderType type, int32_t subType=0);
 
 		bool Clear(const Color& color);
 		bool Present(bool waitVsync = true /* don't work */);
@@ -65,7 +65,7 @@ namespace Equisetum2
 
 		void SortRenderQueue();
 		void SetOrthographicProjection();
-		bool SelectProgram(Type type);
+		bool SelectProgram(ShaderType type);
 	};
 }
 

@@ -29,7 +29,7 @@ namespace Equisetum2
 		static std::shared_ptr<Sprite> CreateFromTexture(std::shared_ptr<Texture> texture);
 		bool SetAnimAtlas(const std::vector<stSpriteAnimAtlas>& vAnimAtlas);
 
-		const stSpriteAnimAtlas& GetAtlas(int32_t num);
+		const stSpriteAnimAtlas& GetAtlas(int32_t num) const;
 
 		/**
 		* @brief 新しいインスタンスで現在のインスタンスを置き換える

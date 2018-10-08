@@ -5,6 +5,14 @@
 
 #include <cmath>
 
+namespace std {
+	template <class T>
+	constexpr const T& clamp(const T& v, const T& low, const T& high)
+	{
+		return min(max(v, low), high);
+	}
+}
+
 namespace Equisetum2
 {
 	static const float inv255f = 1.0f / 255.0f;
@@ -13,7 +21,7 @@ namespace Equisetum2
 	{
 	}
 
-	Type RenderObject::GetType() const
+	RenderType RenderObject::GetType() const
 	{
 		return m_type;
 	}
@@ -314,6 +322,475 @@ namespace Equisetum2
 
 		return true;
 	}
+
+
+
+
+
+	void TextRenderer::InitTest()
+	{
+		m_pImpl = std::make_shared<TextRenderer::Impl>();
+	}
+
+	std::shared_ptr<TextRenderer> TextRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	{
+		EQ_DURING
+		{
+			// インスタンス作成
+			auto inst = std::make_shared<TextRenderer>();
+			if (!inst)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			// レンダラを保持
+			inst->m_renderer = renderer;
+
+			// インスタンス初期化
+			inst->m_pImpl = std::make_shared<TextRenderer::Impl>();
+			if (!inst->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの初期化に失敗しました。");
+			}
+
+			return inst;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	TextRenderer& TextRenderer::SetBitmapFont(const std::shared_ptr<BitmapFont>& bitmapFont)
+	{
+		if (m_bitmapFont != bitmapFont)
+		{
+			m_bitmapFont = bitmapFont;
+
+			if (m_bitmapFont)
+			{
+				// BitmapFont作成時に高さが統一されていることが保証されているのでそのまま代入
+				m_height = m_bitmapFont->GetSprite()->GetAtlas(0).m_srcSize.y;
+
+				for (auto& sprite : m_vSpriteRenderer)
+				{
+					sprite->SetSprite(m_bitmapFont->GetSprite());
+				}
+			}
+
+			MeasurementBoxSize();
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetText(const String& text)
+	{
+		m_text = text.to_u32();
+
+		m_vSpriteRenderer.resize(m_text.size());
+
+		if (auto pRenderer = m_renderer.lock())
+		{
+			// 1文字1スプライトとして運用する
+			for (uint32_t i = 0; i < m_text.size(); i++)
+			{
+				auto& spriteRenderer = m_vSpriteRenderer[i];
+
+				if (!spriteRenderer)
+				{
+					// インスタンス作成
+					spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(pRenderer->CreateRenderObject(RenderType::SPRITE));
+				}
+
+				if (m_bitmapFont)
+				{
+					// spriteRendererが直接レンダリングをするわけではないので、ここで設定する意味は無いかも知れない。
+					spriteRenderer->SetSprite(m_bitmapFont->GetSprite());
+
+					// TODO:インスタンスを使いまわしているので設定値のリセットが必要かも？
+					spriteRenderer->SetVisible(true);
+				}
+			}
+		}
+
+		// 一旦設定を親のものに統一
+		SetScale(m_scale.x, m_scale.y);
+		SetColor(m_color);
+		SetAngle(m_angle);
+		SetFlipX(m_flipX);
+		SetFlipY(m_flipY);
+		SetLayer(m_layer);
+		SetOrderInLayer(m_orderInLayer);
+		SetBlendMode(m_blend);
+
+		MeasurementBoxSize();
+
+		return *this;
+	}
+
+	std::shared_ptr<SpriteRenderer> TextRenderer::GetLetter(size_t letterNum)
+	{
+		if (letterNum < m_vSpriteRenderer.size())
+		{
+			return m_vSpriteRenderer[letterNum];
+		}
+
+		return nullptr;
+	}
+
+	size_t TextRenderer::GetLetterSize() const
+	{
+		return m_text.size();
+	}
+
+	Size TextRenderer::GetBoxSize() const
+	{
+		return m_boxSize;
+	}
+
+	TextRenderer& TextRenderer::SetPos(const Point& pos)
+	{
+		m_pos = pos;
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetScale(float x, float y)
+	{
+		SetScaleX(x);
+		SetScaleY(y);
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetScaleX(float x)
+	{
+		m_scale.x = x;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetScaleX(x);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetScaleY(float y)
+	{
+		m_scale.y = y;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetScaleY(y);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetColor(const Color& color)
+	{
+		m_color = color;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetColor(color);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetAngle(float angle)
+	{
+		m_angle = fmod(angle, 360.f);
+		m_angleRad = m_angle * 3.14159265358979323846f / 180.f;	// ラジアンを算出
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetAngle(angle);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetFlipX(bool isFlip)
+	{
+		m_flipX = isFlip;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetFlipX(m_flipX);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetFlipY(bool isFlip)
+	{
+		m_flipY = isFlip;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetFlipY(m_flipY);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetLayer(int layer)
+	{
+		m_layer = layer;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetLayer(layer);
+		}
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetOrderInLayer(int32_t orderInLayer)
+	{
+		m_orderInLayer = orderInLayer;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetOrderInLayer(orderInLayer);
+		}
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetBlendMode(BlendMode blend)
+	{
+		m_blend = blend;
+
+		for (auto& sprite : m_vSpriteRenderer)
+		{
+			sprite->SetBlendMode(blend);
+		}
+
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetTextHAlignment(TextHAlignment textHAlignment)
+	{
+		m_textHAlignment = textHAlignment;
+		return *this;
+	}
+
+	TextRenderer& TextRenderer::SetPivot(PointF pivot)
+	{
+		m_pivot = { std::clamp( pivot.x, 0.f, 1.f), std::clamp(pivot.y, 0.f, 1.f) };
+		return *this;
+	}
+
+	void TextRenderer::MeasurementBoxSize()
+	{
+		m_vCodeMap.resize(m_text.size());
+		m_vWidth.clear();
+		m_boxSize = {};
+
+		// 左寄せ等倍と仮定してマップを作る
+		if (m_bitmapFont)
+		{
+			Point pos;
+			int count = 0;
+
+			// テキストを1文字ずつ処理する
+			for (auto& code : m_text)
+			{
+				stCodeMap codeMap;
+
+				if (code == '\r')
+				{
+					// CRは無視する
+				}
+				else if (code == '\n')
+				{
+					codeMap.x = -'\n';
+					m_vWidth.push_back(pos.x);	// この行の幅を保存
+
+					// ボックスサイズ更新
+					m_boxSize.x = std::max(m_boxSize.x, pos.x);	// 最大幅が更新されていたらそれをセット
+					m_boxSize.y += m_height;
+
+					// 改行を行う
+					pos.x = 0;
+					pos.y += m_height;
+				}
+				else
+				{
+					int atlasNum = m_bitmapFont->CodePointToAtlas(code);
+					if (atlasNum >= 0)
+					{
+						const stSpriteAnimAtlas& atlas = m_bitmapFont->GetSprite()->GetAtlas(atlasNum);
+
+						codeMap.x = pos.x + atlas.m_srcSize.x / 2;		// 座標を保存
+						codeMap.atlas = atlasNum;
+						pos.x += atlas.m_srcSize.x;
+					}
+					else
+					{
+						// スペースのグリフが存在しない場合、とりあえず高さと同じサイズの幅があると見なす
+						if (code == ' ' || code == '\t')
+						{
+							pos.x += m_height;
+						}
+					}
+				}
+
+				m_vCodeMap[count] = codeMap;
+				count++;
+			}
+
+			m_vWidth.push_back(pos.x);	// この行の幅を保存
+
+			// ボックスサイズ更新
+			m_boxSize.x = std::max(m_boxSize.x, pos.x);	// 最大幅が更新されていたらそれをセット
+			m_boxSize.y += m_height;
+		}
+	}
+
+	bool TextRenderer::Calculation()
+	{
+		Size sizeMax;
+		int codeCount = 0;
+		int rowCount = 0;
+		int colCount = 0;
+		int validLetterCount = 0;
+		Point pos;	// box内の位置(次に文字を配置する座標)
+		Size scaledBoxSize = { static_cast<int32_t>(m_boxSize.x * m_scale.x), static_cast<int32_t>(m_boxSize.y * m_scale.y) };
+
+		// コードマップを1文字ずつ処理
+		// TODO:回転処理
+		for (auto& codeMap : m_vCodeMap)
+		{
+			auto& spriteRenderer = m_vSpriteRenderer[codeCount];
+
+			if (colCount == 0)
+			{
+				switch (m_textHAlignment)
+				{
+				case TextHAlignment::Left:
+				default:
+					pos.x = 0;
+					break;
+
+				case TextHAlignment::Center:
+					pos.x = (scaledBoxSize.x - static_cast<int32_t>(m_vWidth[rowCount] * m_scale.x)) / 2;
+					break;
+
+				case TextHAlignment::Right:
+					pos.x = scaledBoxSize.x - static_cast<int32_t>(m_vWidth[rowCount] * m_scale.x);
+					break;
+				}
+			}
+
+			if (codeMap.x == -'\n')
+			{
+				// 改行を行う
+				colCount = -1;
+				rowCount++;
+
+				pos.y = static_cast<int32_t>(m_height * rowCount * m_scale.y);
+			}
+			else if (codeMap.atlas >= 0)
+			{
+				spriteRenderer->SetAtlasNum(codeMap.atlas);
+
+				Point spritePos;	// box内の相対座標
+
+				spritePos.x = pos.x + static_cast<int32_t>(codeMap.x * m_scale.x);
+				spriteRenderer->SetFlipX(m_flipX);
+				if (m_flipX)
+				{
+					spritePos.x = scaledBoxSize.x - spritePos.x;
+				}
+				spriteRenderer->SetScaleX(m_scale.x);
+
+				spritePos.y = pos.y + static_cast<int32_t>(m_height * m_scale.y) / 2;
+				spriteRenderer->SetFlipY(m_flipY);
+				if (m_flipY)
+				{
+					spritePos.y = scaledBoxSize.y - spritePos.y;
+				}
+				spriteRenderer->SetScaleY(m_scale.y);
+
+				// pivotのオフセット算出
+				auto offsetX = spritePos.x - static_cast<int32_t>(scaledBoxSize.x * m_pivot.x);
+				auto offsetY = spritePos.y - static_cast<int32_t>(scaledBoxSize.y * m_pivot.y);
+
+				// 回転なし？
+				if (m_angle == 0)
+				{
+					spriteRenderer->SetPos(m_pos + Point{ offsetX, offsetY });
+				}
+				else
+				{
+					const auto cosVal = cos(m_angleRad);
+					const auto sinVal = -sin(m_angleRad);
+					Point spriteAnglePos;
+
+					spriteAnglePos.x = static_cast<int32_t>(offsetX * cosVal - offsetY * sinVal);
+					spriteAnglePos.y = static_cast<int32_t>(offsetX * sinVal + offsetY * cosVal);
+
+					spriteRenderer->SetPos(m_pos + spriteAnglePos);
+				}
+
+				validLetterCount++;
+			}
+
+			spriteRenderer->Calculation();
+
+			codeCount++;
+			colCount++;
+		}
+
+		auto& vert = m_pImpl->m_vertex;
+		auto& idx = m_pImpl->m_index;
+
+		// 頂点とインデックスの数を設定
+		vert.resize(validLetterCount * 4);
+		idx.resize(validLetterCount * 6);
+
+		// 頂点とインデックスを作成する(スプライトのバッチング)
+		int vertexCount = 0;
+		int indexCount = 0;
+		codeCount = 0;
+		for (auto& codeMap : m_vCodeMap)
+		{
+			if (codeMap.atlas >= 0)
+			{
+				auto& spriteRenderer = m_vSpriteRenderer[codeCount];
+
+				if (spriteRenderer->IsVisible())
+				{
+					// 頂点
+					auto vertexMax = spriteRenderer->m_pImpl->GetVertexCount();
+					memcpy(&vert[vertexCount], spriteRenderer->m_pImpl->GetVertex(), vertexMax * sizeof(stVertexSprite));
+
+					// インデックス
+					auto pIndex = spriteRenderer->m_pImpl->GetIndex();
+					auto indexMax = spriteRenderer->m_pImpl->GetIndexCount();
+					for (size_t i = 0; i < indexMax; i++)
+					{
+						idx[indexCount + i] = vertexCount + pIndex[i];
+					}
+
+					vertexCount += vertexMax;
+					indexCount += indexMax;
+				}
+			}
+
+			codeCount++;
+		}
+
+		m_pImpl->m_vertexSize = vertexCount;
+		m_pImpl->m_indexSize = indexCount;
+
+		return true;
+	}
+
 
 	void LineRenderer::InitTest()
 	{

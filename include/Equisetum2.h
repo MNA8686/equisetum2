@@ -43,6 +43,7 @@
 #include "graphic/Image.hpp"
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
+#include "graphic/BitmapFont.hpp"
 #include "graphic/Renderer.hpp"
 #include "graphic/RenderObject.hpp"
 
