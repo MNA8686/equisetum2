@@ -19,89 +19,7 @@ namespace Equisetum2
 		return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
 	}
 
-	AssetManager::AssetManager()
-	{
-		Singleton<SharedPool<Image>>::GetInstance();
-		Singleton<SharedPool<Sprite>>::GetInstance();
-		Singleton<SharedPool<BGM>>::GetInstance();
-		Singleton<SharedPool<SE>>::GetInstance();
-		Singleton<SharedPool<Texture>>::GetInstance();
-	}
-
-	std::shared_ptr<Image> AssetManager::_LoadImage(const String& id)
-	{
-		EQ_DURING
-		{
-			// TODO: 画像の形式はPNG固定だが、jpgとbmpも見に行くようにする
-			auto inStream = FileStream::CreateFromPath(MakeNativePath("image", id, ".png"));
-			if (!inStream)
-			{
-				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
-			}
-
-			auto imageIn = Image::CreateFromStream(inStream);
-			if (!imageIn)
-			{
-				EQ_THROW(String::Sprintf(u8"イメージファイル(%s)のロードに失敗しました。", id.c_str()));
-			}
-
-			imageIn->SetIdentify(id);
-			
-			auto data = imageIn->Data();
-			for (int i = 0; i < imageIn->Width() * imageIn->Height(); i++)
-			{
-				if (data[i].rgba8888.r == 0 &&
-					data[i].rgba8888.g == 0xff &&
-					data[i].rgba8888.b == 0)
-				{
-					data[i].rgba8888.a = 0;
-				}
-			}
-
-			return imageIn;
-		}
-		EQ_HANDLER
-		{
-			Logger::OutputError(EQ_GET_HANDLER().what());
-		}
-		EQ_END_HANDLER
-
-		return nullptr;
-	}
-
-	std::shared_ptr<Texture> AssetManager::_LoadTexture(const String& id)
-	{
-		// 圧縮テクスチャ時の処理はまた考える
-		// 今はpng画像を固定で見に行く
-
-		EQ_DURING
-		{
-			auto imageIn = _LoadImage(id);
-			if (!imageIn)
-			{
-				EQ_THROW(u8"テクスチャのロードに失敗しました。");
-			}
-
-			auto textureIn = Texture::CreateFromImage(imageIn);
-			if (!textureIn)
-			{
-				EQ_THROW(String::Sprintf(u8"テクスチャ(%s)の作成に失敗しました。", id.c_str()));
-			}
-
-			textureIn->SetIdentify(id);
-
-			return textureIn;
-		}
-		EQ_HANDLER
-		{
-			Logger::OutputError(EQ_GET_HANDLER().what());
-		}
-		EQ_END_HANDLER
-
-		return nullptr;
-	}
-
-	std::shared_ptr<Sprite> AssetManager::_LoadSprite(const String& id)
+	static std::shared_ptr<Sprite> _LoadSpriteImpl(const String& id, const std::function<bool(rapidjson::Document& doc)> cbDoc = nullptr)
 	{
 		EQ_DURING
 		{
@@ -167,7 +85,7 @@ namespace Equisetum2
 
 				// ID一致判定
 				String strID = id_->value.GetString();
-				if(strID != id)
+				if (strID != id)
 				{
 					EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
 				}
@@ -186,7 +104,7 @@ namespace Equisetum2
 
 				// テクスチャ読み込み
 				String strTextureID = imageid->value.GetString();
-				textureIn = _Load<Texture>(strTextureID);
+				textureIn = Singleton<AssetManager>::GetInstance()->Load<Texture>(strTextureID);
 			}
 
 			// アトラス読み込み
@@ -200,7 +118,7 @@ namespace Equisetum2
 				}
 
 				rapidjson::SizeType atlasArraySize = atlas->value.Size();
-				for (decltype(atlasArraySize) i=0; i < atlasArraySize; i++)
+				for (decltype(atlasArraySize) i = 0; i < atlasArraySize; i++)
 				{
 					auto& elem = atlas->value[i];
 
@@ -333,6 +251,15 @@ namespace Equisetum2
 
 			Logger::OutputDebug("  vSpriteAnimAtlas size %d", vSpriteAnimAtlas.size());
 
+			if (cbDoc)
+			{
+				// 追加項目のパースはコールバックで行う
+				if (!cbDoc(doc))
+				{
+					EQ_THROW(u8"追加項目の解析中に失敗しました。");
+				}
+			}
+
 			auto sprite = Sprite::CreateFromTexture(textureIn);
 			if (!sprite)
 			{
@@ -348,6 +275,139 @@ namespace Equisetum2
 			sprite->SetIdentify(id);
 
 			return sprite;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	AssetManager::AssetManager()
+	{
+		Singleton<SharedPool<Image>>::GetInstance();
+		Singleton<SharedPool<Sprite>>::GetInstance();
+		Singleton<SharedPool<BitmapFont>>::GetInstance();
+		Singleton<SharedPool<BGM>>::GetInstance();
+		Singleton<SharedPool<SE>>::GetInstance();
+		Singleton<SharedPool<Texture>>::GetInstance();
+	}
+
+	std::shared_ptr<Image> AssetManager::_LoadImage(const String& id)
+	{
+		EQ_DURING
+		{
+			// TODO: 画像の形式はPNG固定だが、jpgとbmpも見に行くようにする
+			auto inStream = FileStream::CreateFromPath(MakeNativePath("image", id, ".png"));
+			if (!inStream)
+			{
+				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+			}
+
+			auto imageIn = Image::CreateFromStream(inStream);
+			if (!imageIn)
+			{
+				EQ_THROW(String::Sprintf(u8"イメージファイル(%s)のロードに失敗しました。", id.c_str()));
+			}
+
+			imageIn->SetIdentify(id);
+			
+			auto data = imageIn->Data();
+			for (int i = 0; i < imageIn->Width() * imageIn->Height(); i++)
+			{
+				if (data[i].rgba8888.r == 0 &&
+					data[i].rgba8888.g == 0xff &&
+					data[i].rgba8888.b == 0)
+				{
+					data[i].rgba8888.a = 0;
+				}
+			}
+
+			return imageIn;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	std::shared_ptr<Texture> AssetManager::_LoadTexture(const String& id)
+	{
+		// 圧縮テクスチャ時の処理はまた考える
+		// 今はpng画像を固定で見に行く
+
+		EQ_DURING
+		{
+			auto imageIn = _LoadImage(id);
+			if (!imageIn)
+			{
+				EQ_THROW(u8"テクスチャのロードに失敗しました。");
+			}
+
+			auto textureIn = Texture::CreateFromImage(imageIn);
+			if (!textureIn)
+			{
+				EQ_THROW(String::Sprintf(u8"テクスチャ(%s)の作成に失敗しました。", id.c_str()));
+			}
+
+			textureIn->SetIdentify(id);
+
+			return textureIn;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	std::shared_ptr<Sprite> AssetManager::_LoadSprite(const String& id)
+	{
+		return _LoadSpriteImpl(id);
+	}
+
+	std::shared_ptr<BitmapFont> AssetManager::_LoadBitmapFont(const String& id)
+	{
+		EQ_DURING
+		{
+			String codePoint;
+
+			// スプライトのjson追加項目としてcodepointが存在するので、それをコールバックで読み出す
+			auto cb = [&codePoint](rapidjson::Document& doc)->bool {
+				auto& codepoint_ = doc.FindMember("codepoint");
+				if (codepoint_ == doc.MemberEnd() ||
+					codepoint_->value.GetType() != rapidjson::kStringType)
+				{
+					return false;
+				}
+
+				codePoint = codepoint_->value.GetString();
+
+				return true;
+			};
+
+			// スプライトをロードする
+			auto sprite = _LoadSpriteImpl(id, cb);
+			if (!sprite)
+			{
+				EQ_THROW(String::Sprintf(u8"スプライト(%s)のロードに失敗しました。", id.c_str()));
+			}
+
+			// インスタンスを作成する
+			auto bitmapFont = BitmapFont::CreateFromSprite(sprite, codePoint);
+			if (!bitmapFont)
+			{
+				EQ_THROW(String::Sprintf(u8"BitmapFont(%s)のロードに失敗しました。", id.c_str()));
+			}
+
+			return bitmapFont;
 		}
 		EQ_HANDLER
 		{

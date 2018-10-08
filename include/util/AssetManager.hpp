@@ -5,6 +5,7 @@
 #include "system/Singleton.h"
 #include "graphic/Image.hpp"
 #include "graphic/Sprite.hpp"
+#include "graphic/BitmapFont.hpp"
 #include "audio/BGM.hpp"
 #include "audio/SE.hpp"
 
@@ -97,6 +98,12 @@ namespace Equisetum2
 		}
 
 		template<>
+		static std::shared_ptr<BitmapFont> _Load(const String& id)
+		{
+			return _LoadBitmapFont(id);
+		}
+
+		template<>
 		static std::shared_ptr<SE> _Load(const String& id)
 		{
 			return _LoadSE(id);
@@ -116,6 +123,7 @@ namespace Equisetum2
 
 		static std::shared_ptr<Image> _LoadImage(const String& id);
 		static std::shared_ptr<Sprite> _LoadSprite(const String& id);
+		static std::shared_ptr<BitmapFont> _LoadBitmapFont(const String& id);
 		static std::shared_ptr<BGM> _LoadBGM(const String& id);
 		static std::shared_ptr<SE> _LoadSE(const String& id);
 		static std::shared_ptr<Texture> _LoadTexture(const String& id);
