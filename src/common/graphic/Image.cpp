@@ -101,6 +101,45 @@ namespace Equisetum2
 		return inst;
 	}
 
+	std::shared_ptr<Image> Image::CreateFromNativeHandle(void* nativeHandle)
+	{
+		std::shared_ptr<Image> inst;
+
+		EQ_DURING
+		{
+			if (!nativeHandle)
+			{
+				EQ_THROW(u8"有効なネイティブハンドルではありません。");
+			}
+
+			auto inst_ = std::shared_ptr<Image>(new Image);
+			if (!inst_)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			inst_->m_pImpl = std::make_shared<Image::Impl>();
+			if (!inst_->m_pImpl)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			if (!inst_->m_pImpl->InitFromNativeHandle(nativeHandle))
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			inst = inst_;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return inst;
+	}
+
 	bool Image::SaveToStream(std::shared_ptr<IStream> stream) const
 	{
 		auto ret = false;

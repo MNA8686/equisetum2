@@ -137,6 +137,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
     <ClInclude Include="..\..\include\graphic\BitmapFont.hpp" />
+    <ClInclude Include="..\..\include\graphic\FontManager.hpp" />
     <ClInclude Include="..\..\include\graphic\Image.hpp" />
     <ClInclude Include="..\..\include\graphic\Renderer.hpp" />
     <ClInclude Include="..\..\include\graphic\RendererState.hpp" />
@@ -230,6 +231,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\src\common\graphic\BitmapFont.cpp" />
+    <ClCompile Include="..\..\src\common\graphic\FontManager.cpp" />
     <ClCompile Include="..\..\src\common\graphic\Image.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -383,6 +385,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl" />
+    <None Include="..\..\src\porting\SDL\graphic\FontManagerCompatImpl.inl" />
     <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

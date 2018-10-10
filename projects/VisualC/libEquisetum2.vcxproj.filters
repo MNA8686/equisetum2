@@ -321,6 +321,9 @@
     <ClInclude Include="..\..\include\graphic\BitmapFont.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\FontManager.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -470,6 +473,9 @@
     <ClCompile Include="..\..\src\common\graphic\BitmapFont.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\graphic\FontManager.cpp">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\Win32\fs\DirectoryCompat.inl">
@@ -515,6 +521,9 @@
       <Filter>ソース ファイル\compat&amp;porting\audio</Filter>
     </None>
     <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
+      <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </None>
+    <None Include="..\..\src\porting\SDL\graphic\FontManagerCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
   </ItemGroup>

@@ -4,10 +4,6 @@
 #include "stream/SDLBinderRWops.inl"
 #include "SDL_image.h"
 
-#include "SDL_ttf.h"
-#include "stream/FileStream.h"
-#include "fs/Path.hpp"
-
 namespace Equisetum2
 {
 	class Image::Impl final
@@ -35,35 +31,7 @@ namespace Equisetum2
 					EQ_THROW(u8"サーフェスの作成に失敗しました。");
 				}
 
-				// フォーマットコンバート
-				if (pSurface->format->format != SDL_PIXELFORMAT_RGBA32)
-				{
-					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_RGBA32, 0);
-					SDL_FreeSurface(pSurface);
-					pSurface = convSurface;
-				}
-				if (!pSurface)
-				{
-					EQ_THROW(u8"サーフェスのフォーマット変換に失敗しました。");
-				}
-
-				m_pSurface = std::shared_ptr<SDL_Surface>(pSurface,
-					[](SDL_Surface* pSurface) {
-					if (pSurface != nullptr)
-					{
-						SDL_FreeSurface(pSurface);
-					}
-				});
-
-				if (!m_pSurface)
-				{
-					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
-				}
-
-				// ブレンドモードを設定
-				SDL_SetSurfaceBlendMode(m_pSurface.get(), SDL_BLENDMODE_NONE);
-
-				ret = true;
+				ret = InitFromNativeHandle(pSurface);
 			}
 			EQ_HANDLER
 			{
@@ -80,43 +48,42 @@ namespace Equisetum2
 
 			EQ_DURING
 			{
-				if (TTF_Init() == -1)
+				auto pSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA32);
+				if (!pSurface)
 				{
-					EQ_THROW(u8"TTF_Init()の初期化に失敗しました。");
+					EQ_THROW(u8"サーフェスの作成に失敗しました。");
 				}
 
-				auto stream = FileStream::CreateFromPath(Path::GetFullPath("font/mgenplus-1m-regular.ttf"));
-				if (!stream)
+				ret = InitFromNativeHandle(pSurface);
+			}
+			EQ_HANDLER
+			{
+				Logger::OutputError(EQ_GET_HANDLER().what());
+			}
+			EQ_END_HANDLER
+
+			return ret;
+		}
+
+		bool InitFromNativeHandle(void* nativeHandle)
+		{
+			auto ret = false;
+
+			EQ_DURING
+			{
+				auto pSurface = static_cast<SDL_Surface*>(nativeHandle);
+
+				// フォーマットコンバート
+				if (pSurface->format->format != SDL_PIXELFORMAT_RGBA32)
 				{
-					EQ_THROW(u8"streamの作成に失敗しました。");
+					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_RGBA32, 0);
+					SDL_FreeSurface(pSurface);
+					pSurface = convSurface;
 				}
-			
-				auto rwops = SDLBinderRWops::CreateFromStream(stream);
-				if (!rwops)
+				if (!pSurface)
 				{
-					EQ_THROW(u8"rwopsの作成に失敗しました。");
+					EQ_THROW(u8"サーフェスのフォーマット変換に失敗しました。");
 				}
-
-				TTF_Font* ttfFont = TTF_OpenFontRW(rwops, 1, 16);
-				if (!ttfFont)
-				{
-					EQ_THROW(u8"ttfFontのオープンに失敗しました。");
-				}
-
-				SDL_Color color = { 255, 255, 255 };
-				SDL_Surface *pSurface;
-				if (!(pSurface = TTF_RenderUTF8_Blended(ttfFont, u8"Hello World!\ntest吉野家𠮷野家𠮷野家", color)))
-				{
-					EQ_THROW(u8"フォントのレンダリングに失敗しました。");
-				}
-
-
-
-//				auto pSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBA32);
-//				if (!pSurface)
-//				{
-//					EQ_THROW(u8"サーフェスの作成に失敗しました。");
-//				}
 
 				m_pSurface = std::shared_ptr<SDL_Surface>(pSurface,
 					[](SDL_Surface* pSurface) {

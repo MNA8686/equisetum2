@@ -71,6 +71,13 @@ namespace Equisetum2
 		static std::shared_ptr<Image> CreateBlank(uint32_t width, uint32_t height);
 
 		/**
+		* @brief ネイティブハンドルからImageインスタンスを作成する
+		* @param nativeHandle ネイティブハンドル
+		* @return 成功時イメージのポインタ
+		*/
+		static std::shared_ptr<Image> CreateFromNativeHandle(void* nativeHandle);
+
+		/**
 		* @brief ストリームに対してイメージ(PNG)を出力する
 		* @param stream 出力元ストリーム
 		* @return 成否

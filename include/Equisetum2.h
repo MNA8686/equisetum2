@@ -44,6 +44,7 @@
 #include "graphic/Texture.hpp"
 #include "graphic/Sprite.hpp"
 #include "graphic/BitmapFont.hpp"
+#include "graphic/FontManager.hpp"
 #include "graphic/Renderer.hpp"
 #include "graphic/RenderObject.hpp"
 
