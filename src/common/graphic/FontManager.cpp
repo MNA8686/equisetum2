@@ -54,7 +54,7 @@ namespace Equisetum2
 		return inst;
 	}
 
-	std::shared_ptr<BitmapFont> FontManager::MakeBitmapFont(const String& sampleStr, Color color, Size maxSize)
+	std::shared_ptr<BitmapFont> FontManager::MakeBitmapFont(const String& sampleStr, Color inColor, Size maxSize)
 	{
 		EQ_DURING
 		{
@@ -81,13 +81,44 @@ namespace Equisetum2
 				String utf8 = sampleStr.at_by_codepoints(itr.second);
 			}
 
-#if 0
-			SDL_Color color = { 255, 255, 255 };
+#if 1
+			TTF_SetFontOutline(m_pImpl->GetFont().get(), 1);
+//			TTF_SetFontStyle(m_pImpl->GetFont().get(), TTF_STYLE_ITALIC);
+			//TTF_SetFontHinting(m_pImpl->GetFont().get(), TTF_HINTING_LIGHT);
+			//TTF_SetFontKerning(m_pImpl->GetFont().get(), 0);
+
+			int height = TTF_FontHeight(m_pImpl->GetFont().get());
+			Logger::OutputDebug(String::Sprintf("height %d", height).c_str());
+			int skip = TTF_FontLineSkip(m_pImpl->GetFont().get());
+			Logger::OutputDebug(String::Sprintf("skip %d", skip).c_str());
+			int ascent = TTF_FontAscent(m_pImpl->GetFont().get());
+			Logger::OutputDebug(String::Sprintf("ascent %d", ascent).c_str());
+			int descent = TTF_FontDescent(m_pImpl->GetFont().get());
+			Logger::OutputDebug(String::Sprintf("descent %d", descent).c_str());
+
+			{
+				int w,h;
+				TTF_SizeUTF8(m_pImpl->GetFont().get(), u8"a", &w, &h);
+				Logger::OutputDebug(String::Sprintf("w %d, h %d", w, h).c_str());
+
+				TTF_SizeUTF8(m_pImpl->GetFont().get(), u8"が", &w, &h);
+				Logger::OutputDebug(String::Sprintf("w %d, h %d", w, h).c_str());
+
+				TTF_SizeUTF8(m_pImpl->GetFont().get(), u8"広", &w, &h);
+				Logger::OutputDebug(String::Sprintf("w %d, h %d", w, h).c_str());
+			}
+
+			SDL_Color color = { inColor.rgba8888.r, inColor.rgba8888.g, inColor.rgba8888.b };
 			SDL_Surface *pSurface = TTF_RenderUTF8_Blended(m_pImpl->GetFont().get(), sampleStr.c_str(), color);
 			if (!pSurface)
 			{
 				EQ_THROW(u8"フォントのレンダリングに失敗しました。");
 			}
+
+			auto image = Image::CreateFromNativeHandle(pSurface);
+			auto stream = FileStream::NewFileFromPath(Path::GetFullPath("font.png"));
+			image->SaveToStream(stream);
+
 #endif
 			return inst;
 		}
