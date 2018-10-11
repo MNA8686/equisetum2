@@ -95,6 +95,28 @@ namespace Equisetum2
 		return optMapGlyphInfo;
 	}
 
+	static int32_t nearPow2(int32_t n)
+	{
+		if (n <= 0)
+		{
+			return 0;
+		}
+
+		if ((n & (n - 1)) == 0)
+		{
+			return n;
+		}
+
+		int32_t ret = 1;
+		while (n > 0)
+		{
+			ret <<= 1;
+			n >>= 1;
+		}
+
+		return ret;
+	}
+
 	std::shared_ptr<Sprite> FontManager::MakeSpriteByGlyphInfo(const std::map<char32_t, stGlyphInfo>& mapGlyphInfo, Color inColor, Size maxSize)
 	{
 		EQ_DURING
@@ -103,7 +125,7 @@ namespace Equisetum2
 			const SDL_Color color = { inColor.rgba8888.r, inColor.rgba8888.g, inColor.rgba8888.b };	// フォントの色
 
 			std::vector<std::shared_ptr<Image>> vImage;		// フォントイメージ(1行につき、1イメージ)
-			Point nowPos;	// レンダリング先の座標
+			Point nowPos = {};	// レンダリング先の座標
 			Size imageSize{ 1, 1 };	// 最終的に作成されるイメージのサイズ
 			String renderString;	// レンダリングする文字列
 			std::vector<stSpriteAnimAtlas> vAtlas;
@@ -139,10 +161,22 @@ namespace Equisetum2
 					nowPos.y += height;
 				}
 
-				vAtlas.push_back({ { nowPos.x, nowPos.y }, { glyphInfo.size.x , glyphInfo.size.y }, { 0.5f, 0.5f } });
+				// 隣のグリフの端っこが表示されてしまうことがあるので、グリフとグリフの間にはスペースを入れることとする。
+				renderString += glyphInfo.u8str + " ";
 
-				renderString += glyphInfo.u8str;
-				nowPos.x += glyphInfo.size.x;
+				// 文字列を1文字ずつ増やしてレンダリングサイズを取得する
+				// (1文字だけ計測した場合と文字列全体を計測した場合、プロポーショナルでは結果がずれてしまう。
+				//  仕方がないので実情に応じたサイズを取得する必要がある。)
+				int w = 0;
+				int h = 0;
+				if (TTF_SizeUTF8(m_pImpl->GetFont().get(), renderString.c_str(), &w, &h) != 0)
+				{
+					EQ_THROW(u8"フォントサイズの算出に失敗しました。");
+				}
+
+				vAtlas.push_back({ { nowPos.x, nowPos.y },{ glyphInfo.size.x, glyphInfo.size.y },{ 0.5f, 0.5f } });
+
+				nowPos.x = w;
 			}
 
 			// 残っている文字列があればレンダリングする
@@ -167,13 +201,25 @@ namespace Equisetum2
 			// イメージの高さを確定
 			imageSize.y = nowPos.y;
 
-			if (imageSize.x > maxSize.y)
+			if (imageSize.y > maxSize.y)
 			{
 				EQ_THROW(u8"指定されたmaxSize.yを超えました。");
 			}
 
+#if 1
+			// for debug
+			int count = 0;
+			for (auto& img : vImage)
+			{
+				auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font%d.png", count).c_str()));
+				img->SaveToStream(stream);
+				count++;
+			}
+#endif
+
 			// 最終出力用のテクスチャを作成
-			std::shared_ptr<Texture> fontTexture = Texture::CreateBlank(imageSize.x, imageSize.y, 0);
+//			std::shared_ptr<Texture> fontTexture = Texture::CreateBlank(imageSize.x, imageSize.y, 0);
+			std::shared_ptr<Texture> fontTexture = Texture::CreateBlank(nearPow2(imageSize.x), nearPow2(imageSize.y), 0);
 			if (!fontTexture)
 			{
 				EQ_THROW(u8"テクスチャの作成に失敗しました。");
