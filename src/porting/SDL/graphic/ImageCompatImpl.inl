@@ -71,7 +71,7 @@ namespace Equisetum2
 
 			EQ_DURING
 			{
-				auto pSurface = static_cast<SDL_Surface*>(nativeHandle);
+				auto pSurface = reinterpret_cast<SDL_Surface*>(nativeHandle);
 
 				// フォーマットコンバート
 				if (pSurface->format->format != SDL_PIXELFORMAT_RGBA32)

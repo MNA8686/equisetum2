@@ -5,7 +5,29 @@
 
 namespace Equisetum2
 {
-	std::shared_ptr<Texture> Texture::CreateFromImage(const std::shared_ptr<Image> image)
+	static int32_t nearPow2(int32_t n)
+	{
+		if (n <= 0)
+		{
+			return 0;
+		}
+
+		if ((n & (n - 1)) == 0)
+		{
+			return n;
+		}
+
+		int32_t ret = 1;
+		while (n > 0)
+		{
+			ret <<= 1;
+			n >>= 1;
+		}
+
+		return ret;
+	}
+
+	std::shared_ptr<Texture> Texture::CreateFromImage(const std::shared_ptr<Image> image, bool forcedPow2)
 	{
 		EQ_DURING
 		{
@@ -47,8 +69,8 @@ namespace Equisetum2
 				GL_TEXTURE_2D,
 				0,					// mipmap
 				GL_RGBA,
-				image->Width(),		// width
-				image->Height(),	// height
+				forcedPow2 ? nearPow2(image->Width()) : image->Width(),		// width
+				forcedPow2 ? nearPow2(image->Height()) : image->Height(),	// height
 				0,					// border
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,
@@ -84,7 +106,7 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag)
+	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2)
 	{
 		EQ_DURING
 		{
@@ -109,8 +131,8 @@ namespace Equisetum2
 				GL_TEXTURE_2D,
 				0,					// mipmap
 				GL_RGBA,
-				width,				// width
-				height,				// height
+				forcedPow2 ? nearPow2(width) : width,	// width
+				forcedPow2 ? nearPow2(height) : height,	// height
 				0,					// border
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,

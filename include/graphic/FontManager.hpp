@@ -4,16 +4,27 @@
 #include "stream/IStream.h"
 #include "graphic/BitmapFont.hpp"
 #include <memory>
+#include <map>
 
 #include <cereal/cereal.hpp>
 
 namespace Equisetum2
 {
+	typedef struct
+	{
+		String u8str;		// コードポイント
+		Size size;			// レンダリング時のサイズ
+	}stGlyphInfo;
+
 	class FontManager
 	{
 	public:
+
 		static std::shared_ptr<FontManager> CreateFromStream(std::shared_ptr<IStream> stream, int fontSize);
+
 		std::shared_ptr<BitmapFont> MakeBitmapFont(const String& sampleStr, Color color, Size maxSize = { 1024, 1024 });
+		Optional<std::map<char32_t, stGlyphInfo>> GetGlyphInfoBySampleString(const String& sampleStr);
+		std::shared_ptr<Sprite> MakeSpriteByGlyphInfo(const std::map<char32_t, stGlyphInfo>& mapGlyphInfo, Color inColor, Size maxSize = { 1024, 1024 });
 
 	protected:
 
