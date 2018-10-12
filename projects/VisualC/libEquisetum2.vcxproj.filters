@@ -473,7 +473,7 @@
     <ClCompile Include="..\..\src\common\graphic\BitmapFont.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\graphic\FontManager.cpp">
+    <ClCompile Include="..\..\src\porting\SDL\graphic\FontManager.cpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </ClCompile>
   </ItemGroup>
@@ -523,7 +523,7 @@
     <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
-    <None Include="..\..\src\porting\SDL\graphic\FontManagerCompatImpl.inl">
+    <None Include="..\..\src\porting\SDL\graphic\FontManagerImpl.hpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
   </ItemGroup>
