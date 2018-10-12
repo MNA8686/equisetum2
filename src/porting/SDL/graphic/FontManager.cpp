@@ -6,7 +6,7 @@
 
 #include "SDL_ttf.h"
 
-//#define __TO_FILE__
+#define __TO_FILE__
 #if defined(__TO_FILE__)
 #include "stream/FileStream.h"
 #include "fs/Path.hpp"
@@ -238,12 +238,37 @@ namespace Equisetum2
 
 #if defined(__TO_FILE__)
 			// for debug
-			int count = 0;
-			for (auto& img : vImage)
 			{
-				auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font%d.png", count).c_str()));
-				img->SaveToStream(stream);
-				count++;
+				const char *familyname = TTF_FontFaceFamilyName(m_pImpl->m_pFont.get());
+				const char *stylename = TTF_FontFaceStyleName(m_pImpl->m_pFont.get());
+
+				{
+					// 1行ずつ画像出力
+					int count = 0;
+					for (const auto& img : vImage)
+					{
+						auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s)_%02d.png", familyname, stylename, count).c_str()));
+						img->SaveToStream(stream);
+						count++;
+					}
+				}
+				{
+					// テクスチャイメージ出力
+					auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s).png", familyname, stylename)).c_str());
+					auto image = Image::CreateBlank(imageSize.x, imageSize.y);
+
+					Point pos;
+					for (const auto& img : vImage)
+					{
+						auto width = static_cast<int32_t>(img->Width());
+						auto height = static_cast<int32_t>(img->Height());
+
+						img->CopyTo(image, Rect{ 0, 0, width, height }, Rect{ pos.x, pos.y, width, height });
+
+						pos.y += height;
+					}
+					image->SaveToStream(stream);
+				}
 			}
 #endif
 
@@ -262,6 +287,7 @@ namespace Equisetum2
 				pos.y += height;
 			}
 
+			// スプライトを作成する
 			std::shared_ptr<Sprite> sprite = Sprite::CreateFromTexture(fontTexture);
 			if (!sprite)
 			{
@@ -269,6 +295,7 @@ namespace Equisetum2
 			}
 			if (!vAtlas.empty())
 			{
+				// アトラスをセットする
 				sprite->SetAnimAtlas(vAtlas);
 			}
 
