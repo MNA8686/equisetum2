@@ -9,6 +9,13 @@ namespace Equisetum2
 		auto ptr = std::make_shared<Sprite>();
 		ptr->m_texture = texture;
 
+		stSpriteAnimAtlas atlas;
+		atlas.m_point = { 0, 0 };
+		atlas.m_srcSize = { (int32_t)texture->Width(), (int32_t)texture->Height() };
+		atlas.m_pivot = { 0.5f, 0.5f };
+
+		ptr->m_vAnimAtlas.push_back(atlas);
+
 		return ptr;
 	}
 
@@ -20,8 +27,6 @@ namespace Equisetum2
 
 	const stSpriteAnimAtlas& Sprite::GetAtlas(int32_t num) const
 	{
-		// TODO:‰½‚àİ’è‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Ì‚±‚Æ‚àl‚¦‚é
-
 		if (num < 0)
 		{
 			num = 0;
