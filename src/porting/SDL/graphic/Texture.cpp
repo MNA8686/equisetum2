@@ -5,6 +5,31 @@
 
 namespace Equisetum2
 {
+	namespace Math
+	{
+		int32_t NearPow2(int32_t n)
+		{
+			if (n <= 0)
+			{
+				return 0;
+			}
+
+			if ((n & (n - 1)) == 0)
+			{
+				return n;
+			}
+
+			int32_t ret = 1;
+			while (n > 0)
+			{
+				ret <<= 1;
+				n >>= 1;
+			}
+
+			return ret;
+		}
+	}
+
 	std::shared_ptr<Texture> Texture::CreateFromImage(const std::shared_ptr<Image> image)
 	{
 		EQ_DURING
@@ -84,7 +109,7 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag)
+	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2)
 	{
 		EQ_DURING
 		{
@@ -105,12 +130,16 @@ namespace Equisetum2
 			::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+			// 必要なら2のべき乗に変換する
+			auto width_ = forcedPow2 ? Math::NearPow2(width) : width;
+			auto height_ = forcedPow2 ? Math::NearPow2(height) : height;
+
 			::glTexImage2D(
 				GL_TEXTURE_2D,
 				0,					// mipmap
 				GL_RGBA,
-				width,				// width
-				height,				// height
+				width_,				// width
+				height_,			// height
 				0,					// border
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,
@@ -132,8 +161,8 @@ namespace Equisetum2
 			}
 
 			inst->m_flag = flag;
-			inst->m_pImpl->m_width = width;
-			inst->m_pImpl->m_height = height;
+			inst->m_pImpl->m_width = width_;
+			inst->m_pImpl->m_height = height_;
 			inst->m_pImpl->m_texID = spTexID;
 
 			if (inst->m_flag & AccessFlag::RenderTarget)

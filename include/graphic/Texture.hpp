@@ -20,7 +20,7 @@ namespace Equisetum2
 		};
 
 		static std::shared_ptr<Texture> CreateFromImage(const std::shared_ptr<Image> image);
-		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int32_t flag);
+		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2 = false);
 		virtual bool Update(const Point& pos, const std::shared_ptr<Image> image);
 
 		/**
