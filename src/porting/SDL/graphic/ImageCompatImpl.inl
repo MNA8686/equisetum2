@@ -31,35 +31,7 @@ namespace Equisetum2
 					EQ_THROW(u8"サーフェスの作成に失敗しました。");
 				}
 
-				// フォーマットコンバート
-				if (pSurface->format->format != SDL_PIXELFORMAT_RGBA32)
-				{
-					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_RGBA32, 0);
-					SDL_FreeSurface(pSurface);
-					pSurface = convSurface;
-				}
-				if (!pSurface)
-				{
-					EQ_THROW(u8"サーフェスのフォーマット変換に失敗しました。");
-				}
-
-				m_pSurface = std::shared_ptr<SDL_Surface>(pSurface,
-					[](SDL_Surface* pSurface) {
-					if (pSurface != nullptr)
-					{
-						SDL_FreeSurface(pSurface);
-					}
-				});
-
-				if (!m_pSurface)
-				{
-					EQ_THROW(u8"サーフェスのインスタンス作成に失敗しました。");
-				}
-
-				// ブレンドモードを設定
-				SDL_SetSurfaceBlendMode(m_pSurface.get(), SDL_BLENDMODE_NONE);
-
-				ret = true;
+				ret = InitFromNativeHandle(pSurface);
 			}
 			EQ_HANDLER
 			{
@@ -80,6 +52,37 @@ namespace Equisetum2
 				if (!pSurface)
 				{
 					EQ_THROW(u8"サーフェスの作成に失敗しました。");
+				}
+
+				ret = InitFromNativeHandle(pSurface);
+			}
+			EQ_HANDLER
+			{
+				Logger::OutputError(EQ_GET_HANDLER().what());
+			}
+			EQ_END_HANDLER
+
+			return ret;
+		}
+
+		bool InitFromNativeHandle(void* nativeHandle)
+		{
+			auto ret = false;
+
+			EQ_DURING
+			{
+				auto pSurface = reinterpret_cast<SDL_Surface*>(nativeHandle);
+
+				// フォーマットコンバート
+				if (pSurface->format->format != SDL_PIXELFORMAT_RGBA32)
+				{
+					auto convSurface = SDL_ConvertSurfaceFormat(pSurface, SDL_PIXELFORMAT_RGBA32, 0);
+					SDL_FreeSurface(pSurface);
+					pSurface = convSurface;
+				}
+				if (!pSurface)
+				{
+					EQ_THROW(u8"サーフェスのフォーマット変換に失敗しました。");
 				}
 
 				m_pSurface = std::shared_ptr<SDL_Surface>(pSurface,
