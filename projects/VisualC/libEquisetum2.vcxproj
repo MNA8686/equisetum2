@@ -52,7 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_ITERATOR_DEBUG_LEVEL=0</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/SDL2_ttf/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -63,8 +63,8 @@
     </Link>
     <Lib>
       <OutputFile>$(IntDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/SDL2_ttf/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -90,7 +90,7 @@ copy "debug\libEquisetum2_d.lib" "..\..\lib\win32\lib"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../src/common;../../src/compat;../../src/porting/SDL;../../src/porting/Win32;../../external/dep/win32/SDL2/include;../../external/dep/win32/SDL2_image/include;../../external/dep/win32/SDL2_mixer/include;../../external/dep/win32/SDL2_ttf/include;../../external/dep/win32/glew/include;../../external/dep/win32/cereal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
@@ -104,8 +104,8 @@ copy "debug\libEquisetum2_d.lib" "..\..\lib\win32\lib"</Command>
     </Link>
     <Lib>
       <OutputFile>$(IntDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../external/dep/win32/SDL2/lib;../../external/dep/win32/SDL2_image/lib;../../external/dep/win32/SDL2_mixer/lib;../../external/dep/win32/SDL2_ttf/lib;../../external/dep/win32/glew/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;OpenGL32.lib;glew32.lib</AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
       <Command>
@@ -137,6 +137,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
     <ClInclude Include="..\..\include\graphic\BitmapFont.hpp" />
+    <ClInclude Include="..\..\include\graphic\FontManager.hpp" />
     <ClInclude Include="..\..\include\graphic\Image.hpp" />
     <ClInclude Include="..\..\include\graphic\Renderer.hpp" />
     <ClInclude Include="..\..\include\graphic\RendererState.hpp" />
@@ -360,6 +361,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\src\porting\SDL\graphic\FontManager.cpp" />
     <ClCompile Include="..\..\src\porting\SDL\graphic\Renderer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -383,6 +385,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl" />
+    <None Include="..\..\src\porting\SDL\graphic\FontManagerImpl.hpp" />
     <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
