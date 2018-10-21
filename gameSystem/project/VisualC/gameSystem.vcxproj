@@ -156,6 +156,8 @@
     <ClCompile Include="..\..\src\Node.cpp" />
     <ClCompile Include="..\..\src\Object.cpp" />
     <ClCompile Include="..\..\src\Script.cpp" />
+    <ClCompile Include="..\..\src\SystemView.cpp" />
+    <ClCompile Include="..\..\src\SystemWidget.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -167,6 +169,8 @@
     <ClInclude Include="..\..\include\Node.hpp" />
     <ClInclude Include="..\..\include\Object.hpp" />
     <ClInclude Include="..\..\include\Script.hpp" />
+    <ClInclude Include="..\..\include\SystemView.hpp" />
+    <ClInclude Include="..\..\include\SystemWidget.hpp" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
