@@ -14,7 +14,8 @@ public:
 
 	void SetPos(const Point& pos);
 
-	virtual int Init() = 0;
+	virtual int Enter();
+	virtual int Leave();
 
 	const String& GetName() const;
 
@@ -22,6 +23,8 @@ public:
 	{
 	//	ウィジェットの操作
 	}
+
+//	std::shared_ptr<SystemView> CreateSystemView();
 
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
