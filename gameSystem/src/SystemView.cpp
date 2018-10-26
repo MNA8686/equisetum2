@@ -43,7 +43,7 @@ void SystemView::SetPos(const Point& pos)
 
 const String& SystemView::GetName() const
 {
-	return{};
+	return m_name;
 }
 
 int SystemView::Enter()
@@ -56,45 +56,104 @@ int SystemView::Leave()
 	return 0;
 }
 
-void Do()
+int SystemView::Do()
 {
-	//	ウィジェットの操作
+	return 0;
 }
 
-class RootMenu : public SystemView
+int SystemView::Render()
+{
+	return 0;
+}
+
+void SystemView::DoWidget()
+{
+	size_t index = 0;
+	size_t nextFocus = 0;
+
+	for (auto& widget : m_vWidget)
+	{
+		if (widget->GetFocus())
+		{
+			widget->Prepare();
+			widget->Do();
+
+			SystemWidget::Stat stat = widget->GetStat();
+			switch (stat)
+			{
+			case SystemWidget::Stat::Prev:
+				nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
+				break;
+			case SystemWidget::Stat::Next:
+				nextFocus = (index + 1) % m_vWidget.size();
+				break;
+			default:
+				nextFocus = index;
+				break;
+			}
+
+			if (index != nextFocus)
+			{
+				widget->SetFocus(false);
+				m_vWidget[nextFocus]->SetFocus(true);
+			}
+
+			break;
+		}
+
+		index++;
+	}
+}
+
+void SystemView::RenderWidget()
+{
+	for (auto& widget : m_vWidget)
+	{
+		if (widget->GetFocus())
+		{
+			// ハイライト処理とか
+		}
+
+		widget->Render();
+	}
+}
+
+class TopMenu : public SystemView
 {
 public:
-	RootMenu() = default;
-	virtual ~RootMenu() = default;
+	TopMenu() = default;
+	virtual ~TopMenu() = default;
 
 	int Enter() override
 	{
-		m_returnToGame = SystemWidgetNext::Create();
+		m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
 		m_vWidget.push_back(m_returnToGame);
 
-		m_inputTest = SystemWidgetNext::Create([]() {
-			return nullptr;
-		});
+		m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
 		m_vWidget.push_back(m_inputTest);
 
-		m_assetTest = SystemWidgetNext::Create();
+		m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
 		m_vWidget.push_back(m_assetTest);
+
+		m_returnToGame->SetFocus(true);
 
 		return 0;
 	}
 
-	void Do()
-	{
-	//	ウィジェットの操作
-	}
+	//void Do() override;
 
-	std::shared_ptr<RootMenu> Create();
+	std::shared_ptr<TopMenu> Create();
 
 protected:
 	std::shared_ptr<SystemWidget> m_returnToGame;
 	std::shared_ptr<SystemWidget> m_inputTest;
 	std::shared_ptr<SystemWidget> m_assetTest;
 };
+
+//void TopMenu::Do()
+//{
+//	ウィジェットの操作
+//}
 
 class AssetMenu : public SystemView
 {
@@ -104,21 +163,18 @@ public:
 
 	int Enter() override
 	{
-		auto m_returnToGame = SystemWidgetSpin::Create([](int32_t val) {
+		auto m_return = SystemWidgetSpin::Create("SPIN", [](int32_t val) {
 			
 		});
-		m_vWidget.push_back(m_returnToGame);
+		m_vWidget.push_back(m_return);
 
-		auto m_prev = SystemWidgetPrev::Create();
+		auto m_prev = SystemWidgetReturnView::Create("RETURN");
 		m_vWidget.push_back(m_prev);
 
 		return 0;
 	}
 
-	void Do()
-	{
-	//	ウィジェットの操作
-	}
+//	void Do() override;
 
 	std::shared_ptr<AssetMenu> Create();
 
@@ -127,3 +183,9 @@ protected:
 	//std::shared_ptr<SystemWidget> m_inputTest;
 	//std::shared_ptr<SystemWidget> m_assetTest;
 };
+
+//void AssetMenu::Do()
+//{
+//
+//}
+

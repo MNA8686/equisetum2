@@ -16,15 +16,13 @@ public:
 
 	virtual int Enter();
 	virtual int Leave();
+	virtual int Do();
+	virtual int Render();
 
 	const String& GetName() const;
 
-	void Do()
-	{
-	//	ウィジェットの操作
-	}
-
-//	std::shared_ptr<SystemView> CreateSystemView();
+	void DoWidget();
+	void RenderWidget();
 
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
