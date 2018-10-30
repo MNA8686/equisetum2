@@ -167,6 +167,10 @@ namespace Equisetum2
 
 			if (inst->m_flag & AccessFlag::RenderTarget)
 			{
+				GLint framebuffer = -1;
+				// 現在のフレームバッファを保存
+				glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+
 				auto spFBO = std::shared_ptr<GLuint>(new GLuint,
 					[](GLuint* pID) {
 					::glDeleteFramebuffers(1, pID);
@@ -184,6 +188,9 @@ namespace Equisetum2
 				{
 					EQ_THROW(u8"レンダーターゲットの切り替えに失敗しました。");
 				}
+
+				// フレームバッファを復元
+				glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 			}
 
 			return inst;

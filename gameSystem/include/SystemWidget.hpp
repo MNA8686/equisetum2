@@ -91,6 +91,8 @@ private:
 	int32_t m_step = 1;
 	int32_t m_val = 0;
 	std::shared_ptr<TextRenderer> m_textRenderer;
+	std::shared_ptr<RectRenderer> m_rectRenderer;
+	int32_t m_direction = 0;
 };
 
 class SystemWidgetChoice : public SystemWidget

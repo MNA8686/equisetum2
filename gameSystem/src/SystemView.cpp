@@ -169,18 +169,25 @@ std::shared_ptr<AssetMenu> AssetMenu::Create()
 
 int AssetMenu::Enter()
 {
-	auto m_return = SystemWidgetSpin::Create("SPIN", [](int32_t val) {
+	auto m_return = SystemWidgetSpin::Create(u8"SPIN", [](int32_t val) {
 
 	});
-	m_return->SetPos({ 0.2f, 0.2f });
+	m_return->SetPos({ 0.05f, 0.2f });
 	m_return->SetFocus(true);
 	m_vWidget.push_back(m_return);
 
-	auto m_return2 = SystemWidgetSpin::Create("MOUIKKO", [](int32_t val) {
+	auto m_return2 = SystemWidgetSpin::Create(u8"ƒnƒ€‘¾˜Y", [](int32_t val) {
 
 	});
-	m_return2->SetPos({ 0.2f, 0.24f });
+	m_return2->SetPos({ 0.05f, 0.25f });
+	m_return2->SetRange(-100, 100, 10);
 	m_vWidget.push_back(m_return2);
+
+	auto m_return3 = SystemWidgetSpin::Create(u8"‚à‚¤‚ ‚©‚ñ", [](int32_t val) {
+
+	});
+	m_return3->SetPos({ 0.05f, 0.30f });
+	m_vWidget.push_back(m_return3);
 
 	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
 	//m_vWidget.push_back(m_prev);

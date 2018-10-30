@@ -1,4 +1,4 @@
-#include "SystemWidget.hpp"
+ï»¿#include "SystemWidget.hpp"
 #include "Application.hpp"
 
 SystemWidget::SystemWidget()
@@ -71,7 +71,7 @@ std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const Str
 		auto inst = std::shared_ptr<SystemWidgetReturnView>(new SystemWidgetReturnView);
 		if (!inst)
 		{
-			EQ_THROW(u8"ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
 		inst->m_label = label;
@@ -90,7 +90,7 @@ std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const Str
 
 int SystemWidgetReturnView::Do()
 {
-	// ZƒL[‰Ÿ‰ºH
+	// Zã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
 	if (KB::KeyZ.IsDown())
 	{
 	}
@@ -112,7 +112,7 @@ std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const Strin
 		auto inst = std::shared_ptr<SystemWidgetEnterView>(new SystemWidgetEnterView);
 		if (!inst)
 		{
-			EQ_THROW(u8"ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
 		inst->m_label = label;
@@ -131,7 +131,7 @@ std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const Strin
 
 int SystemWidgetEnterView::Do()
 {
-	// ZƒL[‰Ÿ‰ºH
+	// Zã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
 	if (KB::KeyZ.IsDown())
 	{
 	}
@@ -152,7 +152,7 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 		auto inst = std::shared_ptr<SystemWidgetCustom>(new SystemWidgetCustom);
 		if (!inst)
 		{
-			EQ_THROW(u8"ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
 		inst->m_label = label;
@@ -177,7 +177,7 @@ int SystemWidgetCustom::Do()
 	}
 	else
 	{
-		// ZƒL[‰Ÿ‰ºH
+		// Zã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
 		if (KB::KeyZ.IsDown())
 		{
 			m_exclusive = true;
@@ -200,7 +200,7 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		auto inst = std::shared_ptr<SystemWidgetSpin>(new SystemWidgetSpin);
 		if (!inst)
 		{
-			EQ_THROW(u8"ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
 		inst->m_label = label;
@@ -208,18 +208,24 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		inst->m_textRenderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
 		if (!inst->m_textRenderer)
 		{
-			EQ_THROW(u8"ƒŒƒ“ƒ_ƒ‰‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ãƒ¬ãƒ³ãƒ€ãƒ©ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
-		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(" <0123456789>" + label, Color{0xff, 0xff, 0xff, 0xff});
+		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(u8" <0123456789>+-â—€â–¶" + label, Color{0xff, 0xff, 0xff, 0xff});
 		if (!bitmapFont)
 		{
-			EQ_THROW(u8"ƒrƒbƒgƒ}ƒbƒvƒtƒHƒ“ƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B");
+			EQ_THROW(u8"ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ãƒ•ã‚©ãƒ³ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		}
 
 		inst->m_textRenderer->SetBitmapFont(bitmapFont);
 		inst->m_textRenderer->SetBlendMode(BlendMode::Blend);
 		
+		inst->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+		if (!inst->m_rectRenderer)
+		{
+			EQ_THROW(u8"ãƒ¬ãƒ³ãƒ€ãƒ©ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
+		}
+
 		return inst;
 	}
 	EQ_HANDLER
@@ -251,34 +257,46 @@ int32_t SystemWidgetSpin::GetValue() const
 
 int SystemWidgetSpin::Do()
 {
-	// ãƒL[‰Ÿ‰ºH
+	m_direction = 0;
+
+	// ä¸Šã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
 	if (KB::KeyUp.IsDown())
 	{
 		Prev();
 	}
-	// ‰ºƒL[‰Ÿ‰ºH
+	// ä¸‹ã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
 	else if (KB::KeyDown.IsDown())
 	{
 		Next();
 	}
-	// ¶ƒL[‰Ÿ‰ºH
-	else if (KB::KeyLeft.IsDown())
+	// å·¦ã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
+	else if (KB::KeyLeft.IsPress())
 	{
-		if (m_val > m_min)
+		m_direction = -1;
+
+		if(KB::KeyLeft.IsDown() || KB::KeyLeft.PressedDuration() > 500)
 		{
-			// ’lƒ_ƒEƒ“
-			m_val = std::max(m_min, m_val - m_step);
-			m_cb(m_val);
+			if (m_val > m_min)
+			{
+				// å€¤ãƒ€ã‚¦ãƒ³
+				m_val = std::max(m_min, m_val - m_step);
+				m_cb(m_val);
+			}
 		}
 	}
-	// ‰EƒL[‰Ÿ‰ºH
-	else if (KB::KeyRight.IsDown())
+	// å³ã‚­ãƒ¼æŠ¼ä¸‹ï¼Ÿ
+	else if (KB::KeyRight.IsPress())
 	{
-		if (m_val < m_max)
+		m_direction = 1;
+
+		if (KB::KeyRight.IsDown() || KB::KeyRight.PressedDuration() > 500)
 		{
-			// ’lƒAƒbƒv
-			m_val = std::min(m_max, m_val + m_step);
-			m_cb(m_val);
+			if (m_val < m_max)
+			{
+				// å€¤ã‚¢ãƒƒãƒ—
+				m_val = std::min(m_max, m_val + m_step);
+				m_cb(m_val);
+			}
 		}
 	}
 
@@ -288,12 +306,59 @@ int SystemWidgetSpin::Do()
 int SystemWidgetSpin::Render()
 {
 	Size size = Window::Size();
+	const String left = u8"â—€";
+	const String right = u8"â–¶";
 
 	// label < val >
-	String text = String::Sprintf("%s < %d >", m_label.c_str(), m_val);
+	const String text = String::Sprintf(u8"%s  %s %d %s", m_label.c_str(), left.c_str(), m_val, right.c_str());
+	m_textRenderer->SetColor(Color{128, 128, 128, 128});
 	m_textRenderer->SetText(text);
 	m_textRenderer->SetPivot({ 0, 0.5f });
 	m_textRenderer->SetPos({ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) });
+
+	if (GetFocus())
+	{
+		m_rectRenderer->SetVisible(true);
+		m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
+		m_rectRenderer->SetBlendMode(BlendMode::Blend);
+		Size boxSize = m_textRenderer->GetBoxSize();
+		m_rectRenderer->SetRect(Rect{ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y });
+	
+		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
+	}
+
+#if 1
+	// æŠ¼ã—ã¦ã„ã‚‹çŸ¢å°ã®è‰²ã‚’å¤‰ãˆã‚‹
+	auto str32 = text.to_u32();
+	auto left32 = left.to_u32().at(0);
+	auto right32 = right.to_u32().at(0);
+	int32_t count = 0;
+	for (auto& c : str32)
+	{
+		bool blink = false;
+
+		if (m_direction < 0 &&
+			c == left32)
+		{
+			blink = true;
+		}
+		else if (m_direction > 0 &&
+			c == right32)
+		{
+			blink = true;
+		}
+
+		if (blink)
+		{
+			std::shared_ptr<SpriteRenderer> sprite = m_textRenderer->GetLetter(count);
+			sprite->SetColor(Color{ 255, 0, 0, 128 });
+			break;
+		}
+
+		count++;
+	}
+
+#endif
 
 	GetApplication()->GetRenderer()->AddRenderQueue(m_textRenderer.get());
 

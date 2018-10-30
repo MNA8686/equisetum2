@@ -80,7 +80,7 @@ int Application::Main()
 
 			OnUpdate();
 
-			OnDraw();
+			//OnDraw();
 	{
 		m_renderer->SetRenderTarget(nullptr);
 		m_renderer->Clear({ 128, 128, 0, 0 });
@@ -143,7 +143,7 @@ std::shared_ptr<FontManager>& Application::GetSystemFont(void)
 	if (!m_fontManager)
 	{
 		int fontSize = Window::Size().y / 30;
-		String arg = String::Sprintf(u8"mgenplus-1m-regular?%d", fontSize);
+		String arg = String::Sprintf(u8"mgenplus-1pp-heavy?%d", fontSize);
 		
 		m_fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
 	}
