@@ -4,6 +4,8 @@
 #include "Equisetum2.h"
 using namespace Equisetum2; 
 
+#include "SystemView.hpp"
+
 class Application
 {
 public:
@@ -11,6 +13,14 @@ public:
 	~Application() = default;
 
 	int Main();
+
+	void SetTargetFps(int32_t fps);
+	int32_t NowFps(void) const;
+
+	std::shared_ptr<Renderer>& GetRenderer(void);
+	std::shared_ptr<FontManager>& GetSystemFont(void);
+
+	std::shared_ptr<SystemView> m_view;
 
 protected:
 
@@ -23,14 +33,10 @@ protected:
 
 	void Quit();
 
-	void SetTargetFps(int32_t fps);
-	int32_t NowFps(void) const;
-
-	std::shared_ptr<Renderer>& GetRenderer(void);
-
 private:
 
 	std::shared_ptr<Renderer> m_renderer;
+	std::shared_ptr<FontManager> m_fontManager;
 
 	std::shared_ptr<SystemTimer> m_sysTimer;
 	std::shared_ptr<TickCounter> m_fpsMakerTick;
@@ -40,8 +46,9 @@ private:
 
 	int32_t m_fps = 60;
 	bool m_isQuit = false;
+
 };
 
-extern std::shared_ptr<Application> GetApplication(void);
+extern Application* GetApplication(void);
 
 #endif

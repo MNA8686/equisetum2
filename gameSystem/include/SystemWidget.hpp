@@ -24,11 +24,13 @@ public:
 	void SetFocus(bool focus);
 	bool GetFocus() const;
 	Stat GetStat() const;
+	void SetPos(const PointF& pos);
 
 protected:
 	String m_label;
 	Stat m_stat = Stat::Idle;
 	bool m_focus = false;
+	PointF m_pos;
 };
 
 class SystemWidgetEnterView : public SystemWidget
@@ -88,6 +90,7 @@ private:
 	int32_t m_max = 100;
 	int32_t m_step = 1;
 	int32_t m_val = 0;
+	std::shared_ptr<TextRenderer> m_textRenderer;
 };
 
 class SystemWidgetChoice : public SystemWidget

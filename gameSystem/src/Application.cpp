@@ -36,6 +36,11 @@ int Application::Main()
 
 	m_renderer = Renderer::Create();
 
+	// viewƒeƒXƒg
+	{
+		m_view = AssetMenu::Create();
+	}
+	
 	OnInit();
 
 	while (!m_isQuit)
@@ -71,10 +76,19 @@ int Application::Main()
 
 		if (!isError)
 		{
+		m_view->DoWidget();	// for view test
+
 			OnUpdate();
 
-
 			OnDraw();
+	{
+		m_renderer->SetRenderTarget(nullptr);
+		m_renderer->Clear({ 128, 128, 0, 0 });
+		m_view->RenderWidget();	// for view test
+		m_renderer->Render();
+	}
+
+
 		}
 
 		m_renderer->Present();
@@ -124,6 +138,19 @@ std::shared_ptr<Renderer>& Application::GetRenderer(void)
 	return m_renderer;
 }
 
+std::shared_ptr<FontManager>& Application::GetSystemFont(void)
+{
+	if (!m_fontManager)
+	{
+		int fontSize = Window::Size().y / 30;
+		String arg = String::Sprintf(u8"mgenplus-1m-regular?%d", fontSize);
+		
+		m_fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
+	}
+
+	return m_fontManager;
+}
+
 void Application::SetTargetFps(int32_t fps)
 {
 	m_fpsMaker->SetTargetFps(fps);
@@ -133,3 +160,4 @@ int32_t Application::NowFps(void) const
 {
 	return m_fpsCounter->Fps();
 }
+

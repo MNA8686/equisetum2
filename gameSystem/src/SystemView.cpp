@@ -126,14 +126,18 @@ public:
 
 	int Enter() override
 	{
-		m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
+		m_returnToGame = SystemWidgetSpin::Create("RETURN TO GAME", [](int index) {
+		});
 		m_vWidget.push_back(m_returnToGame);
 
-		m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
-		m_vWidget.push_back(m_inputTest);
+		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
+		//m_vWidget.push_back(m_returnToGame);
 
-		m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
-		m_vWidget.push_back(m_assetTest);
+		//m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
+		//m_vWidget.push_back(m_inputTest);
+
+		//m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
+		//m_vWidget.push_back(m_assetTest);
 
 		m_returnToGame->SetFocus(true);
 
@@ -155,37 +159,33 @@ protected:
 //	ウィジェットの操作
 //}
 
-class AssetMenu : public SystemView
+std::shared_ptr<AssetMenu> AssetMenu::Create()
 {
-public:
-	AssetMenu() = default;
-	virtual ~AssetMenu() = default;
+	auto p = std::make_shared<AssetMenu>();
+	p->Enter();
 
-	int Enter() override
-	{
-		auto m_return = SystemWidgetSpin::Create("SPIN", [](int32_t val) {
-			
-		});
-		m_vWidget.push_back(m_return);
+	return p;
+}
 
-		auto m_prev = SystemWidgetReturnView::Create("RETURN");
-		m_vWidget.push_back(m_prev);
+int AssetMenu::Enter()
+{
+	auto m_return = SystemWidgetSpin::Create("SPIN", [](int32_t val) {
 
-		return 0;
-	}
+	});
+	m_return->SetPos({ 0.2f, 0.2f });
+	m_return->SetFocus(true);
+	m_vWidget.push_back(m_return);
 
-//	void Do() override;
+	auto m_return2 = SystemWidgetSpin::Create("MOUIKKO", [](int32_t val) {
 
-	std::shared_ptr<AssetMenu> Create();
+	});
+	m_return2->SetPos({ 0.2f, 0.24f });
+	m_vWidget.push_back(m_return2);
 
-protected:
-	//std::shared_ptr<SystemWidget> m_returnToGame;
-	//std::shared_ptr<SystemWidget> m_inputTest;
-	//std::shared_ptr<SystemWidget> m_assetTest;
-};
+	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
+	//m_vWidget.push_back(m_prev);
 
-//void AssetMenu::Do()
-//{
-//
-//}
+	return 0;
+}
+
 

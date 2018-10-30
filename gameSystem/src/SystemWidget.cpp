@@ -1,4 +1,5 @@
 #include "SystemWidget.hpp"
+#include "Application.hpp"
 
 SystemWidget::SystemWidget()
 {
@@ -37,6 +38,29 @@ void SystemWidget::Prepare()
 {
 	m_stat = Stat::Idle;
 }
+
+void SystemWidget::SetPos(const PointF& pos)
+{
+	m_pos = pos;
+}
+
+#if 0
+std::shared_ptr<BitmapFont> CreateBitmapFontRenderer()
+{
+	auto app = GetApplication();
+
+	auto renderer = Script::GetRenderer();
+	auto renderObject = renderer->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::CIRCLE);
+	auto circleRenderer = std::dynamic_pointer_cast<CircleRenderer>(renderObject);
+
+	if (auto owner = m_ownerObject.lock())
+	{
+		owner->AddRenderObject(renderObject);
+	}
+
+	return circleRenderer;
+}
+#endif
 
 
 
@@ -181,7 +205,21 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 
 		inst->m_label = label;
 		inst->m_cb = cb;
+		inst->m_textRenderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
+		if (!inst->m_textRenderer)
+		{
+			EQ_THROW(u8"レンダラの作成に失敗しました。");
+		}
 
+		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(" <0123456789>" + label, Color{0xff, 0xff, 0xff, 0xff});
+		if (!bitmapFont)
+		{
+			EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
+		}
+
+		inst->m_textRenderer->SetBitmapFont(bitmapFont);
+		inst->m_textRenderer->SetBlendMode(BlendMode::Blend);
+		
 		return inst;
 	}
 	EQ_HANDLER
@@ -234,7 +272,7 @@ int SystemWidgetSpin::Do()
 		}
 	}
 	// 右キー押下？
-	else if (KB::KeyLeft.IsDown())
+	else if (KB::KeyRight.IsDown())
 	{
 		if (m_val < m_max)
 		{
@@ -249,6 +287,15 @@ int SystemWidgetSpin::Do()
 
 int SystemWidgetSpin::Render()
 {
+	Size size = Window::Size();
+
 	// label < val >
+	String text = String::Sprintf("%s < %d >", m_label.c_str(), m_val);
+	m_textRenderer->SetText(text);
+	m_textRenderer->SetPivot({ 0, 0.5f });
+	m_textRenderer->SetPos({ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) });
+
+	GetApplication()->GetRenderer()->AddRenderQueue(m_textRenderer.get());
+
 	return 0;
 }

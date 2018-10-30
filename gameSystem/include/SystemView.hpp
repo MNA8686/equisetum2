@@ -30,4 +30,19 @@ protected:
 	int m_focus = 0;
 };
 
+class AssetMenu : public SystemView
+{
+public:
+	AssetMenu() = default;
+	virtual ~AssetMenu() = default;
+
+	int Enter() override;
+
+//	void Do() override;
+
+	static std::shared_ptr<AssetMenu> Create();
+
+protected:
+};
+
 #endif

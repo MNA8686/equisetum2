@@ -56,6 +56,8 @@ namespace Equisetum2
 
 			// フォントサイズを設定
 			inst->m_fontSize = fontSize;
+			// ストリームを保持する
+			inst->m_stream = stream;
 
 			// SDL_ttfの初期化
 			{
@@ -359,5 +361,15 @@ namespace Equisetum2
 		EQ_END_HANDLER
 
 		return nullptr;
+	}
+
+	void FontManager::SetIdentify(const String& id)
+	{
+		m_id = id;
+	}
+
+	String FontManager::Identify() const
+	{
+		return m_id;
 	}
 }

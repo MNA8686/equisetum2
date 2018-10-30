@@ -3,6 +3,7 @@
 
 using namespace Equisetum2;
 
+
 int Main()
 {
 	if (auto app = GetApplication())

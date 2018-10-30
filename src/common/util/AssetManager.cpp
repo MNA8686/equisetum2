@@ -418,6 +418,45 @@ namespace Equisetum2
 		return nullptr;
 	}
 
+	std::shared_ptr<FontManager> AssetManager::_LoadFontManager(const String& id)
+	{
+		EQ_DURING
+		{
+			// 暫定的に "/font/sample.ttf?16" のようにidとフォントサイズを指定する
+			std::vector<String> str = id.split("?");
+
+			auto inStream = FileStream::CreateFromPath(MakeNativePath("font", str[0], ".ttf"));
+			if (!inStream)
+			{
+				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+			}
+
+			// フォントサイズを指定
+			int fontSize = 16;
+			if (str.size() >= 2)
+			{
+				fontSize = atoi(str[1].c_str());
+			}
+
+			auto font = FontManager::CreateFromStream(inStream, fontSize);
+			if (!font)
+			{
+				EQ_THROW(String::Sprintf(u8"フォント(%s)の作成に失敗しました。", id.c_str()));
+			}
+
+			font->SetIdentify(id);
+
+			return font;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
 	std::shared_ptr<BGM> AssetManager::_LoadBGM(const String & id)
 	{
 		EQ_DURING
