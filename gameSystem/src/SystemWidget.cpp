@@ -49,63 +49,6 @@ void SystemWidget::SetEnable(bool enable)
 	m_enable = enable;
 }
 
-std::shared_ptr<TextRenderer>& SystemWidget::GetLabelRenderer()
-{
-	return m_labelRenderer;
-}
-
-bool SystemWidget::SetLabel(const String& label)
-{
-	EQ_DURING
-	{
-		if (!m_labelRenderer)
-		{
-			m_labelRenderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
-			if (!m_labelRenderer)
-			{
-				EQ_THROW(u8"レンダラの作成に失敗しました。");
-			}
-		}
-
-		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(u8" <0123456789>" + label, Color{0xff, 0xff, 0xff, 0xff});
-		if (!bitmapFont)
-		{
-			EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
-		}
-
-		m_labelRenderer->SetBitmapFont(bitmapFont);
-		m_labelRenderer->SetText(label);
-		m_labelRenderer->SetPivot({ 0, 0.5f });
-		m_labelRenderer->SetBlendMode(BlendMode::Blend);
-
-		return true;
-	}
-	EQ_HANDLER
-	{
-		Logger::OutputError(EQ_GET_HANDLER().what());
-	}
-	EQ_END_HANDLER
-
-	return false;
-}
-
-bool SystemWidget::RenderLabel()
-{
-	Size size = Window::Size();
-	m_labelRenderer->SetPos({ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) });
-
-	uint8_t color = m_enable ? 128 : 96;
-	m_labelRenderer->SetColor(Color{ color, color, color, 128 });
-
-	RenderLabelPostEffect();
-
-	GetApplication()->GetRenderer()->AddRenderQueue(m_labelRenderer.get());
-
-	return true;
-}
-
-
-
 std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const String& label)
 {
 	EQ_DURING
@@ -116,7 +59,7 @@ std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const Str
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		inst->m_label = label;
+		inst->m_text = label;
 
 		return inst;
 	}
@@ -141,6 +84,7 @@ int SystemWidgetReturnView::Do()
 
 int SystemWidgetReturnView::Render()
 {
+	m_label->Render(this);
 	// label
 	return 0;
 }
@@ -156,7 +100,7 @@ std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const Strin
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		inst->m_label = label;
+		inst->m_text = label;
 
 		return inst;
 	}
@@ -181,6 +125,7 @@ int SystemWidgetEnterView::Do()
 
 int SystemWidgetEnterView::Render()
 {
+	m_label->Render(this);
 	// label
 	return 0;
 }
@@ -195,9 +140,12 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		inst->m_label = label;
+		inst->m_text = label;
 		inst->m_cb = cb;
-		if (!inst->SetLabel(label))
+		inst->m_label = std::make_shared<Label>();
+		inst->m_label->SetPreset(u8" " + label);
+
+		if (!inst->m_label->SetText(label))
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
@@ -252,22 +200,15 @@ int SystemWidgetCustom::Render()
 {
 	// label
 	Size size = Window::Size();
-	auto label = GetLabelRenderer();
 
-#if 0
-	const String text = String::Sprintf(u8"%s", m_label.c_str());
-	label->SetColor(m_enable ? Color{128, 128, 128, 128} : Color{96, 96, 96, 128});
-	label->SetText(text);
-	label->SetPivot({ 0, 0.5f });
-	label->SetPos({ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) });
-#endif
+	m_label->Render(this);
 
 	if (GetFocus())
 	{
 		m_rectRenderer->SetVisible(true);
 		m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
 		m_rectRenderer->SetBlendMode(BlendMode::Blend);
-		Size boxSize = label->GetBoxSize();
+		Size boxSize = m_label->GetBoxSize();
 		m_rectRenderer->SetRect(Rect{ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y });
 	
 		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
@@ -286,10 +227,13 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		inst->m_label = label;
+		inst->m_text = label;
 		inst->m_cb = cb;
+		inst->m_label = std::make_shared<LabelEx>();
+		inst->m_label->SetPreset(u8" 0123456789-+◀▶" + label);
+
 		auto str = inst->MakeString();
-		if (!inst->SetLabel(label))
+		if (!inst->m_label->SetText(str))
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
@@ -319,7 +263,7 @@ void SystemWidgetSpin::SetRange(int32_t min, int32_t max, int32_t step)
 	m_val = 0;
 
 	auto str = MakeString();
-	SetLabel(str);
+	m_label->SetText(str);
 }
 
 void SystemWidgetSpin::SetValue(int32_t val)
@@ -327,7 +271,7 @@ void SystemWidgetSpin::SetValue(int32_t val)
 	m_val = val;
 
 	auto str = MakeString();
-	SetLabel(str);
+	m_label->SetText(str);
 }
 
 int32_t SystemWidgetSpin::GetValue() const
@@ -340,53 +284,12 @@ void SystemWidgetSpin::SetCyclic(bool val)
 	m_cyclic = val;
 }
 
-void SystemWidgetSpin::RenderLabelPostEffect()
-{
-	// 押している矢印の色を変える
-	const String left = u8"◀";
-	const String right = u8"▶";
-
-	auto label = GetLabelRenderer();
-
-	auto str32 = label->GetTextU32();
-	if (!str32.empty())
-	{
-		auto left32 = left.to_u32().at(0);
-		auto right32 = right.to_u32().at(0);
-		int32_t count = 0;
-		for (auto& c : str32)
-		{
-			bool blink = false;
-
-			if (m_direction < 0 &&
-				c == left32)
-			{
-				blink = true;
-			}
-			else if (m_direction > 0 &&
-				c == right32)
-			{
-				blink = true;
-			}
-
-			if (blink)
-			{
-				std::shared_ptr<SpriteRenderer> sprite = label->GetLetter(count);
-				sprite->SetColor(Color{ 255, 0, 0, 128 });
-				break;
-			}
-
-			count++;
-		}
-	}
-}
-
 const String SystemWidgetSpin::MakeString()
 {
 	const String left = u8"◀";
 	const String right = u8"▶";
 
-	const String text = String::Sprintf(u8"%s  %s %d %s", m_label.c_str(), left.c_str(), m_val, right.c_str());
+	const String text = String::Sprintf(u8"%s  %s %d %s", m_text.c_str(), left.c_str(), m_val, right.c_str());
 	return text;
 }
 
@@ -452,7 +355,7 @@ int SystemWidgetSpin::Do()
 	if (valBak != m_val)
 	{
 		auto str = MakeString();
-		SetLabel(str);
+		m_label->SetText(str);
 	}
 
 	return 0;
@@ -461,21 +364,122 @@ int SystemWidgetSpin::Do()
 int SystemWidgetSpin::Render()
 {
 	Size size = Window::Size();
-	const String left = u8"◀";
-	const String right = u8"▶";
 
-	auto label = GetLabelRenderer();
+	m_label->Render(this);
 
 	if (GetFocus())
 	{
 		m_rectRenderer->SetVisible(true);
 		m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
 		m_rectRenderer->SetBlendMode(BlendMode::Blend);
-		Size boxSize = label->GetBoxSize();
+		Size boxSize = m_label->GetBoxSize();
 		m_rectRenderer->SetRect(Rect{ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y });
 	
 		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
 	}
 
 	return 0;
+}
+
+SystemWidget::Label::Label()
+{
+	m_renderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
+	m_renderer->SetPivot({ 0, 0.5f });
+	m_renderer->SetBlendMode(BlendMode::Blend);
+}
+
+bool SystemWidget::Label::Render(SystemWidget * pWidget)
+{
+	Size size = Window::Size();
+	m_renderer->SetPos({ static_cast<int32_t>(size.x * pWidget->m_pos.x), static_cast<int32_t>(size.y * pWidget->m_pos.y) });
+
+	uint8_t color = pWidget->m_enable ? 128 : 96;
+	m_renderer->SetColor(Color{ color, color, color, 128 });
+
+	RenderPostEffect(pWidget);
+
+	GetApplication()->GetRenderer()->AddRenderQueue(m_renderer.get());
+
+	return true;
+}
+
+Size SystemWidget::Label::GetBoxSize() const
+{
+	return m_renderer->GetBoxSize();
+}
+
+std::shared_ptr<TextRenderer>& SystemWidget::Label::GetRenderer()
+{
+	return m_renderer;
+}
+
+bool SystemWidget::Label::SetPreset(const String & preset)
+{
+	EQ_DURING
+	{
+		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(preset, Color{0xff, 0xff, 0xff, 0xff});
+		if (!bitmapFont)
+		{
+			EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
+		}
+
+		m_renderer->SetBitmapFont(bitmapFont);
+
+		return true;
+	}
+	EQ_HANDLER
+	{
+		Logger::OutputError(EQ_GET_HANDLER().what());
+	}
+	EQ_END_HANDLER
+
+	return false;
+}
+
+bool SystemWidget::Label::SetText(const String & label)
+{
+	m_renderer->SetText(label);
+	return true;
+}
+
+void SystemWidgetSpin::LabelEx::RenderPostEffect(SystemWidget * pWidget)
+{
+	// 押している矢印の色を変える
+	const String left = u8"◀";
+	const String right = u8"▶";
+
+	auto renderer = GetRenderer();
+	auto pWidget_ = static_cast<SystemWidgetSpin*>(pWidget);
+
+	auto str32 = renderer->GetTextU32();
+	if (!str32.empty())
+	{
+		auto left32 = left.to_u32().at(0);
+		auto right32 = right.to_u32().at(0);
+		int32_t count = 0;
+		for (auto& c : str32)
+		{
+			bool blink = false;
+
+			if (pWidget_->m_direction < 0 &&
+				c == left32)
+			{
+				blink = true;
+			}
+			else if (pWidget_->m_direction > 0 &&
+				c == right32)
+			{
+				blink = true;
+			}
+
+			if (blink)
+			{
+				std::shared_ptr<SpriteRenderer> sprite = renderer->GetLetter(count);
+				sprite->SetColor(Color{ 255, 0, 0, 128 });
+				break;
+			}
+
+			count++;
+		}
+	}
 }

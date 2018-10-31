@@ -130,7 +130,7 @@ void SystemView::RenderView()
 		}
 
 		widget->Render();
-		widget->RenderLabel();
+//		widget->RenderLabel();
 	}
 }
 
@@ -193,7 +193,7 @@ int AssetMenu::Enter()
 	m_spritePos = Window::Size() / 2;
 	m_spriteRenderer->SetPos(m_spritePos);
 
-	auto m_return = SystemWidgetSpin::Create(u8"Šg‘å—¦", [this](int32_t val) {
+	auto m_return = SystemWidgetSpin::Create(u8"Šg‘å—¦(%)", [this](int32_t val) {
 		m_rate = val;
 	});
 	m_return->SetPos({ 0.05f, 0.2f });
@@ -206,7 +206,8 @@ int AssetMenu::Enter()
 		m_ptr = val;
 	});
 	m_return2->SetPos({ 0.05f, 0.25f });
-	m_return2->SetRange(0, sprite->GetAnimAtlas().size(), 1);
+	size_t animSize = sprite->GetAnimAtlas().size();
+	m_return2->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
 	m_return2->SetCyclic(true);
 	m_vWidget.push_back(m_return2);
 

@@ -4,6 +4,7 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
+
 class SystemWidget
 {
 public:
@@ -27,20 +28,34 @@ public:
 	Stat GetStat() const;
 	void SetPos(const PointF& pos);
 	void SetEnable(bool enable);
-	bool RenderLabel();
+
+	class Label
+	{
+	public:
+		Label();
+		~Label() = default;
+
+		bool SetPreset(const String& preset);
+		bool SetText(const String& label);
+		bool Render(SystemWidget* pWidget);
+		Size GetBoxSize() const;
+
+	protected:
+		std::shared_ptr<TextRenderer>& GetRenderer();
+	
+	private:
+		virtual void RenderPostEffect(SystemWidget* pWidget) {}
+		std::shared_ptr<TextRenderer> m_renderer;
+	};
 
 protected:
-	String m_label;
+	String m_text;
 	Stat m_stat = Stat::Idle;
 	bool m_focus = false;
 	PointF m_pos;
 	bool m_enable = true;
-	std::shared_ptr<TextRenderer>& GetLabelRenderer();
-	bool SetLabel(const String& label);
-	virtual void RenderLabelPostEffect() {}
 
-private:
-	std::shared_ptr<TextRenderer> m_labelRenderer;
+	std::shared_ptr<Label> m_label;
 };
 
 class SystemWidgetEnterView : public SystemWidget
@@ -78,7 +93,6 @@ public:
 private:
 	std::function<bool(void)> m_cb;
 	bool m_exclusive = false;
-	//std::shared_ptr<TextRenderer> m_textRenderer;
 	std::shared_ptr<RectRenderer> m_rectRenderer;
 };
 
@@ -97,8 +111,15 @@ public:
 	int32_t GetValue() const;
 	void SetCyclic(bool val);
 
-protected:
-	void RenderLabelPostEffect() override;
+	class LabelEx : public Label
+	{
+	public:
+		LabelEx() = default;
+		~LabelEx() = default;
+
+	private:
+		virtual void RenderPostEffect(SystemWidget* pWidget) override;
+	};
 
 private:
 	std::function<void(int32_t)> m_cb;
@@ -106,7 +127,6 @@ private:
 	int32_t m_max = 100;
 	int32_t m_step = 1;
 	int32_t m_val = 0;
-	//std::shared_ptr<TextRenderer> m_textRenderer;
 	std::shared_ptr<RectRenderer> m_rectRenderer;
 	int32_t m_direction = 0;
 	bool m_cyclic = false;
