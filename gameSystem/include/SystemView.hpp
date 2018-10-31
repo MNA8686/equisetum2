@@ -21,8 +21,8 @@ public:
 
 	const String& GetName() const;
 
-	void DoWidget();
-	void RenderWidget();
+	void DoView();
+	void RenderView();
 
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
@@ -37,12 +37,16 @@ public:
 	virtual ~AssetMenu() = default;
 
 	int Enter() override;
-
-//	void Do() override;
+	int Do() override;
+	int Render() override;
 
 	static std::shared_ptr<AssetMenu> Create();
 
 protected:
+	int32_t m_rate = 100;
+	int32_t m_ptr = 0;
+	Point m_spritePos;
+	std::shared_ptr<SpriteRenderer> m_spriteRenderer;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "SystemView.hpp"
+#include "Application.hpp"
 
 #if 0
 std::shared_ptr<SystemView> SystemView::CreateSystemView()
@@ -66,10 +67,11 @@ int SystemView::Render()
 	return 0;
 }
 
-void SystemView::DoWidget()
+void SystemView::DoView()
 {
 	size_t index = 0;
 	size_t nextFocus = 0;
+	bool enable = true;
 
 	for (auto& widget : m_vWidget)
 	{
@@ -98,15 +100,28 @@ void SystemView::DoWidget()
 				m_vWidget[nextFocus]->SetFocus(true);
 			}
 
+			if (widget->GetStat() == SystemWidget::Stat::Exclusive)
+			{
+				enable = false;
+			}
 			break;
 		}
 
 		index++;
 	}
+
+	for (auto& widget : m_vWidget)
+	{
+		widget->SetEnable(enable);
+	}
+	
+	Do();
 }
 
-void SystemView::RenderWidget()
+void SystemView::RenderView()
 {
+	Render();
+
 	for (auto& widget : m_vWidget)
 	{
 		if (widget->GetFocus())
@@ -115,6 +130,7 @@ void SystemView::RenderWidget()
 		}
 
 		widget->Render();
+		widget->RenderLabel();
 	}
 }
 
@@ -169,28 +185,75 @@ std::shared_ptr<AssetMenu> AssetMenu::Create()
 
 int AssetMenu::Enter()
 {
-	auto m_return = SystemWidgetSpin::Create(u8"SPIN", [](int32_t val) {
+	m_spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::SPRITE));
 
+	std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>("bullet_tama08");
+	m_spriteRenderer->SetSprite(sprite);
+	m_spriteRenderer->SetBlendMode(BlendMode::Blend);
+	m_spritePos = Window::Size() / 2;
+	m_spriteRenderer->SetPos(m_spritePos);
+
+	auto m_return = SystemWidgetSpin::Create(u8"拡大率", [this](int32_t val) {
+		m_rate = val;
 	});
 	m_return->SetPos({ 0.05f, 0.2f });
 	m_return->SetFocus(true);
+	m_return->SetRange(10, 1000, 10);
+	m_return->SetValue(100);
 	m_vWidget.push_back(m_return);
 
-	auto m_return2 = SystemWidgetSpin::Create(u8"ハム太郎", [](int32_t val) {
-
+	auto m_return2 = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
+		m_ptr = val;
 	});
 	m_return2->SetPos({ 0.05f, 0.25f });
-	m_return2->SetRange(-100, 100, 10);
+	m_return2->SetRange(0, sprite->GetAnimAtlas().size(), 1);
+	m_return2->SetCyclic(true);
 	m_vWidget.push_back(m_return2);
 
-	auto m_return3 = SystemWidgetSpin::Create(u8"もうあかん", [](int32_t val) {
+	auto m_return3 = SystemWidgetCustom::Create(u8"移動", [this]()->bool {
+		int32_t amount = KB::KeyTab.IsPress() ? 4 : 1;
 
+		if (KB::KeyLeft.IsPress())
+		{
+			m_spritePos.x -= amount;
+		}
+		else if (KB::KeyRight.IsPress())
+		{
+			m_spritePos.x += amount;
+		}
+
+		if (KB::KeyUp.IsPress())
+		{
+			m_spritePos.y -= amount;
+		}
+		else if (KB::KeyDown.IsPress())
+		{
+			m_spritePos.y += amount;
+		}
+
+		return !KB::KeyZ.IsDown();
 	});
 	m_return3->SetPos({ 0.05f, 0.30f });
 	m_vWidget.push_back(m_return3);
 
 	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
 	//m_vWidget.push_back(m_prev);
+
+	return 0;
+}
+
+int AssetMenu::Do()
+{
+	m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
+	m_spriteRenderer->SetAtlasNum(m_ptr);
+	m_spriteRenderer->SetPos(m_spritePos);
+
+	return 0;
+}
+
+int AssetMenu::Render()
+{
+	GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
 
 	return 0;
 }

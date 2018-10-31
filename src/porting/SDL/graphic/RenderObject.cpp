@@ -651,6 +651,11 @@ namespace Equisetum2
 		}
 	}
 
+	const std::u32string & TextRenderer::GetTextU32() const
+	{
+		return m_text;
+	}
+	
 	bool TextRenderer::Calculation()
 	{
 		Size sizeMax;

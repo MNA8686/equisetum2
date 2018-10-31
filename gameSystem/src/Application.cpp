@@ -76,7 +76,7 @@ int Application::Main()
 
 		if (!isError)
 		{
-		m_view->DoWidget();	// for view test
+		m_view->DoView();	// for view test
 
 			OnUpdate();
 
@@ -84,7 +84,7 @@ int Application::Main()
 	{
 		m_renderer->SetRenderTarget(nullptr);
 		m_renderer->Clear({ 128, 128, 0, 0 });
-		m_view->RenderWidget();	// for view test
+		m_view->RenderView();	// for view test
 		m_renderer->Render();
 	}
 

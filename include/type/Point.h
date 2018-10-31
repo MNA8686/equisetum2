@@ -72,9 +72,21 @@ namespace Equisetum2
 	}
 
 	template <typename T>
+	Point_t<T> operator + (const Point_t<T>& op1, const T& op2)
+	{
+		return{ op1.x + op2, op1.y + op2 };
+	}
+
+	template <typename T>
 	Point_t<T> operator - (const Point_t<T>& op1, const Point_t<T>& op2)
 	{
 		return{ op1.x - op2.x, op1.y - op2.y };
+	}
+
+	template <typename T>
+	Point_t<T> operator - (const Point_t<T>& op1, const T& op2)
+	{
+		return{ op1.x - op2, op1.y - op2 };
 	}
 
 	template <typename T>
@@ -84,9 +96,21 @@ namespace Equisetum2
 	}
 
 	template <typename T>
+	Point_t<T> operator * (const Point_t<T>& op1, const T& op2)
+	{
+		return{ op1.x * op2, op1.y * op2 };
+	}
+
+	template <typename T>
 	Point_t<T> operator / (const Point_t<T>& op1, const Point_t<T>& op2)
 	{
 		return{ op1.x / op2.x, op1.y / op2.y };
+	}
+
+	template <typename T>
+	Point_t<T> operator / (const Point_t<T>& op1, const T& op2)
+	{
+		return{ op1.x / op2, op1.y / op2 };
 	}
 
 	template <typename T>
