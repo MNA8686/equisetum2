@@ -1,4 +1,4 @@
-#if !defined(_EQSYSTEMWIDGET_H_)
+﻿#if !defined(_EQSYSTEMWIDGET_H_)
 #define _EQSYSTEMWIDGET_H_
 
 #include "Equisetum2.h"
@@ -27,7 +27,9 @@ public:
 	bool GetFocus() const;
 	Stat GetStat() const;
 	void SetPos(const PointF& pos);
+	PointF GetPos() const;
 	void SetEnable(bool enable);
+	Rect GetBox() const;
 
 	class Label
 	{
@@ -35,9 +37,13 @@ public:
 		Label();
 		~Label() = default;
 
+		// 使用する文字一覧をセットする
 		bool SetPreset(const String& preset);
+		// テキストを設定する
 		bool SetText(const String& label);
+		// ラベルのレンダリング
 		bool Render(SystemWidget* pWidget);
+		// ラベルのサイズ
 		Size GetBoxSize() const;
 
 	protected:
@@ -127,11 +133,13 @@ private:
 	int32_t m_max = 100;
 	int32_t m_step = 1;
 	int32_t m_val = 0;
-	std::shared_ptr<RectRenderer> m_rectRenderer;
 	int32_t m_direction = 0;
 	bool m_cyclic = false;
 
 	const String MakeString();
+
+	const String leftArrow = u8"◀";
+	const String rightArrow = u8"▶";
 };
 
 class SystemWidgetChoice : public SystemWidget

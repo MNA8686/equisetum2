@@ -28,6 +28,11 @@ protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
 	String m_name;
 	int m_focus = 0;
+	int m_cursolMoveCounter = 0;
+	std::shared_ptr<RectRenderer> m_rectRenderer;
+	Rect m_cursorNow;
+	Rect m_cursorSrc;
+	Rect m_cursorDest;
 };
 
 class AssetMenu : public SystemView

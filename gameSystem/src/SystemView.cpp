@@ -70,51 +70,93 @@ int SystemView::Render()
 void SystemView::DoView()
 {
 	size_t index = 0;
-	size_t nextFocus = 0;
+	size_t nextFocus = -1;
 	bool enable = true;
 
-	for (auto& widget : m_vWidget)
+	if (m_cursolMoveCounter == 0)
 	{
-		if (widget->GetFocus())
+		for (auto& widget : m_vWidget)
 		{
-			widget->Prepare();
-			widget->Do();
-
-			SystemWidget::Stat stat = widget->GetStat();
-			switch (stat)
+			if (widget->GetFocus())
 			{
-			case SystemWidget::Stat::Prev:
-				nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
-				break;
-			case SystemWidget::Stat::Next:
-				nextFocus = (index + 1) % m_vWidget.size();
-				break;
-			default:
-				nextFocus = index;
+				widget->Prepare();
+				widget->Do();
+
+				m_cursorNow = widget->GetBox();
+
+				SystemWidget::Stat stat = widget->GetStat();
+				switch (stat)
+				{
+				case SystemWidget::Stat::Prev:
+					nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
+					break;
+				case SystemWidget::Stat::Next:
+					nextFocus = (index + 1) % m_vWidget.size();
+					break;
+				default:
+					nextFocus = index;
+					break;
+				}
+
+				if (index != nextFocus)
+				{
+					widget->SetFocus(false);
+					m_vWidget[nextFocus]->SetFocus(true);
+
+					m_cursorSrc = m_cursorNow;
+					m_cursorDest = m_vWidget[nextFocus]->GetBox();
+					m_cursolMoveCounter = 1;
+				}
+
+				if (widget->GetStat() == SystemWidget::Stat::Exclusive)
+				{
+					enable = false;
+				}
 				break;
 			}
 
-			if (index != nextFocus)
-			{
-				widget->SetFocus(false);
-				m_vWidget[nextFocus]->SetFocus(true);
-			}
-
-			if (widget->GetStat() == SystemWidget::Stat::Exclusive)
-			{
-				enable = false;
-			}
-			break;
+			index++;
 		}
 
-		index++;
+		for (auto& widget : m_vWidget)
+		{
+			widget->SetEnable(enable);
+		}
+	}
+	else
+	{
+		// 何フレーム掛けてカーソルを移動させるか
+		int32_t maxFrame = 10;
+
+		// カーソルアニメーション中？
+		if (m_cursolMoveCounter < maxFrame)
+		{
+			// 1フレームあたりのカーソル移動量を算出
+			float maxFrameF = static_cast<float>(maxFrame);
+			auto subXPerFrame = (m_cursorDest.x - m_cursorSrc.x) / maxFrameF;
+			auto subYPerFrame = (m_cursorDest.y - m_cursorSrc.y) / maxFrameF;
+			auto subWidthPerFrame = (m_cursorDest.width - m_cursorSrc.width) / maxFrameF;
+			auto subHeightPerFrame = (m_cursorDest.height - m_cursorSrc.height) / maxFrameF;
+			
+			// 現在のカーソル位置を算出
+			m_cursorNow = {
+				m_cursorSrc.x + static_cast<int32_t>(subXPerFrame * m_cursolMoveCounter),
+				m_cursorSrc.y + static_cast<int32_t>(subYPerFrame * m_cursolMoveCounter),
+				m_cursorSrc.width + static_cast<int32_t>(subWidthPerFrame * m_cursolMoveCounter),
+				m_cursorSrc.height + static_cast<int32_t>(subHeightPerFrame * m_cursolMoveCounter),
+			};
+
+			// カーソルアニメーション進行
+			m_cursolMoveCounter++;
+		}
+		else
+		{
+			// カーソルアニメーション終了
+			m_cursorNow = m_cursorDest;
+			m_cursolMoveCounter = 0;
+		}
 	}
 
-	for (auto& widget : m_vWidget)
-	{
-		widget->SetEnable(enable);
-	}
-	
 	Do();
 }
 
@@ -122,15 +164,15 @@ void SystemView::RenderView()
 {
 	Render();
 
+	m_rectRenderer->SetRect(m_cursorNow);
+	m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
+	m_rectRenderer->SetBlendMode(BlendMode::Blend);
+
+	GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
+
 	for (auto& widget : m_vWidget)
 	{
-		if (widget->GetFocus())
-		{
-			// ハイライト処理とか
-		}
-
 		widget->Render();
-//		widget->RenderLabel();
 	}
 }
 
@@ -178,6 +220,13 @@ protected:
 std::shared_ptr<AssetMenu> AssetMenu::Create()
 {
 	auto p = std::make_shared<AssetMenu>();
+
+	p->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+	if (!p->m_rectRenderer)
+	{
+	//	EQ_THROW(u8"レンダラの作成に失敗しました。");
+	}
+
 	p->Enter();
 
 	return p;

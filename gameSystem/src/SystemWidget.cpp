@@ -44,9 +44,22 @@ void SystemWidget::SetPos(const PointF& pos)
 	m_pos = pos;
 }
 
+PointF SystemWidget::GetPos() const
+{
+	return m_pos;
+}
+
 void SystemWidget::SetEnable(bool enable)
 {
 	m_enable = enable;
+}
+
+Rect SystemWidget::GetBox() const
+{
+	const Size boxSize = m_label->GetBoxSize();
+	Size windowSize = Window::Size();
+
+	return Rect{ static_cast<int32_t>(windowSize.x * m_pos.x), static_cast<int32_t>(windowSize.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y };
 }
 
 std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const String& label)
@@ -150,11 +163,13 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
 
+#if 0
 		inst->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
 		if (!inst->m_rectRenderer)
 		{
 			EQ_THROW(u8"レンダラの作成に失敗しました。");
 		}
+#endif
 
 		return inst;
 	}
@@ -203,6 +218,7 @@ int SystemWidgetCustom::Render()
 
 	m_label->Render(this);
 
+#if 0
 	if (GetFocus())
 	{
 		m_rectRenderer->SetVisible(true);
@@ -213,6 +229,7 @@ int SystemWidgetCustom::Render()
 	
 		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
 	}
+#endif
 
 	return 0;
 }
@@ -230,20 +247,20 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		inst->m_text = label;
 		inst->m_cb = cb;
 		inst->m_label = std::make_shared<LabelEx>();
-		inst->m_label->SetPreset(u8" 0123456789-+◀▶" + label);
+		inst->m_label->SetPreset(u8" 0123456789-+" + inst->leftArrow + inst->rightArrow + label);
 
 		auto str = inst->MakeString();
 		if (!inst->m_label->SetText(str))
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
-
+#if 0
 		inst->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
 		if (!inst->m_rectRenderer)
 		{
 			EQ_THROW(u8"レンダラの作成に失敗しました。");
 		}
-
+#endif
 		return inst;
 	}
 	EQ_HANDLER
@@ -286,10 +303,7 @@ void SystemWidgetSpin::SetCyclic(bool val)
 
 const String SystemWidgetSpin::MakeString()
 {
-	const String left = u8"◀";
-	const String right = u8"▶";
-
-	const String text = String::Sprintf(u8"%s  %s %d %s", m_text.c_str(), left.c_str(), m_val, right.c_str());
+	const String text = String::Sprintf(u8"%s  %s %d %s", m_text.c_str(), leftArrow.c_str(), m_val, rightArrow.c_str());
 	return text;
 }
 
@@ -366,7 +380,7 @@ int SystemWidgetSpin::Render()
 	Size size = Window::Size();
 
 	m_label->Render(this);
-
+#if 0
 	if (GetFocus())
 	{
 		m_rectRenderer->SetVisible(true);
@@ -377,7 +391,7 @@ int SystemWidgetSpin::Render()
 	
 		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
 	}
-
+#endif
 	return 0;
 }
 
@@ -390,12 +404,15 @@ SystemWidget::Label::Label()
 
 bool SystemWidget::Label::Render(SystemWidget * pWidget)
 {
+	// 座標を設定する
 	Size size = Window::Size();
 	m_renderer->SetPos({ static_cast<int32_t>(size.x * pWidget->m_pos.x), static_cast<int32_t>(size.y * pWidget->m_pos.y) });
 
+	// 有効か無効かで文字の色を変える
 	uint8_t color = pWidget->m_enable ? 128 : 96;
 	m_renderer->SetColor(Color{ color, color, color, 128 });
 
+	// ポストエフェクトを呼び出す
 	RenderPostEffect(pWidget);
 
 	GetApplication()->GetRenderer()->AddRenderQueue(m_renderer.get());
@@ -445,27 +462,27 @@ bool SystemWidget::Label::SetText(const String & label)
 void SystemWidgetSpin::LabelEx::RenderPostEffect(SystemWidget * pWidget)
 {
 	// 押している矢印の色を変える
-	const String left = u8"◀";
-	const String right = u8"▶";
-
 	auto renderer = GetRenderer();
 	auto pWidget_ = static_cast<SystemWidgetSpin*>(pWidget);
 
 	auto str32 = renderer->GetTextU32();
 	if (!str32.empty())
 	{
-		auto left32 = left.to_u32().at(0);
-		auto right32 = right.to_u32().at(0);
+		auto left32 = pWidget_->leftArrow.to_u32().at(0);
+		auto right32 = pWidget_->rightArrow.to_u32().at(0);
 		int32_t count = 0;
+		
 		for (auto& c : str32)
 		{
 			bool blink = false;
 
+			// 左が押されている？
 			if (pWidget_->m_direction < 0 &&
 				c == left32)
 			{
 				blink = true;
 			}
+			// 右が押されている？
 			else if (pWidget_->m_direction > 0 &&
 				c == right32)
 			{
@@ -474,6 +491,7 @@ void SystemWidgetSpin::LabelEx::RenderPostEffect(SystemWidget * pWidget)
 
 			if (blink)
 			{
+				// 色を変える
 				std::shared_ptr<SpriteRenderer> sprite = renderer->GetLetter(count);
 				sprite->SetColor(Color{ 255, 0, 0, 128 });
 				break;
