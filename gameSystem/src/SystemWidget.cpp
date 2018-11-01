@@ -163,14 +163,6 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
 
-#if 0
-		inst->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
-		if (!inst->m_rectRenderer)
-		{
-			EQ_THROW(u8"レンダラの作成に失敗しました。");
-		}
-#endif
-
 		return inst;
 	}
 	EQ_HANDLER
@@ -218,19 +210,6 @@ int SystemWidgetCustom::Render()
 
 	m_label->Render(this);
 
-#if 0
-	if (GetFocus())
-	{
-		m_rectRenderer->SetVisible(true);
-		m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
-		m_rectRenderer->SetBlendMode(BlendMode::Blend);
-		Size boxSize = m_label->GetBoxSize();
-		m_rectRenderer->SetRect(Rect{ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y });
-	
-		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
-	}
-#endif
-
 	return 0;
 }
 
@@ -254,13 +233,7 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
-#if 0
-		inst->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
-		if (!inst->m_rectRenderer)
-		{
-			EQ_THROW(u8"レンダラの作成に失敗しました。");
-		}
-#endif
+
 		return inst;
 	}
 	EQ_HANDLER
@@ -380,18 +353,7 @@ int SystemWidgetSpin::Render()
 	Size size = Window::Size();
 
 	m_label->Render(this);
-#if 0
-	if (GetFocus())
-	{
-		m_rectRenderer->SetVisible(true);
-		m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
-		m_rectRenderer->SetBlendMode(BlendMode::Blend);
-		Size boxSize = m_label->GetBoxSize();
-		m_rectRenderer->SetRect(Rect{ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y });
-	
-		GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
-	}
-#endif
+
 	return 0;
 }
 

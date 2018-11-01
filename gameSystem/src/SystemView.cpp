@@ -73,63 +73,68 @@ void SystemView::DoView()
 	size_t nextFocus = -1;
 	bool enable = true;
 
-	if (m_cursolMoveCounter == 0)
+	for (auto& widget : m_vWidget)
 	{
-		for (auto& widget : m_vWidget)
+		if (widget->GetFocus())
 		{
-			if (widget->GetFocus())
+			widget->Prepare();
+			widget->Do();
+
+			m_cursorNow = widget->GetBox();
+
+			SystemWidget::Stat stat = widget->GetStat();
+			switch (stat)
 			{
-				widget->Prepare();
-				widget->Do();
-
-				m_cursorNow = widget->GetBox();
-
-				SystemWidget::Stat stat = widget->GetStat();
-				switch (stat)
-				{
-				case SystemWidget::Stat::Prev:
-					nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
-					break;
-				case SystemWidget::Stat::Next:
-					nextFocus = (index + 1) % m_vWidget.size();
-					break;
-				default:
-					nextFocus = index;
-					break;
-				}
-
-				if (index != nextFocus)
-				{
-					widget->SetFocus(false);
-					m_vWidget[nextFocus]->SetFocus(true);
-
-					m_cursorSrc = m_cursorNow;
-					m_cursorDest = m_vWidget[nextFocus]->GetBox();
-					m_cursolMoveCounter = 1;
-				}
-
-				if (widget->GetStat() == SystemWidget::Stat::Exclusive)
-				{
-					enable = false;
-				}
+			case SystemWidget::Stat::Prev:
+				nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
+				break;
+			case SystemWidget::Stat::Next:
+				nextFocus = (index + 1) % m_vWidget.size();
+				break;
+			default:
+				nextFocus = index;
 				break;
 			}
 
-			index++;
+			// メニュー項目を移動した？
+			if (index != nextFocus)
+			{
+				widget->SetFocus(false);
+				m_vWidget[nextFocus]->SetFocus(true);
+
+				m_cursorSrc = m_cursorNow;
+				m_cursorDest = m_vWidget[nextFocus]->GetBox();
+				m_cursolMoveCounter = 1;
+			}
+
+			// 排他操作を行うウィジェットに入ったらメニュー内の項目を無効にする
+			if (widget->GetStat() == SystemWidget::Stat::Exclusive)
+			{
+				enable = false;
+			}
+			break;
 		}
 
-		for (auto& widget : m_vWidget)
-		{
-			widget->SetEnable(enable);
-		}
+		index++;
 	}
-	else
-	{
-		// 何フレーム掛けてカーソルを移動させるか
-		int32_t maxFrame = 10;
 
-		// カーソルアニメーション中？
-		if (m_cursolMoveCounter < maxFrame)
+	for (auto& widget : m_vWidget)
+	{
+		widget->SetEnable(enable);
+	}
+
+	// 何フレーム掛けてカーソルを移動させるか
+	int32_t maxFrame = 8;
+	// カーソルアニメーション中？
+	if(m_cursolMoveCounter > 0 && m_cursolMoveCounter < maxFrame)
+	{
+		if(m_cursolMoveCounter == maxFrame)
+		{
+			// カーソルアニメーション終了
+			m_cursorNow = m_cursorDest;
+			m_cursolMoveCounter = 0;
+		}
+		else
 		{
 			// 1フレームあたりのカーソル移動量を算出
 			float maxFrameF = static_cast<float>(maxFrame);
@@ -148,12 +153,6 @@ void SystemView::DoView()
 
 			// カーソルアニメーション進行
 			m_cursolMoveCounter++;
-		}
-		else
-		{
-			// カーソルアニメーション終了
-			m_cursorNow = m_cursorDest;
-			m_cursolMoveCounter = 0;
 		}
 	}
 
