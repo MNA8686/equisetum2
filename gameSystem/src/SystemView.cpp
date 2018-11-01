@@ -3,30 +3,6 @@
 #include "SystemView.hpp"
 #include "Application.hpp"
 
-#if 0
-std::shared_ptr<SystemView> SystemView::CreateSystemView()
-{
-	EQ_DURING
-	{
-		auto inst = std::shared_ptr<SystemView>(new SystemView);
-		if (!inst)
-		{
-			EQ_THROW(u8"インスタンスの作成に失敗しました。");
-		}
-
-
-		return inst;
-	}
-	EQ_HANDLER
-	{
-		Logger::OutputError(EQ_GET_HANDLER().what());
-	}
-	EQ_END_HANDLER
-
-	return nullptr;
-}
-#endif
-
 SystemView::SystemView()
 {
 
@@ -69,91 +45,10 @@ int SystemView::Render()
 
 void SystemView::DoView()
 {
-	size_t index = 0;
-	size_t nextFocus = -1;
-	bool enable = true;
-
 	for (auto& widget : m_vWidget)
 	{
-		if (widget->GetFocus())
-		{
-			widget->Prepare();
-			widget->Do();
-
-			m_cursorNow = widget->GetBox();
-
-			SystemWidget::Stat stat = widget->GetStat();
-			switch (stat)
-			{
-			case SystemWidget::Stat::Prev:
-				nextFocus = (index == 0 ? m_vWidget.size() : index) - 1;
-				break;
-			case SystemWidget::Stat::Next:
-				nextFocus = (index + 1) % m_vWidget.size();
-				break;
-			default:
-				nextFocus = index;
-				break;
-			}
-
-			// メニュー項目を移動した？
-			if (index != nextFocus)
-			{
-				widget->SetFocus(false);
-				m_vWidget[nextFocus]->SetFocus(true);
-
-				m_cursorSrc = m_cursorNow;
-				m_cursorDest = m_vWidget[nextFocus]->GetBox();
-				m_cursolMoveCounter = 1;
-			}
-
-			// 排他操作を行うウィジェットに入ったらメニュー内の項目を無効にする
-			if (widget->GetStat() == SystemWidget::Stat::Exclusive)
-			{
-				enable = false;
-			}
-			break;
-		}
-
-		index++;
-	}
-
-	for (auto& widget : m_vWidget)
-	{
-		widget->SetEnable(enable);
-	}
-
-	// 何フレーム掛けてカーソルを移動させるか
-	int32_t maxFrame = 8;
-	// カーソルアニメーション中？
-	if(m_cursolMoveCounter > 0 && m_cursolMoveCounter < maxFrame)
-	{
-		if(m_cursolMoveCounter == maxFrame)
-		{
-			// カーソルアニメーション終了
-			m_cursorNow = m_cursorDest;
-			m_cursolMoveCounter = 0;
-		}
-		else
-		{
-			// 1フレームあたりのカーソル移動量を算出
-			float maxFrameF = static_cast<float>(maxFrame);
-			auto subXPerFrame = (m_cursorDest.x - m_cursorSrc.x) / maxFrameF;
-			auto subYPerFrame = (m_cursorDest.y - m_cursorSrc.y) / maxFrameF;
-			auto subWidthPerFrame = (m_cursorDest.width - m_cursorSrc.width) / maxFrameF;
-			auto subHeightPerFrame = (m_cursorDest.height - m_cursorSrc.height) / maxFrameF;
-			
-			// 現在のカーソル位置を算出
-			m_cursorNow = {
-				m_cursorSrc.x + static_cast<int32_t>(subXPerFrame * m_cursolMoveCounter),
-				m_cursorSrc.y + static_cast<int32_t>(subYPerFrame * m_cursolMoveCounter),
-				m_cursorSrc.width + static_cast<int32_t>(subWidthPerFrame * m_cursolMoveCounter),
-				m_cursorSrc.height + static_cast<int32_t>(subHeightPerFrame * m_cursolMoveCounter),
-			};
-
-			// カーソルアニメーション進行
-			m_cursolMoveCounter++;
-		}
+		widget->Prepare();
+		widget->Do();
 	}
 
 	Do();
@@ -162,12 +57,6 @@ void SystemView::DoView()
 void SystemView::RenderView()
 {
 	Render();
-
-	m_rectRenderer->SetRect(m_cursorNow);
-	m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
-	m_rectRenderer->SetBlendMode(BlendMode::Blend);
-
-	GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
 
 	for (auto& widget : m_vWidget)
 	{
@@ -220,12 +109,6 @@ std::shared_ptr<AssetMenu> AssetMenu::Create()
 {
 	auto p = std::make_shared<AssetMenu>();
 
-	p->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
-	if (!p->m_rectRenderer)
-	{
-	//	EQ_THROW(u8"レンダラの作成に失敗しました。");
-	}
-
 	p->Enter();
 
 	return p;
@@ -241,25 +124,27 @@ int AssetMenu::Enter()
 	m_spritePos = Window::Size() / 2;
 	m_spriteRenderer->SetPos(m_spritePos);
 
-	auto m_return = SystemWidgetSpin::Create(u8"拡大率(%)", [this](int32_t val) {
+	auto menu = SystemWidgetMenu::Create(u8"メニュー");
+	menu->SetPos({ 0.05f, 0.2f });
+	m_vWidget.push_back(menu);
+
+	auto rate = SystemWidgetSpin::Create(u8"拡大率(%)", [this](int32_t val) {
 		m_rate = val;
 	});
-	m_return->SetPos({ 0.05f, 0.2f });
-	m_return->SetFocus(true);
-	m_return->SetRange(10, 1000, 10);
-	m_return->SetValue(100);
-	m_vWidget.push_back(m_return);
+	rate->SetFocus(true);
+	rate->SetRange(10, 1000, 10);
+	rate->SetValue(100);
+	menu->SetWidget(rate);
 
-	auto m_return2 = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
+	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
 		m_ptr = val;
 	});
-	m_return2->SetPos({ 0.05f, 0.25f });
 	size_t animSize = sprite->GetAnimAtlas().size();
-	m_return2->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
-	m_return2->SetCyclic(true);
-	m_vWidget.push_back(m_return2);
+	ptr->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+	ptr->SetCyclic(true);
+	menu->SetWidget(ptr);
 
-	auto m_return3 = SystemWidgetCustom::Create(u8"移動", [this]()->bool {
+	auto move = SystemWidgetCustom::Create(u8"移動", [this]()->bool {
 		int32_t amount = KB::KeyTab.IsPress() ? 4 : 1;
 
 		if (KB::KeyLeft.IsPress())
@@ -282,12 +167,17 @@ int AssetMenu::Enter()
 
 		return !KB::KeyZ.IsDown();
 	});
-	m_return3->SetPos({ 0.05f, 0.30f });
-	m_vWidget.push_back(m_return3);
+	menu->SetWidget(move);
 
 	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
 	//m_vWidget.push_back(m_prev);
 
+	{
+		auto ptr = SystemWidgetSpin::Create(u8"テストだよ", [this](int32_t val) {
+		});
+		ptr->SetPos({ 0.05f, 0.75f });
+		m_vWidget.push_back(ptr);
+	}
 	return 0;
 }
 
