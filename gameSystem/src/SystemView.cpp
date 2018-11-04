@@ -1,5 +1,8 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
+#include "SystemWidgetCustom.hpp"
+#include "SystemWidgetLabel.hpp"
+#include "SystemWidgetSpin.hpp"
 #include "SystemView.hpp"
 #include "Application.hpp"
 
@@ -47,7 +50,7 @@ void SystemView::DoView()
 {
 	for (auto& widget : m_vWidget)
 	{
-		//if (widget->GetFocus())
+		if (widget->GetFocus())
 		{
 			widget->Prepare();
 			widget->Do();
@@ -171,6 +174,8 @@ int AssetMenu::Enter()
 		return !KB::KeyZ.IsDown();
 	});
 	menu->SetWidget(move);
+
+	menu->SetFocus(true);
 
 	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
 	//m_vWidget.push_back(m_prev);
