@@ -64,6 +64,39 @@ protected:
 	std::shared_ptr<Label> m_label;
 };
 
+class SystemWidgetLabel : public SystemWidget
+{
+public:
+	static std::shared_ptr<SystemWidgetLabel> Create(const String& label);
+
+	SystemWidgetLabel();
+	~SystemWidgetLabel() = default;
+
+	// 使用する文字一覧をセットする
+	bool SetPreset(const String& preset);
+	// テキストを設定する
+	bool SetText(const String& label);
+	// ラベルのレンダリング
+	int Render();
+	// ラベルのサイズ
+	Size GetBoxSize() const;
+	// pivotを設定する
+	void SetPivot(PointF pivot);
+	// ポストエフェクトコールバックを設定する
+	void SetPostEffect(const std::function<void(TextRenderer*)> cb);
+
+protected:
+	std::shared_ptr<TextRenderer>& GetRenderer();
+
+private:
+	//virtual void RenderPostEffect(SystemWidget* pWidget) {}
+	std::shared_ptr<TextRenderer> m_renderer;
+	std::function<void(TextRenderer*)> m_cb;
+
+	// SystemWidget を介して継承されました
+	virtual int Do() override;
+};
+
 class SystemWidgetMenu : public SystemWidget
 {
 public:

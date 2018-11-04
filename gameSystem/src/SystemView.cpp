@@ -178,6 +178,12 @@ int AssetMenu::Enter()
 		ptr->SetPos({ 0.05f, 0.75f });
 		m_vWidget.push_back(ptr);
 	}
+	{
+		auto ptr = SystemWidgetLabel::Create(u8"ƒeƒXƒg‚¾‚æ‚ñ");
+		ptr->SetPos({ 1.f, 0.5f });
+		ptr->SetPivot({ 1.f, 0.5f });
+		m_vWidget.push_back(ptr);
+	}
 	return 0;
 }
 
