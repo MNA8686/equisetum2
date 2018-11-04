@@ -1,5 +1,6 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
+#include "SystemWidgetMenu.hpp"
 #include "SystemWidgetCustom.hpp"
 #include "SystemWidgetLabel.hpp"
 #include "SystemWidgetSpin.hpp"
