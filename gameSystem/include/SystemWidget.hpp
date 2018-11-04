@@ -26,11 +26,12 @@ public:
 	void SetFocus(bool focus);
 	bool GetFocus() const;
 	Stat GetStat() const;
-	void SetPos(const PointF& pos);
+	virtual void SetPos(const PointF& pos);
 	PointF GetPos() const;
 	void SetEnable(bool enable);
-	Rect GetBox() const;
+	virtual Rect GetBox() const = 0;
 
+	/*
 	class Label
 	{
 	public:
@@ -53,6 +54,7 @@ public:
 		virtual void RenderPostEffect(SystemWidget* pWidget) {}
 		std::shared_ptr<TextRenderer> m_renderer;
 	};
+	*/
 
 protected:
 	String m_text;
@@ -61,7 +63,6 @@ protected:
 	PointF m_pos;
 	bool m_enable = true;
 
-	std::shared_ptr<Label> m_label;
 };
 
 class SystemWidgetLabel : public SystemWidget
@@ -84,6 +85,7 @@ public:
 	void SetPivot(PointF pivot);
 	// ポストエフェクトコールバックを設定する
 	void SetPostEffect(const std::function<void(TextRenderer*)> cb);
+	Rect GetBox() const override;
 
 protected:
 	std::shared_ptr<TextRenderer>& GetRenderer();
@@ -108,6 +110,7 @@ public:
 	virtual int Render();
 
 	static std::shared_ptr<SystemWidgetMenu> Create(const String& label);
+	Rect GetBox() const override;
 
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
@@ -128,6 +131,12 @@ public:
 	int Render() override;
 
 	static std::shared_ptr<SystemWidgetEnterView> Create(const String& label);
+
+private:
+	std::shared_ptr<SystemWidgetLabel> m_label;
+
+	// SystemWidget を介して継承されました
+	virtual Rect GetBox() const override;
 };
 
 class SystemWidgetReturnView : public SystemWidget
@@ -139,6 +148,10 @@ public:
 	int Render() override;
 
 	static std::shared_ptr<SystemWidgetReturnView> Create(const String& label);
+	Rect GetBox() const override;
+
+private:
+	std::shared_ptr<SystemWidgetLabel> m_label;
 };
 
 class SystemWidgetCustom : public SystemWidget
@@ -148,13 +161,15 @@ public:
 	~SystemWidgetCustom() = default;
 	int Do() override;
 	int Render() override;
+	Rect GetBox() const override;
+	void SetPos(const PointF& pos) override;
 	
 	static std::shared_ptr<SystemWidgetCustom> Create(const String& label, const std::function<bool (void)> cb);
 
 private:
 	std::function<bool(void)> m_cb;
 	bool m_exclusive = false;
-	std::shared_ptr<RectRenderer> m_rectRenderer;
+	std::shared_ptr<SystemWidgetLabel> m_label;
 };
 
 class SystemWidgetSpin : public SystemWidget
@@ -171,16 +186,8 @@ public:
 	void SetValue(int32_t val);
 	int32_t GetValue() const;
 	void SetCyclic(bool val);
-
-	class LabelEx : public Label
-	{
-	public:
-		LabelEx() = default;
-		~LabelEx() = default;
-
-	private:
-		virtual void RenderPostEffect(SystemWidget* pWidget) override;
-	};
+	Rect GetBox() const override;
+	void SetPos(const PointF& pos) override;
 
 private:
 	std::function<void(int32_t)> m_cb;
@@ -195,6 +202,8 @@ private:
 
 	const String leftArrow = u8"◀";
 	const String rightArrow = u8"▶";
+
+	std::shared_ptr<SystemWidgetLabel> m_label;
 };
 
 class SystemWidgetChoice : public SystemWidget

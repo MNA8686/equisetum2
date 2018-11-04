@@ -47,8 +47,11 @@ void SystemView::DoView()
 {
 	for (auto& widget : m_vWidget)
 	{
-		widget->Prepare();
-		widget->Do();
+		//if (widget->GetFocus())
+		{
+			widget->Prepare();
+			widget->Do();
+		}
 	}
 
 	Do();

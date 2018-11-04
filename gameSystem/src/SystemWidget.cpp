@@ -54,14 +54,6 @@ void SystemWidget::SetEnable(bool enable)
 	m_enable = enable;
 }
 
-Rect SystemWidget::GetBox() const
-{
-	const Size boxSize = m_label->GetBoxSize();
-	Size windowSize = Window::Size();
-
-	return Rect{ static_cast<int32_t>(windowSize.x * m_pos.x), static_cast<int32_t>(windowSize.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y };
-}
-
 
 
 
@@ -74,8 +66,18 @@ std::shared_ptr<SystemWidgetMenu> SystemWidgetMenu::Create(const String& label)
 	{
 	//	EQ_THROW(u8"レンダラの作成に失敗しました。");
 	}
+	//p->m_label = SystemWidgetLabel::Create(label);
+	//if (!p->m_label)
+	//{
+	//	EQ_THROW(u8"レンダラの作成に失敗しました。");
+	//}
 
 	return p;
+}
+
+Rect SystemWidgetMenu::GetBox() const
+{
+	return{};
 }
 
 int SystemWidgetMenu::SetWidget(std::shared_ptr<SystemWidget> pWidget)
@@ -238,10 +240,16 @@ int SystemWidgetReturnView::Do()
 
 int SystemWidgetReturnView::Render()
 {
-	m_label->Render(this);
+	//m_label->Render();
 	// label
 	return 0;
 }
+
+Rect SystemWidgetReturnView::GetBox() const
+{
+	return m_label->GetBox();
+}
+
 
 
 std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const String& label)
@@ -279,10 +287,19 @@ int SystemWidgetEnterView::Do()
 
 int SystemWidgetEnterView::Render()
 {
-	m_label->Render(this);
+	//m_label->Render();
 	// label
 	return 0;
 }
+
+Rect SystemWidgetEnterView::GetBox() const
+{
+	return m_label->GetBox();
+}
+
+
+
+
 
 std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& label, const std::function<bool (void)> cb)
 {
@@ -296,7 +313,11 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 
 		inst->m_text = label;
 		inst->m_cb = cb;
-		inst->m_label = std::make_shared<Label>();
+		inst->m_label = SystemWidgetLabel::Create(label);
+		if (!inst->m_label)
+		{
+			EQ_THROW(u8"ラベルの作成に失敗しました。");
+		}
 		inst->m_label->SetPreset(u8" " + label);
 
 		if (!inst->m_label->SetText(label))
@@ -317,6 +338,8 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 
 int SystemWidgetCustom::Do()
 {
+	m_label->SetPos(m_pos);
+
 	if (m_exclusive)
 	{
 		m_stat = Stat::Exclusive;
@@ -349,9 +372,20 @@ int SystemWidgetCustom::Render()
 	// label
 	Size size = Window::Size();
 
-	m_label->Render(this);
+	m_label->Render();
 
 	return 0;
+}
+
+Rect SystemWidgetCustom::GetBox() const
+{
+	return m_label->GetBox();
+}
+
+void SystemWidgetCustom::SetPos(const PointF & pos)
+{
+	SystemWidget::SetPos(pos);
+	m_label->SetPos(pos);
 }
 
 std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, const std::function<void(int32_t)> cb)
@@ -366,7 +400,12 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 
 		inst->m_text = label;
 		inst->m_cb = cb;
-		inst->m_label = std::make_shared<LabelEx>();
+	
+		inst->m_label = SystemWidgetLabel::Create(label);
+		if (!inst->m_label)
+		{
+			EQ_THROW(u8"ラベルの作成に失敗しました。");
+		}
 		inst->m_label->SetPreset(u8" 0123456789-+" + inst->leftArrow + inst->rightArrow + label);
 
 		auto str = inst->MakeString();
@@ -374,6 +413,46 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
+
+		auto thiz = inst.get();
+		inst->m_label->SetPostEffect([thiz](TextRenderer* renderer) {
+			// 押している矢印の色を変える
+			auto str32 = renderer->GetTextU32();
+			if (!str32.empty())
+			{
+				auto left32 = thiz->leftArrow.to_u32().at(0);
+				auto right32 = thiz->rightArrow.to_u32().at(0);
+				int32_t count = 0;
+
+				for (auto& c : str32)
+				{
+					bool blink = false;
+
+					// 左が押されている？
+					if (thiz->m_direction < 0 &&
+						c == left32)
+					{
+						blink = true;
+					}
+					// 右が押されている？
+					else if (thiz->m_direction > 0 &&
+						c == right32)
+					{
+						blink = true;
+					}
+
+					if (blink)
+					{
+						// 色を変える
+						std::shared_ptr<SpriteRenderer> sprite = renderer->GetLetter(count);
+						sprite->SetColor(Color{ 255, 0, 0, 128 });
+						break;
+					}
+
+					count++;
+				}
+			}
+		});
 
 		return inst;
 	}
@@ -415,6 +494,11 @@ void SystemWidgetSpin::SetCyclic(bool val)
 	m_cyclic = val;
 }
 
+Rect SystemWidgetSpin::GetBox() const
+{
+	return m_label->GetBox();
+}
+
 const String SystemWidgetSpin::MakeString()
 {
 	const String text = String::Sprintf(u8"%s  %s %d %s", m_text.c_str(), leftArrow.c_str(), m_val, rightArrow.c_str());
@@ -424,6 +508,8 @@ const String SystemWidgetSpin::MakeString()
 int SystemWidgetSpin::Do()
 {
 	int32_t valBak = m_val;
+
+	m_label->SetPos(m_pos);
 
 	m_direction = 0;
 
@@ -489,15 +575,22 @@ int SystemWidgetSpin::Do()
 	return 0;
 }
 
+void SystemWidgetSpin::SetPos(const PointF& pos)
+{
+	SystemWidget::SetPos(pos);
+	m_label->SetPos(pos);
+}
+
 int SystemWidgetSpin::Render()
 {
 	Size size = Window::Size();
 
-	m_label->Render(this);
+	m_label->Render();
 
 	return 0;
 }
 
+#if 0
 SystemWidget::Label::Label()
 {
 	m_renderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
@@ -604,6 +697,7 @@ void SystemWidgetSpin::LabelEx::RenderPostEffect(SystemWidget * pWidget)
 		}
 	}
 }
+#endif
 
 std::shared_ptr<SystemWidgetLabel> SystemWidgetLabel::Create(const String & label)
 {
@@ -715,5 +809,13 @@ void SystemWidgetLabel::SetPostEffect(const std::function<void(TextRenderer*)> c
 std::shared_ptr<TextRenderer>& SystemWidgetLabel::GetRenderer()
 {
 	return m_renderer;
+}
+
+Rect SystemWidgetLabel::GetBox() const
+{
+	const Size boxSize = m_renderer->GetBoxSize();
+	Size windowSize = Window::Size();
+
+	return Rect{ static_cast<int32_t>(windowSize.x * m_pos.x), static_cast<int32_t>(windowSize.y * m_pos.y) - boxSize.y / 2, boxSize.x, boxSize.y };
 }
 
