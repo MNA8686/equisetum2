@@ -23,8 +23,11 @@ int SystemWidgetMenu::SetWidget(std::shared_ptr<SystemWidget> pWidget)
 {
 	m_vWidget.push_back(pWidget);
 
-
 	pWidget->SetPos({ m_pos.x, m_pos.y + (m_vWidget.size() - 1) * 0.05f });
+	if (m_vWidget.size() == 1)
+	{
+		m_vWidget[0]->SetFocus(true);
+	}
 
 	return 0;
 }
@@ -91,7 +94,7 @@ int SystemWidgetMenu::Do(SystemView* pView)
 	// 何フレーム掛けてカーソルを移動させるか
 	int32_t maxFrame = 8;
 	// カーソルアニメーション中？
-	if(m_cursolMoveCounter > 0 && m_cursolMoveCounter < maxFrame)
+	if(m_cursolMoveCounter > 0 && m_cursolMoveCounter <= maxFrame)
 	{
 		if(m_cursolMoveCounter == maxFrame)
 		{

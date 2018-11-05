@@ -131,22 +131,12 @@ public:
 		menu->SetPos({ 0.05f, 0.2f });
 		m_vWidget.push_back(menu);
 
-		auto test = SystemWidgetSpin::Create("test", [](int index) {
-		});
-		test->SetFocus(true);
-		menu->SetWidget(test);
+//		auto test = SystemWidgetSpin::Create("test", [](int index) {
+//		});
+//		menu->SetWidget(test);
 
 		auto returnToGame = SystemWidgetPopView::Create("testdayo");
 		menu->SetWidget(returnToGame);
-
-		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
-		//m_vWidget.push_back(m_returnToGame);
-
-		//m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
-		//m_vWidget.push_back(m_inputTest);
-
-		//m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
-		//m_vWidget.push_back(m_assetTest);
 
 		menu->SetFocus(true);
 
@@ -186,7 +176,6 @@ public:
 
 		auto test = SystemWidgetSpin::Create("test", [](int index) {
 		});
-		test->SetFocus(true);
 		menu->SetWidget(test);
 
 		auto returnToGame = SystemWidgetPopView::Create("RETURN TO GAME");
@@ -196,15 +185,6 @@ public:
 			return TestMenu::Create(u8"‚»‚ÌŸ‚Ì‰æ–Ê");
 		});
 		menu->SetWidget(next);
-
-		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
-		//m_vWidget.push_back(m_returnToGame);
-
-		//m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
-		//m_vWidget.push_back(m_inputTest);
-
-		//m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
-		//m_vWidget.push_back(m_assetTest);
 
 		menu->SetFocus(true);
 
@@ -262,7 +242,6 @@ int AssetMenu::Enter()
 	auto rate = SystemWidgetSpin::Create(u8"Šg‘å—¦(%)", [this](int32_t val) {
 		m_rate = val;
 	});
-	rate->SetFocus(true);
 	rate->SetRange(10, 1000, 10);
 	rate->SetValue(100);
 	menu->SetWidget(rate);
