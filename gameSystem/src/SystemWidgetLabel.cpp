@@ -80,8 +80,15 @@ std::shared_ptr<TextRenderer>& SystemWidgetLabel::GetRenderer()
 int SystemWidgetLabel::Render(const SystemView* pView)
 {
 	// 座標を設定する
+	PointF parentPos;
+	if (pView)
+	{
+		parentPos.x = pView->GetPos().x;
+		parentPos.y = pView->GetPos().y;
+	}
+
 	Size size = Window::Size();
-	m_renderer->SetPos({ static_cast<int32_t>(size.x * (pView->GetPos().x + m_pos.x)), static_cast<int32_t>(size.y * (pView->GetPos().y + m_pos.y)) });
+	m_renderer->SetPos({ static_cast<int32_t>(size.x * (parentPos.x + m_pos.x)), static_cast<int32_t>(size.y * (parentPos.y + m_pos.y)) });
 
 	// 有効か無効かで文字の色を変える
 	uint8_t color = m_enable ? 128 : 96;

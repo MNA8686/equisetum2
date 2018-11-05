@@ -193,7 +193,7 @@ public:
 		menu->SetWidget(returnToGame);
 
 		auto next = SystemWidgetPushView::Create("NEXT", [this]()->std::shared_ptr<SystemView> {
-			return TestMenu::Create(u8"Ÿ‚Ì‰æ–Ê");
+			return TestMenu::Create(u8"‚»‚ÌŸ‚Ì‰æ–Ê");
 		});
 		menu->SetWidget(next);
 

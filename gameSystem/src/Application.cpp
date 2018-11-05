@@ -7,6 +7,7 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
 
+#include "SystemWidgetLabel.hpp"
 
 int Application::Main()
 {
@@ -44,6 +45,13 @@ int Application::Main()
 
 		//m_view = AssetMenu::Create(u8"アセットテスト");
 	}
+	auto labelFps = SystemWidgetLabel::Create(u8" 0123456789/");
+	labelFps->SetPivot({ 1.0f, 0.5f });
+	labelFps->SetPos({ 0.98f, 0.95f });
+	
+	auto labelBreadcrumb = SystemWidgetLabel::Create(u8"Breadcrumb");
+	labelBreadcrumb->SetPivot({ 0.f, 0.5f });
+	labelBreadcrumb->SetPos({ 0.05f, 0.08f });
 	
 	OnInit();
 
@@ -161,6 +169,26 @@ int Application::Main()
 						dest_x += 1.f;
 					}
 				}
+
+				{
+					String path;
+
+					int count = 0;
+					for (auto& view : m_vView)
+					{
+						if (count > 0)
+						{
+							path += " > ";
+						}
+
+						path += view->GetName();
+
+						count++;
+					}
+
+					labelBreadcrumb->SetPreset(path);
+					labelBreadcrumb->SetText(path);
+				}
 			}
 
 			OnUpdate();
@@ -168,6 +196,10 @@ int Application::Main()
 			m_renderer->SetRenderTarget(nullptr);
 			m_renderer->Clear({ 128, 128, 0, 0 });
 			//OnDraw();
+			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
+			labelFps->Render(nullptr);
+			labelBreadcrumb->Render(nullptr);
+			
 			for (auto& view : m_vView)
 			{
 				auto pos = view->GetPos();
