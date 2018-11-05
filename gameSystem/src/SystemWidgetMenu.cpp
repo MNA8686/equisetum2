@@ -29,7 +29,7 @@ int SystemWidgetMenu::SetWidget(std::shared_ptr<SystemWidget> pWidget)
 	return 0;
 }
 
-int SystemWidgetMenu::Do()
+int SystemWidgetMenu::Do(SystemView* pView)
 {
 	size_t index = 0;
 	size_t nextFocus = -1;
@@ -40,7 +40,7 @@ int SystemWidgetMenu::Do()
 		if (widget->GetFocus())
 		{
 			widget->Prepare();
-			widget->Do();
+			widget->Do(pView);
 
 			m_cursorNow = widget->GetBox();
 
@@ -124,10 +124,17 @@ int SystemWidgetMenu::Do()
 	return 0;
 }
 
-int SystemWidgetMenu::Render()
+int SystemWidgetMenu::Render(const SystemView* pView)
 {
+	Size size = Window::Size();
+	Rect rect{ static_cast<int32_t>(size.x * pView->GetPos().x) + m_cursorNow.x,
+		static_cast<int32_t>(size.y * pView->GetPos().y) + m_cursorNow.y,
+		m_cursorNow.width,
+		m_cursorNow.height
+	};
+
 	// カーソルの枠を描画
-	m_rectRenderer->SetRect(m_cursorNow);
+	m_rectRenderer->SetRect(rect);
 	m_rectRenderer->SetColor(Color{ 255, 255, 255, 100 });
 	m_rectRenderer->SetBlendMode(BlendMode::Blend);
 	GetApplication()->GetRenderer()->AddRenderQueue(m_rectRenderer.get());
@@ -135,7 +142,7 @@ int SystemWidgetMenu::Render()
 	// このメニュー内のウィジェットを描画
 	for (auto& widget : m_vWidget)
 	{
-		widget->Render();
+		widget->Render(pView);
 	}
 
 	return 0;

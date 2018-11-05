@@ -12,7 +12,8 @@ public:
 	SystemView();
 	virtual ~SystemView();
 
-	void SetPos(const Point& pos);
+	void SetPos(const PointF& pos);
+	PointF GetPos() const;
 
 	virtual int Enter();
 	virtual int Leave();
@@ -24,15 +25,19 @@ public:
 	void DoView();
 	void RenderView();
 
+	void Push(std::shared_ptr<SystemView> pView);
+	std::shared_ptr<SystemView> GetNextView();
+	void Pop();
+
+	void SetFocus(bool focus);
+	bool GetFocus() const;
+
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
 	String m_name;
-	//int m_focus = 0;
-	//int m_cursolMoveCounter = 0;
-	//std::shared_ptr<RectRenderer> m_rectRenderer;
-	//Rect m_cursorNow;
-	//Rect m_cursorSrc;
-	//Rect m_cursorDest;
+	std::shared_ptr<SystemView> m_nextView;
+	PointF m_pos;
+	bool m_focus = false;
 };
 
 class AssetMenu : public SystemView
@@ -45,7 +50,7 @@ public:
 	int Do() override;
 	int Render() override;
 
-	static std::shared_ptr<AssetMenu> Create();
+	static std::shared_ptr<AssetMenu> Create(const String & name);
 
 protected:
 	int32_t m_rate = 100;

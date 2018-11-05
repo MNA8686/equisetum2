@@ -10,8 +10,8 @@ class SystemWidgetSpin : public SystemWidget
 public:
 	SystemWidgetSpin() = default;
 	~SystemWidgetSpin() = default;
-	int Do() override;
-	int Render() override;
+	int Do(SystemView* pView) override;
+	int Render(const SystemView* pView) override;
 
 	static std::shared_ptr<SystemWidgetSpin> Create(const String& label, const std::function<void (int32_t)> cb);
 

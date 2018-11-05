@@ -20,7 +20,8 @@ public:
 	std::shared_ptr<Renderer>& GetRenderer(void);
 	std::shared_ptr<FontManager>& GetSystemFont(void);
 
-	std::shared_ptr<SystemView> m_view;
+	//std::shared_ptr<SystemView> m_view;
+	std::vector<std::shared_ptr<SystemView>> m_vView;
 
 protected:
 

@@ -18,7 +18,7 @@ public:
 	// テキストを設定する
 	bool SetText(const String& label);
 	// ラベルのレンダリング
-	int Render();
+	int Render(const SystemView* pView) override;
 	// ラベルのサイズ
 	Size GetBoxSize() const;
 	// pivotを設定する
@@ -26,7 +26,7 @@ public:
 	// ポストエフェクトコールバックを設定する
 	void SetPostEffect(const std::function<void(TextRenderer*)> cb);
 	Rect GetBox() const override;
-	int Do() override;
+	int Do(SystemView* pView) override;
 
 protected:
 	std::shared_ptr<TextRenderer>& GetRenderer();

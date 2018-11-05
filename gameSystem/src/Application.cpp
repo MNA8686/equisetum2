@@ -38,7 +38,11 @@ int Application::Main()
 
 	// viewテスト
 	{
-		m_view = AssetMenu::Create();
+		auto view = AssetMenu::Create(u8"アセットテスト");
+		view->SetFocus(true);
+		m_vView.push_back(view);
+
+		//m_view = AssetMenu::Create(u8"アセットテスト");
 	}
 	
 	OnInit();
@@ -76,19 +80,69 @@ int Application::Main()
 
 		if (!isError)
 		{
-		m_view->DoView();	// for view test
+			static bool next = false;
+			static float tran_x = 0;
+
+			if (!next)
+			{
+				std::shared_ptr<SystemView> nextView;
+				for (auto& view : m_vView)
+				{
+					if (view->GetFocus())
+					{
+						view->DoView();	// for view test
+						nextView = view->GetNextView();
+						if (nextView)
+						{
+							view->SetFocus(false);
+						}
+						break;
+					}
+				}
+
+				if (nextView)
+				{
+					nextView->SetFocus(true);
+					nextView->SetPos(PointF{ 1.f, 0 });
+					m_vView.push_back(nextView);
+					nextView = nullptr;
+
+					next = true;
+				}
+			}
+			else
+			{
+				tran_x += 0.06f;
+				if (tran_x > 1.f)
+				{
+					tran_x = 1.f;
+					next = false;
+				}
+
+				int index = 0;
+				for (auto& view : m_vView)
+				{
+					view->SetPos(PointF{index - tran_x, 0});
+					index++;
+				}
+
+			}
 
 			OnUpdate();
 
+			m_renderer->SetRenderTarget(nullptr);
+			m_renderer->Clear({ 128, 128, 0, 0 });
 			//OnDraw();
-	{
-		m_renderer->SetRenderTarget(nullptr);
-		m_renderer->Clear({ 128, 128, 0, 0 });
-		m_view->RenderView();	// for view test
-		m_renderer->Render();
-	}
-
-
+			for (auto& view : m_vView)
+			{
+				auto pos = view->GetPos();
+				// 画面内に存在する？
+				if (pos.x > -1.f && pos.x < 1.f)
+				{
+					view->RenderView();	// for view test
+				}
+			}
+			m_renderer->Render();
 		}
 
 		m_renderer->Present();

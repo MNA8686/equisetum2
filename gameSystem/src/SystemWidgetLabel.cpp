@@ -67,7 +67,7 @@ bool SystemWidgetLabel::SetText(const String & label)
 	return true;
 }
 
-int SystemWidgetLabel::Do()
+int SystemWidgetLabel::Do(SystemView* pView)
 {
 	return 0;
 }
@@ -77,11 +77,11 @@ std::shared_ptr<TextRenderer>& SystemWidgetLabel::GetRenderer()
 	return m_renderer;
 }
 
-int SystemWidgetLabel::Render()
+int SystemWidgetLabel::Render(const SystemView* pView)
 {
 	// 座標を設定する
 	Size size = Window::Size();
-	m_renderer->SetPos({ static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) });
+	m_renderer->SetPos({ static_cast<int32_t>(size.x * (pView->GetPos().x + m_pos.x)), static_cast<int32_t>(size.y * (pView->GetPos().y + m_pos.y)) });
 
 	// 有効か無効かで文字の色を変える
 	uint8_t color = m_enable ? 128 : 96;

@@ -118,7 +118,7 @@ const String SystemWidgetSpin::MakeString()
 	return text;
 }
 
-int SystemWidgetSpin::Do()
+int SystemWidgetSpin::Do(SystemView* pView)
 {
 	int32_t valBak = m_val;
 
@@ -194,11 +194,11 @@ void SystemWidgetSpin::SetPos(const PointF& pos)
 	m_label->SetPos(pos);
 }
 
-int SystemWidgetSpin::Render()
+int SystemWidgetSpin::Render(const SystemView* pView)
 {
 	Size size = Window::Size();
 
-	m_label->Render();
+	m_label->Render(pView);
 
 	return 0;
 }

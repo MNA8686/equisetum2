@@ -10,8 +10,8 @@ class SystemWidgetCustom : public SystemWidget
 public:
 	SystemWidgetCustom() = default;
 	~SystemWidgetCustom() = default;
-	int Do() override;
-	int Render() override;
+	int Do(SystemView* pView) override;
+	int Render(const SystemView* pView) override;
 	Rect GetBox() const override;
 	void SetPos(const PointF& pos) override;
 	

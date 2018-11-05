@@ -17,9 +17,14 @@ SystemView::~SystemView()
 
 }
 
-void SystemView::SetPos(const Point& pos)
+void SystemView::SetPos(const PointF& pos)
 {
+	m_pos = pos;
+}
 
+PointF SystemView::GetPos() const
+{
+	return m_pos;
 }
 
 const String& SystemView::GetName() const
@@ -54,7 +59,8 @@ void SystemView::DoView()
 		if (widget->GetFocus())
 		{
 			widget->Prepare();
-			widget->Do();
+			widget->Do(this);
+			break;
 		}
 	}
 
@@ -67,9 +73,36 @@ void SystemView::RenderView()
 
 	for (auto& widget : m_vWidget)
 	{
-		widget->Render();
+		widget->Render(this);
 	}
 }
+
+void SystemView::Push(std::shared_ptr<SystemView> pView)
+{
+	m_nextView = pView;
+}
+
+std::shared_ptr<SystemView> SystemView::GetNextView()
+{
+	return m_nextView;
+}
+
+void SystemView::Pop()
+{
+}
+
+void SystemView::SetFocus(bool focus)
+{
+	m_focus = focus;
+}
+
+bool SystemView::GetFocus() const
+{
+	return m_focus;
+}
+
+
+
 
 class TopMenu : public SystemView
 {
@@ -79,9 +112,14 @@ public:
 
 	int Enter() override
 	{
+		auto menu = SystemWidgetMenu::Create(u8"メニュー");
+		menu->SetPos({ 0.05f, 0.2f });
+		m_vWidget.push_back(menu);
+
 		m_returnToGame = SystemWidgetSpin::Create("RETURN TO GAME", [](int index) {
 		});
-		m_vWidget.push_back(m_returnToGame);
+		m_returnToGame->SetFocus(true);
+		menu->SetWidget(m_returnToGame);
 
 		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
 		//m_vWidget.push_back(m_returnToGame);
@@ -92,14 +130,14 @@ public:
 		//m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
 		//m_vWidget.push_back(m_assetTest);
 
-		m_returnToGame->SetFocus(true);
+		menu->SetFocus(true);
 
 		return 0;
 	}
 
 	//void Do() override;
 
-	std::shared_ptr<TopMenu> Create();
+	static std::shared_ptr<TopMenu> Create(const String& name);
 
 protected:
 	std::shared_ptr<SystemWidget> m_returnToGame;
@@ -112,10 +150,11 @@ protected:
 //	ウィジェットの操作
 //}
 
-std::shared_ptr<AssetMenu> AssetMenu::Create()
+std::shared_ptr<AssetMenu> AssetMenu::Create(const String & name)
 {
 	auto p = std::make_shared<AssetMenu>();
 
+	p->m_name = name;
 	p->Enter();
 
 	return p;
@@ -176,6 +215,11 @@ int AssetMenu::Enter()
 	});
 	menu->SetWidget(move);
 
+	auto next = SystemWidgetPushView::Create(u8"次の画面へ", [this]() {
+		Push(TopMenu::Create(u8"次の画面"));
+	});
+	menu->SetWidget(next);
+
 	menu->SetFocus(true);
 
 	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
@@ -212,4 +256,12 @@ int AssetMenu::Render()
 	return 0;
 }
 
+std::shared_ptr<TopMenu> TopMenu::Create(const String & name)
+{
+	auto p = std::make_shared<TopMenu>();
 
+	p->m_name = name;
+	p->Enter();
+
+	return p;
+}

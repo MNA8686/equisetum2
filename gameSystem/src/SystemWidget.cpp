@@ -62,11 +62,11 @@ void SystemWidget::SetEnable(bool enable)
 
 
 
-std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const String& label)
+std::shared_ptr<SystemWidgetPopView> SystemWidgetPopView::Create(const String& label)
 {
 	EQ_DURING
 	{
-		auto inst = std::shared_ptr<SystemWidgetReturnView>(new SystemWidgetReturnView);
+		auto inst = std::shared_ptr<SystemWidgetPopView>(new SystemWidgetPopView);
 		if (!inst)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
@@ -85,7 +85,7 @@ std::shared_ptr<SystemWidgetReturnView> SystemWidgetReturnView::Create(const Str
 	return nullptr;
 }
 
-int SystemWidgetReturnView::Do()
+int SystemWidgetPopView::Do(SystemView* pView)
 {
 	// Zキー押下？
 	if (KB::KeyZ.IsDown())
@@ -95,31 +95,42 @@ int SystemWidgetReturnView::Do()
 	return 0;
 }
 
-int SystemWidgetReturnView::Render()
+int SystemWidgetPopView::Render(const SystemView* pView)
 {
 	//m_label->Render();
 	// label
 	return 0;
 }
 
-Rect SystemWidgetReturnView::GetBox() const
+Rect SystemWidgetPopView::GetBox() const
 {
 	return m_label->GetBox();
 }
 
 
 
-std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const String& label)
+std::shared_ptr<SystemWidgetPushView> SystemWidgetPushView::Create(const String& label, const std::function<void()>& cb)
 {
 	EQ_DURING
 	{
-		auto inst = std::shared_ptr<SystemWidgetEnterView>(new SystemWidgetEnterView);
+		auto inst = std::shared_ptr<SystemWidgetPushView>(new SystemWidgetPushView);
 		if (!inst)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
 
-		inst->m_text = label;
+		inst->m_cb = cb;
+		inst->m_label = SystemWidgetLabel::Create(label);
+		if (!inst->m_label)
+		{
+			EQ_THROW(u8"ラベルの作成に失敗しました。");
+		}
+		inst->m_label->SetPreset(u8" " + label);
+
+		if (!inst->m_label->SetText(label))
+		{
+			EQ_THROW(u8"ラベルの作成に失敗しました。");
+		}
 
 		return inst;
 	}
@@ -132,26 +143,45 @@ std::shared_ptr<SystemWidgetEnterView> SystemWidgetEnterView::Create(const Strin
 	return nullptr;
 }
 
-int SystemWidgetEnterView::Do()
+int SystemWidgetPushView::Do(SystemView* pView)
 {
 	// Enterキー押下？
 	if (KB::KeyEnter.IsDown())
 	{
+		if (m_cb)
+		{
+			m_cb();
+		}
+	}
+	// 上キー押下？
+	else if (KB::KeyUp.IsDown())
+	{
+		Prev();
+	}
+	// 下キー押下？
+	else if (KB::KeyDown.IsDown())
+	{
+		Next();
 	}
 
 	return 0;
 }
 
-int SystemWidgetEnterView::Render()
+int SystemWidgetPushView::Render(const SystemView* pView)
 {
-	//m_label->Render();
-	// label
+	m_label->Render(pView);
 	return 0;
 }
 
-Rect SystemWidgetEnterView::GetBox() const
+Rect SystemWidgetPushView::GetBox() const
 {
 	return m_label->GetBox();
+}
+
+void SystemWidgetPushView::SetPos(const PointF & pos)
+{
+	SystemWidget::SetPos(pos);
+	m_label->SetPos(pos);
 }
 
 

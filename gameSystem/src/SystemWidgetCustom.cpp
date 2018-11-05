@@ -36,7 +36,7 @@ std::shared_ptr<SystemWidgetCustom> SystemWidgetCustom::Create(const String& lab
 	return nullptr;
 }
 
-int SystemWidgetCustom::Do()
+int SystemWidgetCustom::Do(SystemView* pView)
 {
 	m_label->SetPos(m_pos);
 
@@ -67,12 +67,12 @@ int SystemWidgetCustom::Do()
 	return 0;
 }
 
-int SystemWidgetCustom::Render()
+int SystemWidgetCustom::Render(const SystemView* pView)
 {
 	// label
 	Size size = Window::Size();
 
-	m_label->Render();
+	m_label->Render(pView);
 
 	return 0;
 }

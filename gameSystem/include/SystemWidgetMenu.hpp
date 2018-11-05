@@ -12,8 +12,8 @@ public:
 	virtual ~SystemWidgetMenu() = default;
 
 	int SetWidget(std::shared_ptr<SystemWidget> pWidget);
-	virtual int Do();
-	virtual int Render();
+	virtual int Do(SystemView* pView) override;
+	virtual int Render(const SystemView* pView) override;
 
 	static std::shared_ptr<SystemWidgetMenu> Create(const String& label);
 	Rect GetBox() const override;

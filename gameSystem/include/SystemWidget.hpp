@@ -4,6 +4,8 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
+class SystemView;
+
 class SystemWidget
 {
 public:
@@ -17,8 +19,8 @@ public:
 
 	SystemWidget();
 	virtual ~SystemWidget();
-	virtual int Do() = 0;
-	virtual int Render() = 0;
+	virtual int Do(SystemView* pView) = 0;
+	virtual int Render(const SystemView* pView) = 0;
 	void Prev();
 	void Next();
 	void Prepare();
@@ -36,37 +38,38 @@ protected:
 	bool m_focus = false;
 	PointF m_pos;
 	bool m_enable = true;
-
 };
 
 #include "SystemWidgetLabel.hpp"
 class SystemWidgetLabel;
 
-class SystemWidgetEnterView : public SystemWidget
+class SystemWidgetPushView : public SystemWidget
 {
 public:
-	SystemWidgetEnterView() = default;
-	~SystemWidgetEnterView() = default;
-	int Do() override;
-	int Render() override;
+	SystemWidgetPushView() = default;
+	~SystemWidgetPushView() = default;
+	int Do(SystemView* pView) override;
+	int Render(const SystemView* pView) override;
 	Rect GetBox() const override;
+	void SetPos(const PointF& pos) override;
 
-	static std::shared_ptr<SystemWidgetEnterView> Create(const String& label);
+	static std::shared_ptr<SystemWidgetPushView> Create(const String& label, const std::function<void()>& cb);
 
 private:
 	std::shared_ptr<SystemWidgetLabel> m_label;
-
+	std::function<void()> m_cb;
 };
 
-class SystemWidgetReturnView : public SystemWidget
+
+class SystemWidgetPopView : public SystemWidget
 {
 public:
-	SystemWidgetReturnView() = default;
-	~SystemWidgetReturnView() = default;
-	int Do() override;
-	int Render() override;
+	SystemWidgetPopView() = default;
+	~SystemWidgetPopView() = default;
+	int Do(SystemView* pView) override;
+	int Render(const SystemView* pView) override;
 
-	static std::shared_ptr<SystemWidgetReturnView> Create(const String& label);
+	static std::shared_ptr<SystemWidgetPopView> Create(const String& label);
 	Rect GetBox() const override;
 
 private:
