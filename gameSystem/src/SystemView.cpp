@@ -27,6 +27,12 @@ PointF SystemView::GetPos() const
 	return m_pos;
 }
 
+Point SystemView::PosNormalToPixel() const
+{
+	Size size = Window::Size();
+	return { static_cast<int32_t>(size.x * m_pos.x), static_cast<int32_t>(size.y * m_pos.y) };
+}
+
 const String& SystemView::GetName() const
 {
 	return m_name;
@@ -54,6 +60,8 @@ int SystemView::Render()
 
 void SystemView::DoView()
 {
+	m_stat = Stat::Idle;
+
 	for (auto& widget : m_vWidget)
 	{
 		if (widget->GetFocus())
@@ -79,6 +87,7 @@ void SystemView::RenderView()
 
 void SystemView::Push(std::shared_ptr<SystemView> pView)
 {
+	m_stat = Stat::Push;
 	m_nextView = pView;
 }
 
@@ -89,6 +98,7 @@ std::shared_ptr<SystemView> SystemView::GetNextView()
 
 void SystemView::Pop()
 {
+	m_stat = Stat::Pop;
 }
 
 void SystemView::SetFocus(bool focus)
@@ -101,6 +111,64 @@ bool SystemView::GetFocus() const
 	return m_focus;
 }
 
+SystemView::Stat SystemView::GetStat() const
+{
+	return m_stat;
+}
+
+
+
+
+class TestMenu : public SystemView
+{
+public:
+	TestMenu() = default;
+	virtual ~TestMenu() = default;
+
+	int Enter() override
+	{
+		auto menu = SystemWidgetMenu::Create(u8"メニュー");
+		menu->SetPos({ 0.05f, 0.2f });
+		m_vWidget.push_back(menu);
+
+		auto test = SystemWidgetSpin::Create("test", [](int index) {
+		});
+		test->SetFocus(true);
+		menu->SetWidget(test);
+
+		auto returnToGame = SystemWidgetPopView::Create("testdayo");
+		menu->SetWidget(returnToGame);
+
+		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
+		//m_vWidget.push_back(m_returnToGame);
+
+		//m_inputTest = SystemWidgetEnterView::Create("INPUT TEST");
+		//m_vWidget.push_back(m_inputTest);
+
+		//m_assetTest = SystemWidgetEnterView::Create("ASSET TEST");
+		//m_vWidget.push_back(m_assetTest);
+
+		menu->SetFocus(true);
+
+		return 0;
+	}
+
+	//void Do() override;
+
+	static std::shared_ptr<TestMenu> Create(const String& name);
+
+protected:
+};
+
+std::shared_ptr<TestMenu> TestMenu::Create(const String & name)
+{
+	auto p = std::make_shared<TestMenu>();
+
+	p->m_name = name;
+	p->Enter();
+
+	return p;
+}
 
 
 
@@ -116,10 +184,18 @@ public:
 		menu->SetPos({ 0.05f, 0.2f });
 		m_vWidget.push_back(menu);
 
-		m_returnToGame = SystemWidgetSpin::Create("RETURN TO GAME", [](int index) {
+		auto test = SystemWidgetSpin::Create("test", [](int index) {
 		});
-		m_returnToGame->SetFocus(true);
-		menu->SetWidget(m_returnToGame);
+		test->SetFocus(true);
+		menu->SetWidget(test);
+
+		auto returnToGame = SystemWidgetPopView::Create("RETURN TO GAME");
+		menu->SetWidget(returnToGame);
+
+		auto next = SystemWidgetPushView::Create("NEXT", [this]()->std::shared_ptr<SystemView> {
+			return TestMenu::Create(u8"次の画面");
+		});
+		menu->SetWidget(next);
 
 		//m_returnToGame = SystemWidgetEnterView::Create("RETURN TO GAME");
 		//m_vWidget.push_back(m_returnToGame);
@@ -145,6 +221,15 @@ protected:
 	std::shared_ptr<SystemWidget> m_assetTest;
 };
 
+std::shared_ptr<TopMenu> TopMenu::Create(const String & name)
+{
+	auto p = std::make_shared<TopMenu>();
+
+	p->m_name = name;
+	p->Enter();
+
+	return p;
+}
 //void TopMenu::Do()
 //{
 //	ウィジェットの操作
@@ -215,15 +300,12 @@ int AssetMenu::Enter()
 	});
 	menu->SetWidget(move);
 
-	auto next = SystemWidgetPushView::Create(u8"次の画面へ", [this]() {
-		Push(TopMenu::Create(u8"次の画面"));
+	auto next = SystemWidgetPushView::Create(u8"次の画面へ", [this]()->std::shared_ptr<SystemView> {
+		return TopMenu::Create(u8"次の画面");
 	});
 	menu->SetWidget(next);
 
 	menu->SetFocus(true);
-
-	//auto m_prev = SystemWidgetReturnView::Create("RETURN");
-	//m_vWidget.push_back(m_prev);
 
 	{
 		auto ptr = SystemWidgetSpin::Create(u8"テストだよ", [this](int32_t val) {
@@ -242,26 +324,17 @@ int AssetMenu::Enter()
 
 int AssetMenu::Do()
 {
-	m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
-	m_spriteRenderer->SetAtlasNum(m_ptr);
-	m_spriteRenderer->SetPos(m_spritePos);
-
 	return 0;
 }
 
 int AssetMenu::Render()
 {
+	m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
+	m_spriteRenderer->SetAtlasNum(m_ptr);
+	m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
+
 	GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
 
 	return 0;
 }
 
-std::shared_ptr<TopMenu> TopMenu::Create(const String & name)
-{
-	auto p = std::make_shared<TopMenu>();
-
-	p->m_name = name;
-	p->Enter();
-
-	return p;
-}

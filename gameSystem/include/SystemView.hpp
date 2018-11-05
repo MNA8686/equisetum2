@@ -9,11 +9,19 @@ using namespace Equisetum2;
 class SystemView
 {
 public:
+	enum class Stat : int32_t
+	{
+		Idle,
+		Push,
+		Pop,
+	};
+
 	SystemView();
 	virtual ~SystemView();
 
 	void SetPos(const PointF& pos);
 	PointF GetPos() const;
+	Point PosNormalToPixel() const;
 
 	virtual int Enter();
 	virtual int Leave();
@@ -31,6 +39,7 @@ public:
 
 	void SetFocus(bool focus);
 	bool GetFocus() const;
+	Stat GetStat() const;
 
 protected:
 	std::vector<std::shared_ptr<SystemWidget>> m_vWidget;
@@ -38,6 +47,7 @@ protected:
 	std::shared_ptr<SystemView> m_nextView;
 	PointF m_pos;
 	bool m_focus = false;
+	Stat m_stat = Stat::Idle;
 };
 
 class AssetMenu : public SystemView

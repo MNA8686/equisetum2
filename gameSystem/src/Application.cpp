@@ -81,9 +81,46 @@ int Application::Main()
 		if (!isError)
 		{
 			static bool next = false;
-			static float tran_x = 0;
+			static bool prev = false;
+			//static float tran_x = 0;
+			static float now_x = 0;
+			static float dest_x = 0;
 
-			if (!next)
+			if (next)
+			{
+				now_x -= 0.06f;
+				if (now_x < dest_x)
+				{
+					now_x = dest_x;
+					next = false;
+				}
+
+				int index = 0;
+				for (auto& view : m_vView)
+				{
+					view->SetPos(PointF{ index * 1.f + now_x, 0 });
+					index++;
+				}
+			}
+			else if (prev)
+			{
+				now_x += 0.06f;
+				if (now_x > dest_x)
+				{
+					now_x = dest_x;
+					m_vView.pop_back();
+					m_vView[m_vView.size() - 1]->SetFocus(true);
+					prev = false;
+				}
+
+				int index = 0;
+				for (auto& view : m_vView)
+				{
+					view->SetPos(PointF{ index * 1.f + now_x, 0 });
+					index++;
+				}
+			}
+			else
 			{
 				std::shared_ptr<SystemView> nextView;
 				for (auto& view : m_vView)
@@ -91,41 +128,39 @@ int Application::Main()
 					if (view->GetFocus())
 					{
 						view->DoView();	// for view test
-						nextView = view->GetNextView();
-						if (nextView)
+						if (view->GetStat() == SystemView::Stat::Push)
 						{
-							view->SetFocus(false);
+							nextView = view->GetNextView();
+							if (nextView)
+							{
+								view->SetFocus(false);
+								next = true;
+							}
+						}
+						else if (view->GetStat() == SystemView::Stat::Pop)
+						{
+							prev = true;
 						}
 						break;
 					}
 				}
 
-				if (nextView)
+				if (next)
 				{
 					nextView->SetFocus(true);
 					nextView->SetPos(PointF{ 1.f, 0 });
 					m_vView.push_back(nextView);
 					nextView = nullptr;
-
-					next = true;
+					dest_x -= 1.f;
 				}
-			}
-			else
-			{
-				tran_x += 0.06f;
-				if (tran_x > 1.f)
+				else if (prev)
 				{
-					tran_x = 1.f;
-					next = false;
+					if (m_vView.size() > 0)
+					{
+						prev = true;
+						dest_x += 1.f;
+					}
 				}
-
-				int index = 0;
-				for (auto& view : m_vView)
-				{
-					view->SetPos(PointF{index - tran_x, 0});
-					index++;
-				}
-
 			}
 
 			OnUpdate();

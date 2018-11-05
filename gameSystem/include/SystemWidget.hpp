@@ -53,11 +53,11 @@ public:
 	Rect GetBox() const override;
 	void SetPos(const PointF& pos) override;
 
-	static std::shared_ptr<SystemWidgetPushView> Create(const String& label, const std::function<void()>& cb);
+	static std::shared_ptr<SystemWidgetPushView> Create(const String& label, const std::function<std::shared_ptr<SystemView>()>& cb);
 
 private:
 	std::shared_ptr<SystemWidgetLabel> m_label;
-	std::function<void()> m_cb;
+	std::function<std::shared_ptr<SystemView>()> m_cb;
 };
 
 
@@ -71,6 +71,7 @@ public:
 
 	static std::shared_ptr<SystemWidgetPopView> Create(const String& label);
 	Rect GetBox() const override;
+	void SetPos(const PointF& pos) override;
 
 private:
 	std::shared_ptr<SystemWidgetLabel> m_label;
