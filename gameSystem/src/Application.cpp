@@ -34,9 +34,6 @@ int Application::Main()
 	m_fpsCounterTick = TickCounter::Create(m_sysTimer);
 	m_fpsCounter = FpsCounter::Create(m_fpsCounterTick);
 
-	bool atDashboard = true;
-	bool pause = false;
-
 	m_renderer = Renderer::Create();
 
 	// ダッシュボード
@@ -48,7 +45,11 @@ int Application::Main()
 	labelFps->SetPivot({ 1.0f, 0.5f });
 	labelFps->SetPos({ 0.98f, 0.95f });
 
-	OnInit();
+	bool isModeChange = true;
+	bool atDashboard = false;
+	bool pause = false;
+
+	//OnInit();
 
 	while (!m_isQuit)
 	{
@@ -83,12 +84,28 @@ int Application::Main()
 
 		if (!isError)
 		{
+			if (isModeChange)
+			{
+				if (atDashboard)
+				{
+					OnQuit();
+					Node<Object>::DestroyThemAll();
+				}
+				else
+				{
+					OnInit();
+				}
+
+				isModeChange = false;
+			}
+
 			if (atDashboard)
 			{
 				int ret = m_dashboard->Do();
 				if (ret > 0)
 				{
 					atDashboard = false;
+					isModeChange = true;
 				}
 
 				m_renderer->SetRenderTarget(nullptr);
@@ -101,6 +118,7 @@ int Application::Main()
 				if (KB::KeyT.IsDown())
 				{
 					atDashboard = true;
+					isModeChange = true;
 				}
 
 				OnDraw();
