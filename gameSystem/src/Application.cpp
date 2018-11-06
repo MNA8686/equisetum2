@@ -110,6 +110,7 @@ int Application::Main()
 			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
 			labelFps->Render(nullptr);
 
+			// レンダーキューの内容を処理する
 			m_renderer->Render();
 		}
 
