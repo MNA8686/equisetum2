@@ -5,6 +5,7 @@
 using namespace Equisetum2; 
 
 #include "SystemView.hpp"
+#include "Dashboard.hpp"
 
 class Application
 {
@@ -21,7 +22,7 @@ public:
 	std::shared_ptr<FontManager>& GetSystemFont(void);
 
 	//std::shared_ptr<SystemView> m_view;
-	std::vector<std::shared_ptr<SystemView>> m_vView;
+	//std::vector<std::shared_ptr<SystemView>> m_vView;
 
 protected:
 
@@ -35,6 +36,7 @@ protected:
 	void Quit();
 
 private:
+	std::shared_ptr<Dashboard> m_dashboard;
 
 	std::shared_ptr<Renderer> m_renderer;
 	std::shared_ptr<FontManager> m_fontManager;
