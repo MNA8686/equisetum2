@@ -34,36 +34,19 @@ int Application::Main()
 	m_fpsCounterTick = TickCounter::Create(m_sysTimer);
 	m_fpsCounter = FpsCounter::Create(m_fpsCounterTick);
 
+	bool atDashboard = true;
 	bool pause = false;
 
 	m_renderer = Renderer::Create();
 
-#if 0
-	// viewテスト
-	{
-		auto view = AssetMenu::Create(u8"アセットテスト");
-		view->SetFocus(true);
-		m_vView.push_back(view);
-
-		//m_view = AssetMenu::Create(u8"アセットテスト");
-	}
-#endif
-	{
-		auto view = AssetMenu::Create(u8"アセットテスト");
-		m_dashboard = Dashboard::CreateWithView(view);
-	}
+	// ダッシュボード
+	auto view = AssetMenu::Create(u8"アセットテスト");
+	m_dashboard = Dashboard::CreateWithView(view);
 
 	// FPS
 	auto labelFps = SystemWidgetLabel::Create(u8" 0123456789/");
 	labelFps->SetPivot({ 1.0f, 0.5f });
 	labelFps->SetPos({ 0.98f, 0.95f });
-
-#if 0
-	// パンくず
-	auto labelBreadcrumb = SystemWidgetLabel::Create(u8"Breadcrumb");
-	labelBreadcrumb->SetPivot({ 0.f, 0.5f });
-	labelBreadcrumb->SetPos({ 0.05f, 0.08f });
-#endif
 
 	OnInit();
 
@@ -100,16 +83,29 @@ int Application::Main()
 
 		if (!isError)
 		{
-			m_dashboard->Do();
+			if (atDashboard)
+			{
+				int ret = m_dashboard->Do();
+				if (ret > 0)
+				{
+					atDashboard = false;
+				}
 
-			OnUpdate();
+				m_renderer->SetRenderTarget(nullptr);
+				m_renderer->Clear({ 32, 150, 32, 0 });
+				m_dashboard->Render();
+			}
+			else
+			{
+				OnUpdate();
+				if (KB::KeyT.IsDown())
+				{
+					atDashboard = true;
+				}
 
-			m_renderer->SetRenderTarget(nullptr);
-			m_renderer->Clear({ 128, 128, 0, 0 });
-			//OnDraw();
+				OnDraw();
+			}
 
-			m_dashboard->Render();
-			
 			// FPS表示
 			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
 			labelFps->Render(nullptr);

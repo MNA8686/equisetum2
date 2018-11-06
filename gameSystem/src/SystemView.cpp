@@ -241,6 +241,9 @@ int AssetMenu::Enter()
 	menu->SetPos({ 0.05f, 0.2f });
 	m_vWidget.push_back(menu);
 
+	auto returnToGame = SystemWidgetPopView::Create(u8"ƒQ[ƒ€‚Ö–ß‚é");
+	menu->SetWidget(returnToGame);
+
 	auto rate = SystemWidgetSpin::Create(u8"Šg‘å—¦(%)", [this](int32_t val) {
 		m_rate = val;
 	});

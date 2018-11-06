@@ -54,6 +54,8 @@ PointF Dashboard::GetPos() const
 
 int Dashboard::Do()
 {
+	int ret = 0;
+
 	// ƒrƒ…[ˆÚ“®’†H
 	if (IsTransition())
 	{
@@ -95,7 +97,7 @@ int Dashboard::Do()
 			index++;
 		}
 		
-		return 0;
+		return ret;
 	}
 
 	std::shared_ptr<SystemView> nextView;
@@ -137,7 +139,12 @@ int Dashboard::Do()
 		}
 		else if (m_prev)
 		{
-			if (m_vView.size() > 0)
+			if (m_vView.size() <= 1)
+			{
+				m_prev = false;
+				ret = 1;
+			}
+			else
 			{
 				// 1‰æ–Ê•ª‚¸‚ç‚·
 				m_destPos.x += 1.f;
@@ -145,7 +152,7 @@ int Dashboard::Do()
 		}
 	}
 
-	return 0;
+	return ret;
 }
 
 int Dashboard::Render()
