@@ -161,6 +161,8 @@
     <ClCompile Include="..\..\src\SystemWidgetCustom.cpp" />
     <ClCompile Include="..\..\src\SystemWidgetLabel.cpp" />
     <ClCompile Include="..\..\src\SystemWidgetMenu.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetPopView.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetPushView.cpp" />
     <ClCompile Include="..\..\src\SystemWidgetSpin.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -178,6 +180,8 @@
     <ClInclude Include="..\..\include\SystemWidgetCustom.hpp" />
     <ClInclude Include="..\..\include\SystemWidgetLabel.hpp" />
     <ClInclude Include="..\..\include\SystemWidgetMenu.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetPopView.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetPushView.hpp" />
     <ClInclude Include="..\..\include\SystemWidgetSpin.hpp" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

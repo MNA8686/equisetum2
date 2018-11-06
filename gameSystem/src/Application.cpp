@@ -170,6 +170,7 @@ int Application::Main()
 					}
 				}
 
+				// パンくず生成
 				{
 					String path;
 
@@ -196,8 +197,11 @@ int Application::Main()
 			m_renderer->SetRenderTarget(nullptr);
 			m_renderer->Clear({ 128, 128, 0, 0 });
 			//OnDraw();
+			
+			// FPS表示
 			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
 			labelFps->Render(nullptr);
+			// パンくず表示
 			labelBreadcrumb->Render(nullptr);
 			
 			for (auto& view : m_vView)

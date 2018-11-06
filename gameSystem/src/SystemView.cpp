@@ -4,6 +4,8 @@
 #include "SystemWidgetCustom.hpp"
 #include "SystemWidgetLabel.hpp"
 #include "SystemWidgetSpin.hpp"
+#include "SystemWidgetPushView.hpp"
+#include "SystemWidgetPopView.hpp"
 #include "SystemView.hpp"
 #include "Application.hpp"
 
