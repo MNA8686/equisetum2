@@ -16,8 +16,8 @@ public:
 		Pop,
 	};
 
-	SystemView();
-	virtual ~SystemView();
+	SystemView() = default;
+	virtual ~SystemView() = default;
 
 	void SetPos(const PointF& pos);
 	PointF GetPos() const;

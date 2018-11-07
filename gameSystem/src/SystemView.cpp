@@ -6,18 +6,9 @@
 #include "SystemWidgetSpin.hpp"
 #include "SystemWidgetPushView.hpp"
 #include "SystemWidgetPopView.hpp"
+#include "SystemWidgetChoice.hpp"
 #include "SystemView.hpp"
 #include "Application.hpp"
-
-SystemView::SystemView()
-{
-
-}
-
-SystemView::~SystemView()
-{
-
-}
 
 void SystemView::SetPos(const PointF& pos)
 {
@@ -288,6 +279,11 @@ int AssetMenu::Enter()
 		return TopMenu::Create(u8"次の画面");
 	});
 	menu->SetWidget(next);
+
+	auto choice = SystemWidgetChoice::Create(u8"ファイル選択", [this]()->std::vector<String> {
+		return{ u8"test", u8"test2" };
+	});
+	menu->SetWidget(choice);
 
 	menu->SetFocus(true);
 

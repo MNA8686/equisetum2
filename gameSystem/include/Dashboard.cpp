@@ -54,6 +54,7 @@ PointF Dashboard::GetPos() const
 
 int Dashboard::Do()
 {
+	const int frameMax = 16;	// 何フレームかけてスクロールするか？
 	int ret = 0;
 
 	// ビュー移動中？
@@ -62,7 +63,7 @@ int Dashboard::Do()
 		if (m_next)
 		{
 			// ビューを移動
-			m_nowPos.x -= 0.06f;
+			m_nowPos.x -= 1.f / frameMax;
 			// 移動完了？
 			if (m_nowPos.x < m_destPos.x)
 			{
@@ -76,7 +77,7 @@ int Dashboard::Do()
 		else if (m_prev)
 		{
 			// ビューを移動
-			m_nowPos.x += 0.06f;
+			m_nowPos.x += 1.f / frameMax;
 			// 移動完了？
 			if (m_nowPos.x > m_destPos.x)
 			{

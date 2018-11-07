@@ -40,8 +40,4 @@ protected:
 	bool m_enable = true;
 };
 
-class SystemWidgetChoice : public SystemWidget
-{
-};
-
 #endif
