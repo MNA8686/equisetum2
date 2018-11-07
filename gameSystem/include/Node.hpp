@@ -542,6 +542,23 @@ public:
 		archive(CEREAL_NVP(m_listZombie));
 	}
 
+	void Reset()
+	{
+		m_vNodeSlot.clear();
+		m_vNodeSlot.resize(defaultNum);
+		
+		m_vGcQueue.clear();
+		m_vGcQueue.reserve(defaultNum);
+
+	   std::queue<NodeID> empty;
+	   std::swap( m_queFreeNode, empty );
+   
+		for (int i = 0; i < defaultNum; i++)
+		{
+			m_queFreeNode.push(i);
+		}
+	}
+
 protected:
 
 	friend Node<T>;
@@ -559,13 +576,7 @@ protected:
 
 	NodePool()	// インスタンス作成封じ
 	{
-		m_vNodeSlot.resize(defaultNum);
-		m_vGcQueue.reserve(defaultNum);
-
-		for (int i = 0; i < defaultNum; i++)
-		{
-			m_queFreeNode.push(i);
-		}
+		Reset();
 	}
 };
 

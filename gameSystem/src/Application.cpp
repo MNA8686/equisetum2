@@ -90,6 +90,7 @@ int Application::Main()
 				{
 					OnQuit();
 					Node<Object>::DestroyThemAll();
+					Singleton<NodePool<Object>>::GetInstance()->Reset();
 				}
 				else
 				{
