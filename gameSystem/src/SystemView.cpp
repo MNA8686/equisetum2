@@ -250,6 +250,27 @@ int AssetMenu::Enter()
 	ptr->SetCyclic(true);
 	menu->SetWidget(ptr);
 
+	auto choice = SystemWidgetChoice::Create(u8"ファイル選択", [this]()->std::vector<String> {
+		std::vector<String> test;
+		
+		auto spriteList = Directory::GetFiles(Path::GetFullPath("sprite"));
+		if (spriteList)
+		{
+			for (auto sprite : *spriteList)
+			{
+				test.push_back(Path::GetFileNameWithoutExtension(sprite));
+			}
+		}
+		
+		for (int i = 0; i < 100; i++)
+		{
+			//test.push_back(String::Sprintf("%03d", i));
+		}
+
+		return test;
+	});
+	menu->SetWidget(choice);
+
 	auto move = SystemWidgetCustom::Create(u8"移動", [this]()->bool {
 		int32_t amount = KB::KeyTab.IsPress() ? 4 : 1;
 
@@ -280,13 +301,9 @@ int AssetMenu::Enter()
 	});
 	menu->SetWidget(next);
 
-	auto choice = SystemWidgetChoice::Create(u8"ファイル選択", [this]()->std::vector<String> {
-		return{ u8"test", u8"test2" };
-	});
-	menu->SetWidget(choice);
-
 	menu->SetFocus(true);
 
+#if 0
 	{
 		auto ptr = SystemWidgetSpin::Create(u8"テストだよ", [this](int32_t val) {
 		});
@@ -299,6 +316,8 @@ int AssetMenu::Enter()
 		ptr->SetPivot({ 1.f, 0.5f });
 		m_vWidget.push_back(ptr);
 	}
+#endif
+
 	return 0;
 }
 

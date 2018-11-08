@@ -19,16 +19,20 @@ public:
 	bool IsActive() const;
 
 protected:
-	std::function<void(int index, const String& item)> m_cb;
+	std::function<void(int index, const String& item)> m_cb;	// 選択されたアイテムのインデックスとアイテムを引数に設定する。何もない場合は-1が設定される。
 	std::vector<String> m_vItem;
 	String m_title;
 	bool m_isActive = false;
-	int32_t m_maxRow = 0;
+	int32_t m_maxRow = 0;	// 表示可能最大行数
 
 	std::shared_ptr<RectRenderer> m_rectRendererBorder;
 	std::shared_ptr<RectRenderer> m_rectRendererInnerFrame;
 	std::shared_ptr<SystemWidgetLabel> m_label;
 	
+	std::vector<std::shared_ptr<SystemWidgetLabel>> m_vLabel;
+	int32_t m_cursor = -1;	// 選択しているアイテムの番号
+	int32_t m_index = 0;	// アイテムの表示開始行
+
 	const float textSize = 0.05f;
 	const float textMargin = textSize * 1.5f;
 

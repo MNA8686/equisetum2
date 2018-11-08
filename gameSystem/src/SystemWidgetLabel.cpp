@@ -85,6 +85,8 @@ std::shared_ptr<TextRenderer>& SystemWidgetLabel::GetRenderer()
 
 int SystemWidgetLabel::Render(const SystemView* pView)
 {
+	m_renderer->SetLayer(m_layer);
+
 	// 座標を設定する
 	PointF parentPos;
 	if (pView)

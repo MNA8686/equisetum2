@@ -54,4 +54,9 @@ void SystemWidget::SetEnable(bool enable)
 	m_enable = enable;
 }
 
+void SystemWidget::Setlayer(int layer)
+{
+	m_layer = layer;
+}
+
 

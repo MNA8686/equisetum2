@@ -31,6 +31,7 @@ public:
 	PointF GetPos() const;
 	void SetEnable(bool enable);
 	virtual Rect GetBox() const = 0;
+	void Setlayer(int layer);
 
 protected:
 	String m_text;
@@ -38,6 +39,7 @@ protected:
 	bool m_focus = false;
 	PointF m_pos;
 	bool m_enable = true;
+	int m_layer = 0;
 };
 
 #endif

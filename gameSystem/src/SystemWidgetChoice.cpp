@@ -68,9 +68,16 @@ int SystemWidgetChoice::Do(SystemView* pView)
 		else if (KB::KeyEnter.IsDown())
 		{
 			m_exclusive = true;
+			// アイテム一覧を取得する
 			m_vItem = m_cb();
-			m_dialog = SystemChoiceDialog::Create(m_text, m_vItem, [](int index, const String& item) {
-
+			// ダイアログを作成する
+			m_dialog = SystemChoiceDialog::Create(m_text, m_vItem, [this](int index, const String& item) {
+				if (index >= 0)
+				{
+					m_chooseIndex = index;
+					m_label->SetPreset(u8" []" + m_text + item);
+					m_label->SetText(m_text + u8" [" + item + u8"]");
+				}
 			});
 		}
 	}
@@ -103,5 +110,10 @@ void SystemWidgetChoice::SetPos(const PointF & pos)
 {
 	SystemWidget::SetPos(pos);
 	m_label->SetPos(pos);
+}
+
+int32_t SystemWidgetChoice::GetChooseIndex() const
+{
+	return m_chooseIndex;
 }
 
