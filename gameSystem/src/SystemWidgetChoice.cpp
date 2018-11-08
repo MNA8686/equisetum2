@@ -90,6 +90,7 @@ int SystemWidgetChoice::Render(const SystemView* pView)
 	// label
 	Size size = Window::Size();
 
+	m_label->SetEnable(m_enable);
 	m_label->Render(pView);
 
 	if (m_exclusive &&

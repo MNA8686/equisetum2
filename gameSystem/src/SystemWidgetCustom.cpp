@@ -57,8 +57,8 @@ int SystemWidgetCustom::Do(SystemView* pView)
 		{
 			Next();
 		}
-		// Zキー押下？
-		else if (KB::KeyZ.IsDown())
+		// Enterキー押下？
+		else if (KB::KeyEnter.IsDown())
 		{
 			m_exclusive = true;
 		}
@@ -72,6 +72,7 @@ int SystemWidgetCustom::Render(const SystemView* pView)
 	// label
 	Size size = Window::Size();
 
+	m_label->SetEnable(m_enable);
 	m_label->Render(pView);
 
 	return 0;

@@ -62,6 +62,7 @@ int SystemWidgetPushView::Do(SystemView* pView)
 
 int SystemWidgetPushView::Render(const SystemView* pView)
 {
+	m_label->SetEnable(m_enable);
 	m_label->Render(pView);
 	return 0;
 }

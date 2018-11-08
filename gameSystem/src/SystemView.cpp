@@ -262,11 +262,6 @@ int AssetMenu::Enter()
 			}
 		}
 		
-		for (int i = 0; i < 100; i++)
-		{
-			//test.push_back(String::Sprintf("%03d", i));
-		}
-
 		return test;
 	});
 	menu->SetWidget(choice);
@@ -292,7 +287,7 @@ int AssetMenu::Enter()
 			m_spritePos.y += amount;
 		}
 
-		return !KB::KeyZ.IsDown();
+		return !KB::KeyEscape.IsDown();
 	});
 	menu->SetWidget(move);
 
@@ -302,21 +297,6 @@ int AssetMenu::Enter()
 	menu->SetWidget(next);
 
 	menu->SetFocus(true);
-
-#if 0
-	{
-		auto ptr = SystemWidgetSpin::Create(u8"テストだよ", [this](int32_t val) {
-		});
-		ptr->SetPos({ 0.05f, 0.75f });
-		m_vWidget.push_back(ptr);
-	}
-	{
-		auto ptr = SystemWidgetLabel::Create(u8"テストだよん");
-		ptr->SetPos({ 1.f, 0.5f });
-		ptr->SetPivot({ 1.f, 0.5f });
-		m_vWidget.push_back(ptr);
-	}
-#endif
 
 	return 0;
 }

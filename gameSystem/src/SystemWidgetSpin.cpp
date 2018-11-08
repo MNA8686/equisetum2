@@ -198,6 +198,7 @@ int SystemWidgetSpin::Render(const SystemView* pView)
 {
 	Size size = Window::Size();
 
+	m_label->SetEnable(m_enable);
 	m_label->Render(pView);
 
 	return 0;

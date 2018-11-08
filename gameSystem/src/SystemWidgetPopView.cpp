@@ -60,6 +60,7 @@ int SystemWidgetPopView::Do(SystemView* pView)
 
 int SystemWidgetPopView::Render(const SystemView* pView)
 {
+	m_label->SetEnable(m_enable);
 	m_label->Render(pView);
 	return 0;
 }
