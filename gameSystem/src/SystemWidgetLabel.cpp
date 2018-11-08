@@ -61,6 +61,12 @@ bool SystemWidgetLabel::SetPreset(const String & preset)
 	return false;
 }
 
+bool SystemWidgetLabel::SetPreset(std::shared_ptr<BitmapFont> bitmapFont)
+{
+	m_renderer->SetBitmapFont(bitmapFont);
+	return true;
+}
+
 bool SystemWidgetLabel::SetText(const String & label)
 {
 	m_renderer->SetText(label);

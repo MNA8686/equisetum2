@@ -15,6 +15,8 @@ public:
 
 	// 使用する文字一覧をセットする
 	bool SetPreset(const String& preset);
+	// 使用する文字一覧をセットする
+	bool SetPreset(std::shared_ptr<BitmapFont> bitmapFont);
 	// テキストを設定する
 	bool SetText(const String& label);
 	// ラベルのレンダリング
