@@ -50,23 +50,4 @@ protected:
 	Stat m_stat = Stat::Idle;
 };
 
-class AssetMenu : public SystemView
-{
-public:
-	AssetMenu() = default;
-	virtual ~AssetMenu() = default;
-
-	int Enter() override;
-	int Do() override;
-	int Render() override;
-
-	static std::shared_ptr<AssetMenu> Create(const String & name);
-
-protected:
-	int32_t m_rate = 100;
-	int32_t m_ptr = 0;
-	Point m_spritePos;
-	std::shared_ptr<SpriteRenderer> m_spriteRenderer;
-};
-
 #endif

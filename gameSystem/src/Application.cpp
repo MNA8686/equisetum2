@@ -9,6 +9,7 @@
 
 #include "SystemWidgetLabel.hpp"
 #include "Dashboard.hpp"
+#include "SystemViewTopMenu.hpp"
 
 int Application::Main()
 {
@@ -37,7 +38,7 @@ int Application::Main()
 	m_renderer = Renderer::Create();
 
 	// ダッシュボード
-	auto view = AssetMenu::Create(u8"アセットテスト");
+	auto view = TopMenu::Create(u8"TOP");
 	m_dashboard = Dashboard::CreateWithView(view);
 
 	// FPS

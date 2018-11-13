@@ -159,6 +159,8 @@
     <ClCompile Include="..\..\src\Script.cpp" />
     <ClCompile Include="..\..\src\SystemChoiceDialog.cpp" />
     <ClCompile Include="..\..\src\SystemView.cpp" />
+    <ClCompile Include="..\..\src\SystemViewAssetTest.cpp" />
+    <ClCompile Include="..\..\src\SystemViewTopMenu.cpp" />
     <ClCompile Include="..\..\src\SystemWidget.cpp" />
     <ClCompile Include="..\..\src\SystemWidgetChoice.cpp" />
     <ClCompile Include="..\..\src\SystemWidgetCustom.cpp" />
@@ -181,6 +183,8 @@
     <ClInclude Include="..\..\include\Script.hpp" />
     <ClInclude Include="..\..\include\SystemChoiceDialog.hpp" />
     <ClInclude Include="..\..\include\SystemView.hpp" />
+    <ClInclude Include="..\..\include\SystemViewAssetTest.hpp" />
+    <ClInclude Include="..\..\include\SystemViewTopMenu.hpp" />
     <ClInclude Include="..\..\include\SystemWidget.hpp" />
     <ClInclude Include="..\..\include\SystemWidgetChoice.hpp" />
     <ClInclude Include="..\..\include\SystemWidgetCustom.hpp" />
