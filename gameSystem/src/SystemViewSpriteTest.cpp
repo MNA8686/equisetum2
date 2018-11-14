@@ -57,6 +57,7 @@ int SpriteTest::Enter()
 					m_spriteRenderer->SetBlendMode(BlendMode::Blend);
 					m_spritePos = Window::Size() / 2;
 					m_spriteRenderer->SetPos(m_spritePos);
+					m_ptr = 0;
 
 					// アニメーションパターン数設定
 					size_t animSize = sprite->GetAnimAtlas().size();
