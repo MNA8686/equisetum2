@@ -1,6 +1,7 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "SystemViewAssetTest.hpp"
+#include "SystemViewSpriteTest.hpp"
 #include "SystemWidgetMenu.hpp"
 #include "SystemWidgetSpin.hpp"
 #include "SystemWidgetPopView.hpp"
@@ -29,7 +30,7 @@ int AssetTest::Enter()
 	menu->SetWidget(pop);
 
 	auto spriteTest = SystemWidgetPushView::Create(u8"スプライトテスト", [this]()->std::shared_ptr<SystemView> {
-		return{};// TestMenu::Create(u8"その次の画面");
+		return SpriteTest::Create(u8"スプライトテスト");
 	});
 	menu->SetWidget(spriteTest);
 

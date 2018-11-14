@@ -2,7 +2,7 @@
 #include "SystemChoiceDialog.hpp"
 #include "Application.hpp"
 
-std::shared_ptr<SystemWidgetChoice> SystemWidgetChoice::Create(const String& label, const std::function<std::vector<String>()> cb)
+std::shared_ptr<SystemWidgetChoice> SystemWidgetChoice::Create(const String& label, const std::function<std::vector<String>()>& cbBegin, const std::function<void(int32_t, const String&)>& cbEnd)
 {
 	EQ_DURING
 	{
@@ -13,7 +13,8 @@ std::shared_ptr<SystemWidgetChoice> SystemWidgetChoice::Create(const String& lab
 		}
 
 		inst->m_text = label;
-		inst->m_cb = cb;
+		inst->m_cbBegin = cbBegin;
+		inst->m_cbEnd = cbEnd;
 		inst->m_label = SystemWidgetLabel::Create(label);
 		if (!inst->m_label)
 		{
@@ -69,7 +70,7 @@ int SystemWidgetChoice::Do(SystemView* pView)
 		{
 			m_exclusive = true;
 			// アイテム一覧を取得する
-			m_vItem = m_cb();
+			m_vItem = m_cbBegin();
 			// ダイアログを作成する
 			m_dialog = SystemChoiceDialog::Create(m_text, m_vItem, [this](int index, const String& item) {
 				if (index >= 0)
@@ -77,6 +78,8 @@ int SystemWidgetChoice::Do(SystemView* pView)
 					m_chooseIndex = index;
 					m_label->SetPreset(u8" []" + m_text + item);
 					m_label->SetText(m_text + u8" [" + item + u8"]");
+					
+					m_cbEnd(index, item);
 				}
 			});
 		}
