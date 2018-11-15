@@ -28,6 +28,7 @@ std::shared_ptr<Dashboard> Dashboard::CreateWithView(std::shared_ptr<SystemView>
 		}
 		inst->m_labelBreadcrumb->SetPivot({ 0.f, 0.5f });
 		inst->m_labelBreadcrumb->SetPos({ 0.05f, 0.08f });
+		inst->m_labelBreadcrumb->Setlayer(Renderer::LayerMax - 1);
 
 		inst->RebuildBreadcrumb();
 

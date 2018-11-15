@@ -42,8 +42,11 @@ int SystemWidgetCustom::Do(SystemView* pView)
 
 	if (m_exclusive)
 	{
-		m_stat = Stat::Exclusive;
 		m_exclusive = m_cb();
+		if (m_exclusive)
+		{
+			m_stat = Stat::Exclusive;
+		}
 	}
 	else
 	{

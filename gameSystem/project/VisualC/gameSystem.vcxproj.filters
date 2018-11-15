@@ -84,6 +84,12 @@
     <ClCompile Include="..\..\src\SystemViewSpriteTest.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\SystemViewBGMTest.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\SystemViewSETest.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Node.hpp">
@@ -144,6 +150,12 @@
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\SystemViewSpriteTest.hpp">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\SystemViewBGMTest.hpp">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\SystemViewSETest.hpp">
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
   </ItemGroup>

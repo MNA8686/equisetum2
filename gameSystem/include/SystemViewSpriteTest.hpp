@@ -6,17 +6,17 @@ using namespace Equisetum2;
 #include "SystemView.hpp"
 
 class SystemWidgetSpin;
-class SpriteTest : public SystemView
+class SystemViewSpriteTest : public SystemView
 {
 public:
-	SpriteTest() = default;
-	virtual ~SpriteTest() = default;
+	SystemViewSpriteTest() = default;
+	virtual ~SystemViewSpriteTest() = default;
 
 	int Enter() override;
 	int Do() override;
 	int Render() override;
 
-	static std::shared_ptr<SpriteTest> Create(const String & name);
+	static std::shared_ptr<SystemViewSpriteTest> Create(const String & name);
 
 protected:
 	int32_t m_rate = 100;
@@ -24,5 +24,6 @@ protected:
 	Point m_spritePos;
 	std::shared_ptr<SpriteRenderer> m_spriteRenderer;
 	std::shared_ptr<SystemWidgetSpin> m_spinAnim;
+	Color m_color{128, 128, 128, 128};
 };
 
