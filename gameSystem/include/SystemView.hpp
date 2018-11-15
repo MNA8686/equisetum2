@@ -34,7 +34,7 @@ public:
 	void RenderView();
 
 	void Push(std::shared_ptr<SystemView> pView);
-	std::shared_ptr<SystemView> GetNextView();
+	std::shared_ptr<SystemView> GetNextViewWithClear();
 	void Pop();
 
 	void SetFocus(bool focus);

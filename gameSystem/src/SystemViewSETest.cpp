@@ -1,4 +1,4 @@
-#include "system/Logger.h"
+ï»¿#include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "SystemViewSETest.hpp"
 #include "SystemWidgetMenu.hpp"
@@ -21,17 +21,17 @@ std::shared_ptr<SystemViewSETest> SystemViewSETest::Create(const String & name)
 
 int SystemViewSETest::Enter()
 {
-	auto menu = SystemWidgetMenu::Create(u8"ƒƒjƒ…[");
+	auto menu = SystemWidgetMenu::Create(u8"ãƒ¡ãƒ‹ãƒ¥ãƒ¼");
 	menu->SetPos({ 0.05f, 0.2f });
 	m_vWidget.push_back(menu);
 
-	auto pop = SystemWidgetPopView::Create(u8"–ß‚é");
+	auto pop = SystemWidgetPopView::Create(u8"æˆ»ã‚‹");
 	menu->SetWidget(pop);
 
-	auto choice = SystemWidgetChoice::Create(u8"ƒtƒ@ƒCƒ‹‘I‘ð", [this]()->std::vector<String> {
+	auto choice = SystemWidgetChoice::Create(u8"ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠž", [this]()->std::vector<String> {
 		std::vector<String> test;
 		
-		// SEƒŠƒXƒg‚ðŽæ“¾‚·‚é
+		// SEãƒªã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹
 		auto seList = Directory::GetFiles(Path::GetFullPath("se"));
 		if (seList)
 		{
@@ -50,7 +50,7 @@ int SystemViewSETest::Enter()
 	});
 	menu->SetWidget(choice);
 
-	auto play = SystemWidgetCustom::Create(u8"Ä¶/’âŽ~", [this]()->bool {
+	auto play = SystemWidgetCustom::Create(u8"å†ç”Ÿ/åœæ­¢", [this]()->bool {
 		if (m_se)
 		{
 			if (m_se->IsPlaying())
@@ -66,7 +66,7 @@ int SystemViewSETest::Enter()
 	});
 	menu->SetWidget(play);
 
-	auto pause = SystemWidgetCustom::Create(u8"ˆêŽž’âŽ~/ÄŠJ", [this]()->bool {
+	auto pause = SystemWidgetCustom::Create(u8"ä¸€æ™‚åœæ­¢/å†é–‹", [this]()->bool {
 		if (m_se)
 		{
 			if (m_se->IsPaused())
@@ -82,7 +82,7 @@ int SystemViewSETest::Enter()
 	});
 	menu->SetWidget(pause);
 
-	auto vol = SystemWidgetSpin::Create(u8"ƒ{ƒŠƒ…[ƒ€", [this](int32_t val) {
+	auto vol = SystemWidgetSpin::Create(u8"ãƒœãƒªãƒ¥ãƒ¼ãƒ ", [this](int32_t val) {
 		m_volume = val;
 	});
 	vol->SetRange(0, 100, 1);
@@ -91,20 +91,50 @@ int SystemViewSETest::Enter()
 
 	menu->SetFocus(true);
 
+	m_labelPlay = SystemWidgetLabel::Create(u8"â–¶â– |");
+	m_labelPlay->SetPos({0.5f, 0.9f});
+
 	return 0;
 }
 
 int SystemViewSETest::Do()
 {
+	String play;
+
 	if (m_se)
 	{
 		m_se->SetVolume(m_volume / 100.f);
+		
+		
+		if (m_se->IsPlaying())
+		{
+			if (m_se->IsPaused())
+			{
+				play = u8"||";
+			}
+			else
+			{
+				play = u8"â–¶";
+			}
+		}
+		else
+		{
+			play = u8"â– ";
+		}
 	}
+
+	m_labelPlay->SetText(play);
+
 	return 0;
 }
 
 int SystemViewSETest::Render()
 {
+	if (m_se)
+	{
+		m_labelPlay->Render(this);
+	}
+
 	return 0;
 }
 

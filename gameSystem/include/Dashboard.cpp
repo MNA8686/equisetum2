@@ -111,7 +111,7 @@ int Dashboard::Do()
 			view->DoView();
 			if (view->GetStat() == SystemView::Stat::Push)
 			{
-				nextView = view->GetNextView();
+				nextView = view->GetNextViewWithClear();
 				if (nextView)
 				{
 					view->SetFocus(false);

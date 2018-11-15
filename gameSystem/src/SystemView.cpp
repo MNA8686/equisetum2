@@ -85,9 +85,11 @@ void SystemView::Push(std::shared_ptr<SystemView> pView)
 	m_nextView = pView;
 }
 
-std::shared_ptr<SystemView> SystemView::GetNextView()
+std::shared_ptr<SystemView> SystemView::GetNextViewWithClear()
 {
-	return m_nextView;
+	auto tmp = m_nextView;
+	m_nextView = nullptr;
+	return tmp;
 }
 
 void SystemView::Pop()
@@ -109,50 +111,4 @@ SystemView::Stat SystemView::GetStat() const
 {
 	return m_stat;
 }
-
-
-
-
-class TestMenu : public SystemView
-{
-public:
-	TestMenu() = default;
-	virtual ~TestMenu() = default;
-
-	int Enter() override
-	{
-		auto menu = SystemWidgetMenu::Create(u8"ƒƒjƒ…[");
-		menu->SetPos({ 0.05f, 0.2f });
-		m_vWidget.push_back(menu);
-
-//		auto test = SystemWidgetSpin::Create("test", [](int index) {
-//		});
-//		menu->SetWidget(test);
-
-		auto returnToGame = SystemWidgetPopView::Create("testdayo");
-		menu->SetWidget(returnToGame);
-
-		menu->SetFocus(true);
-
-		return 0;
-	}
-
-	//void Do() override;
-
-	static std::shared_ptr<TestMenu> Create(const String& name);
-
-protected:
-};
-
-std::shared_ptr<TestMenu> TestMenu::Create(const String & name)
-{
-	auto p = std::make_shared<TestMenu>();
-
-	p->m_name = name;
-	p->Enter();
-
-	return p;
-}
-
-
 

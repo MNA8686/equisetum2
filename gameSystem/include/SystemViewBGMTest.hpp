@@ -6,6 +6,7 @@ using namespace Equisetum2;
 #include "SystemView.hpp"
 
 class SystemWidgetSpin;
+class SystemWidgetLabel;
 class SystemViewBGMTest : public SystemView
 {
 public:
@@ -20,6 +21,7 @@ public:
 
 protected:
 	std::shared_ptr<BGM> m_bgm;
+	std::shared_ptr<SystemWidgetLabel> m_labelPlay;
 	int32_t m_volume = 100;
 };
 
