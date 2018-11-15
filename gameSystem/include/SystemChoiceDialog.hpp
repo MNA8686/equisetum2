@@ -37,7 +37,7 @@ protected:
 	const float textMargin = textSize * 1.5f;
 
 	// 外枠
-	const SizeF sizeBorderMargin{ 0.05f, 0.05f };
+	const SizeF sizeBorderMargin{ 0.05f, 0.085f };
 	RectF m_rectBorder{ sizeBorderMargin.x, sizeBorderMargin.y, 1.f - (sizeBorderMargin.x) * 2, 1.f - (sizeBorderMargin.y) * 2 };
 	Rect m_rectBorderPixel;			// ピクセル版 
 

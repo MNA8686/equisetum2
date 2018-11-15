@@ -27,7 +27,7 @@ std::shared_ptr<Dashboard> Dashboard::CreateWithView(std::shared_ptr<SystemView>
 			EQ_THROW(u8"ƒpƒ“‚­‚¸‚Ìì¬‚ÉŽ¸”s‚µ‚Ü‚µ‚½B");
 		}
 		inst->m_labelBreadcrumb->SetPivot({ 0.f, 0.5f });
-		inst->m_labelBreadcrumb->SetPos({ 0.05f, 0.08f });
+		inst->m_labelBreadcrumb->SetPos({ 0.05f, 0.07f });
 		inst->m_labelBreadcrumb->Setlayer(Renderer::LayerMax - 1);
 
 		inst->RebuildBreadcrumb();
