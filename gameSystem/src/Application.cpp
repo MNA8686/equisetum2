@@ -111,7 +111,8 @@ int Application::Main()
 				}
 
 				m_renderer->SetRenderTarget(nullptr);
-				m_renderer->Clear({ 32, 150, 32, 0 });
+				//m_renderer->Clear({ 32, 150, 32, 0 });
+				m_renderer->Clear({ 5, 32, 18, 0 });
 				m_dashboard->Render();
 			}
 			else

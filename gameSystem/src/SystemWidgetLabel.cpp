@@ -100,7 +100,15 @@ int SystemWidgetLabel::Render(const SystemView* pView)
 
 	// 有効か無効かで文字の色を変える
 	uint8_t color = m_enable ? 128 : 40;
-	m_renderer->SetColor(Color{ color, color, color, 128 });
+	if (m_enable)
+	{
+		m_renderer->SetColor(Color{ 5, 218, 20, 128 });
+	}
+	else
+	{
+		m_renderer->SetColor(Color{ 5, 32, 20, 128 });
+	}
+	//m_renderer->SetColor(Color{ color, color, color, 128 });
 
 	// ポストエフェクトを呼び出す
 	if (m_cb)
