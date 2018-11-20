@@ -134,6 +134,12 @@ namespace Equisetum2
 			auto width_ = forcedPow2 ? Math::NearPow2(width) : width;
 			auto height_ = forcedPow2 ? Math::NearPow2(height) : height;
 
+			std::vector<Color> plane(width_ * height_);
+			for (auto& p : plane)
+			{
+				p = Color{0,0,255,64};
+			}
+
 			::glTexImage2D(
 				GL_TEXTURE_2D,
 				0,					// mipmap
@@ -143,7 +149,7 @@ namespace Equisetum2
 				0,					// border
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,
-				nullptr
+				plane.data()//nullptr
 			);
 
 			// インスタンス作成
@@ -225,6 +231,7 @@ namespace Equisetum2
 			::glTexSubImage2D(GL_TEXTURE_2D, 0, pos.x, pos.y, image->Width(), image->Height(),
 				GL_RGBA, GL_UNSIGNED_BYTE, image->Data());
 
+			Logger::OutputDebug("x %d, y %d, width %d, height %d, tex w %d, tex h %d", pos.x, pos.y, image->Width(), image->Height(), m_pImpl->m_width, m_pImpl->m_height);
 			return true;
 		}
 		EQ_HANDLER

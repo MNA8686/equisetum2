@@ -6,7 +6,7 @@
 
 #include "SDL_ttf.h"
 
-#define __TO_FILE__
+//#define __TO_FILE__
 #if defined(__TO_FILE__)
 #include "stream/FileStream.h"
 #include "fs/Path.hpp"
@@ -243,20 +243,21 @@ namespace Equisetum2
 			{
 				const char *familyname = TTF_FontFaceFamilyName(m_pImpl->m_pFont.get());
 				const char *stylename = TTF_FontFaceStyleName(m_pImpl->m_pFont.get());
+				static int index = 0;
 
 				{
 					// 1行ずつ画像出力
 					int count = 0;
 					for (const auto& img : vImage)
 					{
-						auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s)_%02d.png", familyname, stylename, count).c_str()));
+						auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s)_%02d_%02d.png", familyname, stylename, count, index).c_str()));
 						img->SaveToStream(stream);
 						count++;
 					}
 				}
 				{
 					// テクスチャイメージ出力
-					auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s).png", familyname, stylename)).c_str());
+					auto stream = FileStream::NewFileFromPath(Path::GetFullPath(String::Sprintf("font(%s)(%s)_%02d.png", familyname, stylename, index)).c_str());
 					auto image = Image::CreateBlank(imageSize.x, imageSize.y);
 
 					Point pos;
@@ -271,6 +272,7 @@ namespace Equisetum2
 					}
 					image->SaveToStream(stream);
 				}
+				index++;
 			}
 #endif
 

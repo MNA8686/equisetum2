@@ -21,8 +21,8 @@ namespace Equisetum2
 				"",							// ウィンドウのタイトル
 				SDL_WINDOWPOS_CENTERED,		// X座標の初期値
 				SDL_WINDOWPOS_CENTERED,		// Y座標の初期値
-				640,						// 幅のピクセル数
-				480,						// 高さのピクセル数
+				1920,						// 幅のピクセル数
+				1080,						// 高さのピクセル数
 				SDL_WINDOW_OPENGL			// フラグ
 			);
 

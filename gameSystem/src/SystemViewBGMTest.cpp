@@ -37,7 +37,10 @@ int SystemViewBGMTest::Enter()
 		{
 			for (auto bgm : *bgmList)
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(bgm));
+				if (Path::GetExtension(bgm) == u8".ogg")
+				{
+					test.push_back(Path::GetFileNameWithoutExtension(bgm));
+				}
 			}
 		}
 		

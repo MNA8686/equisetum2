@@ -99,16 +99,8 @@ int SystemWidgetLabel::Render(const SystemView* pView)
 	m_renderer->SetPos({ static_cast<int32_t>(size.x * (parentPos.x + m_pos.x)), static_cast<int32_t>(size.y * (parentPos.y + m_pos.y)) });
 
 	// 有効か無効かで文字の色を変える
-	uint8_t color = m_enable ? 128 : 40;
-	if (m_enable)
-	{
-		m_renderer->SetColor(Color{ 5, 218, 20, 128 });
-	}
-	else
-	{
-		m_renderer->SetColor(Color{ 5, 32, 20, 128 });
-	}
-	//m_renderer->SetColor(Color{ color, color, color, 128 });
+	auto color = m_enable ? Color{ 5, 218, 20, 128 } : Color{ 5, 32, 20, 128 };
+	m_renderer->SetColor(color);
 
 	// ポストエフェクトを呼び出す
 	if (m_cb)

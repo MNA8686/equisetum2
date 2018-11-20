@@ -501,7 +501,7 @@ namespace Equisetum2
 		// レンダーキューをクリアする
 		ClearRenderQueue();
 
-		Logger::OutputDebug("draw call %d", gDrawCallCount);
+		//Logger::OutputDebug("draw call %d", gDrawCallCount);
 
 		return true;
 	}

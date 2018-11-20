@@ -37,7 +37,10 @@ int SystemViewSETest::Enter()
 		{
 			for (auto se : *seList)
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(se));
+				if (Path::GetExtension(se) == u8".wav")
+				{
+					test.push_back(Path::GetFileNameWithoutExtension(se));
+				}
 			}
 		}
 		

@@ -37,7 +37,10 @@ int SystemViewSpriteTest::Enter()
 		{
 			for (auto sprite : *spriteList)
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(sprite));
+				if (Path::GetExtension(sprite) == u8".json")
+				{
+					test.push_back(Path::GetFileNameWithoutExtension(sprite));
+				}
 			}
 		}
 		
