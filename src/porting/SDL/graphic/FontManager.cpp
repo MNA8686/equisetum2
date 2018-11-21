@@ -277,7 +277,7 @@ namespace Equisetum2
 #endif
 
 			// 最終出力用のテクスチャを作成
-			std::shared_ptr<Texture> fontTexture = Texture::CreateBlank(imageSize.x, imageSize.y, 0, true);
+			std::shared_ptr<Texture> fontTexture = Texture::CreateBlank(imageSize.x, imageSize.y, Texture::AccessFlag::ForcedPow2);
 			if (!fontTexture)
 			{
 				EQ_THROW(u8"テクスチャの作成に失敗しました。");

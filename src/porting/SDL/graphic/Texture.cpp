@@ -109,10 +109,12 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2)
+	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag)
 	{
 		EQ_DURING
 		{
+			bool forcedPow2 = !!(flag & AccessFlag::ForcedPow2);
+
 			::glActiveTexture(GL_TEXTURE0);
 
 			// テクスチャのデリーター作成
@@ -134,31 +136,6 @@ namespace Equisetum2
 			auto width_ = forcedPow2 ? Math::NearPow2(width) : width;
 			auto height_ = forcedPow2 ? Math::NearPow2(height) : height;
 
-			int index = 0;
-			std::vector<Color> plane(width_ * height_);
-			for (auto& p : plane)
-			{
-				if (index < width_)
-				{
-					p = Color{ 255,0,0,255 };
-					index++;
-				}
-				else if (index < width_*2)
-				{
-					p = Color{ 0,255,0,255 };
-					index++;
-				}
-				else if (index < width_*3)
-				{
-					p = Color{ 0,0,0,255 };
-					index++;
-				}
-				else
-				{
-					p = Color{ 0,0,255,255 };
-				}
-			}
-
 			::glTexImage2D(
 				GL_TEXTURE_2D,
 				0,					// mipmap
@@ -168,7 +145,7 @@ namespace Equisetum2
 				0,					// border
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,
-				plane.data()//nullptr
+				nullptr
 			);
 
 			// インスタンス作成
@@ -250,7 +227,6 @@ namespace Equisetum2
 			::glTexSubImage2D(GL_TEXTURE_2D, 0, pos.x, pos.y, image->Width(), image->Height(),
 				GL_RGBA, GL_UNSIGNED_BYTE, image->Data());
 
-			Logger::OutputDebug("x %d, y %d, width %d, height %d, tex w %d, tex h %d", pos.x, pos.y, image->Width(), image->Height(), m_pImpl->m_width, m_pImpl->m_height);
 			return true;
 		}
 		EQ_HANDLER

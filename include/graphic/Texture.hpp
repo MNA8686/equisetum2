@@ -17,10 +17,11 @@ namespace Equisetum2
 			static const int Static       = (1 << 0);
 			static const int Stream       = (1 << 1);		// don't work
 			static const int RenderTarget = (1 << 2);
+			static const int ForcedPow2   = (1 << 3);
 		};
 
 		static std::shared_ptr<Texture> CreateFromImage(const std::shared_ptr<Image> image);
-		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2 = false);
+		static std::shared_ptr<Texture> CreateBlank(uint32_t width, uint32_t height, int32_t flag);
 		virtual bool Update(const Point& pos, const std::shared_ptr<Image> image);
 
 		/**
