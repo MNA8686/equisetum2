@@ -36,5 +36,7 @@ protected:
 private:
 	std::shared_ptr<TextRenderer> m_renderer;
 	std::function<void(TextRenderer*)> m_cb;
+
+	float angle = 0;
 };
 

@@ -250,8 +250,8 @@ namespace Equisetum2
 			// pivotで指定された表示位置になるようにする
 			// (左上の座標を求める)
 			auto& pivot = atlas.m_pivot;
-			const float posX = baseX - pivot.x * width;
-			const float posY = baseY - pivot.y * height;
+			const float posX = floor(baseX - pivot.x * width);
+			const float posY = floor(baseY - pivot.y * height);
 
 			// 回転なし？
 			if (m_angle == 0)

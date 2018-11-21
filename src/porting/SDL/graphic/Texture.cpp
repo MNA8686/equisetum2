@@ -134,10 +134,29 @@ namespace Equisetum2
 			auto width_ = forcedPow2 ? Math::NearPow2(width) : width;
 			auto height_ = forcedPow2 ? Math::NearPow2(height) : height;
 
+			int index = 0;
 			std::vector<Color> plane(width_ * height_);
 			for (auto& p : plane)
 			{
-				p = Color{0,0,255,64};
+				if (index < width_)
+				{
+					p = Color{ 255,0,0,255 };
+					index++;
+				}
+				else if (index < width_*2)
+				{
+					p = Color{ 0,255,0,255 };
+					index++;
+				}
+				else if (index < width_*3)
+				{
+					p = Color{ 0,0,0,255 };
+					index++;
+				}
+				else
+				{
+					p = Color{ 0,0,255,255 };
+				}
 			}
 
 			::glTexImage2D(

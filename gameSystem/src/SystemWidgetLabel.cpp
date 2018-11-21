@@ -98,6 +98,10 @@ int SystemWidgetLabel::Render(const SystemView* pView)
 	Size size = Window::Size();
 	m_renderer->SetPos({ static_cast<int32_t>(size.x * (parentPos.x + m_pos.x)), static_cast<int32_t>(size.y * (parentPos.y + m_pos.y)) });
 
+	//angle += .1f;
+	//m_renderer->SetAngle(angle);
+	//m_renderer->SetScale(0.33333f, 0.33333f);
+
 	// 有効か無効かで文字の色を変える
 	auto color = m_enable ? Color{ 5, 218, 20, 128 } : Color{ 5, 32, 20, 128 };
 	m_renderer->SetColor(color);
