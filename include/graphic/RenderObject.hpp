@@ -207,6 +207,7 @@ namespace Equisetum2
 		std::shared_ptr<SpriteRenderer> GetLetter(size_t letterNum);
 		size_t GetLetterSize() const;
 		Size GetBoxSize() const;
+		const std::u32string& GetTextU32() const;
 
 		bool Calculation();
 
