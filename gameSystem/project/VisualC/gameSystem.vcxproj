@@ -151,11 +151,27 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\include\Dashboard.cpp" />
     <ClCompile Include="..\..\src\Application.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Node.cpp" />
     <ClCompile Include="..\..\src\Object.cpp" />
     <ClCompile Include="..\..\src\Script.cpp" />
+    <ClCompile Include="..\..\src\SystemChoiceDialog.cpp" />
+    <ClCompile Include="..\..\src\SystemView.cpp" />
+    <ClCompile Include="..\..\src\SystemViewAssetTest.cpp" />
+    <ClCompile Include="..\..\src\SystemViewBGMTest.cpp" />
+    <ClCompile Include="..\..\src\SystemViewSETest.cpp" />
+    <ClCompile Include="..\..\src\SystemViewSpriteTest.cpp" />
+    <ClCompile Include="..\..\src\SystemViewTopMenu.cpp" />
+    <ClCompile Include="..\..\src\SystemWidget.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetChoice.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetCustom.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetLabel.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetMenu.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetPopView.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetPushView.cpp" />
+    <ClCompile Include="..\..\src\SystemWidgetSpin.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -163,10 +179,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Application.hpp" />
+    <ClInclude Include="..\..\include\Dashboard.hpp" />
     <ClInclude Include="..\..\include\INodeAttachment.hpp" />
     <ClInclude Include="..\..\include\Node.hpp" />
     <ClInclude Include="..\..\include\Object.hpp" />
     <ClInclude Include="..\..\include\Script.hpp" />
+    <ClInclude Include="..\..\include\SystemChoiceDialog.hpp" />
+    <ClInclude Include="..\..\include\SystemView.hpp" />
+    <ClInclude Include="..\..\include\SystemViewAssetTest.hpp" />
+    <ClInclude Include="..\..\include\SystemViewBGMTest.hpp" />
+    <ClInclude Include="..\..\include\SystemViewSETest.hpp" />
+    <ClInclude Include="..\..\include\SystemViewSpriteTest.hpp" />
+    <ClInclude Include="..\..\include\SystemViewTopMenu.hpp" />
+    <ClInclude Include="..\..\include\SystemWidget.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetChoice.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetCustom.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetLabel.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetMenu.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetPopView.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetPushView.hpp" />
+    <ClInclude Include="..\..\include\SystemWidgetSpin.hpp" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

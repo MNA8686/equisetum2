@@ -7,6 +7,9 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>
 
+#include "SystemWidgetLabel.hpp"
+#include "Dashboard.hpp"
+#include "SystemViewTopMenu.hpp"
 
 int Application::Main()
 {
@@ -32,11 +35,20 @@ int Application::Main()
 	m_fpsCounterTick = TickCounter::Create(m_sysTimer);
 	m_fpsCounter = FpsCounter::Create(m_fpsCounterTick);
 
-	bool pause = false;
-
 	m_renderer = Renderer::Create();
 
-	OnInit();
+	// ダッシュボード
+	auto view = TopMenu::Create(u8"TOP");
+	m_dashboard = Dashboard::CreateWithView(view);
+
+	// FPS
+	auto labelFps = SystemWidgetLabel::Create(u8" 0123456789/");
+	labelFps->SetPivot({ 1.0f, 0.5f });
+	labelFps->SetPos({ 0.98f, 0.95f });
+
+	bool isModeChange = true;
+	bool atDashboard = true;
+	bool pause = false;
 
 	while (!m_isQuit)
 	{
@@ -71,10 +83,54 @@ int Application::Main()
 
 		if (!isError)
 		{
-			OnUpdate();
+			if (isModeChange)
+			{
+				if (atDashboard)
+				{
+					OnQuit();
+					Node<Object>::DestroyThemAll();
+					Singleton<NodePool<Object>>::GetInstance()->Reset();
+				}
+				else
+				{
+					OnInit();
+				}
 
+				isModeChange = false;
+			}
 
-			OnDraw();
+			if (atDashboard)
+			{
+				int ret = m_dashboard->Do();
+				if (ret > 0)
+				{
+					atDashboard = false;
+					isModeChange = true;
+				}
+
+				m_renderer->SetRenderTarget(nullptr);
+				m_renderer->Clear({ 5, 32, 18, 0 });
+				m_dashboard->Render();
+			}
+			else
+			{
+				OnUpdate();
+				if (KB::KeyT.IsDown())
+				{
+					atDashboard = true;
+					isModeChange = true;
+				}
+
+				OnDraw();
+			}
+
+			// FPS表示
+			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
+			labelFps->Setlayer(Renderer::LayerMax - 1);
+			labelFps->Render(nullptr);
+
+			// レンダーキューの内容を処理する
+			m_renderer->Render();
 		}
 
 		m_renderer->Present();
@@ -122,6 +178,19 @@ void Application::Quit()
 std::shared_ptr<Renderer>& Application::GetRenderer(void)
 {
 	return m_renderer;
+}
+
+std::shared_ptr<FontManager>& Application::GetSystemFont(void)
+{
+	if (!m_fontManager)
+	{
+		int fontSize = Window::Size().y / 30;
+		String arg = String::Sprintf(u8"mgenplus-1pp-heavy?%d", fontSize);
+		
+		m_fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
+	}
+
+	return m_fontManager;
 }
 
 void Application::SetTargetFps(int32_t fps)
