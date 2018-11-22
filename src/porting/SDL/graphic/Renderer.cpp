@@ -34,7 +34,7 @@ namespace Equisetum2
 		void main(void)
 		{
 			// 光らせたり暗くしたりフェードイン・フェードアウトするための処理。 (128, 128, 128, 128)が中央値。
-			v_color = ((a_color * inv255f) - 0.5) * 2;
+			v_color = ((a_color - 128) * inv255f) * 2;
 			// UV座標
 			v_texCoord = a_texCoord;
 			// 表示座標
