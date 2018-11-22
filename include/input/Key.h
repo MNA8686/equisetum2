@@ -141,6 +141,8 @@ namespace Equisetum2
 		const Key KeyDown{ CreateKeyboardFunc(KeyCode::KEY_DOWN) };
 		const Key KeyUp{ CreateKeyboardFunc(KeyCode::KEY_UP) };
 
+		const Key KeyTab{ CreateKeyboardFunc(KeyCode::KEY_TAB) };
+		const Key KeyEnter{ CreateKeyboardFunc(KeyCode::KEY_RETURN) };
 		const Key KeyEscape{ CreateKeyboardFunc(KeyCode::KEY_ESCAPE) };
 	};
 }
