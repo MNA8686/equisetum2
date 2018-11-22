@@ -204,7 +204,7 @@ namespace Equisetum2
 		* @param separator スペースとして認識するUTF8文字列
 		* @return トリムされた文字列
 		*/
-		String trim(const String& separator = " \t")
+		String trim(const String& separator = " \t") const
 		{
 			auto str32 = to_u32();
 			auto isSpace32 = separator.to_u32();
@@ -232,7 +232,7 @@ namespace Equisetum2
 		* @param compressBlank 真の場合、空白を無視する
 		* @return 分割された文字列の配列
 		*/
-		std::vector<String> split(const String& separator = " \t", bool compressBlank = true)
+		std::vector<String> split(const String& separator = " \t", bool compressBlank = true) const
 		{
 			auto str32 = to_u32();
 			auto isSpace32 = separator.to_u32();
