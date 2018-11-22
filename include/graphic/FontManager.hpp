@@ -26,6 +26,17 @@ namespace Equisetum2
 		Optional<std::map<char32_t, stGlyphInfo>> GetGlyphInfoBySampleString(const String& sampleStr);
 		std::shared_ptr<Sprite> MakeSpriteByGlyphInfo(const std::map<char32_t, stGlyphInfo>& mapGlyphInfo, Color inColor, Size maxSize = { 1024, 1024 });
 
+		/**
+		* @brief イメージのIDを設定する
+		*/
+		virtual void SetIdentify(const String& id);
+
+		/**
+		* @brief イメージのIDを取得する
+		* @return イメージのID
+		*/
+		virtual String Identify() const;
+
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
@@ -39,6 +50,8 @@ namespace Equisetum2
 		String m_id;		/// ID
 		int m_fontSize = 16;		/// フォントサイズ
 		//----------------------------------------------
+
+		std::shared_ptr<IStream> m_stream;
 
 		FontManager(const FontManager&) = delete;				// コピーコンストラクタ封じ
 		FontManager& operator= (const FontManager&) = delete;	// コピーコンストラクタ封じ
