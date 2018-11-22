@@ -1,6 +1,7 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "SystemViewAssetTest.hpp"
+#include "SystemViewTextureTest.hpp"
 #include "SystemViewSpriteTest.hpp"
 #include "SystemViewBGMTest.hpp"
 #include "SystemViewSETest.hpp"
@@ -30,6 +31,11 @@ int AssetTest::Enter()
 
 	auto pop = SystemWidgetPopView::Create(u8"戻る");
 	menu->SetWidget(pop);
+
+	auto textureTest = SystemWidgetPushView::Create(u8"テクスチャテスト", [this]()->std::shared_ptr<SystemView> {
+		return SystemViewTextureTest::Create(u8"テクスチャテスト");
+	});
+	menu->SetWidget(textureTest);
 
 	auto spriteTest = SystemWidgetPushView::Create(u8"スプライトテスト", [this]()->std::shared_ptr<SystemView> {
 		return SystemViewSpriteTest::Create(u8"スプライトテスト");
