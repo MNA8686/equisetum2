@@ -109,10 +109,12 @@ namespace Equisetum2
 		return nullptr;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag, bool forcedPow2)
+	std::shared_ptr<Texture> Texture::CreateBlank(uint32_t width, uint32_t height, int32_t flag)
 	{
 		EQ_DURING
 		{
+			bool forcedPow2 = !!(flag & AccessFlag::ForcedPow2);
+
 			::glActiveTexture(GL_TEXTURE0);
 
 			// テクスチャのデリーター作成
@@ -167,6 +169,10 @@ namespace Equisetum2
 
 			if (inst->m_flag & AccessFlag::RenderTarget)
 			{
+				GLint framebuffer = -1;
+				// 現在のフレームバッファを保存
+				glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+
 				auto spFBO = std::shared_ptr<GLuint>(new GLuint,
 					[](GLuint* pID) {
 					::glDeleteFramebuffers(1, pID);
@@ -184,6 +190,9 @@ namespace Equisetum2
 				{
 					EQ_THROW(u8"レンダーターゲットの切り替えに失敗しました。");
 				}
+
+				// フレームバッファを復元
+				glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 			}
 
 			return inst;
