@@ -19,6 +19,34 @@ std::shared_ptr<SystemViewSpriteTest> SystemViewSpriteTest::Create(const String 
 	return p;
 }
 
+void SystemViewSpriteTest::LoadSprite()
+{
+	if (m_item.empty())
+	{
+		return;
+	}
+
+	// スプライトレンダラ作成
+	m_spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::SPRITE));
+	if (m_spriteRenderer)
+	{
+		// スプライト作成
+		std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
+		if (sprite)
+		{
+			m_spriteRenderer->SetSprite(sprite);
+			m_spriteRenderer->SetBlendMode(BlendMode::Blend);
+			m_spritePos = Window::Size() / 2;
+			m_spriteRenderer->SetPos(m_spritePos);
+			m_ptr = 0;
+
+			// アニメーションパターン数設定
+			size_t animSize = sprite->GetAnimAtlas().size();
+			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+		}
+	}
+}
+
 int SystemViewSpriteTest::Enter()
 {
 	auto menu = SystemWidgetMenu::Create(u8"メニュー");
@@ -48,28 +76,17 @@ int SystemViewSpriteTest::Enter()
 	}, [this](int32_t index, const String& item) {
 		if (index >= 0)
 		{
-			// スプライトレンダラ作成
-			m_spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::SPRITE));
-			if (m_spriteRenderer)
-			{
-				// スプライト作成
-				std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(item);
-				if (sprite)
-				{
-					m_spriteRenderer->SetSprite(sprite);
-					m_spriteRenderer->SetBlendMode(BlendMode::Blend);
-					m_spritePos = Window::Size() / 2;
-					m_spriteRenderer->SetPos(m_spritePos);
-					m_ptr = 0;
-
-					// アニメーションパターン数設定
-					size_t animSize = sprite->GetAnimAtlas().size();
-					m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
-				}
-			}
+			m_item = item;
+			LoadSprite();
 		}
 	});
 	menu->SetWidget(choice);
+
+	auto play = SystemWidgetCustom::Create(u8"リロード", [this]()->bool {
+		LoadSprite();
+		return false;
+	});
+	menu->SetWidget(play);
 
 	auto rate = SystemWidgetSpin::Create(u8"拡大率(%)", [this](int32_t val) {
 		m_rate = val;
