@@ -237,7 +237,7 @@ namespace Equisetum2
 								stSpriteAnimAtlas anim{};
 
 								anim.m_point.x = tmp.point.x + tmp.src.x * x;
-								anim.m_point.y = tmp.point.y + tmp.src.x * y;
+								anim.m_point.y = tmp.point.y + tmp.src.y * y;
 
 								anim.m_srcSize = tmp.src;
 								anim.m_pivot = tmp.pivot;
