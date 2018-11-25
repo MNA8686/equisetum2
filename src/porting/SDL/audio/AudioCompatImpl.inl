@@ -34,8 +34,8 @@ namespace Equisetum2
 
 		virtual ~SDLMixer()
 		{
-			Mix_Quit();
 			Mix_CloseAudio();
+			Mix_Quit();
 			SDL_QuitSubSystem(SDL_INIT_AUDIO);
 		}
 
