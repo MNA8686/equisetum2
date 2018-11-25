@@ -4,6 +4,7 @@
 #include "util/SharedPool.hpp"
 #include "stream/FileStream.h"
 #include "fs/Path.hpp"
+#include "fs/File.hpp"
 
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
@@ -461,10 +462,27 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			auto inStream = FileStream::CreateFromPath(MakeNativePath("bgm", id, ".ogg"));
+			const String exts[] = { ".ogg", ".mp3", ".wav" };
+			std::shared_ptr<FileStream> inStream;
+
+			for (auto& ext : exts)
+			{
+				const String path = MakeNativePath("bgm", id, ext);
+
+				if (File::Exists(path))
+				{
+					inStream = FileStream::CreateFromPath(path);
+					if (!inStream)
+					{
+						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+					}
+					break;
+				}
+			}
+
 			if (!inStream)
 			{
-				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+				EQ_THROW(String::Sprintf(u8"%sが存在しません。", id.c_str()));
 			}
 
 			auto bgm = BGM::CreateFromStream(inStream);
@@ -490,10 +508,27 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
-			auto inStream = FileStream::CreateFromPath(MakeNativePath("se", id, ".wav"));
+			const String exts[] = { ".ogg", ".mp3", ".wav" };
+			std::shared_ptr<FileStream> inStream;
+
+			for (auto& ext : exts)
+			{
+				const String path = MakeNativePath("se", id, ext);
+
+				if (File::Exists(path))
+				{
+					inStream = FileStream::CreateFromPath(path);
+					if (!inStream)
+					{
+						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+					}
+					break;
+				}
+			}
+
 			if (!inStream)
 			{
-				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+				EQ_THROW(String::Sprintf(u8"%sが存在しません。", id.c_str()));
 			}
 
 			auto se = SE::CreateFromStream(inStream);

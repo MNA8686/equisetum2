@@ -37,9 +37,17 @@ int SystemViewBGMTest::Enter()
 		{
 			for (auto bgm : *bgmList)
 			{
-				if (Path::GetExtension(bgm) == u8".ogg")
+				const String ext = Path::GetExtension(bgm);
+				if (ext == ".ogg" ||
+					ext == ".mp3" ||
+					ext == ".wav")
 				{
-					test.push_back(Path::GetFileNameWithoutExtension(bgm));
+					const String nameWithoutExt = Path::GetFileNameWithoutExtension(bgm);
+					auto result = std::find(test.begin(), test.end(), nameWithoutExt);
+					if (result == test.end())
+					{
+						test.push_back(nameWithoutExt);
+					}
 				}
 			}
 		}

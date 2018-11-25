@@ -37,9 +37,17 @@ int SystemViewSETest::Enter()
 		{
 			for (auto se : *seList)
 			{
-				if (Path::GetExtension(se) == u8".wav")
+				const String ext = Path::GetExtension(se);
+				if (ext == ".ogg" ||
+					ext == ".mp3" ||
+					ext == ".wav")
 				{
-					test.push_back(Path::GetFileNameWithoutExtension(se));
+					const String nameWithoutExt = Path::GetFileNameWithoutExtension(se);
+					auto result = std::find(test.begin(), test.end(), nameWithoutExt);
+					if (result == test.end())
+					{
+						test.push_back(nameWithoutExt);
+					}
 				}
 			}
 		}
