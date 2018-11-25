@@ -73,6 +73,7 @@
     <PostBuildEvent>
       <Command>md "..\..\lib\win32\dll"
 md "..\..\lib\win32\lib"
+copy "..\..\external\dep\win32\VisualStudio2015\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\lib\win32\dll"
@@ -114,10 +115,11 @@ copy "debug\libEquisetum2_d.lib" "..\..\lib\win32\lib"</Command>
     <PostBuildEvent>
       <Command>md "..\..\lib\win32\dll"
 md "..\..\lib\win32\lib"
-copy "..\..\\external\dep\win32\SDL2\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\external\dep\win32\VisualStudio2015\dll\*" "..\..\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\external\dep\win32\SDL2_image\dll\*" "..\..\\lib\win32\dll"
-copy "..\..\\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
-copy "..\..\\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_ttf\dll\*" "..\..\\lib\win32\dll"
+copy "..\..\external\dep\win32\SDL2_mixer\dll\*" "..\..\\lib\win32\dll"
 copy "..\..\external\dep\win32\glew\dll\*" "..\..\lib\win32\dll"
 copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     </PostBuildEvent>
