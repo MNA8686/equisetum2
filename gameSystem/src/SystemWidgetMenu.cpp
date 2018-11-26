@@ -5,7 +5,7 @@ std::shared_ptr<SystemWidgetMenu> SystemWidgetMenu::Create(const String& label)
 {
 	auto p = std::make_shared<SystemWidgetMenu>();
 
-	p->m_rectRenderer = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+	p->m_rectRenderer = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
 	if (!p->m_rectRenderer)
 	{
 	//	EQ_THROW(u8"レンダラの作成に失敗しました。");

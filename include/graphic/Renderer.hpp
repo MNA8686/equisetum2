@@ -34,15 +34,51 @@ namespace Equisetum2
 		bool SetViewport(const Rect& rect);
 		void SetClipRect(const Rect& rect = {});
 
-		std::shared_ptr<RenderObject> CreateRenderObject(RenderType type, int32_t subType=0);
-
 		bool Clear(const Color& color);
 		bool Present(bool waitVsync = true /* don't work */);
 
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
+		template<typename T>
+		std::shared_ptr<T> CreateRenderObject()
+		{
+			return nullptr;
+		}
+
+		template<>
+		std::shared_ptr<SpriteRenderer> CreateRenderObject()
+		{
+			return std::dynamic_pointer_cast<SpriteRenderer>(_CreateRenderObject(RenderType::SPRITE));
+		}
+
+		template<>
+		std::shared_ptr<TextRenderer> CreateRenderObject()
+		{
+			return std::dynamic_pointer_cast<TextRenderer>(_CreateRenderObject(RenderType::TEXT));
+		}
+
+		template<>
+		std::shared_ptr<LineRenderer> CreateRenderObject()
+		{
+			return std::dynamic_pointer_cast<LineRenderer>(_CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::LINE));
+		}
+
+		template<>
+		std::shared_ptr<RectRenderer> CreateRenderObject()
+		{
+			return std::dynamic_pointer_cast<RectRenderer>(_CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+		}
+
+		template<>
+		std::shared_ptr<CircleRenderer> CreateRenderObject()
+		{
+			return std::dynamic_pointer_cast<CircleRenderer>(_CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::CIRCLE));
+		}
+
 	private:
+
+		std::shared_ptr<RenderObject> _CreateRenderObject(RenderType type, int32_t subType=0);
 
 		std::vector<RenderObject*> m_vRenderObject[LayerMax];		// レンダーキュー
 		int32_t m_renderObjectIndex[LayerMax]{0};					/// レンダーキューのサイズ

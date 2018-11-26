@@ -637,7 +637,7 @@ namespace Equisetum2
 		}
 	}
 
-	std::shared_ptr<RenderObject> Renderer::CreateRenderObject(RenderType type, int32_t subType)
+	std::shared_ptr<RenderObject> Renderer::_CreateRenderObject(RenderType type, int32_t subType)
 	{
 		std::shared_ptr<RenderObject> obj;
 

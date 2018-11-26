@@ -27,7 +27,7 @@ void SystemViewSpriteTest::LoadSprite()
 	}
 
 	// スプライトレンダラ作成
-	m_spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::SPRITE));
+	m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
 	if (m_spriteRenderer)
 	{
 		// スプライト作成

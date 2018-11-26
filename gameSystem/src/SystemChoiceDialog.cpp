@@ -49,7 +49,7 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 			};
 			inst->m_rectBorderPixel = rectBorderPixel;
 			
-			inst->m_rectRendererBorder = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+			inst->m_rectRendererBorder = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
 			inst->m_rectRendererBorder->SetBlendMode(BlendMode::Blend);
 			inst->m_rectRendererBorder->SetColor(Color{ 0, 180, 0, 200 });
 			inst->m_rectRendererBorder->SetRect(inst->m_rectBorderPixel, true);
@@ -67,7 +67,7 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 			};
 			inst->m_rectInnerFramePixel = rectInnerFramePixel;
 			
-			inst->m_rectRendererInnerFrame = std::dynamic_pointer_cast<RectRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::PRIMITIVE, PrimitiveType::RECT));
+			inst->m_rectRendererInnerFrame = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
 			inst->m_rectRendererInnerFrame->SetBlendMode(BlendMode::Blend);
 			inst->m_rectRendererInnerFrame->SetColor(Color{ 32, 200, 32, 200 });
 			inst->m_rectRendererInnerFrame->SetRect(inst->m_rectInnerFramePixel, true);

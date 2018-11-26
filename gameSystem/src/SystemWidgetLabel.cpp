@@ -33,7 +33,7 @@ std::shared_ptr<SystemWidgetLabel> SystemWidgetLabel::Create(const String & labe
 
 SystemWidgetLabel::SystemWidgetLabel()
 {
-	m_renderer = std::dynamic_pointer_cast<TextRenderer>(GetApplication()->GetRenderer()->CreateRenderObject(RenderType::TEXT));
+	m_renderer = GetApplication()->GetRenderer()->CreateRenderObject<TextRenderer>();
 	m_renderer->SetPivot({ 0, 0.5f });
 	m_renderer->SetBlendMode(BlendMode::Blend);
 }

@@ -403,7 +403,7 @@ namespace Equisetum2
 				if (!spriteRenderer)
 				{
 					// インスタンス作成
-					spriteRenderer = std::dynamic_pointer_cast<SpriteRenderer>(pRenderer->CreateRenderObject(RenderType::SPRITE));
+					spriteRenderer = pRenderer->CreateRenderObject<SpriteRenderer>();
 				}
 
 				if (m_bitmapFont)
