@@ -38,11 +38,13 @@ SystemWidgetLabel::SystemWidgetLabel()
 	m_renderer->SetBlendMode(BlendMode::Blend);
 }
 
-bool SystemWidgetLabel::SetPreset(const String & preset)
+bool SystemWidgetLabel::SetPreset(const String & preset, const std::shared_ptr<FontManager> fontManager)
 {
 	EQ_DURING
 	{
-		std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(preset, Color{0xff, 0xff, 0xff, 0xff});
+		auto font = fontManager ? fontManager : GetApplication()->GetSystemFont();
+
+		std::shared_ptr<BitmapFont> bitmapFont = font->MakeBitmapFont(preset, Color{0xff, 0xff, 0xff, 0xff});
 		if (!bitmapFont)
 		{
 			EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");

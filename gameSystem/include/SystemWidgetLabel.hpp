@@ -14,7 +14,7 @@ public:
 	~SystemWidgetLabel() = default;
 
 	// 使用する文字一覧をセットする
-	bool SetPreset(const String& preset);
+	bool SetPreset(const String& preset, const std::shared_ptr<FontManager> fontManager=nullptr);
 	// 使用する文字一覧をセットする
 	bool SetPreset(std::shared_ptr<BitmapFont> bitmapFont);
 	// テキストを設定する

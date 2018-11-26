@@ -1,6 +1,7 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
 #include "SystemViewAssetTest.hpp"
+#include "SystemViewFontTest.hpp"
 #include "SystemViewTextureTest.hpp"
 #include "SystemViewSpriteTest.hpp"
 #include "SystemViewBGMTest.hpp"
@@ -41,6 +42,11 @@ int AssetTest::Enter()
 		return SystemViewSpriteTest::Create(u8"スプライトテスト");
 	});
 	menu->SetWidget(spriteTest);
+
+	auto fontTest = SystemWidgetPushView::Create(u8"フォントテスト", [this]()->std::shared_ptr<SystemView> {
+		return SystemViewFontTest::Create(u8"フォントテスト");
+	});
+	menu->SetWidget(fontTest);
 
 	auto bgmTest = SystemWidgetPushView::Create(u8"BGMテスト", [this]()->std::shared_ptr<SystemView> {
 		return SystemViewBGMTest::Create(u8"BGMテスト");
