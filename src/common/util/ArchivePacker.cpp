@@ -13,7 +13,7 @@
 
 namespace Equisetum2
 {
-	std::shared_ptr<ArchivePacker> ArchivePacker::CreateFromStream(std::shared_ptr<IStream> outStream)
+	std::shared_ptr<ArchivePacker> ArchivePacker::CreateFromStream(std::shared_ptr<IStream> outStream, const String& secretKey)
 	{
 		std::shared_ptr<ArchivePacker> inst;
 
@@ -57,6 +57,8 @@ namespace Equisetum2
 				EQ_THROW(u8"初期化に失敗しました。");
 			}
 
+			inst_->m_secretKey = secretKey;
+		
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -106,7 +108,7 @@ namespace Equisetum2
 
 	bool ArchivePacker::SetCrypt(uint32_t crypt)
 	{
-		m_crypt = crypt;
+		m_isCrypt = crypt;
 		return true;
 	}
 
@@ -139,16 +141,21 @@ namespace Equisetum2
 			}
 
 			// ファイル情報を書き込む
-			if (!m_textWriterStream->WriteLine(String::Sprintf(u8"id=%s length=%lld crypt=%d", id.c_str(), inStream->Length(), m_crypt)))
+			if (!m_textWriterStream->WriteLine(String::Sprintf(u8"id=%s length=%lld crypt=%d", id.c_str(), inStream->Length(), m_isCrypt)))
 			{
 				EQ_THROW(u8"ファイル情報の書き込みに失敗しました。");
 			}
 
 			std::shared_ptr<IStream> cryptStream;
-			if (m_crypt == 1)
+			if (m_isCrypt == 1)
 			{
+				if (m_secretKey.empty())
+				{
+					EQ_THROW(u8"キーが設定されていません。");
+				}
+
 				// 暗号化を適用
-				cryptStream = CryptStream::CreateFromStream(inStream, id);
+				cryptStream = CryptStream::CreateFromStream(inStream, id + m_secretKey);
 			}
 			else
 			{
@@ -194,7 +201,7 @@ namespace Equisetum2
 			}
 
 			// HMAC算出
-			auto hmac = SHA256::HMAC(partial, "EquinoxDevelopment");
+			auto hmac = SHA256::HMAC(partial, m_secretKey);
 			if (!hmac)
 			{
 				EQ_THROW(u8"HMACの算出に失敗しました。");

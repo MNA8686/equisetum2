@@ -3,6 +3,7 @@
 using namespace Equisetum2;
 
 static const char* archiveName = "test.rom";
+static const char* secretKey = "EquinoxDevelopment";
 
 //#define USE_LARGE_FILE
 
@@ -12,7 +13,7 @@ TEST(Archive, MakeArchive)
 	auto outStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName), FileStream::Method::Read | FileStream::Method::Write | FileStream::Method::Create);
 	ASSERT_TRUE(outStream);
 
-	auto packer = ArchivePacker::CreateFromStream(outStream);
+	auto packer = ArchivePacker::CreateFromStream(outStream, secretKey);
 	ASSERT_TRUE(outStream);
 
 	ASSERT_TRUE(packer->SetCrypt(0));
@@ -78,8 +79,11 @@ TEST(Archive, Check)
 	auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
 	ASSERT_TRUE(inStream);
 
-	auto check = ArchiveAccessor::CheckFromStream(inStream);
+	auto check = ArchiveAccessor::CheckFromStream(inStream, secretKey);
 	ASSERT_TRUE(check);
+
+	auto check2 = ArchiveAccessor::CheckFromStream(inStream, "tekitou");
+	ASSERT_FALSE(check2);
 }
 
 // アーカイブから取り出したファイルが正しいかチェック
@@ -94,7 +98,7 @@ TEST(Archive, verify)
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		ASSERT_TRUE(cmp->Length() == partial->Length());
@@ -139,7 +143,7 @@ TEST(Archive, verify)
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		Logger::OutputError(partial->Url().c_str());
@@ -167,7 +171,7 @@ TEST(Archive, verify)
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		Logger::OutputError(partial->Url().c_str());
@@ -195,7 +199,7 @@ TEST(Archive, verify)
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		Logger::OutputError(partial->Url().c_str());
@@ -221,7 +225,7 @@ TEST(Archive, verify)
 
 		const String id = "empty.txt";
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		ASSERT_EQ(0, partial->Length());
@@ -234,7 +238,7 @@ TEST(Archive, verify)
 		ASSERT_TRUE(inStream);
 
 		const String id = "";
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_FALSE(partial);
 	}
 	{
@@ -242,7 +246,7 @@ TEST(Archive, verify)
 		ASSERT_TRUE(inStream);
 
 		const String id = "notfound";
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
 		ASSERT_FALSE(partial);
 	}
 }
@@ -260,7 +264,7 @@ TEST(Archive, MemoryStream)
 
 	ASSERT_EQ(begin, outStream->Seek(begin, SeekOrigin::Begin));
 
-	auto packer = ArchivePacker::CreateFromStream(outStream);
+	auto packer = ArchivePacker::CreateFromStream(outStream, secretKey);
 	ASSERT_TRUE(outStream);
 
 	ASSERT_TRUE(packer->SetCrypt(0));
@@ -299,7 +303,7 @@ TEST(Archive, MemoryStream)
 	{
 		auto memArchive = PartialStream::CreateFromStream(outStream, begin, end - begin);
 		ASSERT_TRUE(memArchive);
-		auto check = ArchiveAccessor::CheckFromStream(memArchive);
+		auto check = ArchiveAccessor::CheckFromStream(memArchive, secretKey);
 		ASSERT_TRUE(check);
 	}
 
@@ -311,7 +315,7 @@ TEST(Archive, MemoryStream)
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(outStream, id);
+		auto partial = ArchiveAccessor::FindFromStream(outStream, id, secretKey);
 		ASSERT_TRUE(partial);
 
 		Logger::OutputError(partial->Url().c_str());

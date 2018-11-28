@@ -25,7 +25,7 @@ namespace Equisetum2
 		* @param key 暗号キー
 		* @return 暗号化ストリームインスタンス 失敗した場合はnullptrを返す
 		*/
-		static std::shared_ptr<CryptStream> CreateFromStream(std::shared_ptr<IStream> stream, const String& key);
+		static std::shared_ptr<CryptStream> CreateFromStream(std::shared_ptr<IStream> stream, const String& secretKey);
 
 		virtual bool CanRead() const override;
 		virtual bool CanSeek() const override;

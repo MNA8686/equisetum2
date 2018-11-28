@@ -38,9 +38,10 @@ namespace Equisetum2
 		* @brief アーカイブ出力インスタンスを作成する。<br>
 		* @brief このメソッドを実行すると、出力ストリームにファイルヘッダが書き込まれる。
 		* @param outStream 出力ストリーム 書き込み属性、読み出し属性、シーク属性が必要
+		* @param secretKey 秘密鍵
 		* @return アーカイブ出力インスタンス
 		*/
-		static std::shared_ptr<ArchivePacker> CreateFromStream(std::shared_ptr<IStream> outStream);
+		static std::shared_ptr<ArchivePacker> CreateFromStream(std::shared_ptr<IStream> outStream, const String& secretKey);
 
 		/**
 		* @brief ファイルの暗号化方式を設定する
@@ -71,7 +72,8 @@ namespace Equisetum2
 		std::shared_ptr<IStream> m_stream;		/// アーカイブファイル出力ストリーム
 		std::shared_ptr<TextWriter> m_textWriterStream;		/// テキストファイル出力ストリーム
 		int64_t m_beginPos = 0;		/// アーカイブ出力開始位置
-		uint32_t m_crypt = 0;		/// 暗号化種別
+		uint32_t m_isCrypt = 0;		/// 暗号化種別
+		String m_secretKey;			/// 暗号化キー
 		bool Init();
 	};
 }

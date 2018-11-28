@@ -65,7 +65,7 @@ namespace Equisetum2
 		return result;
 	}
 
-	std::shared_ptr<CryptStream> CryptStream::CreateFromStream(std::shared_ptr<IStream> stream, const String& key)
+	std::shared_ptr<CryptStream> CryptStream::CreateFromStream(std::shared_ptr<IStream> stream, const String& secretKey)
 	{
 		std::shared_ptr<CryptStream> inst;
 
@@ -76,7 +76,7 @@ namespace Equisetum2
 				EQ_THROW(u8"有効なストリームではありません。");
 			}
 
-			if (key.empty())
+			if (secretKey.empty())
 			{
 				EQ_THROW(u8"キーが設定されていません。");
 			}
@@ -93,7 +93,7 @@ namespace Equisetum2
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
 
-			auto mem = MemoryStream::CreateFromBuf(key.c_str(), key.size());
+			auto mem = MemoryStream::CreateFromBuf(secretKey.c_str(), secretKey.size());
 			if (!mem)
 			{
 				EQ_THROW(u8"メモリストリームの作成に失敗しました。");

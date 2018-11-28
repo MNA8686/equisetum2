@@ -14,7 +14,7 @@
 
 namespace Equisetum2
 {
-	bool ArchiveAccessor::EnumerateFiles(std::shared_ptr<IStream> stream, const std::function<bool(const ArchiveMeta&, std::shared_ptr<IStream>)> cb)
+	bool ArchiveAccessor::EnumerateFiles(std::shared_ptr<IStream> stream, const std::function<bool(const ArchiveMeta&, std::shared_ptr<IStream>)> cb, const String& secretKey)
 	{
 		auto ret = false;
 
@@ -131,7 +131,7 @@ namespace Equisetum2
 				if (meta.crypt == 1)
 				{
 					// 暗号化を適用
-					stm = CryptStream::CreateFromStream(partialStream, meta.id);
+					stm = CryptStream::CreateFromStream(partialStream, meta.id + secretKey);
 				}
 				else
 				{
@@ -173,7 +173,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	std::shared_ptr<IStream> ArchiveAccessor::FindFromStream(std::shared_ptr<IStream> stream, const String& id)
+	std::shared_ptr<IStream> ArchiveAccessor::FindFromStream(std::shared_ptr<IStream> stream, const String& id, const String& secretKey)
 	{
 		std::shared_ptr<IStream> ret;
 
@@ -190,7 +190,7 @@ namespace Equisetum2
 					ret = stream;
 				}
 				return !!ret;
-			}))
+			}, secretKey))
 			{
 				EQ_THROW(u8"ファイルの列挙に失敗しました。");
 			}
@@ -202,159 +202,9 @@ namespace Equisetum2
 		EQ_END_HANDLER
 
 		return ret;
-#if 0
-		std::shared_ptr<IStream> ret;
-
-		EQ_DURING
-		{
-			if (!stream)
-			{
-				EQ_THROW(u8"有効なストリームではありません。");
-			}
-
-			if (!stream->CanRead())
-			{
-				EQ_THROW(u8"リード属性が必要です。");
-			}
-
-			if (!stream->CanSeek())
-			{
-				EQ_THROW(u8"シーク属性が必要です。");
-			}
-
-			if (id.empty())
-			{
-				EQ_THROW(u8"idが設定されていません。");
-			}
-
-			auto textReader = TextReader::CreateFromStream(stream);
-			if (!textReader)
-			{
-				EQ_THROW(u8"テキストリーダーの作成に失敗しました。");
-			}
-
-			// ヘッダチェック
-			{
-				auto optRead = textReader->ReadLine();
-				if (!optRead)
-				{
-					EQ_THROW(u8"ファイルヘッダの読み出しに失敗しました。");
-				}
-				if (*optRead != u8"Equ 2.0")
-				{
-					EQ_THROW(u8"ファイルヘッダが見つかりません。");
-				}
-			}
-
-			while (true)
-			{
-				// ファイル情報読み出し
-				auto optMeta = textReader->ReadLine();
-				if (!optMeta)
-				{
-					EQ_THROW(u8"ファイル情報の読み出しに失敗しました。");
-				}
-				if ((*optMeta).substr(0, 5) == u8"%%EOF")
-				{
-					EQ_THROW(String::Sprintf(u8"id %s は見つかりませんでした。", id.c_str()));
-				}
-
-				ArchiveMeta meta;
-
-				// ファイル情報はこのフォーマットで入っているのでバラす
-				// "id=%s length=%lld crypt=%d"
-				auto vSplit = (*optMeta).split();
-				for (auto& elem : vSplit)
-				{
-					auto hash = elem.split("=");
-					if (hash.size() != 2)
-					{
-						EQ_THROW(u8"ファイル情報が不正です。");
-					}
-
-					if (hash[0] == "id")
-					{
-						meta.id = hash[1];
-					}
-					else if (hash[0] == "length")
-					{
-						meta.length = std::stoll(hash[1]);
-					}
-					else if (hash[0] == "crypt")
-					{
-						meta.crypt = std::stoi(hash[1]);
-					}
-				}
-
-				// "stream" チェック
-				auto optBegin = textReader->ReadLine();
-				if (!optBegin || (*optBegin) != "stream")
-				{
-					EQ_THROW(u8"streamの開始が見つかりません。");
-				}
-
-				// 目的のファイルかどうかチェック
-				if (meta.id == id)
-				{
-					// 不正チェック
-					if (meta.length < 0)
-					{
-						EQ_THROW(u8"lengthが不正です。");
-					}
-					if (meta.crypt < 0)
-					{
-						EQ_THROW(u8"cryptが不正です。");
-					}
-
-					// ファイルの中身を単独のストリームとして扱えるようにする
-					auto partialStream = PartialStream::CreateFromStream(stream, stream->Position(), meta.length);
-					if (!partialStream)
-					{
-						EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
-					}
-
-					if (meta.crypt == 1)
-					{
-						// 暗号化を適用
-						ret = CryptStream::CreateFromStream(partialStream, id);
-					}
-					else
-					{
-						// 暗号化されていない場合はパーシャルストリームをそのまま渡す
-						ret = partialStream;
-					}
-					break;
-				}
-
-				// ファイルの中身を読み飛ばす
-				stream->Seek(meta.length, SeekOrigin::Current);
-
-				// 改行読み飛ばし
-				auto optCRLF = textReader->ReadLine();
-				if (!optCRLF || !(*optCRLF).empty())
-				{
-					EQ_THROW(u8"予期しないデータを検出しました。");
-				}
-
-				// "endstream" チェック
-				auto optEnd = textReader->ReadLine();
-				if (!optEnd || (*optEnd) != "endstream")
-				{
-					EQ_THROW(u8"streamの終端が見つかりません。");
-				}
-			}
-		}
-		EQ_HANDLER
-		{
-			Logger::OutputError(EQ_GET_HANDLER().what());
-		}
-		EQ_END_HANDLER
-
-		return ret;
-#endif
 	}
 
-	bool ArchiveAccessor::CheckFromStream(std::shared_ptr<IStream> stream)
+	bool ArchiveAccessor::CheckFromStream(std::shared_ptr<IStream> stream, const String& secretKey)
 	{
 		auto ret = false;
 
@@ -429,7 +279,7 @@ namespace Equisetum2
 			}
 
 			// このファイルのHMACを算出する
-			auto optHMAC2 = SHA256::HMAC(partial, "EquinoxDevelopment");
+			auto optHMAC2 = SHA256::HMAC(partial, secretKey);
 			if (!optHMAC2)
 			{
 				EQ_THROW(u8"HMACの算出に失敗しました。");
