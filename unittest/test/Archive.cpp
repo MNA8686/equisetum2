@@ -10,7 +10,7 @@ static const char* secretKey = "EquinoxDevelopment";
 // アーカイブ作成テスト
 TEST(Archive, MakeArchive)
 {
-	auto outStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName), FileStream::Method::Read | FileStream::Method::Write | FileStream::Method::Create);
+	auto outStream = FileStream::NewFileFromPath(Path::GetFullPath(archiveName));
 	ASSERT_TRUE(outStream);
 
 	auto packer = ArchivePacker::CreateFromStream(outStream, secretKey);
