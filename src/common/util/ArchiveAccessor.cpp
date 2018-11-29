@@ -14,55 +14,124 @@
 
 namespace Equisetum2
 {
-	bool ArchiveAccessor::EnumerateFiles(std::shared_ptr<IStream> stream, const std::function<bool(const ArchiveMeta&)> cb)
+	std::shared_ptr<ArchiveAccessor> ArchiveAccessor::CreateFromStream(std::shared_ptr<IStream> inStream, const String& secretKey)
+	{
+		std::shared_ptr<ArchiveAccessor> inst;
+
+		EQ_DURING
+		{
+			if (!inStream)
+			{
+				EQ_THROW(u8"有効なストリームではありません。");
+			}
+
+			if (!inStream->CanRead())
+			{
+				EQ_THROW(u8"リード属性が必要です。");
+			}
+
+			if (!inStream->CanSeek())
+			{
+				EQ_THROW(u8"シーク属性が必要です。");
+			}
+
+			auto inst_ = std::make_shared<ArchiveAccessor>(inStream, secretKey);
+
+			if (!inst_)
+			{
+				EQ_THROW(u8"インスタンスの作成に失敗しました。");
+			}
+
+			if (!inst_->Init())
+			{
+				EQ_THROW(u8"初期化に失敗しました。");
+			}
+
+			inst = inst_;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return inst;
+	}
+
+	ArchiveAccessor::ArchiveAccessor(std::shared_ptr<IStream> stream, const String& secretKey)
+	{
+		m_stream = stream;
+		m_secretKey = secretKey;
+		m_beginPos = m_stream->Position();
+	}
+
+	bool Equisetum2::ArchiveAccessor::Init()
 	{
 		auto ret = false;
 
 		EQ_DURING
 		{
-			if (!stream)
+			// ストリームの先頭へ移動
+			int64_t offset = m_stream->Seek(m_beginPos, SeekOrigin::Begin);
+			if (offset != m_beginPos)
 			{
-				EQ_THROW(u8"有効なストリームではありません。");
+				EQ_THROW(u8"シークに失敗しました。");
 			}
 
-			if (!stream->CanRead())
-			{
-				EQ_THROW(u8"リード属性が必要です。");
-			}
-
-			if (!stream->CanSeek())
-			{
-				EQ_THROW(u8"シーク属性が必要です。");
-			}
-
-			if (!cb)
-			{
-				EQ_THROW(u8"コールバックが設定されていません。");
-			}
-
-			auto textReader = TextReader::CreateFromStream(stream);
-			if (!textReader)
+			// テキストリーダー作成
+			m_textReaderStream = TextReader::CreateFromStream(m_stream);
+			if (!m_textReaderStream)
 			{
 				EQ_THROW(u8"テキストリーダーの作成に失敗しました。");
 			}
 
 			// ヘッダチェック
+			auto optRead = m_textReaderStream->ReadLine();
+			if (!optRead)
 			{
-				auto optRead = textReader->ReadLine();
-				if (!optRead)
-				{
-					EQ_THROW(u8"ファイルヘッダの読み出しに失敗しました。");
-				}
-				if (*optRead != u8"Equ 2.0")
-				{
-					EQ_THROW(u8"ファイルヘッダが見つかりません。");
-				}
+				EQ_THROW(u8"ファイルヘッダの読み出しに失敗しました。");
+			}
+			if (*optRead != u8"Equ 2.0")
+			{
+				EQ_THROW(u8"ファイルヘッダが見つかりません。");
 			}
 
+			m_beginContainerPos = m_stream->Position();
+
+			ret = true;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return ret;
+	}
+
+	bool ArchiveAccessor::EnumerateFiles(const std::function<bool(const ArchiveMeta&)> cb)
+	{
+		auto ret = false;
+
+		EQ_DURING
+		{
+			if (!cb)
+			{
+				EQ_THROW(u8"コールバックが設定されていません。");
+			}
+
+			// ヘッダを読み飛ばした位置にシーク
+			int64_t offset = m_stream->Seek(m_beginContainerPos, SeekOrigin::Begin);
+			if (offset != m_beginContainerPos)
+			{
+				EQ_THROW(u8"シークに失敗しました。");
+			}
+
+			// ファイル群アクセス
 			while (true)
 			{
 				// ファイル情報読み出し
-				auto optMeta = textReader->ReadLine();
+				auto optMeta = m_textReaderStream->ReadLine();
 				if (!optMeta)
 				{
 					EQ_THROW(u8"ファイル情報の読み出しに失敗しました。");
@@ -114,13 +183,14 @@ namespace Equisetum2
 				}
 
 				// "stream" チェック
-				auto optBegin = textReader->ReadLine();
+				auto optBegin = m_textReaderStream->ReadLine();
 				if (!optBegin || (*optBegin) != "stream")
 				{
 					EQ_THROW(u8"streamの開始が見つかりません。");
 				}
 
-				meta.offset = stream->Position();
+				// ファイルの中身の開始位置設定
+				meta.offset = m_stream->Position() - m_beginPos;
 
 				if (cb(meta))
 				{
@@ -128,17 +198,17 @@ namespace Equisetum2
 				}
 
 				// ファイルの中身を読み飛ばす
-				stream->Seek(meta.length, SeekOrigin::Current);
+				m_stream->Seek(meta.length, SeekOrigin::Current);
 
 				// 改行読み飛ばし
-				auto optCRLF = textReader->ReadLine();
+				auto optCRLF = m_textReaderStream->ReadLine();
 				if (!optCRLF || !(*optCRLF).empty())
 				{
 					EQ_THROW(u8"予期しないデータを検出しました。");
 				}
 
 				// "endstream" チェック
-				auto optEnd = textReader->ReadLine();
+				auto optEnd = m_textReaderStream->ReadLine();
 				if (!optEnd || (*optEnd) != "endstream")
 				{
 					EQ_THROW(u8"streamの終端が見つかりません。");
@@ -156,36 +226,22 @@ namespace Equisetum2
 		return ret;
 	}
 
-	std::shared_ptr<IStream> ArchiveAccessor::SeekFromStream(std::shared_ptr<IStream> stream, const ArchiveMeta& meta, const String& secretKey)
+	std::shared_ptr<IStream> ArchiveAccessor::SeekByArchiveMeta(const ArchiveMeta& meta)
 	{
 		auto ret = false;
 
 		EQ_DURING
 		{
-			if (!stream)
-			{
-				EQ_THROW(u8"有効なストリームではありません。");
-			}
-
-			if (!stream->CanRead())
-			{
-				EQ_THROW(u8"リード属性が必要です。");
-			}
-
-			if (!stream->CanSeek())
-			{
-				EQ_THROW(u8"シーク属性が必要です。");
-			}
-
-			int64_t offset = stream->Seek(meta.offset, SeekOrigin::Begin);
-			if (offset != meta.offset)
+			// ファイルの中身の先頭へ移動
+			int64_t offset = m_stream->Seek(m_beginPos + meta.offset, SeekOrigin::Begin);
+			if (offset != m_beginPos + meta.offset)
 			{
 				EQ_THROW(u8"シークに失敗しました。");
 			}
 
 			std::shared_ptr<IStream> stm;
 			// ファイルの中身を単独のストリームとして扱えるようにする
-			auto partialStream = PartialStream::CreateFromStream(stream, stream->Position(), meta.length);
+			auto partialStream = PartialStream::CreateFromStream(m_stream, m_stream->Position(), meta.length);
 			if (!partialStream)
 			{
 				EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
@@ -194,7 +250,7 @@ namespace Equisetum2
 			if (meta.crypt == 1)
 			{
 				// 暗号化を適用
-				stm = CryptStream::CreateFromStream(partialStream, meta.id + secretKey);
+				stm = CryptStream::CreateFromStream(partialStream, meta.id + m_secretKey);
 			}
 			else
 			{
@@ -214,7 +270,7 @@ namespace Equisetum2
 
 	}
 
-	std::shared_ptr<IStream> ArchiveAccessor::FindFromStream(std::shared_ptr<IStream> stream, const String& id, const String& secretKey)
+	std::shared_ptr<IStream> ArchiveAccessor::FindByID(const String& id)
 	{
 		std::shared_ptr<IStream> ret;
 		ArchiveMeta findMeta;
@@ -226,7 +282,14 @@ namespace Equisetum2
 				EQ_THROW(u8"idが設定されていません。");
 			}
 
-			if(!EnumerateFiles(stream, [&findMeta, id](const ArchiveMeta& meta)->bool {
+			// ヘッダを読み飛ばした位置にシーク
+			int64_t offset = m_stream->Seek(m_beginContainerPos, SeekOrigin::Begin);
+			if (offset != m_beginContainerPos)
+			{
+				EQ_THROW(u8"シークに失敗しました。");
+			}
+
+			if(!EnumerateFiles([&findMeta, id](const ArchiveMeta& meta)->bool {
 				if (meta.id == id)
 				{
 					findMeta = meta;
@@ -240,7 +303,7 @@ namespace Equisetum2
 
 			if (!findMeta.id.empty())
 			{
-				ret = ArchiveAccessor::SeekFromStream(stream, findMeta, secretKey);
+				ret = ArchiveAccessor::SeekByArchiveMeta(findMeta);
 			}
 		}
 		EQ_HANDLER
@@ -252,35 +315,18 @@ namespace Equisetum2
 		return ret;
 	}
 
-	bool ArchiveAccessor::CheckFromStream(std::shared_ptr<IStream> stream, const String& secretKey)
+	bool ArchiveAccessor::HashCheck()
 	{
 		auto ret = false;
 
 		EQ_DURING
 		{
-			if (!stream)
+			// ストリームの先頭へ移動
+			int64_t offset = m_stream->Seek(m_beginPos, SeekOrigin::Begin);
+			if (offset != m_beginPos)
 			{
-				EQ_THROW(u8"有効なストリームではありません。");
+				EQ_THROW(u8"シークに失敗しました。");
 			}
-
-			if (!stream->CanRead())
-			{
-				EQ_THROW(u8"リード属性が必要です。");
-			}
-
-			if (!stream->CanSeek())
-			{
-				EQ_THROW(u8"シーク属性が必要です。");
-			}
-
-			auto textReader = TextReader::CreateFromStream(stream);
-			if (!textReader)
-			{
-				EQ_THROW(u8"テキストリーダーの作成に失敗しました。");
-			}
-
-			// ストリーム開始位置を保存
-			auto beginPos = stream->Position();
 
 			const String eof = "%%EOF ";	// EOF識別子
 			int64_t pos = -(static_cast<int64_t>(eof.size()));
@@ -288,12 +334,12 @@ namespace Equisetum2
 			// ファイルの後ろからEOF識別子を探す
 			while (true)
 			{
-				stream->Seek(pos, SeekOrigin::End);
+				m_stream->Seek(pos, SeekOrigin::End);
 
 				String find;
 				for (size_t i = 0; i < eof.size(); i++)
 				{
-					find += textReader->Read();
+					find += m_textReaderStream->Read();
 				}
 
 				// EOF識別子？
@@ -312,22 +358,22 @@ namespace Equisetum2
 			}
 
 			// EOF識別子の後に続くHMACを読み出す
-			auto optHMAC1 = textReader->ReadLine();
+			auto optHMAC1 = m_textReaderStream->ReadLine();
 			if (!optHMAC1)
 			{
 				EQ_THROW(u8"HMACの読み出しに失敗しました。");
 			}
 
 			// HMAC算出用ストリームを作成する
-			stream->Seek(pos, SeekOrigin::End);
-			auto partial = PartialStream::CreateFromStream(stream, beginPos, stream->Position() - beginPos);
+			m_stream->Seek(pos, SeekOrigin::End);
+			auto partial = PartialStream::CreateFromStream(m_stream, m_beginPos, m_stream->Position() - m_beginPos);
 			if (!partial)
 			{
 				EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
 			}
 
 			// このファイルのHMACを算出する
-			auto optHMAC2 = SHA256::HMAC(partial, secretKey);
+			auto optHMAC2 = SHA256::HMAC(partial, m_secretKey);
 			if (!optHMAC2)
 			{
 				EQ_THROW(u8"HMACの算出に失敗しました。");
