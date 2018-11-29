@@ -8,9 +8,14 @@
 #include "system/Exception.hpp"
 #include "system/Logger.h"
 #include "stream/MemoryStream.h"
+#include "util/SHA256.hpp"
+#include <numeric>
 
 namespace Equisetum2
 {
+	static const int stateLen = 256;
+	static const int stateLenMask = stateLen - 1;
+
 	// どこに置こう
 	static bool CopyTo(IStream* pSrc, IStream* pDst)
 	{
@@ -65,6 +70,26 @@ namespace Equisetum2
 		return result;
 	}
 
+	static void MakeState(std::vector<uint8_t>& state, const uint8_t* key, size_t len)
+	{
+		uint32_t stateIndex = 0;
+		size_t keyIndex = 0;
+
+		std::iota(state.begin(), state.end(), 0);
+
+		for (int i = 0; i < stateLen; i++)
+		{
+			stateIndex = (stateIndex + key[keyIndex] + state[i]) & stateLenMask;
+			std::swap(state[stateIndex], state[i]);
+
+			keyIndex++;
+			if (keyIndex >= len)
+			{
+				keyIndex = 0;
+			}
+		}
+	}
+
 	std::shared_ptr<CryptStream> CryptStream::CreateFromStream(std::shared_ptr<IStream> stream, const String& secretKey)
 	{
 		std::shared_ptr<CryptStream> inst;
@@ -100,14 +125,17 @@ namespace Equisetum2
 			}
 
 			// キーからSHA256ハッシュを作成し、それを元にcryptを行う
+			// (state作成に使えるキーが最大2048ビットのため、ここで丸め込む)
 			auto sha256 = SHA256::Encrypt(mem);
 			if (!sha256)
 			{
 				EQ_THROW(u8"キーの作成に失敗しました。");
 			}
 
-			// キーを保存
-			inst_->key = *sha256;
+			// SHA256ハッシュからステートを作成して保存
+			std::vector<uint8_t> tmp(stateLen, 0);
+			MakeState(tmp, (*sha256).value, sizeof((*sha256).value));
+			inst_->m_state = std::move(tmp);
 
 			inst_->m_url = String::Sprintf(u8"crypt:// in %s", stream->Url().c_str());
 
@@ -166,7 +194,7 @@ namespace Equisetum2
 		{
 			for (size_t i = 0; i < *optRead; i++)
 			{
-				data[i] ^= key.value[pos & 0x1F];
+				data[i] ^= m_state[pos & stateLenMask];
 
 				pos++;
 			}
@@ -184,7 +212,7 @@ namespace Equisetum2
 
 		for (size_t i = 0; i < size; i++)
 		{
-			buf[i] ^= key.value[pos & 0x1F];
+			buf[i] ^= m_state[pos & stateLenMask];
 
 			pos++;
 		}

@@ -9,7 +9,6 @@
 
 #include "IStream.h"
 #include "type/String.h"
-#include "util/SHA256.hpp"
 
 namespace Equisetum2
 {
@@ -46,7 +45,7 @@ namespace Equisetum2
 
 	private:
 		std::shared_ptr<IStream> m_stream;	/// 親ストリーム
-		SHA256Value key;		/// 暗号化キー
+		std::vector<uint8_t> m_state;		/// 暗号化ステート
 		String m_url;			/// URL
 	};
 }
