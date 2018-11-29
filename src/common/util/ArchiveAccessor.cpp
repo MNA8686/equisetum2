@@ -282,13 +282,7 @@ namespace Equisetum2
 				EQ_THROW(u8"idが設定されていません。");
 			}
 
-			// ヘッダを読み飛ばした位置にシーク
-			int64_t offset = m_stream->Seek(m_beginContainerPos, SeekOrigin::Begin);
-			if (offset != m_beginContainerPos)
-			{
-				EQ_THROW(u8"シークに失敗しました。");
-			}
-
+			// 指定されたIDを持ったファイルを探す
 			if(!EnumerateFiles([&findMeta, id](const ArchiveMeta& meta)->bool {
 				if (meta.id == id)
 				{
@@ -303,7 +297,7 @@ namespace Equisetum2
 
 			if (!findMeta.id.empty())
 			{
-				ret = ArchiveAccessor::SeekByArchiveMeta(findMeta);
+				ret = SeekByArchiveMeta(findMeta);
 			}
 		}
 		EQ_HANDLER

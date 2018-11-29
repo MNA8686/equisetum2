@@ -104,16 +104,19 @@ TEST(Archive, Check)
 // アーカイブから取り出したファイルが正しいかチェック
 TEST(Archive, verify)
 {
+	auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
+	ASSERT_TRUE(inStream);
+
+	auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
+	ASSERT_TRUE(archiveStream);
+
 #if defined(USE_LARGE_FILE)
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
 		const String id = "2G.vmem";
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto partial = ArchiveAccessor::FindFromStream(inStream, id, secretKey);
+		auto partial = archiveStream->FindByID(id);
 		ASSERT_TRUE(partial);
 
 		ASSERT_TRUE(cmp->Length() == partial->Length());
@@ -151,16 +154,10 @@ TEST(Archive, verify)
 #endif
 
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
 		const String id = "jiki_icon.png";
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_TRUE(partial);
 
@@ -182,16 +179,10 @@ TEST(Archive, verify)
 	}
 
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
 		const String id = "jiki_icon.bmp";
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_TRUE(partial);
 
@@ -213,16 +204,10 @@ TEST(Archive, verify)
 	}
 
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
 		const String id = "num.txt";
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_TRUE(partial);
 
@@ -244,14 +229,8 @@ TEST(Archive, verify)
 	}
 
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
 		const String id = "empty.txt";
 
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-		
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_TRUE(partial);
 
@@ -261,23 +240,11 @@ TEST(Archive, verify)
 
 	// 存在しないファイルを指定
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-		
 		const String id = "";
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_FALSE(partial);
 	}
 	{
-		auto inStream = FileStream::CreateFromPath(Path::GetFullPath(archiveName));
-		ASSERT_TRUE(inStream);
-
-		auto archiveStream = ArchiveAccessor::CreateFromStream(inStream, secretKey);
-		ASSERT_TRUE(archiveStream);
-
 		const String id = "notfound";
 		auto partial = archiveStream->FindByID(id);
 		ASSERT_FALSE(partial);
