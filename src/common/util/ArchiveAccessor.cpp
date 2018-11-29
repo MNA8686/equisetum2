@@ -14,7 +14,7 @@
 
 namespace Equisetum2
 {
-	bool ArchiveAccessor::EnumerateFiles(std::shared_ptr<IStream> stream, const std::function<bool(const ArchiveMeta&, std::shared_ptr<IStream>)> cb, const String& secretKey)
+	bool ArchiveAccessor::EnumerateFiles(std::shared_ptr<IStream> stream, const std::function<bool(const ArchiveMeta&)> cb)
 	{
 		auto ret = false;
 
@@ -120,26 +120,9 @@ namespace Equisetum2
 					EQ_THROW(u8"streamの開始が見つかりません。");
 				}
 
-				std::shared_ptr<IStream> stm;
-				// ファイルの中身を単独のストリームとして扱えるようにする
-				auto partialStream = PartialStream::CreateFromStream(stream, stream->Position(), meta.length);
-				if (!partialStream)
-				{
-					EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
-				}
+				meta.offset = stream->Position();
 
-				if (meta.crypt == 1)
-				{
-					// 暗号化を適用
-					stm = CryptStream::CreateFromStream(partialStream, meta.id + secretKey);
-				}
-				else
-				{
-					// 暗号化されていない場合はパーシャルストリームをそのまま渡す
-					stm = partialStream;
-				}
-
-				if (cb(meta, stm))
+				if (cb(meta))
 				{
 					break;
 				}
@@ -173,9 +156,68 @@ namespace Equisetum2
 		return ret;
 	}
 
+	std::shared_ptr<IStream> ArchiveAccessor::SeekFromStream(std::shared_ptr<IStream> stream, const ArchiveMeta& meta, const String& secretKey)
+	{
+		auto ret = false;
+
+		EQ_DURING
+		{
+			if (!stream)
+			{
+				EQ_THROW(u8"有効なストリームではありません。");
+			}
+
+			if (!stream->CanRead())
+			{
+				EQ_THROW(u8"リード属性が必要です。");
+			}
+
+			if (!stream->CanSeek())
+			{
+				EQ_THROW(u8"シーク属性が必要です。");
+			}
+
+			int64_t offset = stream->Seek(meta.offset, SeekOrigin::Begin);
+			if (offset != meta.offset)
+			{
+				EQ_THROW(u8"シークに失敗しました。");
+			}
+
+			std::shared_ptr<IStream> stm;
+			// ファイルの中身を単独のストリームとして扱えるようにする
+			auto partialStream = PartialStream::CreateFromStream(stream, stream->Position(), meta.length);
+			if (!partialStream)
+			{
+				EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
+			}
+
+			if (meta.crypt == 1)
+			{
+				// 暗号化を適用
+				stm = CryptStream::CreateFromStream(partialStream, meta.id + secretKey);
+			}
+			else
+			{
+				// 暗号化されていない場合はパーシャルストリームをそのまま渡す
+				stm = partialStream;
+			}
+
+			return stm;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+
+	}
+
 	std::shared_ptr<IStream> ArchiveAccessor::FindFromStream(std::shared_ptr<IStream> stream, const String& id, const String& secretKey)
 	{
 		std::shared_ptr<IStream> ret;
+		ArchiveMeta findMeta;
 
 		EQ_DURING
 		{
@@ -184,15 +226,21 @@ namespace Equisetum2
 				EQ_THROW(u8"idが設定されていません。");
 			}
 
-			if(!EnumerateFiles(stream, [&ret, id](const ArchiveMeta& meta, std::shared_ptr<IStream> stream)->bool {
+			if(!EnumerateFiles(stream, [&findMeta, id](const ArchiveMeta& meta)->bool {
 				if (meta.id == id)
 				{
-					ret = stream;
+					findMeta = meta;
+					return true;
 				}
-				return !!ret;
-			}, secretKey))
+				return false;
+			}))
 			{
 				EQ_THROW(u8"ファイルの列挙に失敗しました。");
+			}
+
+			if (!findMeta.id.empty())
+			{
+				ret = ArchiveAccessor::SeekFromStream(stream, findMeta, secretKey);
 			}
 		}
 		EQ_HANDLER
