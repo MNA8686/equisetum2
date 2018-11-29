@@ -39,13 +39,7 @@ namespace Equisetum2
 				EQ_THROW(u8"シーク属性が必要です。");
 			}
 
-			class ArchivePackerDummy : public ArchivePacker
-			{
-			public:
-				explicit ArchivePackerDummy(std::shared_ptr<IStream>& stream) : ArchivePacker(stream) {};
-			};
-
-			auto inst_ = std::make_shared<ArchivePackerDummy>(outStream);
+			auto inst_ = std::make_shared<ArchivePacker>(outStream, secretKey);
 
 			if (!inst_)
 			{
@@ -57,8 +51,6 @@ namespace Equisetum2
 				EQ_THROW(u8"初期化に失敗しました。");
 			}
 
-			inst_->m_secretKey = secretKey;
-		
 			inst = inst_;
 		}
 		EQ_HANDLER
@@ -70,9 +62,10 @@ namespace Equisetum2
 		return inst;
 	}
 
-	ArchivePacker::ArchivePacker(std::shared_ptr<IStream>& stream)
+	ArchivePacker::ArchivePacker(std::shared_ptr<IStream> stream, const String& secretKey)
 	{
 		m_stream = stream;
+		m_secretKey = secretKey;
 		m_beginPos = m_stream->Position();
 	}
 
@@ -82,6 +75,13 @@ namespace Equisetum2
 
 		EQ_DURING
 		{
+			// ストリームの先頭へ移動
+			int64_t offset = m_stream->Seek(m_beginPos, SeekOrigin::Begin);
+			if (offset != m_beginPos)
+			{
+				EQ_THROW(u8"シークに失敗しました。");
+			}
+
 			// テキストライター作成
 			m_textWriterStream = TextWriter::CreateFromStream(m_stream);
 			if (!m_textWriterStream)

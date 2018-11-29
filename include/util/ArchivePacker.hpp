@@ -64,9 +64,14 @@ namespace Equisetum2
 		*/
 		bool Finalize();
 
-	protected:
-		ArchivePacker(std::shared_ptr<IStream>& stream);
-		~ArchivePacker() {}
+		ArchivePacker(std::shared_ptr<IStream> stream, const String& secretKey);
+		virtual ~ArchivePacker() = default;
+
+		/**
+		* @brief アーカイブの作成を開始する
+		* @return 成否
+		*/
+		bool Init();
 
 	private:
 		std::shared_ptr<IStream> m_stream;		/// アーカイブファイル出力ストリーム
@@ -74,7 +79,6 @@ namespace Equisetum2
 		int64_t m_beginPos = 0;		/// アーカイブ出力開始位置
 		uint32_t m_isCrypt = 0;		/// 暗号化種別
 		String m_secretKey;			/// 暗号化キー
-		bool Init();
 	};
 }
 
