@@ -17,7 +17,7 @@ namespace Equisetum2
 	static const float inv255f = 1.0f / 255.0f;
 
 	static const char *vertexShaderSpriteSrc = R"(#version 120
-		#define IN         in
+		#define IN         attribute
 		#define OUT        varying
 		#define LOWP
 		#define MEDIUMP
@@ -43,7 +43,7 @@ namespace Equisetum2
 	)";
 
 	static const char *fragmentShaderSpriteSrc = R"(#version 120
-		#define IN         in
+		#define IN         attribute
 		#define LOWP
 		#define MEDIUMP
 		#define HIGHP
@@ -59,7 +59,7 @@ namespace Equisetum2
 	)";
 
 	static const char *vertexShaderPrimitiveSrc = R"(#version 120
-		#define IN         in
+		#define IN         attribute
 		#define OUT        varying
 		#define LOWP
 		#define MEDIUMP
@@ -80,7 +80,7 @@ namespace Equisetum2
 	)";
 
 	static const char *fragmentShaderPrimitiveSrc = R"(#version 120
-		#define IN         in
+		#define IN         attribute
 		#define LOWP
 		#define MEDIUMP
 		#define HIGHP
