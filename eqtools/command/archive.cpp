@@ -2,9 +2,8 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
-#if 0
 // eqtools archive -I path -O path -K key ...
-int DoArchive()
+COMMAND_DEF(archive, "tsukaikata")
 {
 	size_t count = 0;
 
@@ -20,14 +19,17 @@ int DoArchive()
 		{
 			if (!arg.empty())
 			{
+				// オプション？
 				if (arg[0] == '-')
 				{
+					// オプション解析中ならエラーとする
 					if (!parseOption.empty())
 					{
 						printf(u8"option <-%s> syntax error!!!\n", parseOption.c_str());
 						return -1;
 					}
 
+					// オプション名を抜き出す
 					auto opt = arg.substr(1, std::string::npos);
 					if (opt == "I" ||
 						opt == "O" ||
@@ -43,6 +45,7 @@ int DoArchive()
 				}
 				else
 				{
+					// オプションの引数解析中以外はIDの指定と見なす
 					if (parseOption.empty())
 					{
 						vID.push_back(arg);
@@ -62,6 +65,7 @@ int DoArchive()
 							key = arg;
 						}
 
+						// オプション解析状態をクリア
 						parseOption.clear();
 					}
 				}
@@ -82,26 +86,3 @@ int DoArchive()
 	return 0;
 }
 
-static const stCommand cmd = 
-{
-	"archive",
-	"setumei\n"
-	"setumei2\n"
-	"setumei3",
-	DoArchive
-};
-#endif
-
-int Main()
-{
-	int ret = 0;
-
-	Logger::SetPriority(LogLevel::Info);
-	Logger::SetCallback([](LogLevel level, const char* str)->bool {
-		printf("%s\n", str);
-		return false;
-	});
-
-	//Command::GetInstance()->Regist(&cmd);
-	return Command::GetInstance()->Do();
-}
