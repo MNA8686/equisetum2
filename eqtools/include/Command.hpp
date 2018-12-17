@@ -52,7 +52,7 @@ namespace Equisetum2
 	static const stCommand cmd = \
 	{ \
 		(#name), \
-		String(#name) + " " + (usage), \
+		"eqtools " + String(#name) + " " + (usage), \
 		Do \
 	}; \
 \
