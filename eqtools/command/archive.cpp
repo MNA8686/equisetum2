@@ -141,6 +141,8 @@ static int BuildArchive(const Param& param)
 
 	try
 	{
+		printf("BUILDING...\n");
+
 		auto outStream = FileStream::NewFileFromPath(param.outPath);
 		if (!outStream)
 		{
@@ -242,17 +244,53 @@ static int VerifyArchive(const Param& param)
 			throw String::Sprintf("archive <%s> can't open.\n", param.outPath.c_str());
 		}
 
-		auto archivePath = ArchiveAccessor::CreateFromStream(stream, param.key);
-		if (!archivePath)
+		auto archive = ArchiveAccessor::CreateFromStream(stream, param.key);
+		if (!archive)
 		{
 			throw String::Sprintf("archive <%s> can't open.\n", param.outPath.c_str());
 		}
 
-		if (!archivePath->HashCheck())
+		// アーカイブのハッシュが正しいか確認する
+		if (!archive->HashCheck())
 		{
 			throw String::Sprintf("archive <%s> hash check failed.\n", param.outPath.c_str());
 		}
 
+		// アーカイブの中のファイルを列挙する
+		std::vector<ArchiveMeta> vArchiveMeta;
+		archive->EnumerateFiles([&vArchiveMeta](const ArchiveMeta& meta)->bool {
+			vArchiveMeta.push_back(meta);
+			return false;
+		});
+
+		for (auto& meta : vArchiveMeta)
+		{
+			printf("VERIFY %s\n", meta.id.c_str());
+
+			// アーカイブの中のファイルのハッシュを求める
+			auto metaStream = archive->SeekByArchiveMeta(meta);
+			if (!metaStream)
+			{
+				throw String::Sprintf("The id <%s> can't open.\n", meta.id.c_str());
+			}
+			Optional<SHA256Value> cmp1 = SHA256::Encrypt(metaStream);
+
+			// 元ファイルのハッシュを求める
+			String fullPath = param.inPath + meta.id;
+			auto inStream = FileStream::CreateFromPath(fullPath);
+			if (!inStream)
+			{
+				throw String::Sprintf("The file <%s> can't open.\n", fullPath.c_str());
+			}
+			Optional<SHA256Value> cmp2 = SHA256::Encrypt(inStream);
+
+			// ハッシュを比較する
+			if (cmp1 != cmp2)
+			{
+				throw String::Sprintf("The file <%s> verify error.\n", meta.id.c_str());
+			}
+		}
+		
 		ret = 0;
 		printf("OK\n");
 	}
