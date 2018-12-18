@@ -12,124 +12,124 @@ struct Param
 
 static int ParseArgument(Param& param)
 {
-	size_t count = 0;
-	String parseOption;
 	int ret = -1;
 
-	for (auto& arg : Argument())
+	try
 	{
-		if (count != 0)
+		size_t count = 0;
+		String parseOption;
+
+		for (auto& arg : Argument())
 		{
-			if (!arg.empty())
+			if (count != 0)
 			{
-				// オプション？
-				if (arg[0] == '-')
+				if (!arg.empty())
 				{
-					// オプション解析中ならエラーとする
-					if (!parseOption.empty())
+					// オプション？
+					if (arg[0] == '-')
 					{
-						printf(u8"option <-%s> syntax error!!!\n", parseOption.c_str());
-						goto ERROR;
-					}
+						// オプション解析中ならエラーとする
+						if (!parseOption.empty())
+						{
+							throw String::Sprintf(u8"option <-%s> syntax error!!!\n", parseOption.c_str());
+						}
 
-					// オプション名を抜き出す
-					auto opt = arg.substr(1, std::string::npos);
-					if (opt == "I" ||
-						opt == "O" ||
-						opt == "K")
-					{
-						parseOption = opt;
+						// オプション名を抜き出す
+						auto opt = arg.substr(1, std::string::npos);
+						if (opt == "I" ||
+							opt == "O" ||
+							opt == "K")
+						{
+							parseOption = opt;
+						}
+						else
+						{
+							throw String::Sprintf("unknown option <%s>\n", opt.c_str());
+						}
 					}
 					else
 					{
-						printf("unknown option <%s>\n", opt.c_str());
-						goto ERROR;
-					}
-				}
-				else
-				{
-					// オプションの引数解析中以外はIDの指定と見なす
-					if (parseOption.empty())
-					{
-						param.vID.push_back(arg);
-					}
-					else
-					{
-						if (parseOption == "I")
+						// オプションの引数解析中以外はIDの指定と見なす
+						if (parseOption.empty())
 						{
-							param.inPath = arg;
+							param.vID.push_back(arg);
 						}
-						else if (parseOption == "O")
+						else
 						{
-							param.outPath = arg;
-						}
-						else if (parseOption == "K")
-						{
-							param.key = arg;
-						}
+							if (parseOption == "I")
+							{
+								param.inPath = arg;
+							}
+							else if (parseOption == "O")
+							{
+								param.outPath = arg;
+							}
+							else if (parseOption == "K")
+							{
+								param.key = arg;
+							}
 
-						// オプション解析状態をクリア
-						parseOption.clear();
+							// オプション解析状態をクリア
+							parseOption.clear();
+						}
 					}
 				}
 			}
+
+			count++;
 		}
 
-		count++;
-	}
-
 #if 0
-	// for debug
-	printf("I %s\n", inPath.c_str());
-	printf("O %s\n", outPath.c_str());
-	printf("K %s\n", key.c_str());
-	for (auto& id : vID)
-	{
-		printf("id %s\n", id.c_str());
-	}
+		// for debug
+		printf("I %s\n", inPath.c_str());
+		printf("O %s\n", outPath.c_str());
+		printf("K %s\n", key.c_str());
+		for (auto& id : vID)
+		{
+			printf("id %s\n", id.c_str());
+		}
 #endif
 
-	// 入力パスチェック
-	if (param.inPath.empty())
-	{
-		printf("The InPath is not set.\n");
-		goto ERROR;
-	}
-	if (param.inPath[param.inPath.size() - 1] != '/' && 
-		param.inPath[param.inPath.size() - 1] != '\\')
-	{
-		param.inPath += "/";
-	}
-	if (!Directory::Exists(param.inPath))
-	{
-		printf("The InPath <%s> does not exist.\n", param.inPath.c_str());
-		goto ERROR;
-	}
+		// 入力パスチェック
+		if (param.inPath.empty())
+		{
+			throw String::Sprintf("The InPath is not set.\n");
+		}
+		if (param.inPath[param.inPath.size() - 1] != '/' &&
+			param.inPath[param.inPath.size() - 1] != '\\')
+		{
+			param.inPath += "/";
+		}
+		if (!Directory::Exists(param.inPath))
+		{
+			throw String::Sprintf("The InPath <%s> does not exist.\n", param.inPath.c_str());
+		}
 
-	// 出力パスチェック
-	if (param.outPath.empty())
-	{
-		printf("The OutPath is not set.\n");
-		goto ERROR;
+		// 出力パスチェック
+		if (param.outPath.empty())
+		{
+			throw String::Sprintf("The OutPath is not set.\n");
+		}
+
+		// キーチェック
+		if (param.key.empty())
+		{
+			throw String::Sprintf("The key is not set.\n");
+		}
+
+		// ファイルチェック
+		if (param.vID.empty())
+		{
+			throw String::Sprintf("The file is not set.\n");
+		}
+
+		ret = 0;
 	}
-
-	// キーチェック
-	if (param.key.empty())
+	catch (const String str)
 	{
-		printf("The key is not set.\n");
-		goto ERROR;
+		printf("ERROR: ");
+		printf(str.c_str());
 	}
-
-	// ファイルチェック
-	if (param.vID.empty())
-	{
-		printf("The file is not set.\n");
-		goto ERROR;
-	}
-
-	ret = 0;
-
-ERROR:
 
 	return ret;
 }
@@ -139,13 +139,12 @@ static int BuildArchive(const Param& param)
 	int ret = -1;
 	bool newFileCreated = false;
 
+	try
 	{
-
 		auto outStream = FileStream::NewFileFromPath(param.outPath);
 		if (!outStream)
 		{
-			printf("OutPath <%s> can't create.\n", param.outPath.c_str());
-			goto ERROR;
+			throw String::Sprintf("OutPath <%s> can't create.\n", param.outPath.c_str());
 		}
 		
 		newFileCreated = true;
@@ -153,8 +152,7 @@ static int BuildArchive(const Param& param)
 		auto archiveStream = ArchivePacker::CreateFromStream(outStream, param.key);
 		if (!archiveStream)
 		{
-			printf("The ArchiveStream can't create.\n");
-			goto ERROR;
+			throw String::Sprintf("The ArchiveStream can't create.\n");
 		}
 
 		archiveStream->SetCrypt(1);
@@ -169,59 +167,62 @@ static int BuildArchive(const Param& param)
 				Optional<std::vector<String>> opt = Directory::GetFiles(fullPath);
 				if (!opt)
 				{
-					printf("directory <%s> enum files failed.", file.c_str());
-					goto ERROR;
+					throw String::Sprintf("directory <%s> enum files failed.", file.c_str());
 				}
 
 				for (auto& enumFile : *opt)
 				{
+					printf("PUSH %s\n", (file + "/" +Path::GetFileName(enumFile)).c_str());
+
 					auto inStream = FileStream::CreateFromPath(enumFile);
 					if (!inStream)
 					{
-						printf("The file <%s> can't open.\n", enumFile.c_str());
-						goto ERROR;
+						throw String::Sprintf("The file <%s> can't open.\n", enumFile.c_str());
 					}
 
 					if (!archiveStream->Push(file + "/" + Path::GetFileName(enumFile), inStream))
 					{
-						printf("The file <%s> can't push.\n", enumFile.c_str());
-						goto ERROR;
+						throw String::Sprintf("The file <%s> can't push.\n", enumFile.c_str());
 					}
 				}
 			}
 			else
 			{
+				printf("PUSH %s\n", file.c_str());
+
 				auto inStream = FileStream::CreateFromPath(fullPath);
 				if (!inStream)
 				{
-					printf("The file <%s> can't open.\n", file.c_str());
-					goto ERROR;
+					throw String::Sprintf("The file <%s> can't open.\n", file.c_str());
 				}
 
 				if (!archiveStream->Push(file, inStream))
 				{
-					printf("The file <%s> can't push.\n", file.c_str());
-					goto ERROR;
+					throw String::Sprintf("The file <%s> can't push.\n", file.c_str());
 				}
 			}
 		}
 
+		printf("FINALIZING...\n");
+
 		if (!archiveStream->Finalize())
 		{
-			printf("finalize failed.");
-			goto ERROR;
+			throw String::Sprintf("finalize failed.");
 		}
+
+		ret = 0;
+		printf("OK\n");
 	}
-
-	ret = 0;
-
-ERROR:
-
-	// 途中で失敗した場合は作りかけのファイルを削除する
-	if (ret != 0 &&
-		newFileCreated)
+	catch (const String str)
 	{
-		File::Delete(param.outPath);
+		printf("ERROR: ");
+		printf(str.c_str());
+
+		// 途中で失敗した場合は作りかけのファイルを削除する
+		if(newFileCreated)
+		{
+			File::Delete(param.outPath);
+		}
 	}
 
 	return ret;
@@ -231,35 +232,36 @@ static int VerifyArchive(const Param& param)
 {
 	int ret = -1;
 
+	try
 	{
+		printf("VERIFYING...\n");
+
 		auto stream = FileStream::CreateFromPath(param.outPath);
 		if (!stream)
 		{
-			printf("archive <%s> can't open.\n", param.outPath.c_str());
-			goto ERROR;
+			throw String::Sprintf("archive <%s> can't open.\n", param.outPath.c_str());
 		}
 
 		auto archivePath = ArchiveAccessor::CreateFromStream(stream, param.key);
 		if (!archivePath)
 		{
-			printf("archive <%s> can't open.\n", param.outPath.c_str());
-			goto ERROR;
+			throw String::Sprintf("archive <%s> can't open.\n", param.outPath.c_str());
 		}
 
 		if (!archivePath->HashCheck())
 		{
-			printf("archive <%s> hash check failed.\n", param.outPath.c_str());
-			goto ERROR;
+			throw String::Sprintf("archive <%s> hash check failed.\n", param.outPath.c_str());
 		}
+
+		ret = 0;
+		printf("OK\n");
 	}
-
-	ret = 0;
-
-ERROR:
-
-	// 途中で失敗した場合は作りかけのファイルを削除する
-	if (ret != 0)
+	catch (const String str)
 	{
+		printf("ERROR: ");
+		printf(str.c_str());
+
+		// 途中で失敗した場合は作りかけのファイルを削除する
 		File::Delete(param.outPath);
 	}
 
@@ -269,31 +271,37 @@ ERROR:
 COMMAND_DEF(archive, 
 	"[-I <input directory>] [-O <output file path>] [-K <secret key>] <file|directory ...>")
 {
-	Param param;
 	int ret = -1;
 
-	ret = ParseArgument(param);
-	if (ret != 0)
+	try
 	{
-		goto ERROR;
-	}
+		Param param;
 
-	ret = BuildArchive(param);
-	if (ret != 0)
+		ret = ParseArgument(param);
+		if (ret != 0)
+		{
+			throw String();
+		}
+
+		ret = BuildArchive(param);
+		if (ret != 0)
+		{
+			throw String();
+		}
+
+		ret = VerifyArchive(param);
+		if (ret != 0)
+		{
+			throw String();
+		}
+
+		ret = 0;
+		printf("SUCCESS\n");
+	}
+	catch (const String str)
 	{
-		goto ERROR;
+		// nop
 	}
-
-	ret = VerifyArchive(param);
-	if (ret != 0)
-	{
-		goto ERROR;
-	}
-
-	ret = 0;
-	printf("ok.\n");
-
-ERROR:
 
 	return ret;
 }
