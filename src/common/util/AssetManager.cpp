@@ -296,6 +296,42 @@ namespace Equisetum2
 		Singleton<SharedPool<Texture>>::GetInstance();
 	}
 
+	bool AssetManager::SetArchivePath(const String& path, const String& secretKey)
+	{
+		EQ_DURING
+		{
+			auto stream = FileStream::CreateFromPath(Path::GetFullPath(path));
+			if (!stream)
+			{
+				EQ_THROW(String::Sprintf(u8"アーカイブ %sのオープンに失敗しました。", path.c_str()));
+			}
+
+			auto archiveStream = ArchiveAccessor::CreateFromStream(stream, secretKey);
+			if (!archiveStream)
+			{
+				EQ_THROW(String::Sprintf(u8"アーカイブ%sの解析に失敗しました。", path.c_str()));
+			}
+
+			m_archiveStream = archiveStream;
+			m_archivePath = path;
+			m_secretKey = secretKey;
+
+			return true;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return false;
+	}
+
+	void AssetManager::AllowRewriteFile(bool allow)
+	{
+		m_allowRewriteFile = allow;
+	}
+
 	std::shared_ptr<Image> AssetManager::_LoadImage(const String& id)
 	{
 		EQ_DURING

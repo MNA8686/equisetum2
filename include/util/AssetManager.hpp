@@ -2,6 +2,7 @@
 #define _EQASSETMANAGER_H_
 
 #include "util/SharedPool.hpp"
+#include "util/ArchiveAccessor.hpp"
 #include "system/Singleton.h"
 #include "graphic/Image.hpp"
 #include "graphic/Sprite.hpp"
@@ -54,6 +55,12 @@ namespace Equisetum2
 
 			return nullptr;
 		}
+		
+		// アーカイブのパスを指定する
+		bool SetArchivePath(const String& path, const String& secretKey);
+
+		// アセットファイルが直接配置されている場合、それらのファイルを読み出すことを許可するかどうか
+		void AllowRewriteFile(bool allow);
 
 	private:
 
@@ -135,6 +142,11 @@ namespace Equisetum2
 		static std::shared_ptr<BGM> _LoadBGM(const String& id);
 		static std::shared_ptr<SE> _LoadSE(const String& id);
 		static std::shared_ptr<Texture> _LoadTexture(const String& id);
+
+		bool m_allowRewriteFile = true;
+		String m_archivePath;
+		std::shared_ptr<ArchiveAccessor> m_archiveStream;
+		String m_secretKey;
 	};
 }
 
