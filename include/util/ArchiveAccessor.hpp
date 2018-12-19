@@ -39,6 +39,17 @@ namespace Equisetum2
 		static std::shared_ptr<ArchiveAccessor> CreateFromStream(std::shared_ptr<IStream> inStream, const String& secretKey);
 
 		/**
+		* @brief メタ情報とストリームからアーカイブを読み出す。<br>
+		* @brief 入力ストリームは正しいことが確定しているアーカイブデータ。<br>
+		* @brief フォーマットのチェックは行わない。
+		* @param inStream 入力ストリーム 読み出し属性、シーク属性が必要
+		* @param meta シークしたいファイルのメタ情報
+		* @param secretKey 秘密鍵
+		* @return アーカイブ入力インスタンス
+		*/
+		static std::shared_ptr<IStream> QuickLoadFromStream(std::shared_ptr<IStream> inStream, const ArchiveMeta& meta, const String& secretKey);
+
+		/**
 		* @brief ディレクトリ内のファイルを列挙する 1件列挙するごとにコールバックが呼び出される
 		* @param cb コールバック 引数に列挙したファイル名が入る。 trueを返すと列挙はそこで終了する。
 		* @return 成否

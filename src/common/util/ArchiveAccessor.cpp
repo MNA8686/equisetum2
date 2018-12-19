@@ -109,6 +109,62 @@ namespace Equisetum2
 		return ret;
 	}
 
+	std::shared_ptr<IStream> ArchiveAccessor::QuickLoadFromStream(std::shared_ptr<IStream> inStream, const ArchiveMeta & meta, const String & secretKey)
+	{
+		EQ_DURING
+		{
+			if (!inStream)
+			{
+				EQ_THROW(u8"有効なストリームではありません。");
+			}
+
+			if (!inStream->CanRead())
+			{
+				EQ_THROW(u8"リード属性が必要です。");
+			}
+
+			if (!inStream->CanSeek())
+			{
+				EQ_THROW(u8"シーク属性が必要です。");
+			}
+
+			// ファイルの中身の先頭へ移動
+			int64_t offset = inStream->Seek(meta.offset, SeekOrigin::Begin);
+			if (offset != meta.offset)
+			{
+				EQ_THROW(u8"シークに失敗しました。");
+			}
+
+			// ファイルの中身を単独のストリームとして扱えるようにする
+			auto partialStream = PartialStream::CreateFromStream(inStream, inStream->Position(), meta.length);
+			if (!partialStream)
+			{
+				EQ_THROW(u8"パーシャルストリームの作成に失敗しました。");
+			}
+
+			std::shared_ptr<IStream> stm;
+			if (meta.crypt == 1)
+			{
+				// 暗号化を適用
+				stm = CryptStream::CreateFromStream(partialStream, meta.id + secretKey);
+			}
+			else
+			{
+				// 暗号化されていない場合はパーシャルストリームをそのまま渡す
+				stm = partialStream;
+			}
+
+			return stm;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
 	bool ArchiveAccessor::EnumerateFiles(const std::function<bool(const ArchiveMeta&)> cb)
 	{
 		auto ret = false;

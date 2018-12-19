@@ -327,9 +327,69 @@ namespace Equisetum2
 		return false;
 	}
 
-	void AssetManager::AllowRewriteFile(bool allow)
+	void AssetManager::AllowUrlRewrite(bool allow)
 	{
-		m_allowRewriteFile = allow;
+		m_allowUrlRewrite = allow;
+	}
+
+	std::shared_ptr<IStream> AssetManager::GetStreamByID(const String& type, const String& id, const String& ext)
+	{
+		EQ_DURING
+		{
+			if (m_allowUrlRewrite)
+			{
+				String nativePath = MakeNativePath(type, id, ext);
+
+				if (File::Exists(nativePath))
+				{
+					auto fileStream = FileStream::CreateFromPath(nativePath);
+					if (!fileStream)
+					{
+						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", nativePath.c_str()));
+					}
+
+					return fileStream;
+				}
+			}
+
+			if(!m_archiveStream)
+			{
+				EQ_THROW(u8"アーカイブがオープンされていません。");
+			}
+
+			String archiveID = type + "/" + id + ext;
+			ArchiveMeta assetMeta;
+			m_archiveStream->EnumerateFiles([&assetMeta, &archiveID](const ArchiveMeta& meta)->bool {
+				if (archiveID == meta.id)
+				{
+					assetMeta = meta;
+					return true;
+				}
+
+				return false;
+			});
+
+			if (assetMeta.id.empty())
+			{
+				EQ_THROW(String::Sprintf(u8"%sが見つかりません。", archiveID.c_str()));
+			}
+
+			// 新しいストリームとしてアーカイブを開く
+			auto fileStream = FileStream::CreateFromPath(Path::GetFullPath(m_archivePath));
+			if (!fileStream)
+			{
+				EQ_THROW(String::Sprintf(u8"アーカイブ %sのオープンに失敗しました。", m_archivePath.c_str()));
+			}
+
+			return ArchiveAccessor::QuickLoadFromStream(fileStream, assetMeta, m_secretKey);
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
 	}
 
 	std::shared_ptr<Image> AssetManager::_LoadImage(const String& id)
@@ -337,11 +397,19 @@ namespace Equisetum2
 		EQ_DURING
 		{
 			// TODO: 画像の形式はPNG固定だが、jpgとbmpも見に行くようにする
+#if 1
 			auto inStream = FileStream::CreateFromPath(MakeNativePath("image", id, ".png"));
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
 			}
+#else
+			auto inStream = GetStreamByID("image", id, ".png");
+			if (!inStream)
+			{
+				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+			}
+#endif
 
 			auto imageIn = Image::CreateFromStream(inStream);
 			if (!imageIn)
