@@ -23,6 +23,7 @@ public:
 
 protected:
 
+	virtual bool OnCreate(void) = 0;
 	virtual bool OnInit(void) = 0;
 	virtual void OnQuit(void) = 0;
 	virtual bool OnUpdate(void) = 0;

@@ -104,7 +104,8 @@ std::shared_ptr<Object> Object::Create(const String& id)
 				}
 			})";
 		*/
-		auto stream = FileStream::CreateFromPath(MakeNativePath("object", id, ".json"));
+//		auto stream = FileStream::CreateFromPath(MakeNativePath("object", id, ".json"));
+		auto stream = Singleton<AssetManager>::GetInstance()->GetStreamByID("object/" + id + ".json");
 		if (!stream)
 		{
 			EQ_THROW(u8"ファイルのオープンに失敗しました。");

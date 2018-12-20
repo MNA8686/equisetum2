@@ -5,6 +5,7 @@
 #include "stream/FileStream.h"
 #include "fs/Path.hpp"
 #include "fs/File.hpp"
+#include "fs/Directory.hpp"
 
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
@@ -13,11 +14,12 @@
 
 namespace Equisetum2
 {
-	static String MakeNativePath(const String& type, const String& id, const String& ext )
+	static String MakeIdPath(const String& type, const String& id, const String& ext )
 	{
 		// "type/id" の文字列を作る
 		// 入力IDに拡張子が付いていても無視する
-		return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
+		return type + "/" + Path::GetFileNameWithoutExtension(id) + ext;
+		//return Path::GetFullPath(type + "/" + Path::GetFileNameWithoutExtension(id) + ext);
 	}
 
 	static std::shared_ptr<Sprite> _LoadSpriteImpl(const String& id, const std::function<bool(rapidjson::Document& doc)> cbDoc = nullptr)
@@ -27,7 +29,10 @@ namespace Equisetum2
 			// json読み出し
 			rapidjson::Document doc;
 			{
-				auto jsonStream = FileStream::CreateFromPath(MakeNativePath("sprite", id, ".json"));
+				String idPath = MakeIdPath("sprite", id, ".json");
+	
+				//auto jsonStream = FileStream::CreateFromPath(MakeIdPath("sprite", id, ".json"));
+				auto jsonStream = Singleton<AssetManager>::GetInstance()->GetStreamByID(idPath);
 				if (!jsonStream)
 				{
 					EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
@@ -300,12 +305,16 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
+			/* アーカイブをオープンする */
 			auto stream = FileStream::CreateFromPath(Path::GetFullPath(path));
 			if (!stream)
 			{
 				EQ_THROW(String::Sprintf(u8"アーカイブ %sのオープンに失敗しました。", path.c_str()));
 			}
 
+			/* オープンしたストリームをメタ情報読み出し用に使用する。
+			   同時に複数のアセットを開くことがあるため、ファイルの中身は
+			   その都度ストリームを生成して使用する。 */
 			auto archiveStream = ArchiveAccessor::CreateFromStream(stream, secretKey);
 			if (!archiveStream)
 			{
@@ -332,13 +341,53 @@ namespace Equisetum2
 		m_allowUrlRewrite = allow;
 	}
 
-	std::shared_ptr<IStream> AssetManager::GetStreamByID(const String& type, const String& id, const String& ext)
+	bool AssetManager::ExistsByID( const String & id)
 	{
 		EQ_DURING
 		{
 			if (m_allowUrlRewrite)
 			{
-				String nativePath = MakeNativePath(type, id, ext);
+				if (File::Exists(Path::GetFullPath(id)))
+				{
+					return true;
+				}
+			}
+
+			if(!m_archiveStream)
+			{
+				EQ_THROW(u8"アーカイブがオープンされていません。");
+			}
+
+			//String archiveID = type + "/" + id + ext;
+			ArchiveMeta assetMeta;
+			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
+				if (id == meta.id)
+				{
+					assetMeta = meta;
+					return true;
+				}
+
+				return false;
+			});
+
+			return !assetMeta.id.empty();
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return false;
+	}
+
+	std::shared_ptr<IStream> AssetManager::GetStreamByID(const String& id)
+	{
+		EQ_DURING
+		{
+			if (m_allowUrlRewrite)
+			{
+				String nativePath = Path::GetFullPath(id);
 
 				if (File::Exists(nativePath))
 				{
@@ -357,10 +406,10 @@ namespace Equisetum2
 				EQ_THROW(u8"アーカイブがオープンされていません。");
 			}
 
-			String archiveID = type + "/" + id + ext;
+			//String archiveID = type + "/" + id + ext;
 			ArchiveMeta assetMeta;
-			m_archiveStream->EnumerateFiles([&assetMeta, &archiveID](const ArchiveMeta& meta)->bool {
-				if (archiveID == meta.id)
+			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
+				if (id == meta.id)
 				{
 					assetMeta = meta;
 					return true;
@@ -371,7 +420,7 @@ namespace Equisetum2
 
 			if (assetMeta.id.empty())
 			{
-				EQ_THROW(String::Sprintf(u8"%sが見つかりません。", archiveID.c_str()));
+				EQ_THROW(String::Sprintf(u8"%sが見つかりません。", id.c_str()));
 			}
 
 			// 新しいストリームとしてアーカイブを開く
@@ -391,25 +440,62 @@ namespace Equisetum2
 
 		return nullptr;
 	}
+	
+	std::vector<String> AssetManager::GetIdList(const String& type)
+	{
+		std::vector<String> vID;
+
+		EQ_DURING
+		{
+			if (m_allowUrlRewrite)
+			{
+				String fullPath = Path::GetFullPath(type);
+
+				if (Directory::Exists(fullPath))
+				{
+					auto idList = Directory::GetFiles(fullPath);
+					if (idList)
+					{
+						vID = *idList;
+					}
+				}
+			}
+
+			if(!m_archiveStream)
+			{
+				EQ_THROW(u8"アーカイブがオープンされていません。");
+			}
+
+			const String cmpType = type + "/";
+			m_archiveStream->EnumerateFiles([&type, &vID, &cmpType](const ArchiveMeta& meta)->bool {
+				if (meta.id.compare(0, cmpType.size(), cmpType) == 0)
+				{
+					vID.push_back(meta.id);
+				}
+
+				return false;
+			});
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return vID;
+	}
 
 	std::shared_ptr<Image> AssetManager::_LoadImage(const String& id)
 	{
 		EQ_DURING
 		{
 			// TODO: 画像の形式はPNG固定だが、jpgとbmpも見に行くようにする
-#if 1
-			auto inStream = FileStream::CreateFromPath(MakeNativePath("image", id, ".png"));
+			String idPath = MakeIdPath("image", id, ".png");
+			auto inStream = GetStreamByID(idPath);
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
 			}
-#else
-			auto inStream = GetStreamByID("image", id, ".png");
-			if (!inStream)
-			{
-				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
-			}
-#endif
 
 			auto imageIn = Image::CreateFromStream(inStream);
 			if (!imageIn)
@@ -530,7 +616,10 @@ namespace Equisetum2
 			// 暫定的に "/font/sample.ttf?16" のようにidとフォントサイズを指定する
 			std::vector<String> str = id.split("?");
 
-			auto inStream = FileStream::CreateFromPath(MakeNativePath("font", str[0], ".ttf"));
+			String idPath = MakeIdPath("font", str[0], ".ttf");
+			
+			//auto inStream = FileStream::CreateFromPath(MakeIdPath("font", str[0], ".ttf"));
+			auto inStream = GetStreamByID(idPath);
 			if (!inStream)
 			{
 				EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
@@ -567,21 +656,35 @@ namespace Equisetum2
 		EQ_DURING
 		{
 			const String exts[] = { ".ogg", ".mp3", ".wav" };
-			std::shared_ptr<FileStream> inStream;
+			std::shared_ptr<IStream> inStream;
 
 			for (auto& ext : exts)
 			{
-				const String path = MakeNativePath("bgm", id, ext);
+				String idPath = MakeIdPath("bgm", id, ext);
 
-				if (File::Exists(path))
+				if (ExistsByID(idPath))
 				{
-					inStream = FileStream::CreateFromPath(path);
+					inStream = GetStreamByID(idPath);
 					if (!inStream)
 					{
 						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
 					}
 					break;
 				}
+#if 0
+				const String path = MakeNativePath("bgm", id, ext);
+
+				if (File::Exists(path))
+				{
+					inStream = GetStreamByID("image", id, ".png");
+					//inStream = FileStream::CreateFromPath(path);
+					if (!inStream)
+					{
+						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+					}
+					break;
+				}
+#endif
 			}
 
 			if (!inStream)
@@ -613,10 +716,22 @@ namespace Equisetum2
 		EQ_DURING
 		{
 			const String exts[] = { ".ogg", ".mp3", ".wav" };
-			std::shared_ptr<FileStream> inStream;
+			std::shared_ptr<IStream> inStream;
 
 			for (auto& ext : exts)
 			{
+				String idPath = MakeIdPath("se", id, ext);
+
+				if (ExistsByID(idPath))
+				{
+					inStream = GetStreamByID(idPath);
+					if (!inStream)
+					{
+						EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+					}
+					break;
+				}
+#if 0
 				const String path = MakeNativePath("se", id, ext);
 
 				if (File::Exists(path))
@@ -628,6 +743,7 @@ namespace Equisetum2
 					}
 					break;
 				}
+#endif
 			}
 
 			if (!inStream)

@@ -50,15 +50,13 @@ int SystemViewFontTest::Enter()
 		std::vector<String> test;
 		
 		// フォントリストを取得する
-		auto fontList = Directory::GetFiles(Path::GetFullPath("font"));
-		if (fontList)
+		//auto fontList = Directory::GetFiles(Path::GetFullPath("font"));
+		auto fontList = Singleton<AssetManager>::GetInstance()->GetIdList("font");
+		for (auto font : fontList)
 		{
-			for (auto font : *fontList)
+			if (Path::GetExtension(font) == u8".ttf")
 			{
-				if (Path::GetExtension(font) == u8".ttf")
-				{
-					test.push_back(Path::GetFileNameWithoutExtension(font));
-				}
+				test.push_back(Path::GetFileNameWithoutExtension(font));
 			}
 		}
 		

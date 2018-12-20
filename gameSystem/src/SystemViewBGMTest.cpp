@@ -32,22 +32,20 @@ int SystemViewBGMTest::Enter()
 		std::vector<String> test;
 		
 		// BGMリストを取得する
-		auto bgmList = Directory::GetFiles(Path::GetFullPath("bgm"));
-		if (bgmList)
+		//auto bgmList = Directory::GetFiles(Path::GetFullPath("bgm"));
+		auto bgmList = Singleton<AssetManager>::GetInstance()->GetIdList("bgm");
+		for (auto bgm : bgmList)
 		{
-			for (auto bgm : *bgmList)
+			const String ext = Path::GetExtension(bgm);
+			if (ext == ".ogg" ||
+				ext == ".mp3" ||
+				ext == ".wav")
 			{
-				const String ext = Path::GetExtension(bgm);
-				if (ext == ".ogg" ||
-					ext == ".mp3" ||
-					ext == ".wav")
+				const String nameWithoutExt = Path::GetFileNameWithoutExtension(bgm);
+				auto result = std::find(test.begin(), test.end(), nameWithoutExt);
+				if (result == test.end())
 				{
-					const String nameWithoutExt = Path::GetFileNameWithoutExtension(bgm);
-					auto result = std::find(test.begin(), test.end(), nameWithoutExt);
-					if (result == test.end())
-					{
-						test.push_back(nameWithoutExt);
-					}
+					test.push_back(nameWithoutExt);
 				}
 			}
 		}
