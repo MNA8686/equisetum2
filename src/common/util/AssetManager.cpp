@@ -347,18 +347,24 @@ namespace Equisetum2
 		{
 			if (m_allowUrlRewrite)
 			{
+				// fs上のファイルを探す
 				if (File::Exists(Path::GetFullPath(id)))
 				{
 					return true;
 				}
 			}
 
-			if(!m_archiveStream)
+			if (!m_archiveStream)
 			{
+				if (m_allowUrlRewrite)
+				{
+					return false;
+				}
+
 				EQ_THROW(u8"アーカイブがオープンされていません。");
 			}
 
-			//String archiveID = type + "/" + id + ext;
+			// アーカイブ内のファイルを探す
 			ArchiveMeta assetMeta;
 			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
 				if (id == meta.id)
@@ -391,6 +397,7 @@ namespace Equisetum2
 
 				if (File::Exists(nativePath))
 				{
+					// fs上のファイルを開く
 					auto fileStream = FileStream::CreateFromPath(nativePath);
 					if (!fileStream)
 					{
@@ -401,12 +408,17 @@ namespace Equisetum2
 				}
 			}
 
-			if(!m_archiveStream)
+			if (!m_archiveStream)
 			{
+				if (m_allowUrlRewrite)
+				{
+					return nullptr;
+				}
+
 				EQ_THROW(u8"アーカイブがオープンされていません。");
 			}
 
-			//String archiveID = type + "/" + id + ext;
+			// アーカイブ内のファイルを開く
 			ArchiveMeta assetMeta;
 			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
 				if (id == meta.id)
@@ -451,6 +463,7 @@ namespace Equisetum2
 			{
 				String fullPath = Path::GetFullPath(type);
 
+				// fs上のファイル一覧を取得する
 				if (Directory::Exists(fullPath))
 				{
 					auto idList = Directory::GetFiles(fullPath);
@@ -461,20 +474,26 @@ namespace Equisetum2
 				}
 			}
 
-			if(!m_archiveStream)
+			if (m_archiveStream)
 			{
-				EQ_THROW(u8"アーカイブがオープンされていません。");
+				// アーカイブの中のファイル一覧を取得する
+				const String cmpType = type + "/";
+				m_archiveStream->EnumerateFiles([&type, &vID, &cmpType](const ArchiveMeta& meta)->bool {
+					if (meta.id.compare(0, cmpType.size(), cmpType) == 0)
+					{
+						vID.push_back(meta.id);
+					}
+
+					return false;
+				});
 			}
-
-			const String cmpType = type + "/";
-			m_archiveStream->EnumerateFiles([&type, &vID, &cmpType](const ArchiveMeta& meta)->bool {
-				if (meta.id.compare(0, cmpType.size(), cmpType) == 0)
+			else
+			{
+				if (!m_allowUrlRewrite)
 				{
-					vID.push_back(meta.id);
+					EQ_THROW(u8"アーカイブがオープンされていません。");
 				}
-
-				return false;
-			});
+			}
 		}
 		EQ_HANDLER
 		{
