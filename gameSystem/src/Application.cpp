@@ -37,6 +37,8 @@ int Application::Main()
 
 	m_renderer = Renderer::Create();
 
+	OnCreate();
+
 	// ダッシュボード
 	auto view = TopMenu::Create(u8"TOP");
 	m_dashboard = Dashboard::CreateWithView(view);

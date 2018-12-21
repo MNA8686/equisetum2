@@ -32,22 +32,19 @@ int SystemViewSETest::Enter()
 		std::vector<String> test;
 		
 		// SEリストを取得する
-		auto seList = Directory::GetFiles(Path::GetFullPath("se"));
-		if (seList)
+		auto seList = Singleton<AssetManager>::GetInstance()->GetIdList("se");
+		for (auto se : seList)
 		{
-			for (auto se : *seList)
+			const String ext = Path::GetExtension(se);
+			if (ext == ".ogg" ||
+				ext == ".mp3" ||
+				ext == ".wav")
 			{
-				const String ext = Path::GetExtension(se);
-				if (ext == ".ogg" ||
-					ext == ".mp3" ||
-					ext == ".wav")
+				const String nameWithoutExt = Path::GetFileNameWithoutExtension(se);
+				auto result = std::find(test.begin(), test.end(), nameWithoutExt);
+				if (result == test.end())
 				{
-					const String nameWithoutExt = Path::GetFileNameWithoutExtension(se);
-					auto result = std::find(test.begin(), test.end(), nameWithoutExt);
-					if (result == test.end())
-					{
-						test.push_back(nameWithoutExt);
-					}
+					test.push_back(nameWithoutExt);
 				}
 			}
 		}

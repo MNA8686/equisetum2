@@ -2,6 +2,7 @@
 #define _EQASSETMANAGER_H_
 
 #include "util/SharedPool.hpp"
+#include "util/ArchiveAccessor.hpp"
 #include "system/Singleton.h"
 #include "graphic/Image.hpp"
 #include "graphic/Sprite.hpp"
@@ -54,6 +55,17 @@ namespace Equisetum2
 
 			return nullptr;
 		}
+		
+		// アーカイブのパスを指定する
+		bool SetArchivePath(const String& path, const String& secretKey);
+		// アセットファイルが直接配置されている場合、それらのファイルを読み出すことを許可するかどうか
+		void AllowUrlRewrite(bool allow);
+		// アーカイブ内のファイルへのストリームを取得する
+		std::shared_ptr<IStream> GetStreamByID(const String& id);
+		// アーカイブ内にファイルが存在するかどうかを取得する
+		bool ExistsByID(const String& id);
+		// タイプごとのID一覧を取得する
+		std::vector<String> GetIdList(const String& type);
 
 	private:
 
@@ -61,13 +73,13 @@ namespace Equisetum2
 		virtual ~AssetManager() = default;
 
 		template<typename T>
-		static std::shared_ptr<T> _Load(const String& id)
+		std::shared_ptr<T> _Load(const String& id)
 		{
 			return nullptr;
 		}
 
 		template<>
-		static std::shared_ptr<Image> _Load(const String& id)
+		std::shared_ptr<Image> _Load(const String& id)
 		{
 			return _LoadImage(id);
 		}
@@ -93,48 +105,53 @@ namespace Equisetum2
 		})";
 		*/
 		template<>
-		static std::shared_ptr<Sprite> _Load(const String& id)
+		std::shared_ptr<Sprite> _Load(const String& id)
 		{
 			return _LoadSprite(id);
 		}
 
 		template<>
-		static std::shared_ptr<BitmapFont> _Load(const String& id)
+		std::shared_ptr<BitmapFont> _Load(const String& id)
 		{
 			return _LoadBitmapFont(id);
 		}
 
 		template<>
-		static std::shared_ptr<FontManager> _Load(const String& id)
+		std::shared_ptr<FontManager> _Load(const String& id)
 		{
 			return _LoadFontManager(id);
 		}
 
 		template<>
-		static std::shared_ptr<SE> _Load(const String& id)
+		std::shared_ptr<SE> _Load(const String& id)
 		{
 			return _LoadSE(id);
 		}
 
 		template<>
-		static std::shared_ptr<BGM> _Load(const String& id)
+		std::shared_ptr<BGM> _Load(const String& id)
 		{
 			return _LoadBGM(id);
 		}
 
 		template<>
-		static std::shared_ptr<Texture> _Load(const String& id)
+		std::shared_ptr<Texture> _Load(const String& id)
 		{
 			return _LoadTexture(id);
 		}
 
-		static std::shared_ptr<Image> _LoadImage(const String& id);
-		static std::shared_ptr<Sprite> _LoadSprite(const String& id);
-		static std::shared_ptr<BitmapFont> _LoadBitmapFont(const String& id);
-		static std::shared_ptr<FontManager> _LoadFontManager(const String& id);
-		static std::shared_ptr<BGM> _LoadBGM(const String& id);
-		static std::shared_ptr<SE> _LoadSE(const String& id);
-		static std::shared_ptr<Texture> _LoadTexture(const String& id);
+		std::shared_ptr<Image> _LoadImage(const String& id);
+		std::shared_ptr<Sprite> _LoadSprite(const String& id);
+		std::shared_ptr<BitmapFont> _LoadBitmapFont(const String& id);
+		std::shared_ptr<FontManager> _LoadFontManager(const String& id);
+		std::shared_ptr<BGM> _LoadBGM(const String& id);
+		std::shared_ptr<SE> _LoadSE(const String& id);
+		std::shared_ptr<Texture> _LoadTexture(const String& id);
+
+		bool m_allowUrlRewrite = true;
+		String m_archivePath;
+		std::shared_ptr<ArchiveAccessor> m_archiveStream;
+		String m_secretKey;
 	};
 }
 

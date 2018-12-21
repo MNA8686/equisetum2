@@ -32,15 +32,12 @@ int SystemViewTextureTest::Enter()
 		std::vector<String> test;
 		
 		// スプライトリストを取得する
-		auto spriteList = Directory::GetFiles(Path::GetFullPath("image"));
-		if (spriteList)
+		auto spriteList = Singleton<AssetManager>::GetInstance()->GetIdList("image");
+		for (auto sprite : spriteList)
 		{
-			for (auto sprite : *spriteList)
+			if (Path::GetExtension(sprite) == u8".png")
 			{
-				if (Path::GetExtension(sprite) == u8".png")
-				{
-					test.push_back(Path::GetFileNameWithoutExtension(sprite));
-				}
+				test.push_back(Path::GetFileNameWithoutExtension(sprite));
 			}
 		}
 		

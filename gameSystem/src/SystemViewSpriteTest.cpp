@@ -60,15 +60,12 @@ int SystemViewSpriteTest::Enter()
 		std::vector<String> test;
 		
 		// スプライトリストを取得する
-		auto spriteList = Directory::GetFiles(Path::GetFullPath("sprite"));
-		if (spriteList)
+		auto spriteList = Singleton<AssetManager>::GetInstance()->GetIdList("sprite");
+		for (auto sprite : spriteList)
 		{
-			for (auto sprite : *spriteList)
+			if (Path::GetExtension(sprite) == u8".json")
 			{
-				if (Path::GetExtension(sprite) == u8".json")
-				{
-					test.push_back(Path::GetFileNameWithoutExtension(sprite));
-				}
+				test.push_back(Path::GetFileNameWithoutExtension(sprite));
 			}
 		}
 		
