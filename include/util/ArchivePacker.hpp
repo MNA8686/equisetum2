@@ -52,7 +52,7 @@ namespace Equisetum2
 
 		/**
 		* @brief ファイルをひとつ書き込む SetCrypt()で設定した暗号化方式が適用される
-		* @param id ファイルのID 使用可能な文字は [0-9a-zA-Z._/] のみ。文字数は特に規定しない。
+		* @param id ファイルのID 使用可能な文字は [0-9a-zA-Z._/\-|@] のみ。文字数は特に規定しない。
 		* @param inStream アーカイブに書き込みたいファイルのストリーム
 		* @return 成否
 		*/

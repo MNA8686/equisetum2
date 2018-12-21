@@ -134,10 +134,10 @@ namespace Equisetum2
 			}
 
 			// idに使えない文字が無いかチェック
-			auto search = Regex::Search(id, u8"[^0-9a-zA-Z._/]+");
+			auto search = Regex::Search(id, u8"[^0-9a-zA-Z._/\\-|@]+");
 			if (search)
 			{
-				EQ_THROW(u8"idに使える文字は [0-9a-zA-Z._/] のみです。");
+				EQ_THROW(u8"idに使える文字は [0-9a-zA-Z._/\\-|@] のみです。");
 			}
 
 			// ファイル情報を書き込む
