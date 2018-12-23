@@ -51,6 +51,11 @@ namespace Equisetum2
 			SDL_SetWindowTitle(m_pWindow.get(), title.c_str());
 		}
 
+		void SetMinimumSize(int width, int height)
+		{
+			SDL_SetWindowMinimumSize(m_pWindow.get(), width, height);
+		}
+
 		void SetSize(int width, int height)
 		{
 			SDL_SetWindowSize(m_pWindow.get(), width, height);

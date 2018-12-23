@@ -17,6 +17,7 @@ namespace Equisetum2
 		void Update();
 
 		void SetTitle(const String& title);
+		void SetMinimumSize(int width, int height);
 		void SetSize(int width, int height);
 		void SetStyle(WindowStyle style);
 		void SetPos(int x, int y);

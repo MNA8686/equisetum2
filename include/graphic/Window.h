@@ -21,6 +21,7 @@ namespace Equisetum2
 	{
 	public:
 		static void SetTitle(const String& title);
+		static void SetMinimumSize(int width, int height);
 		static void SetSize(int width, int height);
 		static void SetStyle(WindowStyle style);
 		static void SetPos(int x, int y);

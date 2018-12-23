@@ -9,6 +9,11 @@ namespace Equisetum2
 		Singleton<WindowCompat>::GetInstance()->SetTitle(title);
 	}
 
+	void Window::SetMinimumSize(int width, int height)
+	{
+		Singleton<WindowCompat>::GetInstance()->SetMinimumSize(width, height);
+	}
+
 	void Window::SetSize(int width, int height)
 	{
 		Singleton<WindowCompat>::GetInstance()->SetSize(width, height);

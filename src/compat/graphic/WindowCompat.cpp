@@ -27,6 +27,11 @@ namespace Equisetum2
 		m_Impl->SetTitle(title);
 	}
 
+	void WindowCompat::SetMinimumSize(int width, int height)
+	{
+		m_Impl->SetMinimumSize(width, height);
+	}
+
 	void WindowCompat::SetSize(int width, int height)
 	{
 		m_Impl->SetSize(width, height);
