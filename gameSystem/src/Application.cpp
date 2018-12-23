@@ -28,6 +28,8 @@ int Application::Main()
 		return false;
 	});
 
+	OnCreate();
+
 	m_sysTimer = SystemTimer::Create();
 	m_fpsMakerTick = TickCounter::Create(m_sysTimer);
 	m_fpsMaker = FpsPaceMaker::Create(m_fpsMakerTick, m_fps);
@@ -37,10 +39,12 @@ int Application::Main()
 
 	m_renderer = Renderer::Create();
 
-	OnCreate();
-
 	// ダッシュボード
 	auto view = TopMenu::Create(u8"TOP");
+	if (!view)
+	{
+		return -1;
+	}
 	m_dashboard = Dashboard::CreateWithView(view);
 
 	// FPS

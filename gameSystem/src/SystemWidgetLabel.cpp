@@ -43,6 +43,10 @@ bool SystemWidgetLabel::SetPreset(const String & preset, const std::shared_ptr<F
 	EQ_DURING
 	{
 		auto font = fontManager ? fontManager : GetApplication()->GetSystemFont();
+		if (!font)
+		{
+			EQ_THROW(u8"フォントの取得に失敗しました。");
+		}
 
 		std::shared_ptr<BitmapFont> bitmapFont = font->MakeBitmapFont(preset, Color{0xff, 0xff, 0xff, 0xff});
 		if (!bitmapFont)
