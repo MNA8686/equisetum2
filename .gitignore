@@ -21,3 +21,5 @@
 /projects/VisualC/ipch
 /gameSystem/include/*.bak
 /include/graphic/*.bak
+/eqtools/project/VisualC/Debugs
+/eqtools/project/VisualC/Releases
