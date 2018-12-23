@@ -10,23 +10,72 @@
 #include "SystemWidgetLabel.hpp"
 #include "Dashboard.hpp"
 #include "SystemViewTopMenu.hpp"
+#include <iomanip>
+
+static const String logfile = "log.txt";
 
 int Application::Main()
 {
 	bool isError = false;
+	std::shared_ptr<IStream> logStream;
 
 	Logger::SetPriority(LogLevel::Debug);
-	Logger::SetCallback([&isError](LogLevel level, const char* str)->bool {
-		if (!isError && level >= LogLevel::Error)
+
+	Logger::SetCallback([&isError, &logStream, this](LogLevel level, const char* str)->bool {
+		if (!isError)
 		{
-			// ヤバイエラーはアラートを出して処理を停止する。
-			// アラートは1回だけ表示するようにする。
-			// ほかのはログを見ればわかるようにしておく。
-			Window::ShowAlert(str);
-			isError = true;
+			if (level >= LogLevel::Error)
+			{
+				// ヤバイエラーはアラートを出して処理を停止する。
+				// アラートは1回だけ表示するようにする。
+				// ほかのはログを見ればわかるようにしておく。
+				Window::ShowAlert(str);
+				isError = true;
+			}
+		}
+
+		if (level >= LogLevel::Info)
+		{
+			// ログをファイルに出力する
+			if (logStream)
+			{
+				static const char* tbl[] =
+				{
+					"?",
+					"V",
+					"D",
+					"I",
+					"W",
+					"E",
+					"C",
+				};
+
+				#pragma warning(push)
+				#pragma warning(disable: 4996)
+				std::time_t t = std::time(nullptr);
+				const std::tm* lt = std::localtime(&t);
+				#pragma warning(pop)
+
+				// ログレベルと時刻を先頭に追加する
+				String errorStr = String::Sprintf("%s %d/%02d/%02d %02d:%02d:%02d %s", tbl[static_cast<int>(level)], 1900 + lt->tm_year, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec, str);
+				// 改行が入って無ければ改行を追加する
+				if (*(errorStr.rbegin()) != '\n')
+				{
+					errorStr += "\n";
+				}
+
+				logStream->Write(reinterpret_cast<const uint8_t*>(errorStr.c_str()), errorStr.size());
+			}
 		}
 		return false;
 	});
+
+	// 空のログファイルを作成する
+	Optional<String> path = Path::GetPrivateDocumentPath(GetOrganizationName(), GetApplicationName());
+	if (path)
+	{
+		logStream = FileStream::NewFileFromPath(*path + logfile);
+	}
 
 	OnCreate();
 

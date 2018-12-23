@@ -30,6 +30,9 @@ protected:
 	virtual bool OnDraw(void) = 0;
 
 	virtual bool OnActive(bool active);
+	
+	virtual String GetOrganizationName(void) = 0;
+	virtual String GetApplicationName(void) = 0;
 
 	void Quit();
 
