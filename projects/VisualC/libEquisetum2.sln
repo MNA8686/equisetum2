@@ -26,6 +26,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gameSystem", "..\..\gameSystem\project\VisualC\gameSystem.vcxproj", "{D118A2E3-6C1A-479B-A6CC-76806DDC4C7E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{641DEE76-B658-4449-A6A2-A17BDFBB0F8E} = {641DEE76-B658-4449-A6A2-A17BDFBB0F8E}
+		{F7E37DF3-440E-45A2-993E-84585D05C012} = {F7E37DF3-440E-45A2-993E-84585D05C012}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eqtools", "..\..\eqtools\project\VisualC\eqtools.vcxproj", "{F7E37DF3-440E-45A2-993E-84585D05C012}"

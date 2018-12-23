@@ -14,11 +14,22 @@
 
 namespace Equisetum2
 {
+	static const String gSystemPath = "system/";
+	static const String gSystemFile = "system.eq2";
+
 	static String MakeIdPath(const String& type, const String& id, const String& ext )
 	{
-		// "type/id" の文字列を作る
-		// 入力IDに拡張子が付いていても無視する
-		return type + "/" + Path::GetFileNameWithoutExtension(id) + ext;
+		// systemフォルダが指定されている場合は、systemフォルダ向けのパスを作成する
+		if (id.compare(0, gSystemPath.size(), gSystemPath) == 0)
+		{
+			return gSystemPath + type + "/" + Path::GetFileNameWithoutExtension(id.substr(gSystemPath.size())) + ext;
+		}
+		else
+		{
+			// "type/id" の文字列を作る
+			// 入力IDに拡張子が付いていても無視する
+			return type + "/" + Path::GetFileNameWithoutExtension(id) + ext;
+		}
 	}
 
 	static std::shared_ptr<Sprite> _LoadSpriteImpl(const String& id, const std::function<bool(rapidjson::Document& doc)> cbDoc = nullptr)
@@ -389,6 +400,34 @@ namespace Equisetum2
 	{
 		EQ_DURING
 		{
+			// systemフォルダ内のファイルを指定されている？
+			if (id.compare(0, gSystemPath.size(), gSystemPath) == 0)
+			{
+				// アーカイブをオープンする
+				auto stream = FileStream::CreateFromPath(Path::GetFullPath(gSystemFile));
+				if (!stream)
+				{
+					EQ_THROW(String::Sprintf(u8"アーカイブ %sのオープンに失敗しました。", gSystemFile.c_str()));
+				}
+
+				/* オープンしたストリームをメタ情報読み出し用に使用する。
+				   同時に複数のアセットを開くことがあるため、ファイルの中身は
+				   その都度ストリームを生成して使用する。 */
+				auto archiveStream = ArchiveAccessor::CreateFromStream(stream, "EquinoxDevelopment");
+				if (!archiveStream)
+				{
+					EQ_THROW(String::Sprintf(u8"アーカイブ%sの解析に失敗しました。", gSystemFile.c_str()));
+				}
+
+				auto fileStream = archiveStream->FindByID(id.substr(gSystemPath.size()));
+				if (!fileStream)
+				{
+					EQ_THROW(String::Sprintf(u8"システムファイル%sの取得に失敗しました。", id.c_str()));
+				}
+
+				return fileStream;
+			}
+
 			if (m_allowUrlRewrite)
 			{
 				String nativePath = Path::GetFullPath(id);

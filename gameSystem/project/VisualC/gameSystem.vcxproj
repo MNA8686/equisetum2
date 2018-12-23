@@ -89,7 +89,9 @@
       <OutputFile>$(IntDir)$(TargetName)_d$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(IntDir)gameSystem_d.lib" "..\..\..\lib\win32\lib"</Command>
+      <Command>copy "$(IntDir)gameSystem_d.lib" "..\..\..\lib\win32\lib"
+cd ..\..\..\eqtools\project\VisualC\eqtools
+eqtools archive -I "..\..\..\..\gameSystem\assets" -O "..\..\..\..\lib\win32\system.eq2" -K EquinoxDevelopment font</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +129,9 @@
       <OutputFile>$(IntDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(IntDir)gameSystem.lib" "..\..\..\lib\win32\lib"</Command>
+      <Command>copy "$(IntDir)gameSystem.lib" "..\..\..\lib\win32\lib"
+cd ..\..\..\eqtools\project\VisualC\eqtools
+eqtools archive -I "..\..\..\..\gameSystem\assets" -O "..\..\..\..\lib\win32\system.eq2" -K EquinoxDevelopment font</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

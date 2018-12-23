@@ -187,7 +187,7 @@ std::shared_ptr<FontManager>& Application::GetSystemFont(void)
 	if (!m_fontManager)
 	{
 		int fontSize = Window::Size().y / 30;
-		String arg = String::Sprintf(u8"mgenplus-1pp-heavy?%d", fontSize);
+		String arg = String::Sprintf(u8"system/mgenplus-1pp-heavy?%d", fontSize);
 		
 		m_fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
 	}
