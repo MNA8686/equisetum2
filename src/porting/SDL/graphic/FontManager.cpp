@@ -374,4 +374,9 @@ namespace Equisetum2
 	{
 		return m_id;
 	}
+	
+	int32_t FontManager::GetFontSize() const
+	{
+		return m_fontSize;
+	}
 }

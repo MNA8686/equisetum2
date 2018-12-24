@@ -37,6 +37,8 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
+		int32_t GetFontSize() const;
+
 		class Impl;
 		std::shared_ptr<Impl> m_pImpl;
 
