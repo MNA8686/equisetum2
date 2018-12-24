@@ -36,43 +36,20 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 		}
 		inst->m_label->Setlayer(layer);
 
-		Size windowSize = Window::Size();
-	
 		// 外枠
-		{
-			// ピクセルサイズを求める
-			Rect rectBorderPixel{
-				static_cast<int32_t>(windowSize.x * inst->m_rectBorder.x),
-				static_cast<int32_t>(windowSize.y * inst->m_rectBorder.y),
-				static_cast<int32_t>(windowSize.x * inst->m_rectBorder.width),
-				static_cast<int32_t>(windowSize.y * inst->m_rectBorder.height)
-			};
-			inst->m_rectBorderPixel = rectBorderPixel;
-			
-			inst->m_rectRendererBorder = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
-			inst->m_rectRendererBorder->SetBlendMode(BlendMode::Blend);
-			inst->m_rectRendererBorder->SetColor(Color{ 0, 180, 0, 200 });
-			inst->m_rectRendererBorder->SetRect(inst->m_rectBorderPixel, true);
-			inst->m_rectRendererBorder->SetLayer(layer);
-		}
+		inst->m_rectRendererBorder = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
+		inst->m_rectRendererBorder->SetBlendMode(BlendMode::Blend);
+		inst->m_rectRendererBorder->SetColor(Color{ 0, 180, 0, 200 });
+		inst->m_rectRendererBorder->SetLayer(layer);
 
 		// 内枠
-		{
-			// ピクセルサイズを求める
-			Rect rectInnerFramePixel{
-				static_cast<int32_t>(windowSize.x * inst->m_rectInnerFrame.x),
-				static_cast<int32_t>(windowSize.y * inst->m_rectInnerFrame.y),
-				static_cast<int32_t>(windowSize.x * inst->m_rectInnerFrame.width),
-				static_cast<int32_t>(windowSize.y * inst->m_rectInnerFrame.height)
-			};
-			inst->m_rectInnerFramePixel = rectInnerFramePixel;
-			
-			inst->m_rectRendererInnerFrame = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
-			inst->m_rectRendererInnerFrame->SetBlendMode(BlendMode::Blend);
-			inst->m_rectRendererInnerFrame->SetColor(Color{ 32, 200, 32, 200 });
-			inst->m_rectRendererInnerFrame->SetRect(inst->m_rectInnerFramePixel, true);
-			inst->m_rectRendererInnerFrame->SetLayer(layer);
-		}
+		inst->m_rectRendererInnerFrame = GetApplication()->GetRenderer()->CreateRenderObject<RectRenderer>();
+		inst->m_rectRendererInnerFrame->SetBlendMode(BlendMode::Blend);
+		inst->m_rectRendererInnerFrame->SetColor(Color{ 32, 200, 32, 200 });
+		inst->m_rectRendererInnerFrame->SetLayer(layer);
+
+		// 外枠と内枠のサイズを算出
+		inst->CalculateBorder();
 
 		// タイトル設定
 		inst->m_label->SetPivot({ 0.5f, 0.5f });
@@ -81,14 +58,7 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 
 		// アイテム表示欄作成
 		{
-			// 共通のフォントを作成する
-			String commonStr = u8" 0123456789[]:";
-			for (auto& str : vItem)
-			{
-				commonStr += str;
-			}
-
-			std::shared_ptr<BitmapFont> bitmapFont = GetApplication()->GetSystemFont()->MakeBitmapFont(commonStr, Color{ 0xff, 0xff, 0xff, 0xff });
+			std::shared_ptr<BitmapFont> bitmapFont = inst->MakeBitmapFont();
 			if (!bitmapFont)
 			{
 				EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
@@ -100,12 +70,11 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 			// 行数分だけラベルを作成する
 			for (int32_t count = 0; count < inst->m_maxRow; count++)
 			{
-				auto label = SystemWidgetLabel::Create(u8" ");
+				auto label = SystemWidgetLabelWithFont::CreateWithBitmapFont(u8" ", bitmapFont);
 				if (!label)
 				{
 					EQ_THROW(u8"ラベルの作成に失敗しました。");
 				}
-				label->SetPreset(bitmapFont);
 				label->SetPivot({ 0, 0 });
 				label->SetPos({inst->m_rectInnerFrame.x + 0.01f, inst->m_rectInnerFrame.y + count * inst->textSize});
 				label->Setlayer(layer);
@@ -128,6 +97,97 @@ std::shared_ptr<SystemChoiceDialog> SystemChoiceDialog::Create(const String & ti
 	EQ_END_HANDLER
 
 	return nullptr;
+}
+
+std::shared_ptr<BitmapFont> SystemChoiceDialog::MakeBitmapFont()
+{
+	EQ_DURING
+	{
+		Size size = Window::Size();
+		bool makeBitmap = false;
+
+		if (m_font)
+		{
+			int32_t oldSize = m_font->GetFontSize();
+			
+			m_font = GetApplication()->GetSystemFont();
+			if (m_font)
+			{
+				if (oldSize != m_font->GetFontSize())
+				{
+					makeBitmap = true;
+				}
+			}
+		}
+		else
+		{
+			m_font = GetApplication()->GetSystemFont();
+			makeBitmap = true;
+		}
+		
+		if (!m_font)
+		{
+			EQ_THROW(u8"システムフォントの取得に失敗しました。");
+		}
+
+		std::shared_ptr<BitmapFont> bitmapFont;
+		
+		if (makeBitmap)
+		{
+			// 共通のフォントを作成する
+			String commonStr = u8" 0123456789[]:";
+			for (auto& str : m_vItem)
+			{
+				commonStr += str;
+			}
+
+			bitmapFont = m_font->MakeBitmapFont(commonStr, Color{ 0xff, 0xff, 0xff, 0xff });
+			if (!bitmapFont)
+			{
+				EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
+			}
+		}
+
+		return bitmapFont;
+	}
+	EQ_HANDLER
+	{
+		Logger::OutputError(EQ_GET_HANDLER().what());
+	}
+	EQ_END_HANDLER
+
+	return nullptr;
+}
+
+void SystemChoiceDialog::CalculateBorder()
+{
+	Size windowSize = Window::Size();
+
+	// 外枠
+	{
+		// ピクセルサイズを求める
+		Rect rectBorderPixel{
+			static_cast<int32_t>(windowSize.x * m_rectBorder.x),
+			static_cast<int32_t>(windowSize.y * m_rectBorder.y),
+			static_cast<int32_t>(windowSize.x * m_rectBorder.width),
+			static_cast<int32_t>(windowSize.y * m_rectBorder.height)
+		};
+
+		m_rectRendererBorder->SetRect(rectBorderPixel, true);
+	}
+
+	// 内枠
+	{
+		// ピクセルサイズを求める
+		Rect rectInnerFramePixel{
+			static_cast<int32_t>(windowSize.x * m_rectInnerFrame.x),
+			static_cast<int32_t>(windowSize.y * m_rectInnerFrame.y),
+			static_cast<int32_t>(windowSize.x * m_rectInnerFrame.width),
+			static_cast<int32_t>(windowSize.y * m_rectInnerFrame.height)
+		};
+
+		m_rectRendererInnerFrame->SetRect(rectInnerFramePixel, true);
+	}
 }
 
 int SystemChoiceDialog::Do(SystemView * pView)
@@ -208,9 +268,24 @@ int SystemChoiceDialog::Render(const SystemView * pView)
 		return -1;
 	}
 
+	// 外枠と内枠のサイズを算出
+	CalculateBorder();
+	// 外枠と内枠をレンダーキューに追加
 	GetApplication()->GetRenderer()->AddRenderQueue(m_rectRendererBorder.get());
 	GetApplication()->GetRenderer()->AddRenderQueue(m_rectRendererInnerFrame.get());
 
+	// ビットマップフォントが更新されていたらラベルに反映させる
+	auto bitmapFont = MakeBitmapFont();
+	if(bitmapFont)
+	{
+		// 行数分だけラベルを作成する
+		for (auto& label : m_vLabel)
+		{
+			label->SetBitmapFont(bitmapFont);
+		}
+	}
+
+	// ラベルをレンダリングする
 	m_label->Render(pView);
 
 	for (auto& label : m_vLabel)

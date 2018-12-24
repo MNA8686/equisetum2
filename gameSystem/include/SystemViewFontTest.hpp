@@ -5,7 +5,7 @@ using namespace Equisetum2;
 
 #include "SystemView.hpp"
 
-class SystemWidgetLabel;
+class SystemWidgetLabelWithFont;
 class SystemViewFontTest : public SystemView
 {
 public:
@@ -25,6 +25,6 @@ protected:
 
 	Color m_color{128, 128, 128, 128};
 	PointF m_textPos{0.05f, 0.7f};
-	std::shared_ptr<SystemWidgetLabel> m_label;
+	std::shared_ptr<SystemWidgetLabelWithFont> m_label;
 };
 

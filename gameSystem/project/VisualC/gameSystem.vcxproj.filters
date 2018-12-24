@@ -96,6 +96,9 @@
     <ClCompile Include="..\..\src\SystemViewFontTest.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\SystemWidgetLabelWithFont.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Node.hpp">
@@ -168,6 +171,9 @@
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\SystemViewFontTest.hpp">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\SystemWidgetLabelWithFont.hpp">
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
   </ItemGroup>

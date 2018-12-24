@@ -38,23 +38,48 @@ SystemWidgetLabel::SystemWidgetLabel()
 	m_renderer->SetBlendMode(BlendMode::Blend);
 }
 
-bool SystemWidgetLabel::SetPreset(const String & preset, const std::shared_ptr<FontManager> fontManager)
+bool SystemWidgetLabel::SetPreset(const String & preset)
 {
 	EQ_DURING
 	{
-		auto font = fontManager ? fontManager : GetApplication()->GetSystemFont();
-		if (!font)
+		Size size = Window::Size();
+		bool makeBitmap = false;
+
+		if (m_font)
 		{
-			EQ_THROW(u8"フォントの取得に失敗しました。");
+			int32_t oldSize = m_font->GetFontSize();
+			
+			m_font = GetApplication()->GetSystemFont();
+			if (m_font)
+			{
+				if (oldSize != m_font->GetFontSize())
+				{
+					makeBitmap = true;
+				}
+			}
+		}
+		else
+		{
+			m_font = GetApplication()->GetSystemFont();
+			makeBitmap = true;
+		}
+		
+		if (!m_font)
+		{
+			EQ_THROW(u8"システムフォントの取得に失敗しました。");
 		}
 
-		std::shared_ptr<BitmapFont> bitmapFont = font->MakeBitmapFont(preset, Color{0xff, 0xff, 0xff, 0xff});
-		if (!bitmapFont)
+		if (makeBitmap || m_preset != preset)
 		{
-			EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
-		}
+			m_preset = preset;
+			std::shared_ptr<BitmapFont> bitmapFont = m_font->MakeBitmapFont(m_preset, Color{ 0xff, 0xff, 0xff, 0xff });
+			if (!bitmapFont)
+			{
+				EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
+			}
 
-		m_renderer->SetBitmapFont(bitmapFont);
+			m_renderer->SetBitmapFont(bitmapFont);
+		}
 
 		return true;
 	}
@@ -65,12 +90,6 @@ bool SystemWidgetLabel::SetPreset(const String & preset, const std::shared_ptr<F
 	EQ_END_HANDLER
 
 	return false;
-}
-
-bool SystemWidgetLabel::SetPreset(std::shared_ptr<BitmapFont> bitmapFont)
-{
-	m_renderer->SetBitmapFont(bitmapFont);
-	return true;
 }
 
 bool SystemWidgetLabel::SetText(const String & label)
@@ -99,6 +118,12 @@ int SystemWidgetLabel::Render(const SystemView* pView)
 	{
 		parentPos.x = pView->GetPos().x;
 		parentPos.y = pView->GetPos().y;
+	}
+
+	// システムフォントのサイズに追従する
+	if (!SetPreset(m_preset))
+	{
+		return false;
 	}
 
 	Size size = Window::Size();

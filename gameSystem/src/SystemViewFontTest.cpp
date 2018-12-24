@@ -7,6 +7,7 @@
 #include "SystemWidgetPushView.hpp"
 #include "SystemWidgetCustom.hpp"
 #include "SystemWidgetChoice.hpp"
+#include "SystemWidgetLabelWithFont.hpp"
 #include "Application.hpp"
 
 static const char* testString = u8"abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ\n1234567890.:,;'\"(!?)+-*/=\nEquisetum2でゲームの世界が広がります。";
@@ -33,7 +34,7 @@ void SystemViewFontTest::LoadFont()
 	// フォントマネージャーを作成する
 	auto fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
 
-	m_label->SetPreset(testString, fontManager);
+	m_label->SetPresetWithFont(testString, fontManager);
 	m_label->SetText(testString);
 }
 
@@ -138,7 +139,7 @@ int SystemViewFontTest::Enter()
 
 	menu->SetFocus(true);
 
-	m_label = SystemWidgetLabel::Create(testString);
+	m_label = SystemWidgetLabelWithFont::CreateWithFont(testString, GetApplication()->GetSystemFont());
 	m_label->SetPivot({0, 0.5f});
 	m_label->SetPostEffect([this](TextRenderer* renderer) {
 		renderer->SetColor(m_color);

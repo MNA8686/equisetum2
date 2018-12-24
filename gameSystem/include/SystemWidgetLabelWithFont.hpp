@@ -5,18 +5,19 @@ using namespace Equisetum2;
 
 #include "SystemWidget.hpp"
 
-// システムフォントを使用したラベル
-// 画面サイズの変更に追従する
-class SystemWidgetLabel : public SystemWidget
+class SystemWidgetLabelWithFont : public SystemWidget
 {
 public:
-	static std::shared_ptr<SystemWidgetLabel> Create(const String& label);
+	static std::shared_ptr<SystemWidgetLabelWithFont> CreateWithFont(const String& label, const std::shared_ptr<FontManager> fontManager);
+	static std::shared_ptr<SystemWidgetLabelWithFont> CreateWithBitmapFont(const String& label, std::shared_ptr<BitmapFont> bitmapFont);
 
-	SystemWidgetLabel();
-	~SystemWidgetLabel() = default;
+	SystemWidgetLabelWithFont();
+	~SystemWidgetLabelWithFont() = default;
 
 	// 使用する文字一覧をセットする
-	bool SetPreset(const String& preset);
+	bool SetPresetWithFont(const String& preset, const std::shared_ptr<FontManager> fontManager);
+	// ビットマップフォントをセットする
+	bool SetBitmapFont(std::shared_ptr<BitmapFont> bitmapFont);
 	// テキストを設定する
 	bool SetText(const String& label);
 	// ラベルのレンダリング
@@ -36,7 +37,6 @@ protected:
 private:
 	std::shared_ptr<TextRenderer> m_renderer;
 	std::function<void(TextRenderer*)> m_cb;
-	std::shared_ptr<FontManager> m_font;
 	String m_preset;
 };
 
