@@ -164,6 +164,9 @@ int Application::Main()
 				}
 
 				m_renderer->SetRenderTarget(nullptr);
+				
+				Size windowsSize = Window::Size();
+				m_renderer->SetViewport(Rect{ 0, 0, windowsSize.x, windowsSize.y });
 				m_renderer->Clear({ 5, 32, 18, 0 });
 				m_dashboard->Render();
 			}
@@ -237,12 +240,14 @@ std::shared_ptr<Renderer>& Application::GetRenderer(void)
 
 std::shared_ptr<FontManager>& Application::GetSystemFont(void)
 {
-	if (!m_fontManager)
+	int fontSize = Window::Size().y / 30;
+
+	if (!m_fontManager || fontSize != m_systemFontSize)
 	{
-		int fontSize = Window::Size().y / 30;
 		String arg = String::Sprintf(u8"system/mgenplus-1pp-heavy?%d", fontSize);
 		
 		m_fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
+		m_systemFontSize = fontSize;
 	}
 
 	return m_fontManager;

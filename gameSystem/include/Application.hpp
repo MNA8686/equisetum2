@@ -49,6 +49,7 @@ private:
 	std::shared_ptr<FpsCounter> m_fpsCounter;
 
 	int32_t m_fps = 60;
+	int32_t m_systemFontSize = 8;
 	bool m_isQuit = false;
 };
 
