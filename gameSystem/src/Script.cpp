@@ -83,3 +83,8 @@ String Script::Identify() const
 {
 	return m_identify;
 }
+
+std::shared_ptr<Object> Script::GetOwner()
+{
+	return m_ownerObject.lock();
+}

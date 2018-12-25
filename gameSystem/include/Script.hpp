@@ -62,8 +62,10 @@ public:
 private:
 	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
 	String m_identify;
-protected:
 	std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
+
+protected:
+	std::shared_ptr<Object> GetOwner();
 };
 
 
