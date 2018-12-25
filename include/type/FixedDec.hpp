@@ -138,7 +138,7 @@ namespace Equisetum2
 			return m_val != 0;
 		}
 
-		inline int32_t GetInt()
+		inline int32_t GetInt() const
 		{
 			return m_val >> afterTheDecimalPoint;
 		}
@@ -148,7 +148,7 @@ namespace Equisetum2
 			m_val = val;
 		}
 
-		inline int32_t GetRaw()
+		inline int32_t GetRaw() const
 		{
 			return m_val;
 		}
