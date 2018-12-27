@@ -42,6 +42,7 @@ int TopMenu::Enter()
 		}
 		menu->SetWidget(returnToGame);
 
+#if 0
 		auto inputTest = SystemWidgetPushView::Create(u8"入力テスト", [this]()->std::shared_ptr<SystemView> {
 			return{};
 		});
@@ -50,6 +51,7 @@ int TopMenu::Enter()
 			EQ_THROW("");
 		}
 		menu->SetWidget(inputTest);
+#endif
 
 		auto assetTest = SystemWidgetPushView::Create(u8"アセットテスト", [this]()->std::shared_ptr<SystemView> {
 			return AssetTest::Create(u8"アセットテスト");
