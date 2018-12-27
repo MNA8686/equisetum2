@@ -102,7 +102,7 @@ int Application::Main()
 	labelFps->SetPos({ 0.98f, 0.95f });
 
 	bool isModeChange = true;
-	bool atDashboard = true;
+	bool atDashboard = false;
 	bool pause = false;
 
 	while (!m_isQuit)
