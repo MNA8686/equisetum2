@@ -8,7 +8,7 @@ chcp 65001
 echo ==============================
 echo =    libEquisetum2 Debug     =
 echo ==============================
-MSBuild.exe libEquisetum2.sln /t:Build /p:Configuration=Debug
+MSBuild.exe libEquisetum2.sln /t:Build /p:Configuration=Debug;PlatformTarget="x86"
 if not %errorlevel% == 0 (
 echo errorlevel %errorlevel%
 exit /b %errorlevel%
@@ -17,7 +17,7 @@ exit /b %errorlevel%
 echo ==============================
 echo =    libEquisetum2 Release   =
 echo ==============================
-MSBuild.exe libEquisetum2.sln /t:Build /p:Configuration=Release
+MSBuild.exe libEquisetum2.sln /t:Build /p:Configuration=Release;PlatformTarget="x86"
 if not %errorlevel% == 0 (
 echo errorlevel %errorlevel%
 exit /b %errorlevel%
