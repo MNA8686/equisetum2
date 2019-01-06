@@ -97,7 +97,7 @@ int Application::Main()
 	m_dashboard = Dashboard::CreateWithView(view);
 
 	// FPS
-	auto labelFps = SystemWidgetLabel::Create(u8" 0123456789/");
+	auto labelFps = SystemWidgetLabel::Create(u8" 0123456789/(D)");
 	labelFps->SetPivot({ 1.0f, 0.5f });
 	labelFps->SetPos({ 0.98f, 0.95f });
 
@@ -183,7 +183,11 @@ int Application::Main()
 			}
 
 			// FPS•\Ž¦
-			labelFps->SetText(String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps()));
+			String strFps = String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps());
+#if defined(_DEBUG)
+			strFps.insert(0, "(D) ");
+#endif
+			labelFps->SetText(strFps);
 			labelFps->Setlayer(Renderer::LayerMax - 1);
 			labelFps->Render(nullptr);
 
