@@ -24,7 +24,7 @@ namespace Equisetum2
 			{
 				Mix_Init(MIX_INIT_OGG);
 
-				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == 0)
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == 0)
 				{
 					Mix_AllocateChannels(g_maxChannel);
 					m_enable = true;
