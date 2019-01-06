@@ -283,6 +283,11 @@ namespace Equisetum2
 
 			return str;
 		}
+
+		static const String ascii()
+		{
+			return " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+		}
 	};
 
 	inline String operator+(const String& str1, const String& str2)
