@@ -19,7 +19,7 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
-		inst->m_label->SetPreset(u8" 0123456789-+" + inst->leftArrow + inst->rightArrow + label);
+		inst->m_label->SetPreset(String::ascii() + inst->leftArrow + inst->rightArrow + label);
 
 		auto str = inst->MakeString();
 		if (!inst->m_label->SetText(str))
@@ -97,6 +97,14 @@ void SystemWidgetSpin::SetValue(int32_t val)
 	m_label->SetText(str);
 }
 
+void SystemWidgetSpin::SetFormatCallBack(const std::function<String(int32_t)>& cb)
+{
+	m_cbFormat = cb;
+
+	auto str = MakeString();
+	m_label->SetText(str);
+}
+
 int32_t SystemWidgetSpin::GetValue() const
 {
 	return m_val;
@@ -114,8 +122,8 @@ Rect SystemWidgetSpin::GetBox() const
 
 const String SystemWidgetSpin::MakeString()
 {
-	const String text = String::Sprintf(u8"%s  %s %d %s", m_text.c_str(), leftArrow.c_str(), m_val, rightArrow.c_str());
-	return text;
+	String strVal = m_cbFormat ? m_cbFormat(m_val) : String::Sprintf(u8"%d", m_val);
+	return m_text + "  " + leftArrow + " " + strVal + " " + rightArrow;
 }
 
 int SystemWidgetSpin::Do(SystemView* pView)
