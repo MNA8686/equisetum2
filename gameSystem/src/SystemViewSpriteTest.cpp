@@ -85,11 +85,14 @@ int SystemViewSpriteTest::Enter()
 	});
 	menu->SetWidget(play);
 
-	auto rate = SystemWidgetSpin::Create(u8"拡大率(%)", [this](int32_t val) {
+	auto rate = SystemWidgetSpin::Create(u8"拡大率", [this](int32_t val) {
 		m_rate = val;
 	});
 	rate->SetRange(10, 1000, 10);
 	rate->SetValue(100);
+	rate->SetFormatCallBack([](int32_t val)->String {
+		return String::Sprintf("%d%%", val);
+	});
 	menu->SetWidget(rate);
 
 	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
