@@ -91,6 +91,27 @@ int SystemViewBGMTest::Enter()
 	});
 	menu->SetWidget(pause);
 
+	auto pos = SystemWidgetSpin::Create(u8"ポジション設定", [this](int32_t val) {
+	});
+	pos->SetFormatCallBack([](int32_t val)->String {
+		// "分:秒" のフォーマットで表示する
+		return String::Sprintf("%d:%02d", val / 60, val % 60);
+	});
+	pos->OnEnter([this](int32_t val) {
+		if (m_bgm)
+		{
+			if (!m_bgm->IsPlaying())
+			{
+				m_bgm->Play(false);
+			}
+			m_bgm->SetPos(static_cast<double>(val));
+		}
+	});
+	// BGMの長さがわからないのでとりあえず10分までの範囲を設定可能とする
+	pos->SetRange(0, (10 * 60) - 1, 1);
+	pos->SetValue(0);
+	menu->SetWidget(pos);
+
 	auto vol = SystemWidgetSpin::Create(u8"ボリューム", [this](int32_t val) {
 		m_volume = val;
 	});
