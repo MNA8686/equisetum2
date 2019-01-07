@@ -98,6 +98,11 @@ namespace Equisetum2
 		return Singleton<AudioCompat>::GetInstance()->VolumeBGM();
 	}
 
+	bool BGM::SetPos(double pos)
+	{
+		return Singleton<AudioCompat>::GetInstance()->SetPos(pos);
+	}
+
 	void BGM::SetIdentify(const String& id)
 	{
 		m_identify = id;

@@ -85,6 +85,11 @@ namespace Equisetum2
 		return m_Impl->IsPausedBGM();
 	}
 
+	bool AudioCompat::SetPos(double pos)
+	{
+		return m_Impl->SetPos(pos);
+	}
+
 	bool AudioCompat::SetVolumeBGM(double volume)
 	{
 		return m_Impl->SetVolumeBGM(volume);

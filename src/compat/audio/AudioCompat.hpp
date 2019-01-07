@@ -33,6 +33,7 @@ namespace Equisetum2
 		double VolumeBGM() const;
 		bool IsPlayingBGM() const;
 		bool IsPausedBGM() const;
+		bool SetPos(double pos);
 
 		// SE関連メソッド
 		AudioHandlerID CreateSEFromStream(const std::shared_ptr<IStream> stream);

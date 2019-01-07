@@ -187,6 +187,12 @@ namespace Equisetum2
 			return m_bgm[0].m_volume;
 		}
 
+		bool SetPos(double pos)
+		{
+			Mix_RewindMusic();
+			return Mix_SetMusicPosition(pos) == 0;
+		}
+
 		AudioHandlerID CreateSEFromStream(const std::shared_ptr<IStream> stream)
 		{
 			AudioHandlerID id = -1;

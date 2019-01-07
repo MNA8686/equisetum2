@@ -34,6 +34,7 @@ namespace Equisetum2
 		bool IsPaused() const override;
 		bool SetVolume(double volume) override;
 		double Volume() const override;
+		bool SetPos(double pos);
 
 		/**
 		* @brief ƒCƒ[ƒW‚ÌID‚ğİ’è‚·‚é
