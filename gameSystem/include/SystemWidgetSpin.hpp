@@ -17,11 +17,12 @@ public:
 
 	void SetRange(int32_t min, int32_t max, int32_t step = 1);
 	void SetValue(int32_t val);
-	void SetFormatCallBack(const std::function<String(int32_t)>& cb);
 	int32_t GetValue() const;
 	void SetCyclic(bool val);
 	Rect GetBox() const override;
 	void SetPos(const PointF& pos) override;
+	void SetFormatCallBack(const std::function<String(int32_t)>& cb);
+	void OnEnter(const std::function<void(int32_t)>& cb);
 
 private:
 	std::function<void(int32_t)> m_cb;
@@ -38,6 +39,7 @@ private:
 	const String rightArrow = u8"▶";
 
 	std::function<String(int32_t)> m_cbFormat;
+	std::function<void(int32_t)> m_cbEnter;
 	std::shared_ptr<SystemWidgetLabel> m_label;
 };
 

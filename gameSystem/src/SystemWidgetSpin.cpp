@@ -105,6 +105,11 @@ void SystemWidgetSpin::SetFormatCallBack(const std::function<String(int32_t)>& c
 	m_label->SetText(str);
 }
 
+void SystemWidgetSpin::OnEnter(const std::function<void(int32_t)>& cb)
+{
+	m_cbEnter = cb;
+}
+
 int32_t SystemWidgetSpin::GetValue() const
 {
 	return m_val;
@@ -134,8 +139,16 @@ int SystemWidgetSpin::Do(SystemView* pView)
 
 	m_direction = 0;
 
+	// Enterキー押下？
+	if (KB::KeyEnter.IsDown())
+	{
+		if (m_cbEnter)
+		{
+			m_cbEnter(m_val);
+		}
+	}
 	// 上キー押下？
-	if (KB::KeyUp.IsDown())
+	else if (KB::KeyUp.IsDown())
 	{
 		Prev();
 	}
