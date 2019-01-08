@@ -19,7 +19,7 @@ std::shared_ptr<SystemWidgetSpin> SystemWidgetSpin::Create(const String& label, 
 		{
 			EQ_THROW(u8"ラベルの作成に失敗しました。");
 		}
-		inst->m_label->SetPreset(String::ascii() + inst->leftArrow + inst->rightArrow + label);
+		inst->m_label->SetPreset(String::ascii() + inst->leftArrow + inst->rightArrow + inst->pushArrow + label);
 
 		auto str = inst->MakeString();
 		if (!inst->m_label->SetText(str))
@@ -128,7 +128,13 @@ Rect SystemWidgetSpin::GetBox() const
 const String SystemWidgetSpin::MakeString()
 {
 	String strVal = m_cbFormat ? m_cbFormat(m_val) : String::Sprintf(u8"%d", m_val);
-	return m_text + "  " + leftArrow + " " + strVal + " " + rightArrow;
+	String str = m_text + "  " + leftArrow + " " + strVal + " " + rightArrow;
+	if (m_cbEnter)
+	{
+		str += " " + pushArrow;
+	}
+
+	return str;
 }
 
 int SystemWidgetSpin::Do(SystemView* pView)
@@ -140,12 +146,15 @@ int SystemWidgetSpin::Do(SystemView* pView)
 	m_direction = 0;
 
 	// Enterキー押下？
-	if (KB::KeyEnter.IsDown())
+	if (m_cbEnter && 
+		KB::KeyEnter.IsPress())
 	{
-		if (m_cbEnter)
+		if (KB::KeyEnter.IsDown())
 		{
 			m_cbEnter(m_val);
 		}
+
+		m_label->SetPos(m_pos + m_addPosOnPuress);
 	}
 	// 上キー押下？
 	else if (KB::KeyUp.IsDown())

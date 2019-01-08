@@ -50,8 +50,18 @@ int SystemWidgetCustom::Do(SystemView* pView)
 	}
 	else
 	{
+		// Enterキー押下？
+		if (KB::KeyEnter.IsPress())
+		{
+			if (KB::KeyEnter.IsDown())
+			{
+				m_exclusive = true;
+			}
+		
+			m_label->SetPos(m_pos + m_addPosOnPuress);
+		}
 		// 上キー押下？
-		if (KB::KeyUp.IsDown())
+		else if (KB::KeyUp.IsDown())
 		{
 			Prev();
 		}
@@ -59,11 +69,6 @@ int SystemWidgetCustom::Do(SystemView* pView)
 		else if (KB::KeyDown.IsDown())
 		{
 			Next();
-		}
-		// Enterキー押下？
-		else if (KB::KeyEnter.IsDown())
-		{
-			m_exclusive = true;
 		}
 	}
 

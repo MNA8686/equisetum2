@@ -40,6 +40,8 @@ protected:
 	PointF m_pos;
 	bool m_enable = true;
 	int m_layer = 0;
+
+	const PointF m_addPosOnPuress{ 0.004f, 0.004f };
 };
 
 #endif

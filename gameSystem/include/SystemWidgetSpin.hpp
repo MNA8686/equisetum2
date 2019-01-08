@@ -37,6 +37,7 @@ private:
 
 	const String leftArrow = u8"◀";
 	const String rightArrow = u8"▶";
+	const String pushArrow = u8"↓";
 
 	std::function<String(int32_t)> m_cbFormat;
 	std::function<void(int32_t)> m_cbEnter;
