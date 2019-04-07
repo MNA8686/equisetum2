@@ -10,7 +10,7 @@ namespace Equisetum2
 	{
 	public:
 		// 小数部の桁数
-		const int afterTheDecimalPoint = 8;
+		static const int afterTheDecimalPoint = 8;
 
 		// RAWデータからFixedDecを生成する。
 		// もし将来小数部の桁数が変わってもFixedDec::Rawしている箇所を探せば修正可能となる。
@@ -21,25 +21,23 @@ namespace Equisetum2
 			return val;
 		}
 
-		inline FixedDec::FixedDec()
-		{
-		}
+		inline FixedDec() = default;
 
-		inline FixedDec::FixedDec(int32_t val)
+		inline FixedDec(int32_t val)
 		{
 			m_val = val << afterTheDecimalPoint;
 		}
 
-		inline FixedDec::FixedDec(const FixedDec& src)
+		inline FixedDec(const FixedDec& src)
 		{
 			m_val = src.m_val;
 		}
 
-		inline FixedDec::FixedDec(float val) : FixedDec(static_cast<double>(val))
+		inline FixedDec(float val) : FixedDec(static_cast<double>(val))
 		{
 		}
 
-		inline FixedDec::FixedDec(double val)
+		inline FixedDec(double val)
 		{
 			const int32_t mul = 1 << afterTheDecimalPoint;
 			m_val = static_cast<int32_t>(val * static_cast<double>(mul));
