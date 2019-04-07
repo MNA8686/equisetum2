@@ -13,6 +13,7 @@
 #include <locale>
 #include <codecvt>
 #include <vector>
+#include <functional>
 
 namespace Equisetum2
 {
@@ -312,4 +313,18 @@ namespace Equisetum2
 	}
 }
 
+namespace std
+{
+	// for std::unordered_map
+	template<>
+	class hash<Equisetum2::String>
+	{
+	public:
+		size_t operator () (const Equisetum2::String &str) const
+		{
+			return std::hash<std::string>()(str);
+		}
+	};
+}
+	
 #endif
