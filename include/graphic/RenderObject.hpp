@@ -81,6 +81,7 @@ namespace Equisetum2
 		virtual ~SpriteRenderer() {}
 
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
+		const Sprite* GetSprite() const;
 		SpriteRenderer& SetAtlasNum(int atlasNum);
 		
 		SpriteRenderer& SetPos(const Point& pos);

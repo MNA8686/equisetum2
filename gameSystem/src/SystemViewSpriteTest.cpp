@@ -34,15 +34,41 @@ void SystemViewSpriteTest::LoadSprite()
 		std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
 		if (sprite)
 		{
+			// for test
+			if (m_item == "jiki_subaru")
+			{
+				sprite->SetTag("neutral", 0);
+				sprite->SetTag("right", 1);
+				sprite->SetTag("left", 7);
+				sprite->SetTag("test", 13);
+
+				int32_t size;
+
+				size = sprite->GetTagSize("neutral");
+				Logger::OutputDebug("tag size %d", size);
+				size = sprite->GetTagSize("right");
+				Logger::OutputDebug("tag size %d", size);
+				size = sprite->GetTagSize("left");
+				Logger::OutputDebug("tag size %d", size);
+				size = sprite->GetTagSize("test");
+				Logger::OutputDebug("tag size %d", size);
+			}
+			
 			m_spriteRenderer->SetSprite(sprite);
 			m_spriteRenderer->SetBlendMode(BlendMode::Blend);
 			m_spritePos = Window::Size() / 2;
 			m_spriteRenderer->SetPos(m_spritePos);
 			m_ptr = 0;
+			m_tag = -1;		// ロード時は必ずタグ未設定状態とする
 
 			// アニメーションパターン数設定
 			size_t animSize = sprite->GetAnimAtlas().size();
 			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+
+			// タグ選択スピン設定
+			size_t tagsSize = sprite->GetTags().size();
+			m_spinTag->SetRange(-1, tagsSize > 0 ? tagsSize - 1 : -1, 1);
+			m_spinTag->SetValue(-1);
 		}
 	}
 }
@@ -95,12 +121,71 @@ int SystemViewSpriteTest::Enter()
 	});
 	menu->SetWidget(rate);
 
+#if 1
+	auto tag = SystemWidgetSpin::Create(u8"タグ", [this](int32_t val) {
+		m_tag = val;
+		m_ptr = 0;
+
+		if (m_spriteRenderer &&
+			m_spriteRenderer->GetSprite())
+		{
+			auto sprite = m_spriteRenderer->GetSprite();
+			
+			if (val < 0)
+			{
+				m_spinAnim->SetRange(0, sprite->GetAnimAtlas().size(), 1);
+			}
+			else
+			{
+				m_spinAnim->SetRange(0, sprite->GetTagSize(sprite->GetTags()[val].tag) - 1, 1);
+			}
+		}
+		m_spinAnim->SetValue(m_ptr);
+	});
+	tag->SetCyclic(true);
+	tag->SetEnable(true);
+	tag->SetRange(-1, -1, 1);
+	tag->SetValue(-1);
+	tag->SetFormatCallBack([this](int32_t val)->String {
+		if (val < 0)
+		{
+			return "* ALL *";
+		}
+
+		if (m_spriteRenderer &&
+			m_spriteRenderer->GetSprite())
+		{
+			// タグ名を引いてきてそれを戻り値で返す
+			return m_spriteRenderer->GetSprite()->GetTags()[val].tag;
+		}
+
+		return "???";
+	});
+	m_spinTag = tag;
+	menu->SetWidget(tag);
+#endif
+
 	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
 		m_ptr = val;
 	});
+	m_spinAnim = ptr;
 	ptr->SetCyclic(true);
 	ptr->SetEnable(false);
-	m_spinAnim = ptr;
+	ptr->SetFormatCallBack([this](int32_t val)->String {
+#if 0
+		String str =  String::Sprintf("%d", val);
+		if (m_spriteRenderer &&
+			m_spriteRenderer->GetSprite())
+		{
+			// タグが選択されている場合はタグのサイズを、選択されていない場合は全体のアニメーション数を表示する
+			auto sprite = m_spriteRenderer->GetSprite();
+			int32_t maxSize = m_tag < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(sprite->GetTags()[m_tag].tag);
+			str += String::Sprintf(" / %d", maxSize);
+		}
+		return str;
+#endif
+		return String::Sprintf("%d / %d", val, m_spinAnim->GetMax() + 1);
+	});
 	menu->SetWidget(ptr);
 
 	auto r = SystemWidgetSpin::Create(u8"色成分 R", [this](int32_t val) {
