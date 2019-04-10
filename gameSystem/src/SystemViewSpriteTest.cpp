@@ -130,15 +130,9 @@ int SystemViewSpriteTest::Enter()
 			m_spriteRenderer->GetSprite())
 		{
 			auto sprite = m_spriteRenderer->GetSprite();
+			int32_t max = val < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(sprite->GetTags()[val].tag);
 			
-			if (val < 0)
-			{
-				m_spinAnim->SetRange(0, sprite->GetAnimAtlas().size(), 1);
-			}
-			else
-			{
-				m_spinAnim->SetRange(0, sprite->GetTagSize(sprite->GetTags()[val].tag) - 1, 1);
-			}
+			m_spinAnim->SetRange(0, max - 1, 1);
 		}
 		m_spinAnim->SetValue(m_ptr);
 	});
