@@ -48,26 +48,22 @@ namespace Equisetum2
 		return m_tags;
 	}
 
-	int32_t Sprite::GetTagSize(const String & tag) const
+	int32_t Sprite::GetTagSize(int32_t tagIndex) const
 	{
-		auto findTag = std::find_if(m_tags.begin(), m_tags.end(), [&tag](stTags tags) {
-			return tags.tag == tag;
-		});
-
-		if (findTag == m_tags.end())
+		if (tagIndex < 0 ||
+			tagIndex >= static_cast<int32_t>(m_tags.size()))
 		{
 			return -1;
 		}
 
-		int32_t index = (*findTag).index;
-		findTag++;
+		int32_t index = m_tags[tagIndex].index;
 
-		if (findTag == m_tags.end())
+		if (tagIndex + 1 == static_cast<int32_t>(m_tags.size()))
 		{
 			return m_vAnimAtlas.size() - index;
 		}
 
-		return (*findTag).index - index;
+		return m_tags[tagIndex + 1].index - index;
 	}
 
 	const stSpriteAnimAtlas* Sprite::GetAtlas(int32_t num) const
@@ -80,18 +76,33 @@ namespace Equisetum2
 		return &m_vAnimAtlas[num];
 	}
 
-	const stSpriteAnimAtlas* Sprite::GetAtlasWithTag(const String & tag, int32_t index) const
+	const stSpriteAnimAtlas* Sprite::GetAtlasWithTagIndex(int32_t tagIndex, int32_t num) const
 	{
-		auto findTag = std::find_if(m_tags.begin(), m_tags.end(), [&tag](stTags tags) {
+		if (tagIndex < 0 ||
+			tagIndex >= static_cast<int32_t>(m_tags.size()) ||
+			num >= GetTagSize(tagIndex))
+		{
+			return nullptr;
+		}
+
+		return GetAtlas(m_tags[tagIndex].index + num);
+	}
+
+	int32_t Sprite::TagToInt(const String & tag) const
+	{
+		int32_t tagIndex = -1;
+
+		auto findTag = std::find_if(m_tags.begin(), m_tags.end(), [&tag, &tagIndex](stTags tags) {
+			tagIndex++;
 			return tags.tag == tag;
 		});
 		
 		if (findTag == m_tags.end())
 		{
-			return GetAtlas(index);
+			return -1;
 		}
 
-		return GetAtlas((*findTag).index);
+		return tagIndex;
 	}
 
 	bool Sprite::MoveFrom(std::shared_ptr<Sprite>&& src)

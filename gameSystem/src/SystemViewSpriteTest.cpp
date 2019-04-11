@@ -44,13 +44,13 @@ void SystemViewSpriteTest::LoadSprite()
 
 				int32_t size;
 
-				size = sprite->GetTagSize("neutral");
+				size = sprite->GetTagSize(sprite->TagToInt("neutral"));
 				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize("right");
+				size = sprite->GetTagSize(sprite->TagToInt("right"));
 				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize("left");
+				size = sprite->GetTagSize(sprite->TagToInt("left"));
 				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize("test");
+				size = sprite->GetTagSize(sprite->TagToInt("test"));
 				Logger::OutputDebug("tag size %d", size);
 			}
 			
@@ -121,8 +121,8 @@ int SystemViewSpriteTest::Enter()
 	});
 	menu->SetWidget(rate);
 
-#if 1
 	auto tag = SystemWidgetSpin::Create(u8"タグ", [this](int32_t val) {
+		// タグ切替時のコールバック
 		m_tag = val;
 		m_ptr = 0;
 
@@ -130,7 +130,8 @@ int SystemViewSpriteTest::Enter()
 			m_spriteRenderer->GetSprite())
 		{
 			auto sprite = m_spriteRenderer->GetSprite();
-			int32_t max = val < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(sprite->GetTags()[val].tag);
+			// 0未満の場合は全体のアニメーションパターン数を、0以上の場合は対応するタグのサイズをセット
+			int32_t max = val < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(val);
 			
 			m_spinAnim->SetRange(0, max - 1, 1);
 		}
@@ -157,7 +158,6 @@ int SystemViewSpriteTest::Enter()
 	});
 	m_spinTag = tag;
 	menu->SetWidget(tag);
-#endif
 
 	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
 		m_ptr = val;
@@ -166,18 +166,6 @@ int SystemViewSpriteTest::Enter()
 	ptr->SetCyclic(true);
 	ptr->SetEnable(false);
 	ptr->SetFormatCallBack([this](int32_t val)->String {
-#if 0
-		String str =  String::Sprintf("%d", val);
-		if (m_spriteRenderer &&
-			m_spriteRenderer->GetSprite())
-		{
-			// タグが選択されている場合はタグのサイズを、選択されていない場合は全体のアニメーション数を表示する
-			auto sprite = m_spriteRenderer->GetSprite();
-			int32_t maxSize = m_tag < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(sprite->GetTags()[m_tag].tag);
-			str += String::Sprintf(" / %d", maxSize);
-		}
-		return str;
-#endif
 		return String::Sprintf("%d / %d", val, m_spinAnim->GetMax() + 1);
 	});
 	menu->SetWidget(ptr);
