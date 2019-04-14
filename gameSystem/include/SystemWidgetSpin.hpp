@@ -18,6 +18,8 @@ public:
 	void SetRange(int32_t min, int32_t max, int32_t step = 1);
 	void SetValue(int32_t val);
 	int32_t GetValue() const;
+	int32_t GetMin() const;
+	int32_t GetMax() const;
 	void SetCyclic(bool val);
 	Rect GetBox() const override;
 	void SetPos(const PointF& pos) override;

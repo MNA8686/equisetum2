@@ -100,9 +100,24 @@ namespace Equisetum2
 		return *this;
 	}
 
+	const Sprite* SpriteRenderer::GetSprite() const
+	{
+		return m_sprite.get();
+	}
+
 	SpriteRenderer& SpriteRenderer::SetAtlasNum(int atlasNum)
 	{
 		m_atlasNum = atlasNum;
+		m_tagIndex = -1;
+
+		m_dirtyTexCoords = true;
+		return *this;
+	}
+
+	SpriteRenderer & Equisetum2::SpriteRenderer::SetAtlasNumWithTagIndex(int32_t tagIndex, int atlasNum)
+	{
+		m_atlasNum = atlasNum;
+		m_tagIndex = tagIndex;
 
 		m_dirtyTexCoords = true;
 		return *this;
@@ -184,8 +199,13 @@ namespace Equisetum2
 
 	bool SpriteRenderer::Calculation()
 	{
-		auto atlas = m_sprite->GetAtlas(m_atlasNum);
+		const stSpriteAnimAtlas* atlas = m_tagIndex < 0 ? m_sprite->GetAtlas(m_atlasNum) : m_sprite->GetAtlasWithTagIndex(m_tagIndex, m_atlasNum);
 		auto& vert = m_pImpl->m_vertex;
+
+		if (!atlas)
+		{
+			return false;
+		}
 
 		// テクスチャ座標変更あり？
 		if (m_dirtyTexCoords)
@@ -193,10 +213,10 @@ namespace Equisetum2
 			const float invWf = 1.0f / static_cast<float>(m_sprite->GetTexture()->Width());
 			const float invHf = 1.0f / static_cast<float>(m_sprite->GetTexture()->Height());
 
-			const float leftX = (m_flipX ? atlas.m_point.x + atlas.m_srcSize.x : atlas.m_point.x) * invWf;
-			const float rightX = (m_flipX ? atlas.m_point.x : atlas.m_point.x + atlas.m_srcSize.x) * invWf;
-			const float topY = (m_flipY ? atlas.m_point.y + atlas.m_srcSize.y : atlas.m_point.y) * invHf;
-			const float bottomY = (m_flipY ? atlas.m_point.y : atlas.m_point.y + atlas.m_srcSize.y) * invHf;
+			const float leftX = (m_flipX ? atlas->m_point.x + atlas->m_srcSize.x : atlas->m_point.x) * invWf;
+			const float rightX = (m_flipX ? atlas->m_point.x : atlas->m_point.x + atlas->m_srcSize.x) * invWf;
+			const float topY = (m_flipY ? atlas->m_point.y + atlas->m_srcSize.y : atlas->m_point.y) * invHf;
+			const float bottomY = (m_flipY ? atlas->m_point.y : atlas->m_point.y + atlas->m_srcSize.y) * invHf;
 
 			int index = 0;
 
@@ -244,12 +264,12 @@ namespace Equisetum2
 			const auto baseY = static_cast<float>(m_pos.y);
 
 			// 拡大縮小後のサイズ
-			const float width = atlas.m_srcSize.x * m_scale.x;		// 拡大縮小後の横幅
-			const float height = atlas.m_srcSize.y * m_scale.y;		// 拡大縮小後の縦幅
+			const float width = atlas->m_srcSize.x * m_scale.x;		// 拡大縮小後の横幅
+			const float height = atlas->m_srcSize.y * m_scale.y;		// 拡大縮小後の縦幅
 
 			// pivotで指定された表示位置になるようにする
 			// (左上の座標を求める)
-			auto& pivot = atlas.m_pivot;
+			auto& pivot = atlas->m_pivot;
 			const float posX = floor(baseX - pivot.x * width);
 			const float posY = floor(baseY - pivot.y * height);
 
@@ -373,7 +393,7 @@ namespace Equisetum2
 			if (m_bitmapFont)
 			{
 				// BitmapFont作成時に高さが統一されていることが保証されているのでそのまま代入
-				m_height = m_bitmapFont->GetSprite()->GetAtlas(0).m_srcSize.y;
+				m_height = m_bitmapFont->GetSprite()->GetAtlas(0)->m_srcSize.y;
 
 				for (auto& sprite : m_vSpriteRenderer)
 				{
@@ -623,11 +643,11 @@ namespace Equisetum2
 					int atlasNum = m_bitmapFont->CodePointToAtlas(code);
 					if (atlasNum >= 0)
 					{
-						const stSpriteAnimAtlas& atlas = m_bitmapFont->GetSprite()->GetAtlas(atlasNum);
+						const stSpriteAnimAtlas* atlas = m_bitmapFont->GetSprite()->GetAtlas(atlasNum);
 
-						codeMap.x = pos.x + atlas.m_srcSize.x / 2;		// 座標を保存
+						codeMap.x = pos.x + atlas->m_srcSize.x / 2;		// 座標を保存
 						codeMap.atlas = atlasNum;
-						pos.x += atlas.m_srcSize.x;
+						pos.x += atlas->m_srcSize.x;
 					}
 					else
 					{

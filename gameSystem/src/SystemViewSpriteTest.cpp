@@ -39,10 +39,16 @@ void SystemViewSpriteTest::LoadSprite()
 			m_spritePos = Window::Size() / 2;
 			m_spriteRenderer->SetPos(m_spritePos);
 			m_ptr = 0;
+			m_tagIndex = -1;		// ロード時は必ずタグ未設定状態とする
 
 			// アニメーションパターン数設定
 			size_t animSize = sprite->GetAnimAtlas().size();
 			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+
+			// タグ選択スピン設定
+			size_t tagsSize = sprite->GetTags().size();
+			m_spinTag->SetRange(-1, tagsSize > 0 ? tagsSize - 1 : -1, 1);
+			m_spinTag->SetValue(-1);
 		}
 	}
 }
@@ -95,12 +101,53 @@ int SystemViewSpriteTest::Enter()
 	});
 	menu->SetWidget(rate);
 
+	auto tag = SystemWidgetSpin::Create(u8"タグ", [this](int32_t val) {
+		// タグ切替時のコールバック
+		m_tagIndex = val;
+		m_ptr = 0;
+
+		if (m_spriteRenderer &&
+			m_spriteRenderer->GetSprite())
+		{
+			auto sprite = m_spriteRenderer->GetSprite();
+			// 0未満の場合は全体のアニメーションパターン数を、0以上の場合は対応するタグのサイズをセット
+			int32_t max = val < 0 ? sprite->GetAnimAtlas().size() : sprite->GetTagSize(val);
+			
+			m_spinAnim->SetRange(0, max - 1, 1);
+		}
+		m_spinAnim->SetValue(m_ptr);
+	});
+	tag->SetCyclic(true);
+	tag->SetEnable(true);
+	tag->SetRange(-1, -1, 1);
+	tag->SetValue(-1);
+	tag->SetFormatCallBack([this](int32_t val)->String {
+		if (val < 0)
+		{
+			return "* ALL *";
+		}
+
+		if (m_spriteRenderer &&
+			m_spriteRenderer->GetSprite())
+		{
+			// タグ名を引いてきてそれを戻り値で返す
+			return m_spriteRenderer->GetSprite()->GetTags()[val].tag;
+		}
+
+		return "???";
+	});
+	m_spinTag = tag;
+	menu->SetWidget(tag);
+
 	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
 		m_ptr = val;
 	});
+	m_spinAnim = ptr;
 	ptr->SetCyclic(true);
 	ptr->SetEnable(false);
-	m_spinAnim = ptr;
+	ptr->SetFormatCallBack([this](int32_t val)->String {
+		return String::Sprintf("%d / %d", val, m_spinAnim->GetMax() + 1);
+	});
 	menu->SetWidget(ptr);
 
 	auto r = SystemWidgetSpin::Create(u8"色成分 R", [this](int32_t val) {
@@ -171,7 +218,7 @@ int SystemViewSpriteTest::Render()
 	if (m_spriteRenderer)
 	{
 		m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
-		m_spriteRenderer->SetAtlasNum(m_ptr);
+		m_spriteRenderer->SetAtlasNumWithTagIndex(m_tagIndex, m_ptr);
 		m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
 		m_spriteRenderer->SetColor(m_color);
 

@@ -124,6 +124,13 @@ namespace Equisetum2
 
 			// アトラス読み込み
 			std::vector<stSpriteAnimAtlas> vSpriteAnimAtlas;
+			typedef struct
+			{
+				String tag;
+				int32_t index;
+			}stTag;
+			std::vector<stTag> vSpriteTag;
+
 			{
 				auto& atlas = doc.FindMember("atlas");
 				if (atlas == doc.MemberEnd() ||
@@ -148,6 +155,17 @@ namespace Equisetum2
 						}tmp;
 
 						auto& obj = atlas->value[i].GetObject();
+
+						auto& tag = obj.FindMember("tag");
+						if (tag != obj.MemberEnd())
+						{
+							// テクスチャ読み込み
+							String strTag = tag->value.GetString();
+							stTag tagInfo{ strTag, static_cast<int32_t>(vSpriteAnimAtlas.size()) };
+							vSpriteTag.push_back(tagInfo);
+
+							Logger::OutputDebug("  tag %s %d", tagInfo.tag.c_str(), tagInfo.index);
+						}
 
 						auto& pos = obj.FindMember("pos");
 						if (pos != obj.MemberEnd())
@@ -284,6 +302,15 @@ namespace Equisetum2
 			if (!sprite->SetAnimAtlas(vSpriteAnimAtlas))
 			{
 				EQ_THROW(u8"Spriteのアトラス登録に失敗しました。");
+			}
+
+			for (auto& tag : vSpriteTag)
+			{
+				if (!sprite->SetTag(tag.tag, tag.index))
+				{
+					EQ_THROW(u8"Spriteのタグ登録に失敗しました。");
+					break;
+				}
 			}
 
 			// ID設定
