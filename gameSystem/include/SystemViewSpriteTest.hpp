@@ -21,7 +21,7 @@ public:
 protected:
 	void LoadSprite();
 	int32_t m_rate = 100;
-	int32_t m_tag = -1;	// –¢İ’è -1
+	int32_t m_tagIndex = -1;	// –¢İ’è -1
 	int32_t m_ptr = 0;
 	Point m_spritePos;
 	std::shared_ptr<SpriteRenderer> m_spriteRenderer;

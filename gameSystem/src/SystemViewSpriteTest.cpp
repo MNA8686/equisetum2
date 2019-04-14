@@ -34,32 +34,12 @@ void SystemViewSpriteTest::LoadSprite()
 		std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
 		if (sprite)
 		{
-			// for test
-			if (m_item == "jiki_subaru")
-			{
-				sprite->SetTag("neutral", 0);
-				sprite->SetTag("right", 1);
-				sprite->SetTag("left", 7);
-				sprite->SetTag("test", 13);
-
-				int32_t size;
-
-				size = sprite->GetTagSize(sprite->TagToInt("neutral"));
-				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize(sprite->TagToInt("right"));
-				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize(sprite->TagToInt("left"));
-				Logger::OutputDebug("tag size %d", size);
-				size = sprite->GetTagSize(sprite->TagToInt("test"));
-				Logger::OutputDebug("tag size %d", size);
-			}
-			
 			m_spriteRenderer->SetSprite(sprite);
 			m_spriteRenderer->SetBlendMode(BlendMode::Blend);
 			m_spritePos = Window::Size() / 2;
 			m_spriteRenderer->SetPos(m_spritePos);
 			m_ptr = 0;
-			m_tag = -1;		// ロード時は必ずタグ未設定状態とする
+			m_tagIndex = -1;		// ロード時は必ずタグ未設定状態とする
 
 			// アニメーションパターン数設定
 			size_t animSize = sprite->GetAnimAtlas().size();
@@ -123,7 +103,7 @@ int SystemViewSpriteTest::Enter()
 
 	auto tag = SystemWidgetSpin::Create(u8"タグ", [this](int32_t val) {
 		// タグ切替時のコールバック
-		m_tag = val;
+		m_tagIndex = val;
 		m_ptr = 0;
 
 		if (m_spriteRenderer &&
@@ -238,7 +218,7 @@ int SystemViewSpriteTest::Render()
 	if (m_spriteRenderer)
 	{
 		m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
-		m_spriteRenderer->SetAtlasNum(m_ptr);
+		m_spriteRenderer->SetAtlasNumWithTagIndex(m_tagIndex, m_ptr);
 		m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
 		m_spriteRenderer->SetColor(m_color);
 

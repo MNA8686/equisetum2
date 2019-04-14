@@ -108,6 +108,16 @@ namespace Equisetum2
 	SpriteRenderer& SpriteRenderer::SetAtlasNum(int atlasNum)
 	{
 		m_atlasNum = atlasNum;
+		m_tagIndex = -1;
+
+		m_dirtyTexCoords = true;
+		return *this;
+	}
+
+	SpriteRenderer & Equisetum2::SpriteRenderer::SetAtlasNumWithTagIndex(int32_t tagIndex, int atlasNum)
+	{
+		m_atlasNum = atlasNum;
+		m_tagIndex = tagIndex;
 
 		m_dirtyTexCoords = true;
 		return *this;
@@ -189,7 +199,7 @@ namespace Equisetum2
 
 	bool SpriteRenderer::Calculation()
 	{
-		const stSpriteAnimAtlas* atlas = m_sprite->GetAtlas(m_atlasNum);
+		const stSpriteAnimAtlas* atlas = m_tagIndex < 0 ? m_sprite->GetAtlas(m_atlasNum) : m_sprite->GetAtlasWithTagIndex(m_tagIndex, m_atlasNum);
 		auto& vert = m_pImpl->m_vertex;
 
 		if (!atlas)

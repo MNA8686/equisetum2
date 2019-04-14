@@ -83,6 +83,7 @@ namespace Equisetum2
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
 		const Sprite* GetSprite() const;
 		SpriteRenderer& SetAtlasNum(int atlasNum);
+		SpriteRenderer& SetAtlasNumWithTagIndex(int32_t tagIndex, int atlasNum);
 		
 		SpriteRenderer& SetPos(const Point& pos);
 
@@ -149,6 +150,7 @@ namespace Equisetum2
 		void InitTest();
 		//
 		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
+		int32_t m_tagIndex = -1;	/// タグ番号(未設定時 -1)
 		int m_atlasNum = 0;		/// 表示パターン番号
 		Point m_pos;			/// 表示位置
 		SizeF m_scale{ 1.f, 1.f };	/// 表示倍率
