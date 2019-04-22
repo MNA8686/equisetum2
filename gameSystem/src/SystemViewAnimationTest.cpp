@@ -1,6 +1,6 @@
 #include "system/Logger.h"
 #include "system/Exception.hpp"
-#include "SystemViewSpriteTest.hpp"
+#include "SystemViewAnimationTest.hpp"
 #include "SystemWidgetMenu.hpp"
 #include "SystemWidgetSpin.hpp"
 #include "SystemWidgetPopView.hpp"
@@ -9,9 +9,9 @@
 #include "SystemWidgetChoice.hpp"
 #include "Application.hpp"
 
-std::shared_ptr<SystemViewSpriteTest> SystemViewSpriteTest::Create(const String & name)
+std::shared_ptr<SystemViewAnimationTest> SystemViewAnimationTest::Create(const String & name)
 {
-	auto p = std::make_shared<SystemViewSpriteTest>();
+	auto p = std::make_shared<SystemViewAnimationTest>();
 
 	p->m_name = name;
 	p->Enter();
@@ -19,41 +19,56 @@ std::shared_ptr<SystemViewSpriteTest> SystemViewSpriteTest::Create(const String 
 	return p;
 }
 
-void SystemViewSpriteTest::LoadSprite()
+void SystemViewAnimationTest::LoadAnimation()
 {
 	if (m_item.empty())
 	{
 		return;
 	}
 
+	// 予め解放しておかないとロード済みアセットのコピーが生成されてしまうので潰す
+	m_spriteRenderer = nullptr;
+	m_animation = nullptr;
+
 	// スプライトレンダラ作成
 	m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
 	if (m_spriteRenderer)
 	{
-		// スプライト作成
-		std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
-		if (sprite)
+		// アニメーション作成
+		std::shared_ptr<Animation> animation = Singleton<AssetManager>::GetInstance()->Load<Animation>(m_item);
+		if (animation)
 		{
-			m_spriteRenderer->SetSprite(sprite);
-			m_spriteRenderer->SetBlendMode(BlendMode::Blend);
-			m_spritePos = Window::Size() / 2;
-			m_spriteRenderer->SetPos(m_spritePos);
-			m_ptr = 0;
-			m_tagIndex = -1;		// ロード時は必ずタグ未設定状態とする
+			m_animation = animation;
 
-			// アニメーションパターン数設定
-			size_t animSize = sprite->GetAnimAtlas().size();
-			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+			// スプライト関連設定
+			const stAnimationElement* elem = animation->GetElement(0, 0);
+			if (elem)
+			{
+				m_spriteRenderer->SetSprite(elem->m_sprite);
+
+				m_spriteRenderer->SetBlendMode(BlendMode::Blend);
+				m_spritePos = Window::Size() / 2;
+				m_spriteRenderer->SetPos(m_spritePos);
+			}
 
 			// タグ選択スピン設定
-			size_t tagsSize = sprite->GetTags().size();
-			m_spinTag->SetRange(-1, tagsSize > 0 ? tagsSize - 1 : -1, 1);
-			m_spinTag->SetValue(-1);
+			// アニメーションパターンが無い場合は-1～-1を設定範囲とし、-1はempty扱いとする。
+			size_t tagsSize = animation->GetTagSize();
+			int32_t minIndex = tagsSize <= 0 ? -1 : 0;
+			int32_t maxIndex = tagsSize > 0 ? tagsSize - 1 : -1;
+			m_animationTagIndex = minIndex;
+			m_spinTag->SetRange(minIndex, maxIndex, 1);	
+			m_spinTag->SetValue(minIndex);
+
+			// アニメーションパターン数設定
+			int32_t animSize = animation->GetTimelineSize(0);
+			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+			m_animationPtr = 0;
 		}
 	}
 }
 
-int SystemViewSpriteTest::Enter()
+int SystemViewAnimationTest::Enter()
 {
 	auto menu = SystemWidgetMenu::Create(u8"メニュー");
 	menu->SetPos({ 0.05f, 0.2f });
@@ -65,8 +80,8 @@ int SystemViewSpriteTest::Enter()
 	auto choice = SystemWidgetChoice::Create(u8"ファイル選択", [this]()->std::vector<String> {
 		std::vector<String> test;
 		
-		// スプライトリストを取得する
-		auto spriteList = Singleton<AssetManager>::GetInstance()->GetIdList("sprite");
+		// アニメーションリストを取得する
+		auto spriteList = Singleton<AssetManager>::GetInstance()->GetIdList("animation");
 		for (auto sprite : spriteList)
 		{
 			if (Path::GetExtension(sprite) == u8".json")
@@ -77,19 +92,20 @@ int SystemViewSpriteTest::Enter()
 		
 		return test;
 	}, [this](int32_t index, const String& item) {
+		// リスト選択時に呼び出される
 		if (index >= 0)
 		{
 			m_item = item;
-			LoadSprite();
+			LoadAnimation();
 		}
 	});
 	menu->SetWidget(choice);
 
-	auto play = SystemWidgetCustom::Create(u8"リロード", [this]()->bool {
-		LoadSprite();
-		return false;
+	auto reload = SystemWidgetCustom::Create(u8"リロード", [this]()->bool {
+		LoadAnimation();
+		return false;	// 排他制御しない
 	});
-	menu->SetWidget(play);
+	menu->SetWidget(reload);
 
 	auto rate = SystemWidgetSpin::Create(u8"拡大率", [this](int32_t val) {
 		m_rate = val;
@@ -103,19 +119,13 @@ int SystemViewSpriteTest::Enter()
 
 	auto tag = SystemWidgetSpin::Create(u8"タグ", [this](int32_t val) {
 		// タグ切替時のコールバック
-		m_tagIndex = val;
-		m_ptr = 0;
+		m_animationTagIndex = val;
+		m_animationPtr = 0;	// タグを切り替えたら表示アニメーションパターンを0に戻す
 
-		if (m_spriteRenderer &&
-			m_spriteRenderer->GetSprite())
-		{
-			auto sprite = m_spriteRenderer->GetSprite();
-			// 0未満の場合は全体のアニメーションパターン数を、0以上の場合は対応するタグのサイズをセット
-			int32_t max = val < 0 ? sprite->GetAnimAtlas().size() : sprite->GetAtlasSizeByTagIndex(val);
-			
-			m_spinAnim->SetRange(0, max - 1, 1);
-		}
-		m_spinAnim->SetValue(m_ptr);
+		// アニメーションサイズなどを設定
+		int32_t animSize = m_animation->GetTimelineSize(m_animationTagIndex);
+		m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+		m_spinAnim->SetValue(m_animationPtr);
 	});
 	tag->SetCyclic(true);
 	tag->SetEnable(true);
@@ -124,23 +134,16 @@ int SystemViewSpriteTest::Enter()
 	tag->SetFormatCallBack([this](int32_t val)->String {
 		if (val < 0)
 		{
-			return "* ALL *";
+			return "empty";
 		}
 
-		if (m_spriteRenderer &&
-			m_spriteRenderer->GetSprite())
-		{
-			// タグ名を引いてきてそれを戻り値で返す
-			return m_spriteRenderer->GetSprite()->GetTags()[val].tag;
-		}
-
-		return "???";
+		return m_animation->IntToTag(val);
 	});
 	m_spinTag = tag;
 	menu->SetWidget(tag);
 
 	auto ptr = SystemWidgetSpin::Create(u8"アニメーションパターン", [this](int32_t val) {
-		m_ptr = val;
+		m_animationPtr = val;
 	});
 	m_spinAnim = ptr;
 	ptr->SetCyclic(true);
@@ -149,6 +152,21 @@ int SystemViewSpriteTest::Enter()
 		return String::Sprintf("%d / %d", val, m_spinAnim->GetMax() + 1);
 	});
 	menu->SetWidget(ptr);
+
+	auto play = SystemWidgetCustom::Create(u8"再生/停止", [this]()->bool {
+		if (!m_playing)
+		{
+			m_playing = true;
+			m_frame = 0;
+			m_animationPtr = 0;
+		}
+		else
+		{
+			m_playing = false;
+		}
+		return false;	// 排他制御しない
+	});
+	menu->SetWidget(play);
 
 	auto r = SystemWidgetSpin::Create(u8"色成分 R", [this](int32_t val) {
 		m_color.rgba8888.r = static_cast<uint8_t>(val + 128);
@@ -208,21 +226,47 @@ int SystemViewSpriteTest::Enter()
 	return 0;
 }
 
-int SystemViewSpriteTest::Do()
+int SystemViewAnimationTest::Do()
 {
+	if (m_playing)
+	{
+		// 現在のフレームに対応するアニメーションパターンを取得
+		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000);
+		if (index >= 0)
+		{
+			// アニメーションパターンをセット
+			m_animationPtr = index;
+			// UIにも反映する
+			m_spinAnim->SetValue(index);
+		}
+		else
+		{
+			m_playing = false;
+		}
+
+		// 1フレーム進める
+		m_frame++;
+	}
+
 	return 0;
 }
 
-int SystemViewSpriteTest::Render()
+int SystemViewAnimationTest::Render()
 {
 	if (m_spriteRenderer)
 	{
-		m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
-		m_spriteRenderer->SetAtlasNum(m_spriteRenderer->GetSprite()->ToAtlasNumWithTagIndex(m_tagIndex, m_ptr));
-		m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
-		m_spriteRenderer->SetColor(m_color);
+		// 現在表示すべきアニメーションパターンを取得する
+		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr);
+		if (elem)
+		{
+			m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
+			m_spriteRenderer->SetSprite(elem->m_sprite);
+			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr));
+			m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
+			m_spriteRenderer->SetColor(m_color);
 
-		GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
+			GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
+		}
 	}
 
 	return 0;

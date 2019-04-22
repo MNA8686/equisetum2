@@ -37,10 +37,10 @@ namespace Equisetum2
 		bool SetAnimAtlas(const std::vector<stSpriteAnimAtlas>& vAnimAtlas);
 		bool SetTag(const String& tag, int32_t index);
 		const std::vector<stTags>& GetTags() const;
-		int32_t GetTagSize(int32_t tagIndex) const;
+		int32_t GetAtlasSizeByTagIndex(int32_t tagIndex) const;
 
 		const stSpriteAnimAtlas* GetAtlas(int32_t num) const;
-		const stSpriteAnimAtlas* GetAtlasWithTagIndex(int32_t tagIndex, int32_t num) const;
+		int32_t ToAtlasNumWithTagIndex(int32_t tagIndex, int32_t num) const;
 		int32_t TagToInt(const String& tag) const;
 
 		/**

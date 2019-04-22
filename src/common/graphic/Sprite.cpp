@@ -48,8 +48,15 @@ namespace Equisetum2
 		return m_tags;
 	}
 
-	int32_t Sprite::GetTagSize(int32_t tagIndex) const
+	int32_t Sprite::GetAtlasSizeByTagIndex(int32_t tagIndex) const
 	{
+		// -1を指定された場合は全体のサイズを返す
+		if (tagIndex == -1)
+		{
+			return static_cast<int32_t>(m_vAnimAtlas.size());
+		}
+
+		// 妙な範囲を指定されていたらエラー
 		if (tagIndex < 0 ||
 			tagIndex >= static_cast<int32_t>(m_tags.size()))
 		{
@@ -60,7 +67,7 @@ namespace Equisetum2
 
 		if (tagIndex + 1 == static_cast<int32_t>(m_tags.size()))
 		{
-			return m_vAnimAtlas.size() - index;
+			return static_cast<int32_t>(m_vAnimAtlas.size()) - index;
 		}
 
 		return m_tags[tagIndex + 1].index - index;
@@ -76,16 +83,22 @@ namespace Equisetum2
 		return &m_vAnimAtlas[num];
 	}
 
-	const stSpriteAnimAtlas* Sprite::GetAtlasWithTagIndex(int32_t tagIndex, int32_t num) const
+	int32_t Sprite::ToAtlasNumWithTagIndex(int32_t tagIndex, int32_t num) const
 	{
-		if (tagIndex < 0 ||
-			tagIndex >= static_cast<int32_t>(m_tags.size()) ||
-			num >= GetTagSize(tagIndex))
+		// -1を指定された場合はそのままnumを返す
+		if (tagIndex == -1)
 		{
-			return nullptr;
+			return num;
 		}
 
-		return GetAtlas(m_tags[tagIndex].index + num);
+		if (tagIndex < 0 ||
+			tagIndex >= static_cast<int32_t>(m_tags.size()) ||
+			num >= GetAtlasSizeByTagIndex(tagIndex))
+		{
+			return -1;
+		}
+
+		return m_tags[tagIndex].index + num;
 	}
 
 	int32_t Sprite::TagToInt(const String & tag) const

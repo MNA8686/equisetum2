@@ -324,6 +324,9 @@
     <ClInclude Include="..\..\include\graphic\FontManager.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\graphic\Animation.hpp">
+      <Filter>ヘッダー ファイル\graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -475,6 +478,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\porting\SDL\graphic\FontManager.cpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\graphic\Animation.cpp">
+      <Filter>ソース ファイル\common\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
