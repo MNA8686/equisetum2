@@ -107,6 +107,8 @@ int Application::Main()
 
 	while (!m_isQuit)
 	{
+		isError = false;
+		
 		// システム処理
 		if (!System::Update())
 		{
@@ -136,64 +138,61 @@ int Application::Main()
 		}
 #endif
 
-		if (!isError)
+		if (isModeChange)
 		{
-			if (isModeChange)
-			{
-				if (atDashboard)
-				{
-					OnQuit();
-					Node<Object>::DestroyThemAll();
-					Singleton<NodePool<Object>>::GetInstance()->Reset();
-				}
-				else
-				{
-					OnInit();
-				}
-
-				isModeChange = false;
-			}
-
 			if (atDashboard)
 			{
-				int ret = m_dashboard->Do();
-				if (ret > 0)
-				{
-					atDashboard = false;
-					isModeChange = true;
-				}
-
-				m_renderer->SetRenderTarget(nullptr);
-				
-				Size windowsSize = Window::Size();
-				m_renderer->SetViewport(Rect{ 0, 0, windowsSize.x, windowsSize.y });
-				m_renderer->Clear({ 5, 32, 18, 0 });
-				m_dashboard->Render();
+				OnQuit();
+				Node<Object>::DestroyThemAll();
+				Singleton<NodePool<Object>>::GetInstance()->Reset();
 			}
 			else
 			{
-				OnUpdate();
-				if (KB::KeyT.IsDown())
-				{
-					atDashboard = true;
-					isModeChange = true;
-				}
-
-				OnDraw();
+				OnInit();
 			}
 
-			// FPS表示
-			String strFps = String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps());
-#if defined(_DEBUG)
-			strFps.insert(0, "(D) ");
-#endif
-			labelFps->SetText(strFps);
-			labelFps->Setlayer(Renderer::LayerMax - 1);
-			labelFps->Render(nullptr);
-
-			// レンダーキューの内容を処理する
-			m_renderer->Render();
+			isModeChange = false;
 		}
+
+		if (atDashboard)
+		{
+			int ret = m_dashboard->Do();
+			if (ret > 0)
+			{
+				atDashboard = false;
+				isModeChange = true;
+			}
+
+			m_renderer->SetRenderTarget(nullptr);
+			
+			Size windowsSize = Window::Size();
+			m_renderer->SetViewport(Rect{ 0, 0, windowsSize.x, windowsSize.y });
+			m_renderer->Clear({ 5, 32, 18, 0 });
+			m_dashboard->Render();
+		}
+		else
+		{
+			OnUpdate();
+			if (KB::KeyT.IsDown())
+			{
+				atDashboard = true;
+				isModeChange = true;
+			}
+
+			OnDraw();
+		}
+
+		// FPS表示
+		String strFps = String::Sprintf("%d / %d", m_fpsCounter->Fps(), m_fpsMaker->TargetFps());
+#if defined(_DEBUG)
+		strFps.insert(0, "(D) ");
+#endif
+		labelFps->SetText(strFps);
+		labelFps->Setlayer(Renderer::LayerMax - 1);
+		labelFps->Render(nullptr);
+
+		// レンダーキューの内容を処理する
+		m_renderer->Render();
 
 		m_renderer->Present();
 
