@@ -28,7 +28,7 @@ namespace Equisetum2
 		{
 			// "type/id" の文字列を作る
 			// 入力IDに拡張子が付いていても無視する
-			return type + "/" + Path::GetFileNameWithoutExtension(id) + ext;
+			return type + "/" + Path::ChangeExtension(id, "") + ext;
 		}
 	}
 
@@ -88,24 +88,6 @@ namespace Equisetum2
 				}
 			}
 
-			// ID一致チェック
-			{
-				// id取得
-				auto& id_ = doc.FindMember("id");
-				if (id_ == doc.MemberEnd() ||
-					id_->value.GetType() != rapidjson::kStringType)
-				{
-					EQ_THROW(u8"idが見つかりません。");
-				}
-
-				// ID一致判定
-				String strID = id_->value.GetString();
-				if (strID != id)
-				{
-					EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
-				}
-			}
-
 			// テクスチャ読み込み
 			std::shared_ptr<Texture> textureIn;
 			{
@@ -120,6 +102,10 @@ namespace Equisetum2
 				// テクスチャ読み込み
 				String strTextureID = imageid->value.GetString();
 				textureIn = Singleton<AssetManager>::GetInstance()->Load<Texture>(strTextureID);
+				if (!textureIn)
+				{
+					EQ_THROW(u8"テクスチャのロードに失敗しました。");
+				}
 			}
 
 			// アトラス読み込み
@@ -531,10 +517,52 @@ namespace Equisetum2
 				// fs上のファイル一覧を取得する
 				if (Directory::Exists(fullPath))
 				{
-					auto idList = Directory::GetFiles(fullPath);
-					if (idList)
+					// フルパスの正規化を行う
+					if (fullPath[fullPath.size() - 1] != Path::DirectorySeparatorChar[0])
 					{
-						vID = *idList;
+						fullPath += Path::DirectorySeparatorChar;
+					}
+
+					std::vector<String> targetDir;
+					targetDir.push_back(fullPath);
+
+					auto optDir = Directory::GetDirectories(fullPath, true);
+					if (optDir)
+					{
+						// サブディレクトリがあればそれらも列挙対象とする
+						auto& dirs = *optDir;
+						targetDir.reserve(targetDir.size() + dirs.size()); 
+						std::copy(dirs.begin(), dirs.end(), std::back_inserter(targetDir));
+					}
+
+					// ディレクトリ内のファイルを列挙
+					for (auto& dir : targetDir)
+					{
+						auto idList = Directory::GetFiles(dir);
+						if (idList)
+						{
+							// IDリストを連結する
+							auto& id = *idList;
+							vID.reserve(vID.size() + id.size()); 
+							std::copy(id.begin(), id.end(), std::back_inserter(vID));
+						}
+					}
+
+					// 検索パスを取り除いてかつディレクトリの区切り文字をスラッシュにする
+					for (auto& filename : vID)
+					{
+						filename = filename.substr(fullPath.size());
+
+						if (Path::DirectorySeparatorChar != "/")
+						{
+							for (auto& c : filename)
+							{
+								if (c == Path::DirectorySeparatorChar[0])
+								{
+									c = '/';
+								}
+							}
+						}
 					}
 				}
 			}
@@ -882,24 +910,6 @@ namespace Equisetum2
 				if (strType != "animation")
 				{
 					EQ_THROW(u8"typeがanimationではありません。");
-				}
-			}
-
-			// ID一致チェック
-			{
-				// id取得
-				auto& id_ = doc.FindMember("id");
-				if (id_ == doc.MemberEnd() ||
-					id_->value.GetType() != rapidjson::kStringType)
-				{
-					EQ_THROW(u8"idが見つかりません。");
-				}
-
-				// ID一致判定
-				String strID = id_->value.GetString();
-				if (strID != id)
-				{
-					EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
 				}
 			}
 

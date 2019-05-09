@@ -30,19 +30,25 @@ void SystemViewAnimationTest::LoadAnimation()
 	m_spriteRenderer = nullptr;
 	m_animation = nullptr;
 
-	// スプライトレンダラ作成
-	m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
-	if (m_spriteRenderer)
-	{
-		// アニメーション作成
-		std::shared_ptr<Animation> animation = Singleton<AssetManager>::GetInstance()->Load<Animation>(m_item);
-		if (animation)
-		{
-			m_animation = animation;
+	// コントロールを初期化
+	m_animationTagIndex = -1;
+	m_animationPtr = 0;
+	m_spinTag->SetRange(-1, -1, 1);	
+	m_spinTag->SetValue(-1);
 
-			// スプライト関連設定
-			const stAnimationElement* elem = animation->GetElement(0, 0);
-			if (elem)
+	// アニメーション作成
+	std::shared_ptr<Animation> animation = Singleton<AssetManager>::GetInstance()->Load<Animation>(m_item);
+	if (animation)
+	{
+		m_animation = animation;
+
+		// スプライト関連設定
+		const stAnimationElement* elem = animation->GetElement(0, 0);
+		if (elem)
+		{
+			// スプライトレンダラ作成
+			m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
+			if (m_spriteRenderer)
 			{
 				m_spriteRenderer->SetSprite(elem->m_sprite);
 
@@ -50,21 +56,21 @@ void SystemViewAnimationTest::LoadAnimation()
 				m_spritePos = Window::Size() / 2;
 				m_spriteRenderer->SetPos(m_spritePos);
 			}
-
-			// タグ選択スピン設定
-			// アニメーションパターンが無い場合は-1～-1を設定範囲とし、-1はempty扱いとする。
-			size_t tagsSize = animation->GetTagSize();
-			int32_t minIndex = tagsSize <= 0 ? -1 : 0;
-			int32_t maxIndex = tagsSize > 0 ? tagsSize - 1 : -1;
-			m_animationTagIndex = minIndex;
-			m_spinTag->SetRange(minIndex, maxIndex, 1);	
-			m_spinTag->SetValue(minIndex);
-
-			// アニメーションパターン数設定
-			int32_t animSize = animation->GetTimelineSize(0);
-			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
-			m_animationPtr = 0;
 		}
+
+		// タグ選択スピン設定
+		// アニメーションパターンが無い場合は-1～-1を設定範囲とし、-1はempty扱いとする。
+		size_t tagsSize = animation->GetTagSize();
+		int32_t minIndex = tagsSize <= 0 ? -1 : 0;
+		int32_t maxIndex = tagsSize > 0 ? tagsSize - 1 : -1;
+		m_animationTagIndex = minIndex;
+		m_spinTag->SetRange(minIndex, maxIndex, 1);	
+		m_spinTag->SetValue(minIndex);
+
+		// アニメーションパターン数設定
+		int32_t animSize = animation->GetTimelineSize(0);
+		m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+		m_animationPtr = 0;
 	}
 }
 
@@ -86,7 +92,7 @@ int SystemViewAnimationTest::Enter()
 		{
 			if (Path::GetExtension(sprite) == u8".json")
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(sprite));
+				test.push_back(Path::ChangeExtension(sprite, ""));
 			}
 		}
 		

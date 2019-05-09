@@ -26,20 +26,24 @@ void SystemViewSpriteTest::LoadSprite()
 		return;
 	}
 
-	// スプライトレンダラ作成
-	m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
-	if (m_spriteRenderer)
+	m_spriteRenderer = nullptr;
+	m_ptr = 0;
+	m_tagIndex = -1;		// ロード時は必ずタグ未設定状態とする
+	m_spinTag->SetRange(-1, -1, 1);
+	m_spinTag->SetValue(-1);
+
+	// スプライト作成
+	std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
+	if (sprite)
 	{
-		// スプライト作成
-		std::shared_ptr<Sprite> sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(m_item);
-		if (sprite)
+		// スプライトレンダラ作成
+		m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
+		if (m_spriteRenderer)
 		{
 			m_spriteRenderer->SetSprite(sprite);
 			m_spriteRenderer->SetBlendMode(BlendMode::Blend);
 			m_spritePos = Window::Size() / 2;
 			m_spriteRenderer->SetPos(m_spritePos);
-			m_ptr = 0;
-			m_tagIndex = -1;		// ロード時は必ずタグ未設定状態とする
 
 			// アニメーションパターン数設定
 			size_t animSize = sprite->GetAnimAtlas().size();
@@ -71,7 +75,7 @@ int SystemViewSpriteTest::Enter()
 		{
 			if (Path::GetExtension(sprite) == u8".json")
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(sprite));
+				test.push_back(Path::ChangeExtension(sprite, ""));
 			}
 		}
 		
