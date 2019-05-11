@@ -523,43 +523,25 @@ namespace Equisetum2
 						fullPath += Path::DirectorySeparatorChar;
 					}
 
-					std::vector<String> targetDir;
-					targetDir.push_back(fullPath);
-
-					auto optDir = Directory::GetDirectories(fullPath, true);
-					if (optDir)
+					// ディレクトリ内のファイルを再帰的に列挙する
+					auto optFiles = Directory::GetFiles(fullPath, true);
+					if (optFiles)
 					{
-						// サブディレクトリがあればそれらも列挙対象とする
-						auto& dirs = *optDir;
-						targetDir.reserve(targetDir.size() + dirs.size()); 
-						std::copy(dirs.begin(), dirs.end(), std::back_inserter(targetDir));
-					}
+						vID = std::move(*optFiles);
 
-					// ディレクトリ内のファイルを列挙
-					for (auto& dir : targetDir)
-					{
-						auto idList = Directory::GetFiles(dir);
-						if (idList)
+						// 検索パスを取り除いてかつディレクトリの区切り文字をスラッシュにする
+						for (auto& filename : vID)
 						{
-							// IDリストを連結する
-							auto& id = *idList;
-							vID.reserve(vID.size() + id.size()); 
-							std::copy(id.begin(), id.end(), std::back_inserter(vID));
-						}
-					}
+							filename = filename.substr(fullPath.size());
 
-					// 検索パスを取り除いてかつディレクトリの区切り文字をスラッシュにする
-					for (auto& filename : vID)
-					{
-						filename = filename.substr(fullPath.size());
-
-						if (Path::DirectorySeparatorChar != "/")
-						{
-							for (auto& c : filename)
+							if (Path::DirectorySeparatorChar != "/")
 							{
-								if (c == Path::DirectorySeparatorChar[0])
+								for (auto& c : filename)
 								{
-									c = '/';
+									if (c == Path::DirectorySeparatorChar[0])
+									{
+										c = '/';
+									}
 								}
 							}
 						}
