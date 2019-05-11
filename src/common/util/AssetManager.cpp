@@ -22,7 +22,7 @@ namespace Equisetum2
 		// systemフォルダが指定されている場合は、systemフォルダ向けのパスを作成する
 		if (id.compare(0, gSystemPath.size(), gSystemPath) == 0)
 		{
-			return gSystemPath + type + "/" + Path::GetFileNameWithoutExtension(id.substr(gSystemPath.size())) + ext;
+			return gSystemPath + type + "/" + Path::ChangeExtension(id.substr(gSystemPath.size()), "") + ext;
 		}
 		else
 		{
