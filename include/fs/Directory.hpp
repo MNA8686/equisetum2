@@ -63,7 +63,7 @@ namespace Equisetum2
 		* @param path 対象ディレクトリ名
 		* @return ファイル名の配列
 		*/
-		static Optional<std::vector<String>> GetFiles(const String& path);
+		static Optional<std::vector<String>> GetFiles(const String& path, bool recursion=false);
 
 		/**
 		* @brief ディレクトリ内のディレクトリを列挙する 1件列挙するごとにコールバックが呼び出される

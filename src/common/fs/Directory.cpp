@@ -159,7 +159,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	Optional<std::vector<String>> Directory::GetFiles(const String& path)
+	Optional<std::vector<String>> Directory::GetFiles(const String& path, bool recursion)
 	{
 		Optional<std::vector<String>> opt;
 
@@ -173,6 +173,23 @@ namespace Equisetum2
 			}))
 			{
 				EQ_THROW(String::Sprintf(u8"ディレクトリ[%s]内の列挙に失敗しました。", path.c_str()));
+			}
+
+			if (recursion)
+			{
+				Optional<std::vector<String>> optDirs = GetDirectories(path, true);
+				if (optDirs)
+				{
+					for (auto& dir : *optDirs)
+					{
+						auto optFiles = GetFiles(dir);
+
+						// ファイル一覧を連結する
+						auto& recFiles = *optFiles;
+						v.reserve(v.size() + recFiles.size()); 
+						std::copy(recFiles.begin(), recFiles.end(), std::back_inserter(v));
+					}
+				}
 			}
 
 			opt = v;
