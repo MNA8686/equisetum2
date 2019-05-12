@@ -134,6 +134,45 @@ static int ParseArgument(Param& param)
 	return ret;
 }
 
+static std::vector<String> EnumFilesWithReplaceSeparator(const String& path)
+{
+	String fullPath = path;
+	std::vector<String> vFileList;
+
+	// フルパスの正規化を行う
+	if (fullPath[fullPath.size() - 1] != Path::DirectorySeparatorChar[0])
+	{
+		fullPath += Path::DirectorySeparatorChar;
+	}
+
+	// ディレクトリ内のファイルを再帰的に列挙する
+	auto optFiles = Directory::GetFiles(fullPath, true);
+	if (optFiles)
+	{
+		vFileList = std::move(*optFiles);
+
+		// 検索パスを取り除いてかつディレクトリの区切り文字をスラッシュにする
+		for (auto& filename : vFileList)
+		{
+			filename = filename.substr(fullPath.size());
+
+			if (Path::DirectorySeparatorChar != "/")
+			{
+				for (auto& c : filename)
+				{
+					if (c == Path::DirectorySeparatorChar[0])
+					{
+						c = '/';
+					}
+				}
+			}
+		}
+	}
+	
+	return vFileList;
+}
+
+
 static int BuildArchive(const Param& param)
 {
 	int ret = -1;
@@ -161,30 +200,33 @@ static int BuildArchive(const Param& param)
 
 		for (auto& file : param.vID)
 		{
-			String fullPath = param.inPath + file;
+			String fullPath = Path::GetFullPath(param.inPath + file);
 
 			// ディレクトリが指定されている場合は中のファイルを列挙する
 			if (Directory::Exists(fullPath))
 			{
-				Optional<std::vector<String>> opt = Directory::GetFiles(fullPath);
-				if (!opt)
-				{
-					throw String::Sprintf("directory <%s> enum files failed.", file.c_str());
-				}
+				// ディレクトリの中のファイルを列挙する
+				std::vector<String> files = EnumFilesWithReplaceSeparator(fullPath);
 
-				for (auto& enumFile : *opt)
+				// 列挙したファイルをアーカイブにPUSHしていく
+				for (auto& enumFile : files)
 				{
-					printf("PUSH %s\n", (file + "/" +Path::GetFileName(enumFile)).c_str());
+					// 相対パス作成
+					String filePath = file + "/" + enumFile;
 
-					auto inStream = FileStream::CreateFromPath(enumFile);
+					printf("PUSH %s\n", filePath.c_str());
+
+					// 列挙したファイルをオープン
+					auto inStream = FileStream::CreateFromPath(Path::GetFullPath(param.inPath) + filePath);
 					if (!inStream)
 					{
-						throw String::Sprintf("The file <%s> can't open.\n", enumFile.c_str());
+						throw String::Sprintf("The file <%s> can't open.\n", filePath.c_str());
 					}
 
-					if (!archiveStream->Push(file + "/" + Path::GetFileName(enumFile), inStream))
+					// アーカイブにPUSH
+					if (!archiveStream->Push(filePath, inStream))
 					{
-						throw String::Sprintf("The file <%s> can't push.\n", enumFile.c_str());
+						throw String::Sprintf("The file <%s> can't push.\n", filePath.c_str());
 					}
 				}
 			}
