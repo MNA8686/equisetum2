@@ -206,7 +206,7 @@ namespace Equisetum2
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			// 1:VSYNCを待つ 0:VSYNCを待たない
-			SDL_GL_SetSwapInterval(1);
+			SDL_GL_SetSwapInterval(0);
 
 			return inst;
 		}
