@@ -130,11 +130,29 @@ namespace EqHeap
 }
 */
 
+
+
 class EqHeap
 {
-protected:
-
+public:
 	using Handler = uint32_t;
+
+	template<typename T>
+	class Container
+	{
+	public:
+		Container() = default;
+
+		Container(Handler handler)
+		{
+			m_handler = handler;
+		}
+
+	private:
+		Handler m_handler = 0;
+	};
+
+protected:
 
 	typedef struct
 	{
@@ -273,6 +291,28 @@ void EqHeap::Delete(Handler handler)
 	}
 }
 
+
+
+template<typename T>
+class EqHeapAutoReleaser
+{
+public:
+	EqHeapAutoReleaser(EqHeap::Handler handler)
+	{
+		m_handler = handler;
+	}
+
+	~EqHeapAutoReleaser()
+	{
+		
+	}
+
+private:
+	EqHeap::Handler m_handler;
+};
+
+
+
 void heap_test()
 {
 	auto heap = EqHeap::Create(65536);
@@ -281,6 +321,17 @@ void heap_test()
 	auto ref = heap->Ref<int32_t>(h1);
 	*ref = 123;
 
+	EqHeap::Container<int32_t> hp(h1);
+
+	struct testst
+	{
+		EqHeap::Container<int32_t> h1;
+		EqHeap::Container<int32_t> h2;
+		char arr[128];
+	};
+
+	int32_t size = sizeof(testst);
+	printf("%d", size);
 
 #if 0
 	EqHeap::Initialize();
