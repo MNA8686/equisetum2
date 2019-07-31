@@ -94,7 +94,7 @@ public:
 			return;
 		}
 		
-	#if 1
+	#if 0
 		template < <typename T2> > void CallDestructer(Container<T2>* ref)
 		{
 			ref->~Container();
@@ -161,6 +161,13 @@ public:
 	bool Load(std::shared_ptr<IStream> in);
 	bool Save(std::shared_ptr<IStream> out);
 };
+
+template<>
+template<typename T2> void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
+//template <typename T2> void EqHeap::Container<EqHeap::Container<T2>>::CallDestructer(EqHeap::Container<T2>* ref)
+{
+	ref->~Container();
+}
 
 #if 0
 template<>
