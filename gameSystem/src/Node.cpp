@@ -13,6 +13,7 @@ class EqHeap
 {
 public:
 	using Handler = uint32_t;
+	friend Singleton<EqHeap>;	// シングルトンからインスタンスを作成してもらえるようにする
 
 	template<typename T>
 	class Container
@@ -22,21 +23,85 @@ public:
 
 		explicit Container(Handler handler)
 		{
-			m_handler = handler;
+			if (Singleton<EqHeap>::GetInstance()->AddRef(handler) > 0)
+			{
+				m_handler = handler;
+			}
 		}
 
-		T* Ref(std::shared_ptr<EqHeap>& heapSystem)
+		Container(const Container<T>& src)
 		{
-			return heapSystem->Ref<T>(m_handler);
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->Test(src.m_handler))
+			{
+				heap->AddRef(src.m_handler);
+				m_handler = src.m_handler;
+			}
+		}
+
+		Container<T>& operator =(const Container<T>& src)
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->DecRef(m_handler) == 0)
+			{
+				auto ref = Ref();
+				heap->CallDestructer<T>(ref);
+
+				heap->Delete(m_handler);
+			}
+
+			if (heap->AddRef(src.m_handler) > 0)
+			{
+				m_handler = src.m_handler;
+			}
+			else
+			{
+				m_handler = 0;
+			}
+
+			return (*this);
+		}
+
+		//T* Ref(std::shared_ptr<EqHeap>& heapSystem)
+		T* Ref()
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+			return heap->Ref<T>(m_handler);
 		}
 
 		~Container()
 		{
-			printf("");
+			auto heap = Singleton<EqHeap>::GetInstance();
+			if (heap->DecRef(m_handler) == 0)
+			{
+				auto ref = Ref();
+				CallDestructer<T>(ref);
+
+				heap->Delete(m_handler);
+			}
 		}
 
+		operator Handler () const
+		{
+			return m_handler;
+		}
+
+		//template<typename T>
+		void CallDestructer(T* ref)
+		{
+			return;
+		}
+		
+	#if 1
+		template < <typename T2> > void CallDestructer(Container<T2>* ref)
+		{
+			ref->~Container();
+		}
+	#endif
+
 	private:
-		friend class EqHeap;
 		Handler m_handler = 0;
 	};
 
@@ -46,6 +111,7 @@ protected:
 	{
 		Handler handler;
 		uint32_t size;
+		int32_t refCount;
 		void* ptr;
 	}stHeap;
 
@@ -53,18 +119,25 @@ protected:
 	int32_t m_reservedSize = 0;
 
 	Handler New(uint32_t allocSize);
-	void* Ref(Handler handler);
+	void* Ref(Handler handler) const;
+
+	int32_t AddRef(Handler handler);
+	int32_t DecRef(Handler handler);
 
 	template<typename T>
-	T* Ref(Handler handler)
+	T* Ref(Handler handler) const
 	{
 		return static_cast<T*>(Ref(handler));
 	}
 
+	bool Test(Handler handler) const;
+
+
 	void Delete(Handler handler);
 
 public:
-	static std::shared_ptr<EqHeap> Create(int32_t maxHandlerSize, int32_t reservedSize=0);
+	bool InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize=0);
+
 	EqHeap() = default;
 	~EqHeap();
 
@@ -75,45 +148,43 @@ public:
 		return Container<T>(handler);
 	}
 	
+#if 0
 	template<typename T>
 	void Delete(Container<T>& cont)
 	{
 		Delete(cont.m_handler);
 	}
+#endif
+
+	int32_t UsedHandlerNum() const;
 
 	bool Load(std::shared_ptr<IStream> in);
 	bool Save(std::shared_ptr<IStream> out);
 };
-// オートリリーサー
 
 #if 0
-class EqHeapAccessor
+template<>
+template<class T> EqHeap::Container<EqHeap::Container<T>>::~Container()
 {
-public:
+	auto heap = Singleton<EqHeap>::GetInstance();
+	if (heap->DecRef(m_handler) == 0)
+	{
+		auto ref = heap->Ref();
+		ref->~Container();
 
-	friend Singleton<EqHeapAccessor>;	// シングルトンからインスタンスを作成してもらえるようにする
-
-	EqHeapAccessor() = default;
-	~EqHeapAccessor() = default;
-
-	int32_t Set(std::shared_ptr<EqHeap>& heapSysmtem);
-	EqHeap* Get(int32_t id);
-
-private:
-
-	//std::vector<std::shared_ptr<EqHeap>> m_vHeap;
-	std::shared_ptr<EqHeap> m_heap;
-};
-
-int32_t EqHeapAccessor::Set(std::shared_ptr<EqHeap>& heapSysmtem)
-{
-	m_heap = heapSysmtem;
-	return 0;
+		heap->Delete(m_handler);
+	}
 }
 #endif
 
 EqHeap::~EqHeap()
 {
+	InitHeapSystem(0);
+}
+
+bool EqHeap::InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize)
+{
+	// 全解放
 	for (auto& slot : m_vHandler)
 	{
 		if (slot.ptr)
@@ -121,32 +192,25 @@ EqHeap::~EqHeap()
 			free(slot.ptr);
 		}
 	}
-}
 
-std::shared_ptr<EqHeap> EqHeap::Create(int32_t maxHandlerSize, int32_t reservedSize)
-{
+	m_vHandler.resize(maxHandlerSize);
+
 	uint32_t index = 0;
 
-	auto p = std::make_shared<EqHeap>();
-	if (p)
+	for (auto& slot : m_vHandler)
 	{
+		// 上位16ビットはハンドラの番号、下位16ビットはシリアル番号
+		slot.handler = (index << 16) | 1;
+		slot.size = 0;
+		slot.refCount = 0;
+		slot.ptr = nullptr;
 
-		p->m_vHandler.resize(maxHandlerSize);
-
-		for (auto& slot : p->m_vHandler)
-		{
-			// 上位16ビットはハンドラの番号、下位16ビットはシリアル番号
-			slot.handler = (index << 16) | 1;
-			slot.size = 0;
-			slot.ptr = nullptr;
-
-			index++;
-		}
-
-		p->m_reservedSize = reservedSize;
+		index++;
 	}
 
-	return p;
+	m_reservedSize = reservedSize;
+
+	return true;
 }
 
 EqHeap::Handler EqHeap::New(uint32_t allocSize)
@@ -171,7 +235,7 @@ EqHeap::Handler EqHeap::New(uint32_t allocSize)
 	return handler;
 }
 
-void* EqHeap::Ref(Handler handler)
+void* EqHeap::Ref(Handler handler) const
 {
 	if (handler != 0)
 	{
@@ -185,6 +249,56 @@ void* EqHeap::Ref(Handler handler)
 	}
 
 	return nullptr;
+}
+
+int32_t EqHeap::AddRef(Handler handler)
+{
+	if (handler != 0)
+	{
+		uint32_t index = handler >> 16;
+		auto& slot = m_vHandler[index];
+
+		if (slot.handler == handler)
+		{
+			slot.refCount++;
+			return slot.refCount;
+		}
+	}
+	
+	return -1;
+}
+
+int32_t EqHeap::DecRef(Handler handler)
+{
+	if (handler != 0)
+	{
+		uint32_t index = handler >> 16;
+		auto& slot = m_vHandler[index];
+
+		if (slot.handler == handler)
+		{
+			slot.refCount--;
+			return slot.refCount;
+		}
+	}
+	
+	return -1;
+}
+
+bool EqHeap::Test(Handler handler) const
+{
+	if (handler != 0)
+	{
+		uint32_t index = handler >> 16;
+		auto& slot = m_vHandler[index];
+
+		if (slot.handler == handler)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void EqHeap::Delete(Handler handler)
@@ -213,6 +327,20 @@ void EqHeap::Delete(Handler handler)
 	}
 }
 
+int32_t EqHeap::UsedHandlerNum() const
+{
+	int32_t num = 0;
+
+	for (auto& slot : m_vHandler)
+	{
+		if (slot.ptr != 0)
+		{
+			num++;
+		}
+	}
+
+	return num;
+}
 
 class TestStruct
 {
@@ -227,37 +355,56 @@ public:
 
 void heap_test()
 {
-	auto heap = EqHeap::Create(65536);
-
-#if 0
-	struct testst
-	{
-		EqHeap::Container<int32_t> h1;
-		EqHeap::Container<int32_t> h2;
-		char arr[128];
-	};
-#endif
+	auto heap = Singleton<EqHeap>::GetInstance();
+	heap->InitHeapSystem(32768);
 
 	int32_t size = sizeof(TestStruct);
 	printf("%d", size);
 
+#if 0
 	{
-		//TestStruct st;
+		auto h = heap->New<int32_t>();
+//		auto h2 = heap->New<int32_t>();
 
-		auto h = heap->New<TestStruct>();
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
 
-		auto p = h.Ref(heap);
-		p->~TestStruct();
+		h = EqHeap::Container<int32_t>(0);
 
-//		st.i = heap->New<int32_t>();
-//		auto ref = st.i.Ref(heap);
-//		*ref = 123;
-
-		//	heap->Delete(h1);
-		
-		//auto ref2 = h1.Ref(heap);
-		//*ref2 = 123;
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
 	}
+#endif
+#if 0
+	{
+		auto h = heap->New<EqHeap::Container<int32_t>>();
+		auto h2 = heap->New<int32_t>();
+
+		auto ref = h.Ref();
+		*ref = h2;
+
+		auto ref2 = h2.Ref();
+		*ref2 = 123;
+
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
+	}
+#endif
+#if 1
+	{
+		auto h = heap->New<int32_t>();
+		auto h2 = h;
+
+		auto ref = h2.Ref();
+		*ref = 123;
+
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
+	}
+#endif
+
+	size = heap->UsedHandlerNum();
+	printf("%d", size);
 
 #if 0
 	EqHeap::Initialize();
