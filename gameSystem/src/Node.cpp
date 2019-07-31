@@ -8,22 +8,6 @@ using namespace Equisetum2;
 親を持っていないのはrootノードのみである。
 */
 
-//class EqHeap;
-//class EqHeap::Container;
-
-#if 0
-template<class T>
-void CallDest(T* ref)
-{
-}
-
-template<, class T2>
-void CallDest(EqHeap::Container<T2>* ref)
-{
-	ref->~Container();
-}
-#endif
-
 class EqHeap
 {
 public:
@@ -38,9 +22,16 @@ public:
 
 		explicit Container(Handler handler)
 		{
-			if (Singleton<EqHeap>::GetInstance()->AddRef(handler) > 0)
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->AddRef(handler) > 0)
 			{
 				m_handler = handler;
+
+				if (std::is_class<T>::value)
+				{
+					CallConstructor(Ref(), heap->Size(handler) / sizeof(T));
+				}
 			}
 		}
 
@@ -61,12 +52,9 @@ public:
 
 			if (heap->DecRef(m_handler) == 0)
 			{
-				auto ref = Ref();
-				//heap->CallDestructer(ref);
-				//CallDestructer(ref);
-				if (is_vector<T>::value)
+				if (std::is_class<T>::value)
 				{
-					CallDestructer(ref);
+					CallDestructor(Ref(), heap->Size(m_handler) / sizeof(T));
 				}
 
 				heap->Delete(m_handler);
@@ -84,7 +72,6 @@ public:
 			return (*this);
 		}
 
-		//T* Ref(std::shared_ptr<EqHeap>& heapSystem)
 		T* Ref()
 		{
 			auto heap = Singleton<EqHeap>::GetInstance();
@@ -96,11 +83,9 @@ public:
 			auto heap = Singleton<EqHeap>::GetInstance();
 			if (heap->DecRef(m_handler) == 0)
 			{
-				auto ref = Ref();
-
-				if (is_vector<T>::value)
+				if (std::is_class<T>::value)
 				{
-					CallDestructer(ref);
+					CallDestructor(Ref(), heap->Size(m_handler) / sizeof(T));
 				}
 
 				heap->Delete(m_handler);
@@ -112,49 +97,25 @@ public:
 			return m_handler;
 		}
 
-		void CallDestructer(T* ref)
-		{
-			ref->~T();
-		}
-
-
-
-		//template<class T>
-		//constexpr bool is_vector_v = is_vector<T>::value;
-
-#if 0
-		template<, class T2>
-		void CallDestructer<, T2>(Container<T2>* ref)
-		{
-			ref->~Container();
-		}
-#endif
-
-#if 0
-		template<typename T>
-		void CallDestructer(T* ref)
-		{
-			return;
-		}
-#endif
-
-	#if 0
-		template<>
-		//void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
-		//template<typename T2> void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
-		//template <typename T2> void EqHeap::Container<EqHeap::Container<T2>>::CallDestructer(EqHeap::Container<T2>* ref)
-		void CallDestructer(Container<int32_t>* ref)
-		{
-			//	ref->~Container();
-		}
-
-		template < <typename T2> > void CallDestructer(Container<T2>* ref)
-		{
-			ref->~Container();
-		}
-	#endif
-
 	private:
+		void CallConstructor(T* ref, uint32_t num)
+		{
+			for (uint32_t i = 0; i < num; i++)
+			{
+				new (ref) T();
+				ref++;
+			}
+		}
+
+		void CallDestructor(T* ref, uint32_t num)
+		{
+			for (uint32_t i = 0; i < num; i++)
+			{
+				ref->~T();
+				ref++;
+			}
+		}
+
 		Handler m_handler = 0;
 	};
 
@@ -176,6 +137,7 @@ protected:
 
 	int32_t AddRef(Handler handler);
 	int32_t DecRef(Handler handler);
+	int32_t Size(Handler handler) const;
 
 	template<typename T>
 	T* Ref(Handler handler) const
@@ -201,58 +163,17 @@ public:
 		return Container<T>(handler);
 	}
 	
-#if 0
-	template<typename T>
-	void Delete(Container<T>& cont)
-	{
-		Delete(cont.m_handler);
-	}
-#endif
-
 	int32_t UsedHandlerNum() const;
 
 	bool Load(std::shared_ptr<IStream> in);
 	bool Save(std::shared_ptr<IStream> out);
+
+	template<class T>
+	struct isContainer : std::false_type {};
+
+	template<class T>
+	struct isContainer<Container<T>> : std::true_type {};
 };
-
-template<class T>
-struct is_vector : std::false_type {};
-
-template<class T>
-struct is_vector<EqHeap::Container<T>> : std::true_type {};
-
-
-
-#if 0
-template<>
-template<class T> EqHeap::Container<EqHeap::Container<T>>::~Container()
-{
-	auto heap = Singleton<EqHeap>::GetInstance();
-	if (heap->DecRef(m_handler) == 0)
-	{
-		auto ref = heap->Ref();
-		ref->~Container();
-
-		heap->Delete(m_handler);
-	}
-}
-#endif
-
-#if 0
-template <typename T, typename T2>
-struct is_eqheap 
-{
-	static constexpr bool value = false;
-};
-
-template <, typename T2>
-struct is_eqheap<EqHeap::Container<T2>>
-{
-	static constexpr bool value = true;
-};
-
-#endif
-
 
 EqHeap::~EqHeap()
 {
@@ -345,6 +266,22 @@ int32_t EqHeap::AddRef(Handler handler)
 	return -1;
 }
 
+int32_t EqHeap::Size(Handler handler) const
+{
+	if (handler != 0)
+	{
+		uint32_t index = handler >> 16;
+		auto& slot = m_vHandler[index];
+
+		if (slot.handler == handler)
+		{
+			return slot.size;
+		}
+	}
+	
+	return 0;
+}
+
 int32_t EqHeap::DecRef(Handler handler)
 {
 	if (handler != 0)
@@ -362,6 +299,7 @@ int32_t EqHeap::DecRef(Handler handler)
 	return -1;
 }
 
+// ハンドラが有効かどうか調べる
 bool EqHeap::Test(Handler handler) const
 {
 	if (handler != 0)
@@ -425,6 +363,7 @@ public:
 	EqHeap::Container<int32_t> i;
 	float f;
 	EqHeap::Container<int32_t> i2;
+	//std::vector<int32_t> v;
 
 	TestStruct() = default;
 	~TestStruct() = default;
@@ -438,6 +377,17 @@ void heap_test()
 	int32_t size = sizeof(TestStruct);
 	printf("%d", size);
 
+#if 1
+	{
+		auto h = heap->New<TestStruct>(2);
+		auto h2 = heap->New<TestStruct>(1);
+		//h.Ref()->v.resize(1024);
+		//h2.Ref()->v.resize(1024);
+
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
+	}
+#endif
 #if 0
 	{
 		auto h = heap->New<int32_t>();
@@ -452,7 +402,7 @@ void heap_test()
 		printf("%d", size);
 	}
 #endif
-#if 1
+#if 0
 	{
 		auto h = heap->New<EqHeap::Container<int32_t>>();
 		auto h2 = heap->New<int32_t>();
