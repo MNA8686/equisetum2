@@ -177,7 +177,9 @@ public:
 
 EqHeap::~EqHeap()
 {
-	InitHeapSystem(0);
+	// きちんと解放が行われていればここでやることは無いはずである
+	// メモリリーク検出を行う？
+	//InitHeapSystem(0);
 }
 
 bool EqHeap::InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize)
