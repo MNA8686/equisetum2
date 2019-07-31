@@ -8,6 +8,21 @@ using namespace Equisetum2;
 親を持っていないのはrootノードのみである。
 */
 
+//class EqHeap;
+//class EqHeap::Container;
+
+#if 0
+template<class T>
+void CallDest(T* ref)
+{
+}
+
+template<, class T2>
+void CallDest(EqHeap::Container<T2>* ref)
+{
+	ref->~Container();
+}
+#endif
 
 class EqHeap
 {
@@ -47,7 +62,12 @@ public:
 			if (heap->DecRef(m_handler) == 0)
 			{
 				auto ref = Ref();
-				heap->CallDestructer<T>(ref);
+				//heap->CallDestructer(ref);
+				//CallDestructer(ref);
+				if (is_vector<T>::value)
+				{
+					CallDestructer(ref);
+				}
 
 				heap->Delete(m_handler);
 			}
@@ -77,7 +97,11 @@ public:
 			if (heap->DecRef(m_handler) == 0)
 			{
 				auto ref = Ref();
-				CallDestructer<T>(ref);
+
+				if (is_vector<T>::value)
+				{
+					CallDestructer(ref);
+				}
 
 				heap->Delete(m_handler);
 			}
@@ -88,13 +112,42 @@ public:
 			return m_handler;
 		}
 
-		//template<typename T>
+		void CallDestructer(T* ref)
+		{
+			ref->~T();
+		}
+
+
+
+		//template<class T>
+		//constexpr bool is_vector_v = is_vector<T>::value;
+
+#if 0
+		template<, class T2>
+		void CallDestructer<, T2>(Container<T2>* ref)
+		{
+			ref->~Container();
+		}
+#endif
+
+#if 0
+		template<typename T>
 		void CallDestructer(T* ref)
 		{
 			return;
 		}
-		
+#endif
+
 	#if 0
+		template<>
+		//void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
+		//template<typename T2> void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
+		//template <typename T2> void EqHeap::Container<EqHeap::Container<T2>>::CallDestructer(EqHeap::Container<T2>* ref)
+		void CallDestructer(Container<int32_t>* ref)
+		{
+			//	ref->~Container();
+		}
+
 		template < <typename T2> > void CallDestructer(Container<T2>* ref)
 		{
 			ref->~Container();
@@ -162,12 +215,13 @@ public:
 	bool Save(std::shared_ptr<IStream> out);
 };
 
-template<>
-template<typename T2> void EqHeap::Container<int32_t>::CallDestructer(int32_t* ref)
-//template <typename T2> void EqHeap::Container<EqHeap::Container<T2>>::CallDestructer(EqHeap::Container<T2>* ref)
-{
-	ref->~Container();
-}
+template<class T>
+struct is_vector : std::false_type {};
+
+template<class T>
+struct is_vector<EqHeap::Container<T>> : std::true_type {};
+
+
 
 #if 0
 template<>
@@ -183,6 +237,22 @@ template<class T> EqHeap::Container<EqHeap::Container<T>>::~Container()
 	}
 }
 #endif
+
+#if 0
+template <typename T, typename T2>
+struct is_eqheap 
+{
+	static constexpr bool value = false;
+};
+
+template <, typename T2>
+struct is_eqheap<EqHeap::Container<T2>>
+{
+	static constexpr bool value = true;
+};
+
+#endif
+
 
 EqHeap::~EqHeap()
 {
@@ -382,7 +452,7 @@ void heap_test()
 		printf("%d", size);
 	}
 #endif
-#if 0
+#if 1
 	{
 		auto h = heap->New<EqHeap::Container<int32_t>>();
 		auto h2 = heap->New<int32_t>();
@@ -397,7 +467,7 @@ void heap_test()
 		printf("%d", size);
 	}
 #endif
-#if 1
+#if 0
 	{
 		auto h = heap->New<int32_t>();
 		auto h2 = h;
