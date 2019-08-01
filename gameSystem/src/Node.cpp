@@ -119,6 +119,56 @@ public:
 		Handler m_handler = 0;
 	};
 
+	// 弱い参照用コンテナ
+	template<typename T>
+	class WeakRef
+	{
+	public:
+		explicit WeakRef()// = default;
+		{
+			printf("\n");
+		}
+
+		WeakRef(const Container<T>& src)
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->Test(src.m_handler))
+			{
+				m_handler = src.m_handler;
+			}
+		}
+
+		WeakRef<T>& operator =(const Container<T>& src)
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->Test(src))
+			{
+				m_handler = src;
+			}
+
+			return (*this);
+		}
+
+		T* Ref()
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+			return heap->Ref<T>(m_handler);
+		}
+
+		~WeakRef() = default;
+
+		operator Handler () const
+		{
+			return m_handler;
+		}
+
+	private:
+
+		Handler m_handler = 0;
+	};
+
 protected:
 
 	typedef struct
@@ -173,7 +223,9 @@ public:
 
 	template<class T>
 	struct isContainer<Container<T>> : std::true_type {};
+
 };
+
 
 EqHeap::~EqHeap()
 {
@@ -268,22 +320,6 @@ int32_t EqHeap::AddRef(Handler handler)
 	return -1;
 }
 
-int32_t EqHeap::Size(Handler handler) const
-{
-	if (handler != 0)
-	{
-		uint32_t index = handler >> 16;
-		auto& slot = m_vHandler[index];
-
-		if (slot.handler == handler)
-		{
-			return slot.size;
-		}
-	}
-	
-	return 0;
-}
-
 int32_t EqHeap::DecRef(Handler handler)
 {
 	if (handler != 0)
@@ -299,6 +335,23 @@ int32_t EqHeap::DecRef(Handler handler)
 	}
 	
 	return -1;
+}
+
+// ハンドラに割り付けられているメモリのサイズ
+int32_t EqHeap::Size(Handler handler) const
+{
+	if (handler != 0)
+	{
+		uint32_t index = handler >> 16;
+		auto& slot = m_vHandler[index];
+
+		if (slot.handler == handler)
+		{
+			return slot.size;
+		}
+	}
+	
+	return 0;
 }
 
 // ハンドラが有効かどうか調べる
@@ -318,6 +371,7 @@ bool EqHeap::Test(Handler handler) const
 	return false;
 }
 
+// ハンドラを削除し、メモリを解放する
 void EqHeap::Delete(Handler handler)
 {
 	if (handler != 0)
@@ -371,6 +425,109 @@ public:
 	~TestStruct() = default;
 };
 
+#if 1
+template<typename T>
+class EqVector
+{
+public:
+	class iterator
+	{
+	private:
+		T* m_ptr = nullptr;
+		int32_t m_count = 0;
+
+	public:
+
+		iterator(T* ptr, int32_t count)
+		{
+			m_ptr = ptr;
+			m_count = count;
+		}
+
+		iterator& operator++()
+		{
+			m_count++;
+
+			return *this;
+		}
+
+		iterator operator++(int)
+		{
+			auto it = *this;
+
+			++(*this);
+
+			return it;
+		}
+
+		const T& operator*() const
+		{
+			return m_ptr[m_count];
+		}
+
+		const T* operator->() const
+		{
+			return &m_ptr[m_count];
+		}
+
+		bool operator== (const iterator& r) const
+		{
+			return m_count == r.m_count;
+		}
+
+		bool operator!= (const iterator& r) const
+		{
+			return !(m_count == r.m_count);
+		}
+	};
+
+	EqVector() = default;
+	EqVector(int32_t num)
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+		m_array = heap->New<T>(num);
+
+		m_reservedSize = num;
+		m_usedSize = num;
+	}
+
+	T* Data()
+	{
+		return m_array.Ref();
+	}
+
+	const T* Data() const 
+	{
+		return m_array.Ref();
+	}
+
+	void Clear()
+	{
+		m_usedSize = 0;
+	}
+
+	int32_t Size() const
+	{
+		return m_usedSize;
+	}
+
+	iterator begin()
+	{
+		return{ Data(), 0 };
+	}
+
+	iterator end()
+	{
+		return{ Data(), m_usedSize };
+	}
+
+private:
+	int32_t m_reservedSize = 0;
+	int32_t m_usedSize = 0;
+	EqHeap::Container<T> m_array;
+};
+#endif
+
 void heap_test()
 {
 	auto heap = Singleton<EqHeap>::GetInstance();
@@ -380,6 +537,59 @@ void heap_test()
 	printf("%d", size);
 
 #if 1
+	{
+		EqVector<int32_t> v;
+
+		auto p = v.Data();
+		//p[0] = 123;
+		//p[1] = 456;
+		//p[2] = 789;
+		//p[3] = 888;
+
+		for (auto& e : v)
+		{
+			auto num = e;
+			printf("%d", num);
+		}
+
+		size = sizeof(EqVector<int32_t>);
+		printf("%d", size);
+	}
+#endif
+#if 0
+	{
+		EqHeap::WeakRef<int32_t> w;
+		EqHeap::WeakRef<int32_t> w2;
+
+		{
+			auto h = heap->New<int32_t>();
+			w = h;
+
+			size = heap->UsedHandlerNum();
+			printf("%d", size);
+
+			w2 = w;
+			auto w_ref = w2.Ref();
+			*w_ref = 123;
+
+			auto h_ref = h.Ref();
+			*h_ref = 123;
+		}
+
+		auto w_ref = w.Ref();
+
+		size = heap->UsedHandlerNum();
+		printf("%d", size);
+
+
+		EqHeap::WeakRef<int32_t> arr[32];
+		for (auto& e : arr)
+		{
+
+		}
+	}
+#endif
+#if 0
 	{
 		auto h = heap->New<TestStruct>(2);
 		auto h2 = heap->New<TestStruct>(1);
