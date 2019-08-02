@@ -226,6 +226,11 @@ EqHeap::~EqHeap()
 	// きちんと解放が行われていればここでやることは無いはずである
 	// メモリリーク検出を行う？
 	//InitHeapSystem(0);
+
+	if (UsedHandlerNum() > 0)
+	{
+		Logger::OutputDebug("memory leak!");
+	}
 }
 
 bool EqHeap::InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize)
@@ -445,9 +450,11 @@ public:
 
 #if 1
 template<typename T>
-class EqVector
+class EqVector final
 {
 public:
+	const int32_t minSize = 16;
+
 	class iterator
 	{
 	private:
@@ -499,184 +506,136 @@ public:
 		}
 	};
 
-	template<typename T>
-	class Container
-	{
-	public:
-		explicit Container() = default;
-
-		void Reserve(int32_t reserveSize)
-		{
-			auto heap = Singleton<EqHeap>::GetInstance();
-
-			if (m_reservedSize < reserveSize)
-			{
-				EqHeap::Handler handler = heap->New(reserveSize * sizeof(T));
-
-				if (handler != 0)
-				{
-					if (std::is_class<T>::value)
-					{
-						//コピーコンストラクタ呼び出し
-						CallCopyConstructor(reinterpret_cast<T*>(heap->Ref(handler)), Ref(), m_usedSize);
-
-						CallDestructor(Ref(), m_usedSize);
-					}
-
-					m_reservedSize = reserveSize;
-
-					if (m_handler != 0)
-					{
-						heap->Swap(m_handler, handler);
-						// 古いほうのメモリを削除
-						heap->Delete(handler);
-					}
-					else
-					{
-						m_handler = handler;
-					}
-				}
-			}
-		}
-
-		void Resize(int32_t size)
-		{
-			if (m_usedSize != size)
-			{
-				if (m_usedSize > size)
-				{
-					if (std::is_class<T>::value)
-					{
-						// 小さくする場合ははじき出される部分だけデストラクタを呼ぶ
-						CallDestructor(&Ref()[size], m_usedSize - size);
-					}
-				}
-				else
-				{
-					if (size > m_reservedSize)
-					{
-						Reserve(m_reservedSize < 16 ? 16 : m_reservedSize * 2);
-					}
-					
-					if (std::is_class<T>::value)
-					{
-						// 大きくなった分だけコンストラクタを呼ぶ
-						CallConstructor(&Ref()[size], m_usedSize - size);
-					}
-				}
-				m_usedSize = size;
-			}
-		}
-
-#if 0
-		Container<T>& operator =(const Container<T>& src)
-		{
-			auto heap = Singleton<EqHeap>::GetInstance();
-
-			if (heap->DecRef(m_handler) == 0)
-			{
-				if (std::is_class<T>::value)
-				{
-					CallDestructor(Ref(), heap->Size(m_handler) / sizeof(T));
-				}
-
-				heap->Delete(m_handler);
-			}
-
-			if (heap->AddRef(src.m_handler) > 0)
-			{
-				m_handler = src.m_handler;
-			}
-			else
-			{
-				m_handler = 0;
-			}
-
-			return (*this);
-		}
-#endif
-
-		T* Ref()
-		{
-			auto heap = Singleton<EqHeap>::GetInstance();
-			return heap->Ref<T>(m_handler);
-		}
-
-		~Container()
-		{
-			auto heap = Singleton<EqHeap>::GetInstance();
-
-			if (std::is_class<T>::value)
-			{
-				CallDestructor(Ref(), m_usedSize);
-			}
-
-			heap->Delete(m_handler);
-		}
-
-//		operator EqHeap::Handler () const
-//		{
-//			return m_handler;
-//		}
-
-//	private:
-		void CallConstructor(T* ref, uint32_t num)
-		{
-			for (uint32_t i = 0; i < num; i++)
-			{
-				new (ref) T();
-				ref++;
-			}
-		}
-		
-		void CallCopyConstructor(T* destRef, T* srcRef, uint32_t num)
-		{
-			for (uint32_t i = 0; i < num; i++)
-			{
-				new (destRef) T(*srcRef);
-				srcRef++;
-				destRef++;
-			}
-		}
-
-		void CallDestructor(T* ref, uint32_t num)
-		{
-			for (uint32_t i = 0; i < num; i++)
-			{
-				ref->~T();
-				ref++;
-			}
-		}
-
-		int32_t m_reservedSize = 0;
-		int32_t m_usedSize = 0;
-		EqHeap::Handler m_handler = 0;
-	};
-
 	EqVector() = default;
 	EqVector(int32_t num)
 	{
-		m_array.Resize(num);
+		Resize(num);
+	}
+
+	~EqVector()
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+
+		Clear();
+
+		heap->Delete(m_handler);
+	}
+
+	void Reserve(int32_t reserveSize)
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+
+		if (m_reservedSize < reserveSize)
+		{
+			EqHeap::Handler handler = heap->New(reserveSize * sizeof(T));
+
+			if (handler != 0)
+			{
+				if (std::is_class<T>::value)
+				{
+					//コピーコンストラクタ呼び出し
+					CallCopyConstructor(reinterpret_cast<T*>(heap->Ref(handler)), Data(), m_usedSize);
+
+					// 古い方の配列に入っているオブジェクトのデストラクタを呼ぶ
+					CallDestructor(Data(), m_usedSize);
+				}
+				else
+				{
+					memcpy(heap->Ref(handler), Data(), m_usedSize * sizeof(T));
+				}
+
+				m_reservedSize = reserveSize;
+
+				if (m_handler != 0)
+				{
+					// 新しく確保したメモリと古いメモリを入れ替える
+					heap->Swap(m_handler, handler);
+					// 古いほうのメモリを削除
+					heap->Delete(handler);
+				}
+				else
+				{
+					m_handler = handler;
+				}
+			}
+		}
+	}
+
+	void Resize(int32_t size)
+	{
+		if (m_usedSize != size)
+		{
+			if (m_usedSize > size)
+			{
+				if (std::is_class<T>::value)
+				{
+					// 小さくする場合ははじき出される部分だけデストラクタを呼ぶ
+					CallDestructor(&Data()[size], m_usedSize - size);
+				}
+				memset(&Data()[size], 0, (m_usedSize - size) * sizeof(T));
+			}
+			else
+			{
+				if (size > m_reservedSize)
+				{
+					Reserve(NextSize(size));
+				}
+				
+				if (std::is_class<T>::value)
+				{
+					// 大きくなった分だけコンストラクタを呼ぶ
+					CallConstructor(&Data()[m_usedSize], size - m_usedSize);
+				}
+			}
+			m_usedSize = size;
+		}
 	}
 
 	T* Data()
 	{
-		return m_array.Ref();
+		auto heap = Singleton<EqHeap>::GetInstance();
+		return heap->Ref<T>(m_handler);
 	}
 
 	const T* Data() const 
 	{
-		return m_array.Ref();
+		auto heap = Singleton<EqHeap>::GetInstance();
+		return heap->Ref<T>(m_handler);
 	}
 
 	void Clear()
 	{
-		m_array.Resize(0);
+		Resize(0);
+	}
+
+	void PushBack(const T& src)
+	{
+		// まずはメモリだけ確保する
+		Reserve(NextSize(m_usedSize + 1));
+
+		if (std::is_class<T>::value)
+		{
+			CallCopyConstructor(&Data()[m_usedSize], &src, 1);
+		}
+		else
+		{
+			memcpy(&Data()[m_usedSize], &src, sizeof(T));
+		}
+
+		m_usedSize++;
+	}
+
+	void PopBack()
+	{
+		if (m_usedSize > 0)
+		{
+			Resize(m_usedSize - 1);
+		}
 	}
 
 	int32_t Size() const
 	{
-		return m_array.m_usedSize;
+		return m_usedSize;
 	}
 
 	iterator begin()
@@ -686,13 +645,79 @@ public:
 
 	iterator end()
 	{
-		return{ Data(), m_array.m_usedSize };
+		return{ Data(), m_usedSize };
 	}
 
 private:
-	Container<T> m_array;
+	void CallConstructor(T* ref, uint32_t num)
+	{
+		for (uint32_t i = 0; i < num; i++)
+		{
+			new (ref) T();
+			ref++;
+		}
+	}
+	
+	void CallCopyConstructor(T* destRef, const T* srcRef, uint32_t num)
+	{
+		for (uint32_t i = 0; i < num; i++)
+		{
+			new (destRef) T(*srcRef);
+			srcRef++;
+			destRef++;
+		}
+	}
+
+	void CallDestructor(T* ref, uint32_t num)
+	{
+		for (uint32_t i = 0; i < num; i++)
+		{
+			ref->~T();
+			ref++;
+		}
+	}
+
+	int32_t NextSize(int32_t size) const
+	{
+		int32_t destSize = minSize;
+
+		while (destSize < size)
+		{
+			destSize *= 2;
+		}
+
+		return destSize;
+	}
+
+	int32_t m_reservedSize = 0;
+	int32_t m_usedSize = 0;
+	EqHeap::Handler m_handler = 0;
 };
 #endif
+
+
+static int testCount = 0;
+class TestClass
+{
+public:
+	TestClass()
+	{
+		Logger::OutputDebug("con %d", testCount);
+		i = testCount;
+		testCount++;
+	}
+	~TestClass()
+	{
+		Logger::OutputDebug("des %d", i);
+	}
+	TestClass(const TestClass& src)
+	{
+		Logger::OutputDebug("copy %d", src.i);
+		i = src.i;
+	}
+
+	int i = 0;
+};
 
 void heap_test()
 {
@@ -702,6 +727,41 @@ void heap_test()
 	int32_t size = sizeof(TestStruct);
 	printf("%d", size);
 
+#if 1
+	{
+		EqVector<TestClass> v(4);
+
+		{
+			Logger::OutputDebug("");
+			v.Resize(6);
+		}
+
+		Logger::OutputDebug("");
+		TestClass tmp;
+		v.PushBack(tmp);
+
+		Logger::OutputDebug("");
+		v.PopBack();
+		v.PopBack();
+		v.PopBack();
+		v.PopBack();
+
+		Logger::OutputDebug("");
+		v.Resize(2);
+
+		Logger::OutputDebug("");
+		v.Resize(5);
+
+		Logger::OutputDebug("");
+		v.Clear();
+
+		Logger::OutputDebug("");
+		v.Resize(20);
+
+		size = sizeof(EqVector<int32_t>);
+		Logger::OutputDebug("\n%d", size);
+	}
+#endif
 #if 1
 	{
 		EqVector<int32_t> v(4);
@@ -715,11 +775,53 @@ void heap_test()
 		for (auto& e : v)
 		{
 			auto num = e;
-			printf("%d", num);
+			Logger::OutputDebug("%d", num);
+		}
+		
+		{
+			Logger::OutputDebug("");
+			v.Resize(6);
+			auto p = v.Data();
+			p[4] = 111;
+			p[5] = 222;
+
+			for (auto& e : v)
+			{
+				auto num = e;
+				Logger::OutputDebug("%d", num);
+			}
+		}
+
+		{
+			Logger::OutputDebug("");
+			v.PushBack(333);
+			v.PushBack(444);
+
+			for (auto& e : v)
+			{
+				auto num = e;
+				Logger::OutputDebug("%d", num);
+			}
+		}
+
+		Logger::OutputDebug("");
+		v.Resize(2);
+		for (auto& e : v)
+		{
+			auto num = e;
+			Logger::OutputDebug("%d", num);
+		}
+
+		Logger::OutputDebug("");
+		v.Resize(5);
+		for (auto& e : v)
+		{
+			auto num = e;
+			Logger::OutputDebug("%d", num);
 		}
 
 		size = sizeof(EqVector<int32_t>);
-		printf("%d", size);
+		Logger::OutputDebug("\n%d", size);
 	}
 #endif
 #if 0
