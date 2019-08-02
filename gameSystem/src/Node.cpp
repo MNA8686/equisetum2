@@ -124,10 +124,7 @@ public:
 	class WeakRef
 	{
 	public:
-		explicit WeakRef()// = default;
-		{
-			printf("\n");
-		}
+		explicit WeakRef() = default;
 
 		WeakRef(const Container<T>& src)
 		{
@@ -182,23 +179,8 @@ protected:
 	std::vector<stHeap> m_vHandler;
 	int32_t m_reservedSize = 0;
 
-	Handler New(uint32_t allocSize);
-	void* Ref(Handler handler) const;
-
 	int32_t AddRef(Handler handler);
 	int32_t DecRef(Handler handler);
-	int32_t Size(Handler handler) const;
-
-	template<typename T>
-	T* Ref(Handler handler) const
-	{
-		return static_cast<T*>(Ref(handler));
-	}
-
-	bool Test(Handler handler) const;
-
-
-	void Delete(Handler handler);
 
 public:
 	bool InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize=0);
@@ -212,8 +194,20 @@ public:
 		auto handler = New(sizeof(T) * num);
 		return Container<T>(handler);
 	}
+	Handler New(uint32_t allocSize);
+	void Delete(Handler handler);
+	bool Swap(Handler handler1, Handler handler2);
+
+	template<typename T>
+	T* Ref(Handler handler) const
+	{
+		return static_cast<T*>(Ref(handler));
+	}
 	
 	int32_t UsedHandlerNum() const;
+	int32_t Size(Handler handler) const;
+	void* Ref(Handler handler) const;
+	bool Test(Handler handler) const;
 
 	bool Load(std::shared_ptr<IStream> in);
 	bool Save(std::shared_ptr<IStream> out);
@@ -371,6 +365,30 @@ bool EqHeap::Test(Handler handler) const
 	return false;
 }
 
+// 実体をすり替える
+bool EqHeap::Swap(Handler handler1, Handler handler2)
+{
+	if (handler1 == handler2)
+	{
+		return true;
+	}
+
+	if (!Test(handler1) || !Test(handler2))
+	{
+		return false;
+	}
+
+	uint32_t index1 = handler1 >> 16;
+	auto& slot1 = m_vHandler[index1];
+	uint32_t index2 = handler2 >> 16;
+	auto& slot2 = m_vHandler[index2];
+
+	std::swap(slot1.ptr, slot2.ptr);
+	std::swap(slot1.size, slot2.size);
+
+	return true;
+}
+
 // ハンドラを削除し、メモリを解放する
 void EqHeap::Delete(Handler handler)
 {
@@ -481,14 +499,164 @@ public:
 		}
 	};
 
+	template<typename T>
+	class Container
+	{
+	public:
+		explicit Container() = default;
+
+		void Reserve(int32_t reserveSize)
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (m_reservedSize < reserveSize)
+			{
+				EqHeap::Handler handler = heap->New(reserveSize * sizeof(T));
+
+				if (handler != 0)
+				{
+					if (std::is_class<T>::value)
+					{
+						//コピーコンストラクタ呼び出し
+						CallCopyConstructor(reinterpret_cast<T*>(heap->Ref(handler)), Ref(), m_usedSize);
+
+						CallDestructor(Ref(), m_usedSize);
+					}
+
+					m_reservedSize = reserveSize;
+
+					if (m_handler != 0)
+					{
+						heap->Swap(m_handler, handler);
+						// 古いほうのメモリを削除
+						heap->Delete(handler);
+					}
+					else
+					{
+						m_handler = handler;
+					}
+				}
+			}
+		}
+
+		void Resize(int32_t size)
+		{
+			if (m_usedSize != size)
+			{
+				if (m_usedSize > size)
+				{
+					if (std::is_class<T>::value)
+					{
+						// 小さくする場合ははじき出される部分だけデストラクタを呼ぶ
+						CallDestructor(&Ref()[size], m_usedSize - size);
+					}
+				}
+				else
+				{
+					if (size > m_reservedSize)
+					{
+						Reserve(m_reservedSize < 16 ? 16 : m_reservedSize * 2);
+					}
+					
+					if (std::is_class<T>::value)
+					{
+						// 大きくなった分だけコンストラクタを呼ぶ
+						CallConstructor(&Ref()[size], m_usedSize - size);
+					}
+				}
+				m_usedSize = size;
+			}
+		}
+
+#if 0
+		Container<T>& operator =(const Container<T>& src)
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (heap->DecRef(m_handler) == 0)
+			{
+				if (std::is_class<T>::value)
+				{
+					CallDestructor(Ref(), heap->Size(m_handler) / sizeof(T));
+				}
+
+				heap->Delete(m_handler);
+			}
+
+			if (heap->AddRef(src.m_handler) > 0)
+			{
+				m_handler = src.m_handler;
+			}
+			else
+			{
+				m_handler = 0;
+			}
+
+			return (*this);
+		}
+#endif
+
+		T* Ref()
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+			return heap->Ref<T>(m_handler);
+		}
+
+		~Container()
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+
+			if (std::is_class<T>::value)
+			{
+				CallDestructor(Ref(), m_usedSize);
+			}
+
+			heap->Delete(m_handler);
+		}
+
+//		operator EqHeap::Handler () const
+//		{
+//			return m_handler;
+//		}
+
+//	private:
+		void CallConstructor(T* ref, uint32_t num)
+		{
+			for (uint32_t i = 0; i < num; i++)
+			{
+				new (ref) T();
+				ref++;
+			}
+		}
+		
+		void CallCopyConstructor(T* destRef, T* srcRef, uint32_t num)
+		{
+			for (uint32_t i = 0; i < num; i++)
+			{
+				new (destRef) T(*srcRef);
+				srcRef++;
+				destRef++;
+			}
+		}
+
+		void CallDestructor(T* ref, uint32_t num)
+		{
+			for (uint32_t i = 0; i < num; i++)
+			{
+				ref->~T();
+				ref++;
+			}
+		}
+
+		int32_t m_reservedSize = 0;
+		int32_t m_usedSize = 0;
+		EqHeap::Handler m_handler = 0;
+	};
+
 	EqVector() = default;
 	EqVector(int32_t num)
 	{
-		auto heap = Singleton<EqHeap>::GetInstance();
-		m_array = heap->New<T>(num);
-
-		m_reservedSize = num;
-		m_usedSize = num;
+		m_array.Resize(num);
 	}
 
 	T* Data()
@@ -503,12 +671,12 @@ public:
 
 	void Clear()
 	{
-		m_usedSize = 0;
+		m_array.Resize(0);
 	}
 
 	int32_t Size() const
 	{
-		return m_usedSize;
+		return m_array.m_usedSize;
 	}
 
 	iterator begin()
@@ -518,13 +686,11 @@ public:
 
 	iterator end()
 	{
-		return{ Data(), m_usedSize };
+		return{ Data(), m_array.m_usedSize };
 	}
 
 private:
-	int32_t m_reservedSize = 0;
-	int32_t m_usedSize = 0;
-	EqHeap::Container<T> m_array;
+	Container<T> m_array;
 };
 #endif
 
@@ -538,13 +704,13 @@ void heap_test()
 
 #if 1
 	{
-		EqVector<int32_t> v;
+		EqVector<int32_t> v(4);
 
 		auto p = v.Data();
-		//p[0] = 123;
-		//p[1] = 456;
-		//p[2] = 789;
-		//p[3] = 888;
+		p[0] = 123;
+		p[1] = 456;
+		p[2] = 789;
+		p[3] = 888;
 
 		for (auto& e : v)
 		{
