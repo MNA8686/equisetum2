@@ -99,6 +99,9 @@
     <ClCompile Include="..\..\src\SystemWidgetLabelWithFont.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\EqHeap.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Node.hpp">
@@ -175,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\SystemWidgetLabelWithFont.hpp">
       <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\EqHeap.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\EqVector.hpp">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
