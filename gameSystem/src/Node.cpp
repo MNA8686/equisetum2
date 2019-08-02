@@ -519,6 +519,34 @@ public:
 		heap->Delete(m_handler);
 	}
 
+	EqVector<T>& operator =(const EqVector<T>& src)
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+
+		if (src.m_reservedSize > 0)
+		{
+			EqHeap::Handler handler = heap->New(src.m_reservedSize * sizeof(T));
+			if (handler != 0)
+			{
+				if (std::is_class<T>::value)
+				{
+					//コピーコンストラクタ呼び出し
+					CallCopyConstructor(reinterpret_cast<T*>(heap->Ref(handler)), src.Data(), src.m_usedSize);
+				}
+				else
+				{
+					memcpy(heap->Ref(handler), src.Data(), src.m_usedSize * sizeof(T));
+				}
+
+				m_handler = handler;
+				m_reservedSize = src.m_reservedSize;
+				m_usedSize = src.m_usedSize;
+			}
+		}
+
+		return (*this);
+	}
+
 	void Reserve(int32_t reserveSize)
 	{
 		auto heap = Singleton<EqHeap>::GetInstance();
@@ -732,6 +760,28 @@ void heap_test()
 	printf("%d", size);
 
 #if 1
+	{
+		EqVector<TestClass> v(4);
+		EqVector<TestClass> v2;
+
+		{
+			Logger::OutputDebug("v size %d", v.Size());
+			Logger::OutputDebug("v2 size %d", v2.Size());
+
+			v2 = v;
+			Logger::OutputDebug("v2 size %d", v2.Size());
+
+			v.Clear();
+			Logger::OutputDebug("v size %d", v.Size());
+			Logger::OutputDebug("v2 size %d", v2.Size());
+			
+			v2.PushBack({});
+			Logger::OutputDebug("v size %d", v.Size());
+			Logger::OutputDebug("v2 size %d", v2.Size());
+		}
+	}
+#endif
+#if 0
 	{
 		EqVector<TestClass> v(4);
 
