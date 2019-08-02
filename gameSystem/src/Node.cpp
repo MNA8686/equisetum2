@@ -453,8 +453,6 @@ template<typename T>
 class EqVector final
 {
 public:
-	const int32_t minSize = 16;
-
 	class iterator
 	{
 	private:
@@ -572,6 +570,8 @@ public:
 					// 小さくする場合ははじき出される部分だけデストラクタを呼ぶ
 					CallDestructor(&Data()[size], m_usedSize - size);
 				}
+
+				// 未使用になった領域をゼロ埋め
 				memset(&Data()[size], 0, (m_usedSize - size) * sizeof(T));
 			}
 			else
@@ -611,7 +611,11 @@ public:
 	void PushBack(const T& src)
 	{
 		// まずはメモリだけ確保する
-		Reserve(NextSize(m_usedSize + 1));
+		int32_t destSize = m_usedSize + 1;
+		if (destSize > m_reservedSize)
+		{
+			Reserve(NextSize(destSize));
+		}
 
 		if (std::is_class<T>::value)
 		{
@@ -619,7 +623,7 @@ public:
 		}
 		else
 		{
-			memcpy(&Data()[m_usedSize], &src, sizeof(T));
+			Data()[m_usedSize] = src;
 		}
 
 		m_usedSize++;
@@ -679,7 +683,7 @@ private:
 
 	int32_t NextSize(int32_t size) const
 	{
-		int32_t destSize = minSize;
+		int32_t destSize = 16;
 
 		while (destSize < size)
 		{
