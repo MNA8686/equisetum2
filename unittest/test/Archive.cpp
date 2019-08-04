@@ -70,6 +70,16 @@ TEST(Archive, MakeArchive)
 		ASSERT_TRUE(packer->Push(id, in));
 	}
 
+	{
+		const String id = "dir/testdayo.txt";
+		auto in = FileStream::CreateFromPath(Path::GetFullPath(id));
+		ASSERT_TRUE(in);
+
+		Logger::OutputError(in->Url().c_str());
+
+		ASSERT_TRUE(packer->Push(id, in));
+	}
+
 	ASSERT_TRUE(packer->Finalize());
 }
 
@@ -205,6 +215,31 @@ TEST(Archive, verify)
 
 	{
 		const String id = "num.txt";
+		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
+		ASSERT_TRUE(cmp);
+
+		auto partial = archiveStream->FindByID(id);
+		ASSERT_TRUE(partial);
+
+		Logger::OutputError(partial->Url().c_str());
+
+		ASSERT_TRUE(cmp->Length() == partial->Length());
+
+		auto error = false;
+		for (int64_t i = 0; i < cmp->Length(); i++)
+		{
+			if (cmp->ReadByte() != partial->ReadByte())
+			{
+				error = true;
+				break;
+			}
+		}
+
+		ASSERT_FALSE(error);
+	}
+
+	{
+		const String id = "dir/testdayo.txt";
 		auto cmp = FileStream::CreateFromPath(Path::GetFullPath(id));
 		ASSERT_TRUE(cmp);
 

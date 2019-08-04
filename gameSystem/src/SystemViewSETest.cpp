@@ -40,7 +40,7 @@ int SystemViewSETest::Enter()
 				ext == ".mp3" ||
 				ext == ".wav")
 			{
-				const String nameWithoutExt = Path::GetFileNameWithoutExtension(se);
+				const String nameWithoutExt = Path::ChangeExtension(se, "");
 				auto result = std::find(test.begin(), test.end(), nameWithoutExt);
 				if (result == test.end())
 				{
@@ -53,6 +53,7 @@ int SystemViewSETest::Enter()
 	}, [this](int32_t index, const String& item) {
 		if (index >= 0)
 		{
+			m_se = nullptr;
 			m_se = Singleton<AssetManager>::GetInstance()->Load<SE>(item);
 		}
 	});

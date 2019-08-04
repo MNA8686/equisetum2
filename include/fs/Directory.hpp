@@ -63,7 +63,7 @@ namespace Equisetum2
 		* @param path 対象ディレクトリ名
 		* @return ファイル名の配列
 		*/
-		static Optional<std::vector<String>> GetFiles(const String& path, const String& regex="");
+		static Optional<std::vector<String>> GetFiles(const String& path, bool recursion=false);
 
 		/**
 		* @brief ディレクトリ内のディレクトリを列挙する 1件列挙するごとにコールバックが呼び出される
@@ -82,7 +82,7 @@ namespace Equisetum2
 		*
 		* @detail 取得したパスの終端はセパレータであることが保証されている
 		*/
-		static Optional<std::vector<String>> GetDirectories(const String& path, const String& regex = "");
+		static Optional<std::vector<String>> GetDirectories(const String& path, bool recursion=false);
 	};
 }
 

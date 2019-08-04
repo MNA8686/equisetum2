@@ -138,6 +138,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClInclude Include="..\..\include\fs\Directory.hpp" />
     <ClInclude Include="..\..\include\fs\File.hpp" />
     <ClInclude Include="..\..\include\fs\Path.hpp" />
+    <ClInclude Include="..\..\include\graphic\Animation.hpp" />
     <ClInclude Include="..\..\include\graphic\BitmapFont.hpp" />
     <ClInclude Include="..\..\include\graphic\FontManager.hpp" />
     <ClInclude Include="..\..\include\graphic\Image.hpp" />
@@ -232,6 +233,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     <ClCompile Include="..\..\src\common\fs\Path.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\graphic\Animation.cpp" />
     <ClCompile Include="..\..\src\common\graphic\BitmapFont.cpp" />
     <ClCompile Include="..\..\src\common\graphic\Image.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>

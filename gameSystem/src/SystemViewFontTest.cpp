@@ -33,9 +33,11 @@ void SystemViewFontTest::LoadFont()
 	String arg = String::Sprintf(u8"%s?%d", m_item.c_str(), m_fontSize);
 	// フォントマネージャーを作成する
 	auto fontManager = Singleton<AssetManager>::GetInstance()->Load<FontManager>(arg);
-
-	m_label->SetPresetWithFont(testString, fontManager);
-	m_label->SetText(testString);
+	if (fontManager)
+	{
+		m_label->SetPresetWithFont(testString, fontManager);
+		m_label->SetText(testString);
+	}
 }
 
 int SystemViewFontTest::Enter()
@@ -56,7 +58,7 @@ int SystemViewFontTest::Enter()
 		{
 			if (Path::GetExtension(font) == u8".ttf")
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(font));
+				test.push_back(Path::ChangeExtension(font, ""));
 			}
 		}
 		

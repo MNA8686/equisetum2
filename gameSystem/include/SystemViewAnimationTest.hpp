@@ -6,25 +6,28 @@ using namespace Equisetum2;
 #include "SystemView.hpp"
 
 class SystemWidgetSpin;
-class SystemViewSpriteTest : public SystemView
+class SystemViewAnimationTest : public SystemView
 {
 public:
-	SystemViewSpriteTest() = default;
-	virtual ~SystemViewSpriteTest() = default;
+	SystemViewAnimationTest() = default;
+	virtual ~SystemViewAnimationTest() = default;
 
 	int Enter() override;
 	int Do() override;
 	int Render() override;
 
-	static std::shared_ptr<SystemViewSpriteTest> Create(const String & name);
+	static std::shared_ptr<SystemViewAnimationTest> Create(const String & name);
 
 protected:
-	void LoadSprite();
+	void LoadAnimation();
 	int32_t m_rate = 100;
-	int32_t m_tagIndex = -1;	// ñ¢ê›íËéû -1
-	int32_t m_ptr = 0;
+	int32_t m_animationTagIndex = -1;	// ñ¢ê›íËéû -1
+	int32_t m_animationPtr = 0;
+	int32_t m_frame = 0;
+	bool m_playing = false;
 	Point m_spritePos;
 	std::shared_ptr<SpriteRenderer> m_spriteRenderer;
+	std::shared_ptr<Animation> m_animation;
 	std::shared_ptr<SystemWidgetSpin> m_spinTag;
 	std::shared_ptr<SystemWidgetSpin> m_spinAnim;
 	String m_item;

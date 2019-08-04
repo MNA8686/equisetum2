@@ -8,6 +8,7 @@
 #include "fs/Directory.hpp"
 #include "system/Exception.hpp"
 #include "system/Logger.h"
+#include <iterator>
 
 #include "fs/DirectoryCompat.inl"
 
@@ -158,7 +159,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	Optional<std::vector<String>> Directory::GetFiles(const String& path, const String& regex)
+	Optional<std::vector<String>> Directory::GetFiles(const String& path, bool recursion)
 	{
 		Optional<std::vector<String>> opt;
 
@@ -172,6 +173,23 @@ namespace Equisetum2
 			}))
 			{
 				EQ_THROW(String::Sprintf(u8"ディレクトリ[%s]内の列挙に失敗しました。", path.c_str()));
+			}
+
+			if (recursion)
+			{
+				Optional<std::vector<String>> optDirs = GetDirectories(path, true);
+				if (optDirs)
+				{
+					for (auto& dir : *optDirs)
+					{
+						auto optFiles = GetFiles(dir);
+
+						// ファイル一覧を連結する
+						auto& recFiles = *optFiles;
+						v.reserve(v.size() + recFiles.size()); 
+						std::copy(recFiles.begin(), recFiles.end(), std::back_inserter(v));
+					}
+				}
 			}
 
 			opt = v;
@@ -227,7 +245,7 @@ namespace Equisetum2
 		return ret;
 	}
 
-	Optional<std::vector<String>> Directory::GetDirectories(const String& path, const String& regex)
+	Optional<std::vector<String>> Directory::GetDirectories(const String& path, bool recursion)
 	{
 		Optional<std::vector<String>> opt;
 
@@ -235,8 +253,22 @@ namespace Equisetum2
 		{
 			std::vector<String> v;
 
-			if (!EnumerateDirectories(path, [&v](const String& name)->bool {
+			if (!EnumerateDirectories(path, [&v, recursion](const String& name)->bool {
 				v.push_back(name);
+
+				if (recursion)
+				{
+					// 再帰呼び出しを行う
+					Optional<std::vector<String>> optRecDir = GetDirectories(name, true);
+					if (optRecDir)
+					{
+						// ディレクトリ一覧を連結する
+						auto& recDir = *optRecDir;
+						v.reserve(v.size() + recDir.size()); 
+						std::copy(recDir.begin(), recDir.end(), std::back_inserter(v));
+					}
+				}
+
 				return false;
 			}))
 			{

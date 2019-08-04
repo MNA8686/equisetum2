@@ -199,7 +199,7 @@ int SystemChoiceDialog::Do(SystemView * pView)
 
 	auto size = static_cast<int32_t>(m_vItem.size());
 
-	// 上キー押下？
+	// 上キー押下中？
 	if (KB::KeyUp.IsPress())
 	{
 		if (KB::KeyUp.IsDown() || KB::KeyUp.PressedDuration() > 300)
@@ -216,7 +216,7 @@ int SystemChoiceDialog::Do(SystemView * pView)
 			}
 		}
 	}
-	// 下キー押下？
+	// 下キー押下中？
 	else if (KB::KeyDown.IsPress())
 	{
 		if (KB::KeyDown.IsDown() || KB::KeyDown.PressedDuration() > 300)
@@ -234,6 +234,96 @@ int SystemChoiceDialog::Do(SystemView * pView)
 				{
 					m_index++;
 				}
+			}
+		}
+	}
+	// Pageupキー押下中？
+	else if (KB::KeyPageup.IsPress())
+	{
+		if (KB::KeyPageup.IsDown() || KB::KeyPageup.PressedDuration() > 300)
+		{
+			// 一番上の行にカーソルが存在する？
+			if (m_cursor == m_index)
+			{
+				if (m_index - m_maxRow > 0)
+				{
+					// 1ページ上に移動する
+					m_index -= m_maxRow;
+					m_cursor -= m_maxRow;
+				}
+				else
+				{
+					// 一番上のページに移動する
+					m_index = 0;
+					m_cursor = 0;
+				}
+			}
+			else
+			{
+				// カーソルを表示されている一番上の行に設定する
+				m_cursor = m_index;
+			}
+		}
+	}
+	// Pagedownキー押下中？
+	else if (KB::KeyPagedown.IsPress())
+	{
+		if (KB::KeyPagedown.IsDown() || KB::KeyPagedown.PressedDuration() > 300)
+		{
+			if (size != 0)
+			{
+				if (size <= m_maxRow)
+				{
+					m_index = 0;
+					m_cursor = size - 1;
+				}
+				else
+				{
+					// 一番下の行にカーソルが存在する？
+					if (m_cursor == m_index + m_maxRow - 1)
+					{
+						// 1ページ下に移動する
+						m_index += m_maxRow;
+						m_cursor += m_maxRow;
+
+						if (m_cursor >= size)
+						{
+							m_cursor = size - 1;
+						}
+						if (m_index + m_maxRow >= size)
+						{
+							m_index = m_cursor - m_maxRow + 1;
+						}
+					}
+					else
+					{
+						// カーソルを表示されている一番下の行に設定する
+						m_cursor = m_index + m_maxRow - 1;
+					}
+				}
+			}
+		}
+	}
+	// HOMEキー押下？
+	else if (KB::KeyHome.IsDown())
+	{
+		m_cursor = 0;
+		m_index = 0;
+	}
+	// ENDキー押下？
+	else if (KB::KeyEnd.IsDown())
+	{
+		if (size != 0)
+		{
+			m_cursor = size - 1;
+
+			if (size <= m_maxRow)
+			{
+				m_index = 0;
+			}
+			else
+			{
+				m_index = m_cursor - m_maxRow + 1;
 			}
 		}
 	}

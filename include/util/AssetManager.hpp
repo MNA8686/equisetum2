@@ -8,6 +8,7 @@
 #include "graphic/Sprite.hpp"
 #include "graphic/FontManager.hpp"
 #include "graphic/BitmapFont.hpp"
+#include "graphic/Animation.hpp"
 #include "audio/BGM.hpp"
 #include "audio/SE.hpp"
 
@@ -140,6 +141,12 @@ namespace Equisetum2
 			return _LoadTexture(id);
 		}
 
+		template<>
+		std::shared_ptr<Animation> _Load(const String& id)
+		{
+			return _LoadAnimation(id);
+		}
+
 		std::shared_ptr<Image> _LoadImage(const String& id);
 		std::shared_ptr<Sprite> _LoadSprite(const String& id);
 		std::shared_ptr<BitmapFont> _LoadBitmapFont(const String& id);
@@ -147,6 +154,7 @@ namespace Equisetum2
 		std::shared_ptr<BGM> _LoadBGM(const String& id);
 		std::shared_ptr<SE> _LoadSE(const String& id);
 		std::shared_ptr<Texture> _LoadTexture(const String& id);
+		std::shared_ptr<Animation> _LoadAnimation(const String& id);
 
 		bool m_allowUrlRewrite = true;
 		String m_archivePath;

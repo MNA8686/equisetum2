@@ -165,6 +165,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClCompile Include="..\..\src\Script.cpp" />
     <ClCompile Include="..\..\src\SystemChoiceDialog.cpp" />
     <ClCompile Include="..\..\src\SystemView.cpp" />
+    <ClCompile Include="..\..\src\SystemViewAnimationTest.cpp" />
     <ClCompile Include="..\..\src\SystemViewAssetTest.cpp" />
     <ClCompile Include="..\..\src\SystemViewBGMTest.cpp" />
     <ClCompile Include="..\..\src\SystemViewFontTest.cpp" />
@@ -197,6 +198,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClInclude Include="..\..\include\Script.hpp" />
     <ClInclude Include="..\..\include\SystemChoiceDialog.hpp" />
     <ClInclude Include="..\..\include\SystemView.hpp" />
+    <ClInclude Include="..\..\include\SystemViewAnimationTest.hpp" />
     <ClInclude Include="..\..\include\SystemViewAssetTest.hpp" />
     <ClInclude Include="..\..\include\SystemViewBGMTest.hpp" />
     <ClInclude Include="..\..\include\SystemViewFontTest.hpp" />

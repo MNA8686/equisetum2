@@ -1,6 +1,7 @@
 #include "system/Exception.hpp"
 #include "system/Logger.h"
 #include "graphic/Sprite.hpp"
+#include <algorithm>
 
 namespace Equisetum2
 {
@@ -22,21 +23,99 @@ namespace Equisetum2
 	bool Sprite::SetAnimAtlas(const std::vector<stSpriteAnimAtlas>& vAnimAtlas)
 	{
 		m_vAnimAtlas = vAnimAtlas;
+		m_tags.clear();
 		return true;
 	}
 
-	const stSpriteAnimAtlas& Sprite::GetAtlas(int32_t num) const
+	bool Sprite::SetTag(const String & tag, int32_t index)
 	{
-		if (num < 0)
+		if (index < 0 || index >= static_cast<int32_t>(m_vAnimAtlas.size()))
 		{
-			num = 0;
-		}
-		else if (num >= m_vAnimAtlas.size())
-		{
-			num = m_vAnimAtlas.size() - 1;
+			return false;
 		}
 
-		return m_vAnimAtlas[num];
+		m_tags.push_back({ tag, index });
+
+		std::sort(std::begin(m_tags), std::end(m_tags), [](stTags& a, stTags& b)->bool {
+			return  a.index < b.index;
+		});
+
+		return true;
+	}
+
+	const std::vector<Sprite::stTags>& Sprite::GetTags() const
+	{
+		return m_tags;
+	}
+
+	int32_t Sprite::GetAtlasSizeByTagIndex(int32_t tagIndex) const
+	{
+		// -1を指定された場合は全体のサイズを返す
+		if (tagIndex == -1)
+		{
+			return static_cast<int32_t>(m_vAnimAtlas.size());
+		}
+
+		// 妙な範囲を指定されていたらエラー
+		if (tagIndex < 0 ||
+			tagIndex >= static_cast<int32_t>(m_tags.size()))
+		{
+			return -1;
+		}
+
+		int32_t index = m_tags[tagIndex].index;
+
+		if (tagIndex + 1 == static_cast<int32_t>(m_tags.size()))
+		{
+			return static_cast<int32_t>(m_vAnimAtlas.size()) - index;
+		}
+
+		return m_tags[tagIndex + 1].index - index;
+	}
+
+	const stSpriteAnimAtlas* Sprite::GetAtlas(int32_t num) const
+	{
+		if (num < 0 || num >= static_cast<int32_t>(m_vAnimAtlas.size()))
+		{
+			return nullptr;
+		}
+
+		return &m_vAnimAtlas[num];
+	}
+
+	int32_t Sprite::ToAtlasNumWithTagIndex(int32_t tagIndex, int32_t num) const
+	{
+		// -1を指定された場合はそのままnumを返す
+		if (tagIndex == -1)
+		{
+			return num;
+		}
+
+		if (tagIndex < 0 ||
+			tagIndex >= static_cast<int32_t>(m_tags.size()) ||
+			num >= GetAtlasSizeByTagIndex(tagIndex))
+		{
+			return -1;
+		}
+
+		return m_tags[tagIndex].index + num;
+	}
+
+	int32_t Sprite::TagToInt(const String & tag) const
+	{
+		int32_t tagIndex = -1;
+
+		auto findTag = std::find_if(m_tags.begin(), m_tags.end(), [&tag, &tagIndex](stTags tags) {
+			tagIndex++;
+			return tags.tag == tag;
+		});
+		
+		if (findTag == m_tags.end())
+		{
+			return -1;
+		}
+
+		return tagIndex;
 	}
 
 	bool Sprite::MoveFrom(std::shared_ptr<Sprite>&& src)

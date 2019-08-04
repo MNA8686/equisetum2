@@ -37,7 +37,7 @@ int SystemViewTextureTest::Enter()
 		{
 			if (Path::GetExtension(sprite) == u8".png")
 			{
-				test.push_back(Path::GetFileNameWithoutExtension(sprite));
+				test.push_back(Path::ChangeExtension(sprite, ""));
 			}
 		}
 		
@@ -45,13 +45,15 @@ int SystemViewTextureTest::Enter()
 	}, [this](int32_t index, const String& item) {
 		if (index >= 0)
 		{
-			// スプライトレンダラ作成
-			m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
-			if (m_spriteRenderer)
+			m_spriteRenderer = nullptr;
+			
+			// スプライト作成
+			std::shared_ptr<Texture> texture = Singleton<AssetManager>::GetInstance()->Load<Texture>(item);
+			if (texture)
 			{
-				// スプライト作成
-				std::shared_ptr<Texture> texture = Singleton<AssetManager>::GetInstance()->Load<Texture>(item);
-				if (texture)
+				// スプライトレンダラ作成
+				m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
+				if (m_spriteRenderer)
 				{
 					auto sprite = Sprite::CreateFromTexture(texture);
 

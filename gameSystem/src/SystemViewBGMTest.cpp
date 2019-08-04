@@ -40,7 +40,7 @@ int SystemViewBGMTest::Enter()
 				ext == ".mp3" ||
 				ext == ".wav")
 			{
-				const String nameWithoutExt = Path::GetFileNameWithoutExtension(bgm);
+				const String nameWithoutExt = Path::ChangeExtension(bgm, "");
 				auto result = std::find(test.begin(), test.end(), nameWithoutExt);
 				if (result == test.end())
 				{

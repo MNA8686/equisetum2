@@ -22,13 +22,13 @@ namespace Equisetum2
 		// systemフォルダが指定されている場合は、systemフォルダ向けのパスを作成する
 		if (id.compare(0, gSystemPath.size(), gSystemPath) == 0)
 		{
-			return gSystemPath + type + "/" + Path::GetFileNameWithoutExtension(id.substr(gSystemPath.size())) + ext;
+			return gSystemPath + type + "/" + Path::ChangeExtension(id.substr(gSystemPath.size()), "") + ext;
 		}
 		else
 		{
 			// "type/id" の文字列を作る
 			// 入力IDに拡張子が付いていても無視する
-			return type + "/" + Path::GetFileNameWithoutExtension(id) + ext;
+			return type + "/" + Path::ChangeExtension(id, "") + ext;
 		}
 	}
 
@@ -88,24 +88,6 @@ namespace Equisetum2
 				}
 			}
 
-			// ID一致チェック
-			{
-				// id取得
-				auto& id_ = doc.FindMember("id");
-				if (id_ == doc.MemberEnd() ||
-					id_->value.GetType() != rapidjson::kStringType)
-				{
-					EQ_THROW(u8"idが見つかりません。");
-				}
-
-				// ID一致判定
-				String strID = id_->value.GetString();
-				if (strID != id)
-				{
-					EQ_THROW(u8"指定されたidとファイル内のidが一致しません。");
-				}
-			}
-
 			// テクスチャ読み込み
 			std::shared_ptr<Texture> textureIn;
 			{
@@ -120,10 +102,21 @@ namespace Equisetum2
 				// テクスチャ読み込み
 				String strTextureID = imageid->value.GetString();
 				textureIn = Singleton<AssetManager>::GetInstance()->Load<Texture>(strTextureID);
+				if (!textureIn)
+				{
+					EQ_THROW(u8"テクスチャのロードに失敗しました。");
+				}
 			}
 
 			// アトラス読み込み
 			std::vector<stSpriteAnimAtlas> vSpriteAnimAtlas;
+			typedef struct
+			{
+				String tag;
+				int32_t index;
+			}stTag;
+			std::vector<stTag> vSpriteTag;
+
 			{
 				auto& atlas = doc.FindMember("atlas");
 				if (atlas == doc.MemberEnd() ||
@@ -148,6 +141,17 @@ namespace Equisetum2
 						}tmp;
 
 						auto& obj = atlas->value[i].GetObject();
+
+						auto& tag = obj.FindMember("tag");
+						if (tag != obj.MemberEnd())
+						{
+							// テクスチャ読み込み
+							String strTag = tag->value.GetString();
+							stTag tagInfo{ strTag, static_cast<int32_t>(vSpriteAnimAtlas.size()) };
+							vSpriteTag.push_back(tagInfo);
+
+							Logger::OutputDebug("  tag %s %d", tagInfo.tag.c_str(), tagInfo.index);
+						}
 
 						auto& pos = obj.FindMember("pos");
 						if (pos != obj.MemberEnd())
@@ -286,6 +290,15 @@ namespace Equisetum2
 				EQ_THROW(u8"Spriteのアトラス登録に失敗しました。");
 			}
 
+			for (auto& tag : vSpriteTag)
+			{
+				if (!sprite->SetTag(tag.tag, tag.index))
+				{
+					EQ_THROW(u8"Spriteのタグ登録に失敗しました。");
+					break;
+				}
+			}
+
 			// ID設定
 			sprite->SetIdentify(id);
 
@@ -308,6 +321,7 @@ namespace Equisetum2
 		Singleton<SharedPool<BGM>>::GetInstance();
 		Singleton<SharedPool<SE>>::GetInstance();
 		Singleton<SharedPool<Texture>>::GetInstance();
+		Singleton<SharedPool<AnimationTimeline>>::GetInstance();
 	}
 
 	bool AssetManager::SetArchivePath(const String& path, const String& secretKey)
@@ -503,10 +517,34 @@ namespace Equisetum2
 				// fs上のファイル一覧を取得する
 				if (Directory::Exists(fullPath))
 				{
-					auto idList = Directory::GetFiles(fullPath);
-					if (idList)
+					// フルパスの正規化を行う
+					if (fullPath[fullPath.size() - 1] != Path::DirectorySeparatorChar[0])
 					{
-						vID = *idList;
+						fullPath += Path::DirectorySeparatorChar;
+					}
+
+					// ディレクトリ内のファイルを再帰的に列挙する
+					auto optFiles = Directory::GetFiles(fullPath, true);
+					if (optFiles)
+					{
+						vID = std::move(*optFiles);
+
+						// 検索パスを取り除いてかつディレクトリの区切り文字をスラッシュにする
+						for (auto& filename : vID)
+						{
+							filename = filename.substr(fullPath.size());
+
+							if (Path::DirectorySeparatorChar != "/")
+							{
+								for (auto& c : filename)
+								{
+									if (c == Path::DirectorySeparatorChar[0])
+									{
+										c = '/';
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -788,6 +826,233 @@ namespace Equisetum2
 			se->SetIdentify(id);
 
 			return se;
+		}
+		EQ_HANDLER
+		{
+			Logger::OutputError(EQ_GET_HANDLER().what());
+		}
+		EQ_END_HANDLER
+
+		return nullptr;
+	}
+
+	std::shared_ptr<Animation> AssetManager::_LoadAnimation(const String& id)
+	{
+		EQ_DURING
+		{
+			// json読み出し
+			rapidjson::Document doc;
+			{
+				String idPath = MakeIdPath("animation", id, ".json");
+	
+				auto jsonStream = Singleton<AssetManager>::GetInstance()->GetStreamByID(idPath);
+				if (!jsonStream)
+				{
+					EQ_THROW(String::Sprintf(u8"%sのオープンに失敗しました。", id.c_str()));
+				}
+				auto jsonSize = static_cast<size_t>(jsonStream->Length());
+				std::vector<uint8_t> jsonTmp(jsonSize + 1);
+
+				auto optRead = jsonStream->Read(jsonTmp.data(), jsonSize);
+				if (!optRead ||
+					*optRead != jsonSize)
+				{
+					EQ_THROW(u8"jsonの読み出しに失敗しました。");
+				}
+				jsonTmp[jsonSize] = 0;
+
+				doc.Parse(reinterpret_cast<const char*>(jsonTmp.data()));
+
+				bool error = doc.HasParseError();
+				if (error)
+				{
+					size_t offset = doc.GetErrorOffset();
+					rapidjson::ParseErrorCode code = doc.GetParseError();
+					const char* msg = rapidjson::GetParseError_En(code);
+
+					EQ_THROW(String::Sprintf(u8"jsonのパース時にエラーが発生しました。%d:%d(%s)", static_cast<uint32_t>(offset), code, msg));
+				}
+			}
+
+			// アニメーションコンテナ作成
+			auto animationObj = Animation::Create();
+
+			// タイプ一致チェック
+			{
+				// type取得
+				auto& type = doc.FindMember("type");
+				if (type == doc.MemberEnd() ||
+					type->value.GetType() != rapidjson::kStringType)
+				{
+					EQ_THROW(u8"typeが見つかりません。");
+				}
+
+				// タイプ一致判定
+				String strType = type->value.GetString();
+				if (strType != "animation")
+				{
+					EQ_THROW(u8"typeがanimationではありません。");
+				}
+			}
+
+			// parse "ptr"
+			auto& ptr = doc.FindMember("ptr");
+			if (ptr == doc.MemberEnd() ||
+				ptr->value.GetType() != rapidjson::kArrayType)
+			{
+				EQ_THROW(u8"ptrが見つかりません。");
+			}
+			for (auto& elem : ptr->value.GetArray())
+			{
+				if (elem.GetType() != rapidjson::kObjectType)
+				{
+					EQ_THROW(u8"ptrの配列内にはobjectが配置されていなければいけません。");
+				}
+				auto& obj = elem.GetObject();
+
+				// Animationオブジェクト作成
+				auto animation = AnimationTimeline::Create();
+
+				// parse "tag"
+				auto& tag = obj.FindMember("tag");
+				if (tag == obj.MemberEnd() ||
+					tag->value.GetType() != rapidjson::kStringType)
+				{
+					EQ_THROW(u8"tagが見つかりません。");
+				}
+
+				// parse "looptype"
+				auto& looptype = obj.FindMember("looptype");
+				if (looptype == obj.MemberEnd() ||
+					looptype->value.GetType() != rapidjson::kStringType)
+				{
+					EQ_THROW(u8"looptypeが見つかりません。");
+				}
+				String strLoopType = looptype->value.GetString();
+				if (strLoopType != "none" &&
+					strLoopType != "loop" /*&&
+					strLoopType != "pingPong"*/)
+				{
+					EQ_THROW(u8"不正なlooptypeが設定されています。");
+				}
+				if (strLoopType == "loop")
+				{
+					// アニメーションタイプを設定
+					animation->SetLoopType(AnimationLoopType::loop);
+				}
+
+				// for "timeline" parse
+				typedef struct
+				{
+					std::shared_ptr<Sprite> sprite;
+					String tag;
+					int32_t range[2] = { 0 };
+					int32_t delay = 0;
+				}stTimelineElem;
+				stTimelineElem timelineElem;
+
+				// parse "timeline"
+				auto& timeline = obj.FindMember("timeline");
+				if (timeline == obj.MemberEnd() ||
+					timeline->value.GetType() != rapidjson::kArrayType)
+				{
+					EQ_THROW(u8"timelineが見つかりません。");
+				}
+				for (auto& elemTL : timeline->value.GetArray())
+				{
+					if (elemTL.GetType() != rapidjson::kObjectType)
+					{
+						EQ_THROW(u8"timelineの配列内にはobjectが配置されていなければいけません。");
+					}
+
+					auto& objTL = elemTL.GetObject();
+
+					// parse "sprite"
+					auto& sprite = objTL.FindMember("sprite");
+					if (sprite == objTL.MemberEnd() ||
+						sprite->value.GetType() != rapidjson::kStringType)
+					{
+						EQ_THROW(u8"spriteが見つかりません。");
+					}
+					// スプライト読み込み
+					String strSpriteID = sprite->value.GetString();
+					timelineElem.sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(strSpriteID);
+					if (!timelineElem.sprite)
+					{
+						EQ_THROW(u8"spriteのロードに失敗しました。");
+					}
+
+					// parse "tag"
+					auto& tag = objTL.FindMember("tag");
+					if (tag == objTL.MemberEnd() ||
+						tag->value.GetType() != rapidjson::kStringType)
+					{
+						EQ_THROW(u8"tagが見つかりません。");
+					}
+					timelineElem.tag = tag->value.GetString();
+
+					// parse "range"
+					auto& range = objTL.FindMember("range");
+					if (range == objTL.MemberEnd() ||
+						range->value.GetType() != rapidjson::kArrayType)
+					{
+						EQ_THROW(u8"rangeが見つかりません。");
+					}
+					if (range->value.Size() != 2)
+					{
+						EQ_THROW(u8"rangeの要素数は2でなければいけません。");
+					}
+					if (range->value[0].GetType() != rapidjson::kNumberType ||
+						range->value[1].GetType() != rapidjson::kNumberType)
+					{
+						EQ_THROW(u8"rangeの要素は整数値でなければいけません。");
+					}
+					timelineElem.range[0] = static_cast<int32_t>(range->value[0].GetInt());
+					timelineElem.range[1] = static_cast<int32_t>(range->value[1].GetInt());
+
+					// parse "delay"
+					auto& delay = objTL.FindMember("delay");
+					if (delay == objTL.MemberEnd() ||
+						delay->value.GetType() != rapidjson::kNumberType)
+					{
+						EQ_THROW(u8"delayが見つかりません。");
+					}
+					timelineElem.delay = static_cast<int32_t>(delay->value.GetInt());
+
+
+					// アニメーションパターンを登録する
+					int32_t targetValue = 0;
+					if (timelineElem.range[1] == -1)
+					{
+						if (timelineElem.tag.empty())
+						{
+							targetValue = static_cast<int32_t>(timelineElem.sprite->GetAnimAtlas().size());
+						}
+						else
+						{
+							int32_t tagIndex = timelineElem.sprite->TagToInt(timelineElem.tag);
+							targetValue = timelineElem.sprite->GetAtlasSizeByTagIndex(tagIndex);
+						}
+					}
+					else
+					{
+						targetValue = timelineElem.range[0] + timelineElem.range[1];
+					}
+
+					// 複数の範囲が指定されている場合は開いて登録する
+					for (int32_t i = timelineElem.range[0]; i < targetValue; i++)
+					{
+						animation->AppendTimeline(timelineElem.sprite, timelineElem.tag, i, timelineElem.delay);
+					}
+				}
+
+				animationObj->AppendAnimation(tag->value.GetString(), animation);
+			}
+
+			// ID設定
+			animationObj->SetIdentify(id);
+
+			return animationObj;
 		}
 		EQ_HANDLER
 		{

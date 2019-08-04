@@ -83,7 +83,7 @@ void SystemWidgetSpin::SetRange(int32_t min, int32_t max, int32_t step)
 	m_min = min;
 	m_max = max;
 	m_step = step;
-	m_val = 0;
+	m_val = min;
 
 	auto str = MakeString();
 	m_label->SetText(str);
@@ -113,6 +113,16 @@ void SystemWidgetSpin::OnEnter(const std::function<void(int32_t)>& cb)
 int32_t SystemWidgetSpin::GetValue() const
 {
 	return m_val;
+}
+
+int32_t SystemWidgetSpin::GetMin() const
+{
+	return m_min;
+}
+
+int32_t SystemWidgetSpin::GetMax() const
+{
+	return m_max;
 }
 
 void SystemWidgetSpin::SetCyclic(bool val)
