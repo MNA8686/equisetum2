@@ -43,7 +43,7 @@ void heap_test()
 
 #if 1
 	{
-		EqVector<TestClass> v(4);
+		EqVector<TestClass> v(0);
 		EqVector<TestClass> v2(2);
 
 		{
