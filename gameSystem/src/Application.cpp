@@ -88,6 +88,9 @@ int Application::Main()
 
 	m_renderer = Renderer::Create();
 
+	m_nodePoolCtx = Singleton<NodePool<Object>>::GetInstance()->CreateContext();
+	Singleton<NodePool<Object>>::GetInstance()->SetContext(m_nodePoolCtx);
+
 	// ダッシュボード
 	auto view = TopMenu::Create(u8"TOP");
 	if (!view)
@@ -144,7 +147,9 @@ int Application::Main()
 			{
 				OnQuit();
 				Node<Object>::DestroyThemAll();
-				Singleton<NodePool<Object>>::GetInstance()->Reset();
+
+				m_nodePoolCtx = Singleton<NodePool<Object>>::GetInstance()->CreateContext();
+				Singleton<NodePool<Object>>::GetInstance()->SetContext(m_nodePoolCtx);
 			}
 			else
 			{

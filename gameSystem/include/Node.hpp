@@ -3,6 +3,7 @@
 
 #include "Equisetum2.h"
 #include "INodeAttachment.hpp"
+#include "EqVector.hpp"
 using namespace Equisetum2;
 
 #include <queue>
@@ -10,10 +11,12 @@ using namespace Equisetum2;
 #include <list>
 #include <functional>
 
+#if 0
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
 #include <cereal/types/queue.hpp>
+#endif
 
 #if 0
 using NodeID = int32_t;
@@ -27,12 +30,13 @@ public:
 #endif
 
 template<class T>
-class Node
+class Node final
 {
 public:
 
 	Node() = default;
-	virtual ~Node() = default;
+	~Node() = default;
+	//virtual ~Node() = default;
 
 	static std::shared_ptr<Node<T>> Create(const String& objectName)
 	{
@@ -204,12 +208,12 @@ public:
 		return m_parentId >= 0;
 	}
 
-	virtual bool AddScheduler()
+	/*virtual*/ bool AddScheduler()
 	{
 		return true;
 	}
 
-	virtual bool OnSchedule()
+	/*virtual*/ bool OnSchedule()
 	{
 		return true;
 	}
@@ -252,7 +256,7 @@ public:
 
 	static void DestroyThemAll()
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		auto pNodePool = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
 		for (auto& node : pNodePool->m_vNodeSlot)
 		{
@@ -403,6 +407,7 @@ public:
 #endif
 	}
 
+#if 0
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -415,6 +420,7 @@ public:
 		std::string& m_name_str = m_name;
 		archive(CEREAL_NVP(m_name_str));
 	}
+#endif
 
 protected:
 	static bool Init(std::shared_ptr<Node<T>> pNode, const String& name)
@@ -481,11 +487,21 @@ private:
 	// --- serialize begin ---
 	NodeID m_nodeID = -1;				/// インスタンスのID、管理配列のインデックスと同じである
 	NodeID m_parentId = -1;				/// 親ノードのID、管理配列のインデックスと同じである
+	EqVector<NodeID> m_listChildren;	/// 子ノードIDリスト
+	String m_name;						/// ノードの名前
+	bool m_destroyed = false;			/// 破棄フラグ trueにするとGC対象となる
+	T m_attach;							/// アタッチされたオブジェクト
+	// --- serialize end ---
+#if 0
+	// --- serialize begin ---
+	NodeID m_nodeID = -1;				/// インスタンスのID、管理配列のインデックスと同じである
+	NodeID m_parentId = -1;				/// 親ノードのID、管理配列のインデックスと同じである
 	std::list<NodeID> m_listChildren;	/// 子ノードIDリスト
 	String m_name;						/// ノードの名前
 	bool m_destroyed = false;			/// 破棄フラグ trueにするとGC対象となる
 	std::shared_ptr<T> m_attach;		/// アタッチされたオブジェクト
 	// --- serialize end ---
+#endif
 
 	void DetachParent()
 	{
@@ -531,8 +547,43 @@ class NodePool final
 public:
 	friend Singleton<NodePool<T>>;	// シングルトンからインスタンスを作成してもらえるようにする
 
-	const int32_t defaultNum = 4096;
+	static const int32_t defaultNum = 4096;
 
+	typedef struct
+	{
+		Node<T> m_vNodeSlot[defaultNum];			// ノードの実体を格納した配列
+		int32_t m_numOfObjects = 0;					// 現在生成されているノードの数
+		EqVector<NodeID> m_queFreeNode;		// 未使用状態のノードのIDを格納したキュー
+		EqVector<NodeID> m_listZombie;		// ゾンビノードリスト
+	}Context;
+	
+	EqHeap::Container<Context> CreateContext()
+	{
+		auto handle = Singleton<EqHeap>::GetInstance()->New<Context>();
+		if (handle)
+		{
+			if (auto ctx = handle->Ref())
+			{
+				ctx->m_queFreeNode.Resize(defaultNum);
+
+				int32_t index = defaultNum - 1;
+				for (auto& elem : ctx->m_queFreeNode)
+				{
+					elem = index;
+					index--;
+				}
+			}
+		}
+
+		return handle;
+	}
+
+	void SetContext(const EqHeap::Container<Context>& ctx)
+	{
+		m_pCtx = ctx.Ref();
+	}
+
+#if 0
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -541,7 +592,9 @@ public:
 		archive(CEREAL_NVP(m_numOfObjects));
 		archive(CEREAL_NVP(m_listZombie));
 	}
+#endif
 
+#if 0
 	void Reset()
 	{
 		m_vNodeSlot.clear();
@@ -558,26 +611,34 @@ public:
 			m_queFreeNode.push(i);
 		}
 	}
+#endif
+
+	Context* GetContext() { return m_pCtx; }
+//	Context* operator ->() { return m_pCtx; }
 
 protected:
 
 	friend Node<T>;
 
+#if 0
 	// --- serialize begin ---
 	std::vector<std::shared_ptr<Node<T>>> m_vNodeSlot;		// ノードの実体を格納した配列
 	std::queue<NodeID> m_queFreeNode;					// 未使用状態のノードのIDを格納したキュー
 	int32_t m_numOfObjects = 0;							// 現在生成されているノードの数
 	std::list<std::weak_ptr<Node<T>>> m_listZombie;		// ゾンビノードリスト
 	// --- serialize end ---
+#endif
+
+	Context* m_pCtx;
 
 	std::vector<NodeID> m_vGcQueue;							// GC対象となるノードのIDを格納した配列
 //	bool m_dirty = true;									// スケジュール配列の再構築が必要かどうか
 //	std::vector<std::shared_ptr<Node<T>>> m_vNodeScheduler;	// スケジュール配列
 
-	NodePool()	// インスタンス作成封じ
-	{
-		Reset();
-	}
+	NodePool() = default;
+	//{
+	//	Reset();
+	//}
 };
 
 #endif

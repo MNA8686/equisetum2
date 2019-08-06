@@ -4,12 +4,15 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
+#if 0
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
 //#include <cereal/types/base_class.hpp>
+#endif
 #include "INodeAttachment.hpp"
 #include "Script.hpp"
+#include "EqVector.hpp"
 
 /**
   アセット管理構造体
@@ -115,12 +118,13 @@ struct stAsset
 	}
 };
 
-class Object : public INodeAttachment
+class Object final : public INodeAttachment 
 {
 public:
 
 	Object();
-	virtual ~Object();
+	~Object();
+//	virtual ~Object();
 
 	static std::shared_ptr<Object> Create(const String& id);
 	std::shared_ptr<Object> CreateChild(const String & id);
@@ -189,6 +193,7 @@ private:
 public:
 	static bool m_dirty;		/// スケジュール配列再構築フラグ
 
+#if 0
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -202,6 +207,7 @@ public:
 		archive(CEREAL_NVP(m_visible));
 		archive(CEREAL_NVP(m_nodeID));
 	}
+#endif
 };
 
 //#include <cereal/types/polymorphic.hpp>
