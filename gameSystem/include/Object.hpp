@@ -140,7 +140,8 @@ public:
 	stAsset& GetAsset();
 	bool OnFixedUpdate();
 
-	static std::shared_ptr<Object>& GetObjectByID(NodeID id);
+	//static std::shared_ptr<Object>& GetObjectByID(NodeID id);
+	static Object& GetObjectByID(NodeID id);
 	std::shared_ptr<Object>& Self();
 	bool HasParent() const;
 	std::shared_ptr<Object>& GetParent();

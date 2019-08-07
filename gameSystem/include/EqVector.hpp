@@ -117,6 +117,12 @@ public:
 		return (*this);
 	}
 
+	T& operator[](std::size_t index)
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+		return heap->Ref<T>(m_handler)[index];
+	}
+
 	void Reserve(int32_t reserveSize)
 	{
 		auto heap = Singleton<EqHeap>::GetInstance();

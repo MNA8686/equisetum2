@@ -324,14 +324,14 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 
 			// 親に追従する設定 && 親を持っている？
 			if (m_relativeParent &&
-				thisNode->HasParent())
+				thisNode.HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				if(auto& parentObject = thisNode->GetParent()->GetAttach())
-				{
-					// 親との相対座標を算出
-					m_localPos = m_pos - parentObject->GetPos();
-				}
+				//if(auto& parentObject = thisNode.GetParent()->GetAttach())
+				auto parentObject = thisNode.GetParent()->GetAttach();
+
+				// 親との相対座標を算出
+				m_localPos = m_pos - parentObject.GetPos();
 			}
 			else
 			{
@@ -352,9 +352,9 @@ void Object::SetPosForChild()
 
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	if (thisNode->GetChildCount() > 0)
+	if (thisNode.GetChildCount() > 0)
 	{
-		for (auto& child : thisNode->GetChildrenID())
+		for (auto& child : thisNode.GetChildrenID())
 		{
 			if (auto& childObject = GetObjectByID(child))
 			{
@@ -505,13 +505,13 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 		auto& obj = node->GetAttach();
 
 		// アクティブかつ表示状態でなければこの先のノードは処理しない
-		if (!obj->m_active || !obj->m_visible)
+		if (!obj.m_active || !obj.m_visible)
 		{
 			return false;
 		}
 
 		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
-		for (auto& renderObject : obj->m_vRenderObject)
+		for (auto& renderObject : obj.m_vRenderObject)
 		{
 			if (renderObject->IsVisible())
 			{
@@ -540,7 +540,7 @@ NodeID Object::GetNodeID() const
 	return m_nodeID;
 }
 
-std::shared_ptr<Object>& Object::GetObjectByID(NodeID id)
+Object& Object::GetObjectByID(NodeID id)
 {
 	if (auto& node = Node<Object>::GetNodeByID(id))
 	{

@@ -51,13 +51,16 @@ public:
 		return nullptr;
 	}
 
-	void SetAttach(std::shared_ptr<T> attach)
+#if 0
+	void SetAttach(std::shared_ptr<T>& attach)
 	{
 		m_attach = attach;
 		m_attach->SetNodeID(GetID());
 	}
+#endif
 
-	std::shared_ptr<T>& GetAttach()
+	//std::shared_ptr<T>& GetAttach()
+	T& GetAttach()
 	{
 		return m_attach;
 	}
@@ -65,6 +68,7 @@ public:
 	void Destroy()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		//auto pContext = pNodePool->GetContext();
 
 		if (!m_destroyed)
 		{
@@ -105,9 +109,11 @@ public:
 		return m_name;
 	}
 
-	void SetParent(std::shared_ptr<Node<T>> newParent)
+	//void SetParent(std::shared_ptr<Node<T>> newParent)
+	void SetParent(NodeID newParent)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		auto pContext = pNodePool->GetContext();
 
 		if (m_nodeID == 0)
 		{
@@ -115,24 +121,28 @@ public:
 			return;
 		}
 
-		if (!newParent)
+		//if (!newParent)
+		if (newParent < 0)
 		{
 			// rootノードを取得
-			newParent = pNodePool->m_vNodeSlot[0];
+			newParent = pContext->m_vNodeSlot[0].GetID();
 		}
 
-		if (!newParent->IsDestroyed())
+		auto newParentNode = pContext->m_vNodeSlot[newParent].GetID();
+		//if (!newParent->IsDestroyed())
+		if (!newParentNode->IsDestroyed())
 		{
 			// 前の親の子リストから自分を削除
 			DetachParent();
 
 			// 新しい親の子リストに追加
-			newParent->m_listChildren.push_back(m_nodeID);
+			newParentNode->m_listChildren.PushBack(m_nodeID);
 
 			// 新しい親をセット
-			m_parentId = newParent->GetID();
+			m_parentId = newParent;// newParent->GetID();
 
-			Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
+			//Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
+			Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParentNode->GetID());
 
 			// 再構築フラグセット
 			//pNodePool->m_dirty = true;
@@ -221,6 +231,7 @@ public:
 	static void GC()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		auto pContext = pNodePool->GetContext();
 
 #if 0
 		if (pNodePool->m_dirty)
@@ -231,19 +242,20 @@ public:
 #endif
 
 		// 削除対象リストを元にオブジェクトの削除を行う
-		for (auto& nodeID : pNodePool->m_vGcQueue)
+		for (auto& nodeID : pContext->m_vGcQueue)
 		{
-			pNodePool->m_listZombie.push_back(pNodePool->m_vNodeSlot[nodeID]);	// ゾンビ検出用
+		//	pNodePool->m_listZombie.push_back(pNodePool->m_vNodeSlot[nodeID]);	// ゾンビ検出用
 
-			pNodePool->m_vNodeSlot[nodeID].reset();
-			pNodePool->m_numOfObjects--;
+			pContext->m_vNodeSlot[nodeID] = {};		//TODO:解放処理は？
+			pContext->m_numOfObjects--;
 
-			pNodePool->m_queFreeNode.push(nodeID);
+			pContext->m_queFreeNode.push(nodeID);
 		}
 
 		// 削除対象リストクリア
 		pNodePool->m_vGcQueue.clear();
 
+#if 0
 		// ゾンビ検出を行う
 		pNodePool->m_listZombie.remove_if([](std::weak_ptr<Node<T>>& node)->bool {
 			return node.expired();
@@ -252,27 +264,28 @@ public:
 		{
 			Logger::OutputError("zombie num %d", pNodePool->m_listZombie.size());
 		}
+#endif
 	}
 
 	static void DestroyThemAll()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance()->GetContext();
+		auto pContext = pNodePool->GetContext();
 
-		for (auto& node : pNodePool->m_vNodeSlot)
+		for (auto& node : pContext.m_vNodeSlot)
 		{
-			// ルートノード以外なら破棄する
-//			if (node &&
-//				node->GetID() != 0)
-			if (node)
+			if (node.m_nodeID > 0)
 			{
-				node->Destroy();
+				node.Destroy();
 			}
 		}
 
 		GC();
 
-		Logger::OutputDebug("obj num %d, destroy %d, free %d, zombi %d", pNodePool->m_numOfObjects, pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
+		//Logger::OutputDebug("obj num %d, destroy %d, free %d, zombi %d", pNodePool->m_numOfObjects, pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
+		Logger::OutputDebug("obj num %d, destroy %d, free %d", pContext.m_numOfObjects, pNodePool.m_vGcQueue.size(), pContext.m_queFreeNode.Size());
 
+#if 0
 		for (auto& zombie : pNodePool->m_listZombie)
 		{
 			if (auto node = zombie.lock())
@@ -280,26 +293,30 @@ public:
 				Logger::OutputError("  zombi nodeID %d", node->GetID());
 			}
 		}
+#endif
 	}
 
 	static int32_t NumOfObjects()
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-		return pNodePool->m_numOfObjects;
+		auto pContext = Singleton<NodePool<T>>::GetInstance()->GetContext();
+		return pContext->m_numOfObjects;
 	}
 
-	static std::shared_ptr<Node<T>>& GetNodeByID(NodeID nodeID)
+	//static std::shared_ptr<Node<T>>& GetNodeByID(NodeID nodeID)
+	static Node<T>& GetNodeByID(NodeID nodeID)
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
+#if 0
 		if (nodeID < 0 ||
-			nodeID >= static_cast<NodeID>(pNodePool->m_vNodeSlot.size()) ||
-			!pNodePool->m_vNodeSlot[nodeID])
+			nodeID >= static_cast<NodeID>(ctx.m_vNodeSlot.Size()) ||
+			ctx.m_vNodeSlot[nodeID] < 0)
 		{
 			// アサート
 		}
+#endif
 
-		return pNodePool->m_vNodeSlot[nodeID];
+		return ctx.m_vNodeSlot[nodeID];
 	}
 
 	const std::list<NodeID>& GetChildrenID() const
@@ -308,7 +325,8 @@ public:
 	}
 
 	// cbでfalseを返すとvisitを終了する
-	static bool Visit(std::shared_ptr<Node<T>> beginNode, const std::function<bool(std::shared_ptr<Node<T>>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
+	//static bool Visit(std::shared_ptr<Node<T>> beginNode, const std::function<bool(std::shared_ptr<Node<T>>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
+	static bool Visit(Node<T>& beginNode, const std::function<bool(Node<T>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
 	{
 		if (!cb)
 		{
@@ -319,12 +337,12 @@ public:
 		{
 			if (beginNode->GetChildCount() > 0)
 			{
-				auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+				auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
-				const std::list<NodeID> children = beginNode->GetChildrenID();
+				const std::list<NodeID> children = beginNode.GetChildrenID();
 				for (auto& child : children)
 				{
-					Visit(pNodePool->m_vNodeSlot[child], cb, nestDepth + 1);
+					Visit(ctx.m_vNodeSlot[child], cb, nestDepth + 1);
 				}
 			}
 		}
@@ -334,6 +352,7 @@ public:
 
 	static void Dump()
 	{
+#if 0
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 
 		if (pNodePool->m_numOfObjects == 0)
@@ -364,6 +383,7 @@ public:
 
 		Logger::OutputInfo("vGcQueue %d, queFreeNode %d, listZombie %d", pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
 		Logger::OutputInfo("--- dump end ---");
+#endif
 	}
 
 	static void MakeScheduler()
@@ -477,7 +497,8 @@ protected:
 		return m_parentId;
 	}
 
-	std::shared_ptr<Node<T>>& Self()
+	//std::shared_ptr<Node<T>>& Self()
+	Node<T>& Self()
 	{
 		return GetNodeByID(GetID());
 	}
@@ -551,10 +572,10 @@ public:
 
 	typedef struct
 	{
-		Node<T> m_vNodeSlot[defaultNum];			// ノードの実体を格納した配列
-		int32_t m_numOfObjects = 0;					// 現在生成されているノードの数
+		Node<T> m_vNodeSlot[defaultNum];	// ノードの実体を格納した配列
+		int32_t m_numOfObjects = 0;			// 現在生成されているノードの数
 		EqVector<NodeID> m_queFreeNode;		// 未使用状態のノードのIDを格納したキュー
-		EqVector<NodeID> m_listZombie;		// ゾンビノードリスト
+		//EqVector<NodeID> m_listZombie;		// ゾンビノードリスト
 	}Context;
 	
 	EqHeap::Container<Context> CreateContext()
@@ -613,7 +634,7 @@ public:
 	}
 #endif
 
-	Context* GetContext() { return m_pCtx; }
+	Context& GetContext() { return m_pCtx; }
 //	Context* operator ->() { return m_pCtx; }
 
 protected:
