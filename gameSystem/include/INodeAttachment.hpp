@@ -7,6 +7,8 @@ using NodeID = int32_t;
 class INodeAttachment
 {
 public:
+	static const int32_t nullNode = -2;
+
 	virtual void SetNodeID(NodeID id) = 0;
 	virtual NodeID GetNodeID() const = 0;
 };

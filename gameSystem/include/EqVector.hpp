@@ -241,6 +241,11 @@ public:
 		}
 	}
 
+	T& Back()
+	{
+		return Data()[m_usedSize - 1];
+	}
+
 	int32_t Size() const
 	{
 		return m_usedSize;

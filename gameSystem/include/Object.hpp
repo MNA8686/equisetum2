@@ -25,6 +25,7 @@ struct stAsset
 	std::vector<std::shared_ptr<SE>> m_se;
 	std::vector<std::shared_ptr<Script>> m_script;
 
+#if 0
 	// アセットはIDのみを保存しておき、リストア時にはロードし直す
 	// (スクリプトは除く)
 	template<class Archive>
@@ -116,6 +117,7 @@ struct stAsset
 			archive(CEREAL_NVP(m_script));
 		}
 	}
+#endif
 };
 
 class Object final : public INodeAttachment 
@@ -126,8 +128,10 @@ public:
 	~Object();
 //	virtual ~Object();
 
-	static std::shared_ptr<Object> Create(const String& id);
-	std::shared_ptr<Object> CreateChild(const String & id);
+	//static std::shared_ptr<Object> Create(const String& id);
+	static NodeID Create(const String& id);
+	//std::shared_ptr<Object> CreateChild(const String & id);
+	NodeID CreateChild(const String & id);
 
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
@@ -142,21 +146,27 @@ public:
 
 	//static std::shared_ptr<Object>& GetObjectByID(NodeID id);
 	static Object& GetObjectByID(NodeID id);
-	std::shared_ptr<Object>& Self();
+	//std::shared_ptr<Object>& Self();
+	Object& Self();
 	bool HasParent() const;
-	std::shared_ptr<Object>& GetParent();
+	//Object& GetParent();
+	NodeID GetParentID() const;
 
 	void SetNodeID(NodeID id) override;
 	NodeID GetNodeID() const override;
 
 	void Destroy();
 	bool IsDestroyed() const;
-	void SetParent(std::shared_ptr<Object>& newParent);
-	std::shared_ptr<Object>& GetParent() const;
+	//void SetParent(std::shared_ptr<Object>& newParent);
+	void SetParentID(NodeID newParent);
+	//std::shared_ptr<Object>& GetParent() const;
+//	NodeID GetParentID() const;
+	Object& GetParent() const;
 	void DetachChildren();
-	std::vector<std::shared_ptr<Object>> GetChildren() const;
+//	std::vector<std::shared_ptr<Object>> GetChildren() const;
 	int32_t GetChildCount() const;
-	const std::list<NodeID>& GetChildrenID() const;
+	//const std::list<NodeID>& GetChildrenID() const;
+	const EqVector<NodeID>& GetChildrenID() const;
 
 	std::shared_ptr<Object> Fork();
 

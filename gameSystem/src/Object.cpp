@@ -8,7 +8,7 @@
 
 using namespace Equisetum2;
 
-static std::shared_ptr<Object> nullObject;
+//static std::shared_ptr<Object> nullObject;
 bool Object::m_dirty = true;
 std::vector<NodeID> Object::m_vUpdate;
 
@@ -72,25 +72,32 @@ Object::~Object()
 {
 }
 
-std::shared_ptr<Object> Object::Create(const String& id)
+//std::shared_ptr<Object> Object::Create(const String& id)
+NodeID Object::Create(const String& id)
 {
 	EQ_DURING
 	{
+//		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+//		auto ctx = pNodePool->GetContext(); 
+#if 0
 		// インスタンス作成
 		auto tmpObject = std::make_shared<Object>();
 		if (!tmpObject)
 		{
 			EQ_THROW(u8"インスタンスの作成に失敗しました。");
 		}
+#endif
 
 		// ノード作成
-		auto tmpNode = Node<Object>::Create(id);
-		if (!tmpNode)
+		NodeID nodeID = Node<Object>::GetFreeNodeWithInit(id);
+		if (nodeID < 0)
 		{
 			EQ_THROW(u8"ノードの作成に失敗しました。");
 		}
-		// オブジェクトをアタッチ
-		tmpNode->SetAttach(tmpObject);
+		// オブジェクトを取得
+		Node<Object> node = Node<Object>::GetNodeByID(nodeID);
+		Object& attachedObject = node.GetAttach();
+		//tmpNode->SetAttach(tmpObject);
 
 		/*
 			R"({
@@ -178,7 +185,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"spriteのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_sprite.push_back(p);
+						attachedObject.m_asset.m_sprite.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -203,7 +210,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"bgmのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_bgm.push_back(p);
+						attachedObject.m_asset.m_bgm.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -228,7 +235,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"seのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_se.push_back(p);
+						attachedObject.m_asset.m_se.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -258,7 +265,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 						// IDを設定する
 						p->SetIdentify(v.GetString());
 
-						tmpObject->m_asset.m_script.push_back(p);
+						attachedObject.m_asset.m_script.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -267,7 +274,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : tmpObject->m_asset.m_script)
+		for (auto& script : attachedObject.m_asset.m_script)
 		{
 			script->OnCreate();
 		}
@@ -275,7 +282,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		// 再構築フラグセット
 		m_dirty = true;
 
-		return tmpObject;
+		return nodeID;
 	}
 	EQ_HANDLER
 	{
@@ -283,18 +290,20 @@ std::shared_ptr<Object> Object::Create(const String& id)
 	}
 	EQ_END_HANDLER
 
-	return nullptr;
+	return -1;
 }
 
-std::shared_ptr<Object> Object::CreateChild(const String& id)
+//std::shared_ptr<Object> Object::CreateChild(const String& id)
+NodeID Object::CreateChild(const String& id)
 {
-	auto childObject = Object::Create(id);
-	if (childObject)
+	NodeID childID = Object::Create(id);
+	if (childID >= 0)
 	{
-		childObject->SetParent(Self());
+		auto childObject = GetObjectByID(childID);
+		childObject.SetParentID(m_nodeID);
 	}
 
-	return childObject;
+	return childID;
 }
 
 const Point_t<FixedDec>& Object::GetPos() const
@@ -328,7 +337,7 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 			{
 				// 親ノードに関連付けられたObjectを取得	
 				//if(auto& parentObject = thisNode.GetParent()->GetAttach())
-				auto parentObject = thisNode.GetParent()->GetAttach();
+				auto parentObject = GetObjectByID(thisNode.GetParentID());
 
 				// 親との相対座標を算出
 				m_localPos = m_pos - parentObject.GetPos();
@@ -354,19 +363,18 @@ void Object::SetPosForChild()
 
 	if (thisNode.GetChildCount() > 0)
 	{
-		for (auto& child : thisNode.GetChildrenID())
+		for (auto& childID : thisNode.GetChildrenID())
 		{
-			if (auto& childObject = GetObjectByID(child))
+			auto& childObject = GetObjectByID(childID);
+			
+			// 子は親に追従する？
+			if (childObject.GetRelativeParent())
 			{
-				// 子は親に追従する？
-				if (childObject->GetRelativeParent())
-				{
-					// 子のワールド座標更新
-					childObject->m_pos = m_pos + childObject->GetLocalPos();
+				// 子のワールド座標更新
+				childObject.m_pos = m_pos + childObject.GetLocalPos();
 
-					// ワールド座標が変化したので子に伝搬する
-					childObject->SetPosForChild();
-				}
+				// ワールド座標が変化したので子に伝搬する
+				childObject.SetPosForChild();
 			}
 		}
 	}
@@ -390,11 +398,10 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 				HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				if (auto& parentObject = GetParent())
-				{
-					// 親との相対座標からワールド座標を算出
-					m_pos = parentObject->GetPos() + m_localPos;
-				}
+				auto& parentObject = GetParent();
+
+				// 親との相対座標からワールド座標を算出
+				m_pos = parentObject.GetPos() + m_localPos;
 			}
 			else
 			{
@@ -428,11 +435,10 @@ void Object::SetRelativeParent(bool on)
 			HasParent())
 		{
 			// 親ノードに関連付けられたObjectを取得	
-			if (auto& parentObject = GetParent())
-			{
-				// 親との相対座標を算出
-				m_localPos = m_pos - parentObject->GetPos();
-			}
+			auto& parentObject = GetParent();
+			
+			// 親との相対座標を算出
+			m_localPos = m_pos - parentObject.GetPos();
 		}
 		else
 		{
@@ -461,34 +467,30 @@ void Object::Update()
 		m_vUpdate.clear();
 
 		// ルートノード取得
-		if (auto& rootNode = Node<Object>::GetNodeByID(0))
-		{
-			// ルートオブジェクト取得
-			if (auto rootObject = rootNode->GetAttach())
-			{
-				// ノードを辿り、スケジュール配列に追加していく
-				Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
-					auto object = node->GetAttach();		// 追加条件判定
-					if (object && object->IsActive())
-					{
-						// スケジュール配列にノードを追加
-						m_vUpdate.push_back(object->GetNodeID());
-						return true;
-					}
-					return false;
-				});
+		auto& rootNode = Node<Object>::GetNodeByID(0);
 
-				m_dirty = false;
+		// ルートオブジェクト取得
+		//auto rootObject = rootNode.GetAttach();
+
+		// ノードを辿り、スケジュール配列に追加していく
+		Node<Object>::Visit(rootNode, [](Node<Object>& node, int32_t nestDepth)->bool {
+			auto object = node.GetAttach();		// 追加条件判定
+			if (object.IsActive())
+			{
+				// スケジュール配列にノードを追加
+				m_vUpdate.push_back(object.GetNodeID());
+				return true;
 			}
-		}
+			return false;
+		});
+
+		m_dirty = false;
 	}
 
 	for (auto& id : m_vUpdate)
 	{
-		if (auto& obj = GetObjectByID(id))
-		{
-			obj->OnFixedUpdate();
-		}
+		auto& obj = GetObjectByID(id);
+		obj.OnFixedUpdate();
 	}
 }
 
@@ -501,8 +503,8 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	Node<Object>::Visit(thisNode, [this, &renderer](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
-		auto& obj = node->GetAttach();
+	Node<Object>::Visit(thisNode, [this, &renderer](Node<Object>& node, int32_t nestDepth)->bool {
+		auto& obj = node.GetAttach();
 
 		// アクティブかつ表示状態でなければこの先のノードは処理しない
 		if (!obj.m_active || !obj.m_visible)
@@ -542,41 +544,43 @@ NodeID Object::GetNodeID() const
 
 Object& Object::GetObjectByID(NodeID id)
 {
-	if (auto& node = Node<Object>::GetNodeByID(id))
-	{
-		return node->GetAttach();
-	}
-
-	return nullObject;
+	auto& node = Node<Object>::GetNodeByID(id);
+	return node.GetAttach();
 }
 
-std::shared_ptr<Object>& Object::Self()
+//std::shared_ptr<Object>& Object::Self()
+Object& Object::Self()
 {
 	return GetObjectByID(m_nodeID);
 }
 
 bool Object::HasParent() const
 {
-	return Node<Object>::GetNodeByID(m_nodeID)->HasParent();
+	return Node<Object>::GetNodeByID(m_nodeID).HasParent();
 }
 
-std::shared_ptr<Object>& Object::GetParent()
+//Object& Object::GetParent()
+NodeID Object::GetParentID() const
 {
-	if (auto parentNode = Node<Object>::GetNodeByID(m_nodeID)->GetParent())
-	{
-		return parentNode->GetAttach();
-	}
+	auto selfNode = Node<Object>::GetNodeByID(m_nodeID);// .GetParent();
+	return selfNode.GetParentID();
+//	auto parentNode = Node<Object>::GetNodeByID(selfNode.GetParent());
 
-	return nullObject;
+//	return parentNode.GetAttach();
+}
+
+Object& Object::GetParent() const
+{
+	return GetObjectByID(GetParentID());
 }
 
 void Object::Destroy()
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	if (!thisNode->IsDestroyed())
+	if (!thisNode.IsDestroyed())
 	{
-		thisNode->Destroy();
+		thisNode.Destroy();
 
 		// 再構築フラグセット
 		m_dirty = true;
@@ -587,19 +591,21 @@ bool Object::IsDestroyed() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
 
-	return thisNode->IsDestroyed();
+	return thisNode.IsDestroyed();
 }
 
-void Object::SetParent(std::shared_ptr<Object>& newParent)
+//void Object::SetParent(std::shared_ptr<Object>& newParent)
+void Object::SetParentID(NodeID newParent)
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
+//	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
 
-	thisNode->SetParent(newParentNode);
+	thisNode.SetParent(newParent);
 
 	m_dirty = true;
 }
 
+#if 0
 std::shared_ptr<Object>& Object::GetParent() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
@@ -610,15 +616,17 @@ std::shared_ptr<Object>& Object::GetParent() const
 
 	return nullObject;
 }
+#endif
 
 void Object::DetachChildren()
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	thisNode->DetachChildren();
+	thisNode.DetachChildren();
 
 	m_dirty = true;
 }
 
+#if 0
 std::vector<std::shared_ptr<Object>> Object::GetChildren() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
@@ -640,17 +648,18 @@ std::vector<std::shared_ptr<Object>> Object::GetChildren() const
 
 	return vChildren;
 }
+#endif
 
-const std::list<NodeID>& Object::GetChildrenID() const
+const EqVector<NodeID>& Object::GetChildrenID() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode->GetChildrenID();
+	return thisNode.GetChildrenID();
 }
 
 int32_t Object::GetChildCount() const
 {
 	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode->GetChildCount();
+	return thisNode.GetChildCount();
 }
 
 bool Object::IsActive() const
@@ -680,6 +689,7 @@ void Object::SetVisible(bool visible)
 
 std::shared_ptr<Object> Object::Fork()
 {
+#if 0
 	EQ_DURING
 	{
 		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
@@ -747,6 +757,7 @@ std::shared_ptr<Object> Object::Fork()
 		Logger::OutputError(EQ_GET_HANDLER().what());
 	}
 	EQ_END_HANDLER
+#endif
 
 	return nullptr;
 }
