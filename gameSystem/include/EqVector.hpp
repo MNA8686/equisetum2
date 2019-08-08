@@ -40,6 +40,16 @@ public:
 			return it;
 		}
 
+		T& operator*()
+		{
+			return m_ptr[m_count];
+		}
+
+		T* operator->()
+		{
+			return &m_ptr[m_count];
+		}
+
 		const T& operator*() const
 		{
 			return m_ptr[m_count];
@@ -56,6 +66,56 @@ public:
 		}
 
 		bool operator!= (const iterator& r) const
+		{
+			return !(m_count == r.m_count);
+		}
+	};
+	class const_iterator
+	{
+	private:
+		const T* m_ptr = nullptr;
+		int32_t m_count = 0;
+
+	public:
+
+		const_iterator(const T* ptr, int32_t count)
+		{
+			m_ptr = ptr;
+			m_count = count;
+		}
+
+		const_iterator& operator++()
+		{
+			m_count++;
+
+			return *this;
+		}
+
+		const_iterator operator++(int)
+		{
+			auto it = *this;
+
+			++(*this);
+
+			return it;
+		}
+
+		const T& operator*() const
+		{
+			return m_ptr[m_count];
+		}
+
+		const T* operator->() const
+		{
+			return &m_ptr[m_count];
+		}
+
+		bool operator== (const const_iterator& r) const
+		{
+			return m_count == r.m_count;
+		}
+
+		bool operator!= (const const_iterator& r) const
 		{
 			return !(m_count == r.m_count);
 		}
@@ -249,6 +309,16 @@ public:
 	int32_t Size() const
 	{
 		return m_usedSize;
+	}
+
+	const_iterator begin() const
+	{
+		return{ Data(), 0 };
+	}
+
+	const_iterator end() const
+	{
+		return{ Data(), m_usedSize };
 	}
 
 	iterator begin()

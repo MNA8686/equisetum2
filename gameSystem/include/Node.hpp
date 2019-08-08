@@ -57,7 +57,6 @@ public:
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 		//int32_ index = 0;
-		NodeID id = -1;
 
 		// 未使用ノードあり？
 		if (ctx->m_queFreeNode.Size() == 0)
@@ -74,7 +73,7 @@ public:
 		node.SetID(id);
 		node.m_attach.SetNodeID(id);
 		// ノードの名前を設定
-		node.SetName(name);
+		node.SetName(objectName);
 		// rootノードではない？
 		if (id != 0)
 		{
@@ -170,7 +169,7 @@ public:
 			newParent = 0;// pContext->m_vNodeSlot[0].GetID();
 		}
 
-		auto newParentNode = ctx->m_vNodeSlot[newParent];
+		auto& newParentNode = ctx->m_vNodeSlot[newParent];
 		//if (!newParent->IsDestroyed())
 		if (!newParentNode.IsDestroyed())
 		{
@@ -199,10 +198,10 @@ public:
 
 		if (m_parentId >= 0)
 		{
-			auto parentNode = ctx->m_vNodeSlot[m_parentId];
-			if (!parentNode->IsDestroyed())
+			auto& parentNode = ctx->m_vNodeSlot[m_parentId];
+			if (!parentNode.IsDestroyed())
 			{
-				return m_parentID;
+				return m_parentId;
 			}
 		}
 
@@ -221,9 +220,9 @@ public:
 		{
 			auto& node = ctx->m_vNodeSlot[nodeID];
 
-			if(!node->IsDestroyed())
+			if(!node.IsDestroyed())
 			{
-				node->SetParent(-1);	// nullptrを設定すると自動的に親はrootノードに設定される
+				node.SetParent(-1);	// nullptrを設定すると自動的に親はrootノードに設定される
 
 				Logger::OutputDebug("  nodeID %d, detach childID %d", m_nodeID, node.GetID());
 			}
@@ -233,10 +232,7 @@ public:
 	//std::vector<std::shared_ptr<Node<T>>> GetChildren() const
 	const EqVector<NodeID>& GetChildrenID() const
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-		auto ctx = pNodePool->GetContext();
-
-		return ctx->m_listChildren;
+		return m_listChildren;
 #if 0
 		std::vector<std::shared_ptr<Node<T>>> vChildren;
 		vChildren.reserve(m_listChildren.size());
@@ -257,9 +253,7 @@ public:
 
 	int32_t GetChildCount() const
 	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-		auto ctx = pNodePool->GetContext();
-		return ctx->m_listChildren.Size();
+		return m_listChildren.Size();
 		//return static_cast<int32_t>(m_listChildren.size());
 	}
 
@@ -392,7 +386,7 @@ public:
 				auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
 				//const std::list<NodeID> children = beginNode.GetChildren();
-				for (auto& child : beginNode.GetChildren())
+				for (auto& child : beginNode.GetChildrenID())
 				{
 					Visit(ctx->m_vNodeSlot[child], cb, nestDepth + 1);
 				}
@@ -582,6 +576,8 @@ private:
 
 	void DetachParent()
 	{
+		// TODO
+#if 0
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
@@ -615,6 +611,7 @@ private:
 			// 再構築フラグセット
 //			pNodePool->m_dirty = true;
 		}
+#endif
 	}
 };
 

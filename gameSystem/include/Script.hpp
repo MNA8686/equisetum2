@@ -4,7 +4,7 @@
 #include "Equisetum2.h"
 
 #include "Object.hpp"
-#include <cereal/cereal.hpp>
+//#include <cereal/cereal.hpp>
 
 using namespace Equisetum2;
 
@@ -29,7 +29,8 @@ public:
 	virtual bool OnStart();
 	virtual bool FixedUpdate();
 
-	void SetOwner(std::shared_ptr<Object>& ownerObject);
+	//void SetOwner(std::shared_ptr<Object>& ownerObject);
+	void SetOwner(NodeID ownerObject);
 	bool Start();
 
 	static void SetScriptTbl(const std::vector<stScriptTbl>& tbl);
@@ -49,6 +50,7 @@ public:
 	String Identify() const;
 
 
+#if 0
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -58,14 +60,17 @@ public:
 		std::string& str = m_identify;
 		archive(CEREAL_NVP(str));
 	}
+#endif
 
 private:
 	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
 	String m_identify;
-	std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
+	//std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
+	NodeID m_ownerObject = -1;		/// このスクリプトを所持しているオブジェクト
 
 protected:
-	std::shared_ptr<Object> GetOwner();
+	//std::shared_ptr<Object> GetOwner();
+	NodeID GetOwner();
 };
 
 

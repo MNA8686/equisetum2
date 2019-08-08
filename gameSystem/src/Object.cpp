@@ -95,7 +95,7 @@ NodeID Object::Create(const String& id)
 			EQ_THROW(u8"ノードの作成に失敗しました。");
 		}
 		// オブジェクトを取得
-		Node<Object> node = Node<Object>::GetNodeByID(nodeID);
+		Node<Object>& node = Node<Object>::GetNodeByID(nodeID);
 		Object& attachedObject = node.GetAttach();
 		//tmpNode->SetAttach(tmpObject);
 
@@ -261,7 +261,7 @@ NodeID Object::Create(const String& id)
 						}
 
 						// 所有しているオブジェクトを設定する
-						p->SetOwner(tmpObject);
+						p->SetOwner(attachedObject.GetNodeID());
 						// IDを設定する
 						p->SetIdentify(v.GetString());
 
