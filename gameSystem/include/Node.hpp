@@ -576,8 +576,7 @@ private:
 
 	void DetachParent()
 	{
-		// TODO
-#if 0
+#if 1
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
@@ -600,7 +599,7 @@ private:
 			{
 				if (*it == m_nodeID)
 				{
-					refList.erase(it);
+					refList.Erase(it);
 					break;
 				}
 				++it;

@@ -299,7 +299,7 @@ NodeID Object::CreateChild(const String& id)
 	NodeID childID = Object::Create(id);
 	if (childID >= 0)
 	{
-		auto childObject = GetObjectByID(childID);
+		auto& childObject = GetObjectByID(childID);
 		childObject.SetParentID(m_nodeID);
 	}
 
@@ -337,7 +337,7 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 			{
 				// 親ノードに関連付けられたObjectを取得	
 				//if(auto& parentObject = thisNode.GetParent()->GetAttach())
-				auto parentObject = GetObjectByID(thisNode.GetParentID());
+				auto& parentObject = GetObjectByID(thisNode.GetParentID());
 
 				// 親との相対座標を算出
 				m_localPos = m_pos - parentObject.GetPos();
@@ -562,7 +562,7 @@ bool Object::HasParent() const
 //Object& Object::GetParent()
 NodeID Object::GetParentID() const
 {
-	auto selfNode = Node<Object>::GetNodeByID(m_nodeID);// .GetParent();
+	auto& selfNode = Node<Object>::GetNodeByID(m_nodeID);// .GetParent();
 	return selfNode.GetParentID();
 //	auto parentNode = Node<Object>::GetNodeByID(selfNode.GetParent());
 
