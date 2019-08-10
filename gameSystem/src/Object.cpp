@@ -8,7 +8,6 @@
 
 using namespace Equisetum2;
 
-//static std::shared_ptr<Object> nullObject;
 bool Object::m_dirty = true;
 std::vector<NodeID> Object::m_vUpdate;
 
@@ -72,22 +71,10 @@ Object::~Object()
 {
 }
 
-//std::shared_ptr<Object> Object::Create(const String& id)
 NodeID Object::Create(const String& id)
 {
 	EQ_DURING
 	{
-//		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-//		auto ctx = pNodePool->GetContext(); 
-#if 0
-		// インスタンス作成
-		auto tmpObject = std::make_shared<Object>();
-		if (!tmpObject)
-		{
-			EQ_THROW(u8"インスタンスの作成に失敗しました。");
-		}
-#endif
-
 		// ノード作成
 		NodeID nodeID = Node<Object>::GetFreeNodeWithInit(id);
 		if (nodeID < 0)
@@ -97,7 +84,6 @@ NodeID Object::Create(const String& id)
 		// オブジェクトを取得
 		Node<Object>& node = Node<Object>::GetNodeByID(nodeID);
 		Object& attachedObject = node.GetAttach();
-		//tmpNode->SetAttach(tmpObject);
 
 		/*
 			R"({
@@ -293,7 +279,6 @@ NodeID Object::Create(const String& id)
 	return -1;
 }
 
-//std::shared_ptr<Object> Object::CreateChild(const String& id)
 NodeID Object::CreateChild(const String& id)
 {
 	NodeID childID = Object::Create(id);
@@ -336,7 +321,6 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 				thisNode.HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				//if(auto& parentObject = thisNode.GetParent()->GetAttach())
 				auto& parentObject = GetObjectByID(thisNode.GetParentID());
 
 				// 親との相対座標を算出
@@ -564,9 +548,6 @@ NodeID Object::GetParentID() const
 {
 	auto& selfNode = Node<Object>::GetNodeByID(m_nodeID);// .GetParent();
 	return selfNode.GetParentID();
-//	auto parentNode = Node<Object>::GetNodeByID(selfNode.GetParent());
-
-//	return parentNode.GetAttach();
 }
 
 Object& Object::GetParent() const
@@ -625,30 +606,6 @@ void Object::DetachChildren()
 
 	m_dirty = true;
 }
-
-#if 0
-std::vector<std::shared_ptr<Object>> Object::GetChildren() const
-{
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	std::vector<std::shared_ptr<Object>> vChildren;
-	vChildren.reserve(thisNode->GetChildCount());
-
-	for (auto& nodeID : thisNode->GetChildrenID())
-	{
-		auto& childNode = Node<Object>::GetNodeByID(nodeID);
-
-		if (childNode &&
-			!childNode->IsDestroyed() &&
-			childNode->GetAttach())
-		{
-			vChildren.push_back(childNode->GetAttach());
-		}
-	}
-
-	return vChildren;
-}
-#endif
 
 const EqVector<NodeID>& Object::GetChildrenID() const
 {

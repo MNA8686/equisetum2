@@ -4,12 +4,6 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
-#if 0
-#include <cereal/cereal.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/list.hpp>
-//#include <cereal/types/base_class.hpp>
-#endif
 #include "INodeAttachment.hpp"
 #include "Script.hpp"
 #include "EqVector.hpp"
@@ -126,11 +120,8 @@ public:
 
 	Object();
 	~Object();
-//	virtual ~Object();
 
-	//static std::shared_ptr<Object> Create(const String& id);
 	static NodeID Create(const String& id);
-	//std::shared_ptr<Object> CreateChild(const String & id);
 	NodeID CreateChild(const String & id);
 
 	const Point_t<FixedDec>& GetPos() const;
@@ -144,12 +135,9 @@ public:
 	stAsset& GetAsset();
 	bool OnFixedUpdate();
 
-	//static std::shared_ptr<Object>& GetObjectByID(NodeID id);
 	static Object& GetObjectByID(NodeID id);
-	//std::shared_ptr<Object>& Self();
 	Object& Self();
 	bool HasParent() const;
-	//Object& GetParent();
 	NodeID GetParentID() const;
 
 	void SetNodeID(NodeID id) override;
@@ -157,15 +145,10 @@ public:
 
 	void Destroy();
 	bool IsDestroyed() const;
-	//void SetParent(std::shared_ptr<Object>& newParent);
 	void SetParentID(NodeID newParent);
-	//std::shared_ptr<Object>& GetParent() const;
-//	NodeID GetParentID() const;
 	Object& GetParent() const;
 	void DetachChildren();
-//	std::vector<std::shared_ptr<Object>> GetChildren() const;
 	int32_t GetChildCount() const;
-	//const std::list<NodeID>& GetChildrenID() const;
 	const EqVector<NodeID>& GetChildrenID() const;
 
 	std::shared_ptr<Object> Fork();
@@ -203,26 +186,6 @@ private:
 
 public:
 	static bool m_dirty;		/// スケジュール配列再構築フラグ
-
-#if 0
-	template<class Archive>
-	void serialize(Archive & archive)
-	{
-//		archive(cereal::base_class<Node>(this));
-		archive(CEREAL_NVP(m_asset));
-		archive(CEREAL_NVP(m_vRenderObject));
-		archive(CEREAL_NVP(m_pos));
-		archive(CEREAL_NVP(m_localPos));
-		archive(CEREAL_NVP(m_relativeParent));
-		archive(CEREAL_NVP(m_active));
-		archive(CEREAL_NVP(m_visible));
-		archive(CEREAL_NVP(m_nodeID));
-	}
-#endif
 };
-
-//#include <cereal/types/polymorphic.hpp>
-//CEREAL_REGISTER_TYPE(Object);
-//CEREAL_REGISTER_POLYMORPHIC_RELATION(Node, Object)
 
 #endif

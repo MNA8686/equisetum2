@@ -6,28 +6,8 @@
 #include "EqVector.hpp"
 using namespace Equisetum2;
 
-//#include <queue>
 #include <vector>
-//#include <list>
 #include <functional>
-
-#if 0
-#include <cereal/cereal.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/list.hpp>
-#include <cereal/types/queue.hpp>
-#endif
-
-#if 0
-using NodeID = int32_t;
-
-class INodeAttachment
-{
-public:
-	virtual void SetNodeID(NodeID id) = 0;
-	virtual NodeID GetNodeID() const = 0;
-};
-#endif
 
 template<class T>
 class Node final
@@ -36,22 +16,7 @@ public:
 
 	Node() = default;
 	~Node() = default;
-	//virtual ~Node() = default;
 
-#if 0
-	static std::shared_ptr<Node<T>> Create(const String& objectName)
-	{
-		if (auto tmpNode = std::make_shared<Node<T>>())
-		{
-			if (Init(tmpNode, objectName))
-			{
-				return tmpNode;
-			}
-		}
-
-		return nullptr;
-	}
-#endif
 	static NodeID GetFreeNodeWithInit(const String& objectName)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
@@ -92,15 +57,6 @@ public:
 		return id;
 	}
 
-#if 0
-	void SetAttach(std::shared_ptr<T>& attach)
-	{
-		m_attach = attach;
-		m_attach->SetNodeID(GetID());
-	}
-#endif
-
-	//std::shared_ptr<T>& GetAttach()
 	T& GetAttach()
 	{
 		return m_attach;
@@ -109,7 +65,6 @@ public:
 	void Destroy()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-		//auto pContext = pNodePool->GetContext();
 
 		if (!m_destroyed)
 		{
@@ -150,7 +105,6 @@ public:
 		return m_name;
 	}
 
-	//void SetParent(std::shared_ptr<Node<T>> newParent)
 	void SetParent(NodeID newParent)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
@@ -162,15 +116,13 @@ public:
 			return;
 		}
 
-		//if (!newParent)
 		if (newParent < 0)
 		{
 			// rootノードを取得
-			newParent = 0;// pContext->m_vNodeSlot[0].GetID();
+			newParent = 0;
 		}
 
 		auto& newParentNode = ctx->m_vNodeSlot[newParent];
-		//if (!newParent->IsDestroyed())
 		if (!newParentNode.IsDestroyed())
 		{
 			// 前の親の子リストから自分を削除
@@ -182,7 +134,6 @@ public:
 			// 新しい親をセット
 			m_parentId = newParent;// newParent->GetID();
 
-			//Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParent->GetID());
 			Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParentNode.GetID());
 
 			// 再構築フラグセット
@@ -190,7 +141,6 @@ public:
 		}
 	}
 
-	//std::shared_ptr<Node<T>> GetParent() const
 	NodeID GetParentID() const
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
@@ -229,32 +179,14 @@ public:
 		}
 	}
 
-	//std::vector<std::shared_ptr<Node<T>>> GetChildren() const
 	const EqVector<NodeID>& GetChildrenID() const
 	{
 		return m_listChildren;
-#if 0
-		std::vector<std::shared_ptr<Node<T>>> vChildren;
-		vChildren.reserve(m_listChildren.size());
-
-		for (auto& nodeID : m_listChildren)
-		{
-			auto& pNode = pNodePool->m_vNodeSlot[nodeID];
-			if (pNode &&
-				!pNode->IsDestroyed())
-			{
-				vChildren.push_back(pNode);
-			}
-		}
-
-		return vChildren;
-#endif
 	}
 
 	int32_t GetChildCount() const
 	{
 		return m_listChildren.Size();
-		//return static_cast<int32_t>(m_listChildren.size());
 	}
 
 	bool HasParent() const
@@ -326,7 +258,6 @@ public:
 
 		GC();
 
-		//Logger::OutputDebug("obj num %d, destroy %d, free %d, zombi %d", pNodePool->m_numOfObjects, pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
 		Logger::OutputDebug("obj num %d, destroy %d, free %d", ctx->m_numOfObjects, pNodePool->m_vGcQueue.size(), ctx->m_queFreeNode.Size());
 
 #if 0
@@ -346,7 +277,6 @@ public:
 		return ctx->m_numOfObjects;
 	}
 
-	//static std::shared_ptr<Node<T>>& GetNodeByID(NodeID nodeID)
 	static Node<T>& GetNodeByID(NodeID nodeID)
 	{
 		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
@@ -363,15 +293,7 @@ public:
 		return ctx->m_vNodeSlot[nodeID];
 	}
 
-#if 0
-	const std::list<NodeID>& GetChildrenID() const
-	{
-		return m_listChildren;
-	}
-#endif
-
 	// cbでfalseを返すとvisitを終了する
-	//static bool Visit(std::shared_ptr<Node<T>> beginNode, const std::function<bool(std::shared_ptr<Node<T>>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
 	static bool Visit(Node<T>& beginNode, const std::function<bool(Node<T>&, int32_t nestDepth)>& cb, int32_t nestDepth = 0)
 	{
 		if (!cb)
@@ -385,7 +307,6 @@ public:
 			{
 				auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
-				//const std::list<NodeID> children = beginNode.GetChildren();
 				for (auto& child : beginNode.GetChildrenID())
 				{
 					Visit(ctx->m_vNodeSlot[child], cb, nestDepth + 1);
@@ -473,81 +394,12 @@ public:
 #endif
 	}
 
-#if 0
-	template<class Archive>
-	void serialize(Archive & archive)
-	{
-		archive(CEREAL_NVP(m_nodeID));
-		archive(CEREAL_NVP(m_parentId));
-		archive(CEREAL_NVP(m_listChildren));
-		archive(CEREAL_NVP(m_destroyed));
-		archive(CEREAL_NVP(m_attach));
-
-		std::string& m_name_str = m_name;
-		archive(CEREAL_NVP(m_name_str));
-	}
-#endif
-
 protected:
-#if 0
-	static bool Init(std::shared_ptr<Node<T>> pNode, const String& name)
-	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-		NodeID id = -1;
-
-		// 未使用ノードあり？
-		if (pNodePool->m_queFreeNode.size() > 0)
-		{
-			// 空き領域を取得
-			id = pNodePool->m_queFreeNode.front();
-			pNodePool->m_queFreeNode.pop();
-
-			// ノードプール内の使用する領域を決定
-			pNodePool->m_vNodeSlot[id] = pNode;
-		}
-		else
-		{
-			// 新しいIDを発行する
-			id = static_cast<NodeID>(pNodePool->m_vNodeSlot.size());
-			pNodePool->m_vNodeSlot.push_back(pNode);
-		}
-
-		// ノードのIDを設定
-		pNode->SetID(id);
-		// ノードの名前を設定
-		pNode->SetName(name);
-		// rootノードではない？
-		if (id != 0)
-		{
-			// rootノードを親に設定
-			pNode->SetParent(pNodePool->m_vNodeSlot[0]);
-		}
-
-		// 使用中のオブジェクト数を加算
-		pNodePool->m_numOfObjects++;
-
-		// 再構築フラグセット
-//		pNodePool->m_dirty = true;
-
-		Logger::OutputDebug("spawn id %d, numOfObjects %d", id, pNodePool->m_numOfObjects);
-
-		return true;
-	}
-#endif
-
 	void SetID(NodeID id)
 	{
 		m_nodeID = id;
 	}
 
-#if 0
-	NodeID GetParentID() const
-	{
-		return m_parentId;
-	}
-#endif
-
-	//std::shared_ptr<Node<T>>& Self()
 	Node<T>& Self()
 	{
 		return GetNodeByID(GetID());
@@ -563,20 +415,9 @@ private:
 	bool m_destroyed = false;			/// 破棄フラグ trueにするとGC対象となる
 	T m_attach;							/// アタッチされたオブジェクト
 	// --- serialize end ---
-#if 0
-	// --- serialize begin ---
-	NodeID m_nodeID = -1;				/// インスタンスのID、管理配列のインデックスと同じである
-	NodeID m_parentId = -1;				/// 親ノードのID、管理配列のインデックスと同じである
-	std::list<NodeID> m_listChildren;	/// 子ノードIDリスト
-	String m_name;						/// ノードの名前
-	bool m_destroyed = false;			/// 破棄フラグ trueにするとGC対象となる
-	std::shared_ptr<T> m_attach;		/// アタッチされたオブジェクト
-	// --- serialize end ---
-#endif
 
 	void DetachParent()
 	{
-#if 1
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
@@ -610,7 +451,6 @@ private:
 			// 再構築フラグセット
 //			pNodePool->m_dirty = true;
 		}
-#endif
 	}
 };
 
@@ -628,7 +468,6 @@ public:
 		int32_t m_numOfObjects = 0;			// 現在生成されているノードの数
 		EqVector<NodeID> m_queFreeNode;		// 未使用状態のノードのIDを格納したキュー
 		//EqVector<NodeID> m_listZombie;		// ゾンビノードリスト
-		Node<T> m_null;	// ヌルノード
 	}Context;
 	
 	EqHeap::Container<Context> CreateContext()
@@ -646,8 +485,6 @@ public:
 					elem = index;
 					index--;
 				}
-
-//				ctx->m_null.m_nodeID = INodeAttachment::nullNode;
 			}
 		}
 
@@ -659,62 +496,16 @@ public:
 		m_pCtx = ctx.Ref();
 	}
 
-#if 0
-	template<class Archive>
-	void serialize(Archive & archive)
-	{
-		archive(CEREAL_NVP(m_vNodeSlot));
-		archive(CEREAL_NVP(m_queFreeNode));
-		archive(CEREAL_NVP(m_numOfObjects));
-		archive(CEREAL_NVP(m_listZombie));
-	}
-#endif
-
-#if 0
-	void Reset()
-	{
-		m_vNodeSlot.clear();
-		m_vNodeSlot.resize(defaultNum);
-		
-		m_vGcQueue.clear();
-		m_vGcQueue.reserve(defaultNum);
-
-	   std::queue<NodeID> empty;
-	   std::swap( m_queFreeNode, empty );
-   
-		for (int i = 0; i < defaultNum; i++)
-		{
-			m_queFreeNode.push(i);
-		}
-	}
-#endif
-
 	Context* GetContext() { return m_pCtx; }
-//	Context* operator ->() { return m_pCtx; }
 
 protected:
 
 	friend Node<T>;
-
-#if 0
-	// --- serialize begin ---
-	std::vector<std::shared_ptr<Node<T>>> m_vNodeSlot;		// ノードの実体を格納した配列
-	std::queue<NodeID> m_queFreeNode;					// 未使用状態のノードのIDを格納したキュー
-	int32_t m_numOfObjects = 0;							// 現在生成されているノードの数
-	std::list<std::weak_ptr<Node<T>>> m_listZombie;		// ゾンビノードリスト
-	// --- serialize end ---
-#endif
-
 	Context* m_pCtx;
 
 	std::vector<NodeID> m_vGcQueue;							// GC対象となるノードのIDを格納した配列
-//	bool m_dirty = true;									// スケジュール配列の再構築が必要かどうか
-//	std::vector<std::shared_ptr<Node<T>>> m_vNodeScheduler;	// スケジュール配列
 
 	NodePool() = default;
-	//{
-	//	Reset();
-	//}
 };
 
 #endif
