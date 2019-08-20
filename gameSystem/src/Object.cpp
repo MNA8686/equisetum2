@@ -9,7 +9,7 @@
 using namespace Equisetum2;
 
 bool Object::m_dirty = true;
-std::vector<NodeID> Object::m_vUpdate;
+std::vector<NodeHandler> Object::m_vUpdate;
 
 class JsonParseHelper
 {
@@ -71,19 +71,19 @@ Object::~Object()
 {
 }
 
-NodeID Object::Create(const String& id)
+NodeHandler Object::Create(const String& id)
 {
 	EQ_DURING
 	{
 		// ノード作成
-		NodeID nodeID = Node<Object>::GetFreeNodeWithInit(id);
-		if (nodeID < 0)
+		NodeHandler nodeHandler = Node<Object>::GetFreeNodeWithInit(id);
+		if (nodeHandler.id < 0)
 		{
 			EQ_THROW(u8"ノードの作成に失敗しました。");
 		}
 		// オブジェクトを取得
-		Node<Object>& node = Node<Object>::GetNodeByID(nodeID);
-		Object& attachedObject = node.GetAttach();
+		Node<Object>* node = Node<Object>::GetNodeByHandler(nodeHandler);
+		Object& attachedObject = node->GetAttach();
 
 		/*
 			R"({
@@ -247,7 +247,7 @@ NodeID Object::Create(const String& id)
 						}
 
 						// 所有しているオブジェクトを設定する
-						p->SetOwner(attachedObject.GetNodeID());
+						p->SetOwner(attachedObject.GetNodeHandler());
 						// IDを設定する
 						p->SetIdentify(v.GetString());
 
@@ -268,7 +268,7 @@ NodeID Object::Create(const String& id)
 		// 再構築フラグセット
 		m_dirty = true;
 
-		return nodeID;
+		return nodeHandler;
 	}
 	EQ_HANDLER
 	{
@@ -276,20 +276,22 @@ NodeID Object::Create(const String& id)
 	}
 	EQ_END_HANDLER
 
-	return -1;
+	return{};
 }
 
+#if 0
 NodeID Object::CreateChild(const String& id)
 {
 	NodeID childID = Object::Create(id);
 	if (childID >= 0)
 	{
 		auto& childObject = GetObjectByID(childID);
-		childObject.SetParentID(m_nodeID);
+		childObject.SetParentID(m_nodeHandler);
 	}
 
 	return childID;
 }
+#endif
 
 const Point_t<FixedDec>& Object::GetPos() const
 {
@@ -314,22 +316,24 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 		// ローカル座標更新
 		//-------------------------------------
 		{
-			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-			// 親に追従する設定 && 親を持っている？
-			if (m_relativeParent &&
-				thisNode.HasParent())
+			if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
 			{
-				// 親ノードに関連付けられたObjectを取得	
-				auto& parentObject = GetObjectByID(thisNode.GetParentID());
-
-				// 親との相対座標を算出
-				m_localPos = m_pos - parentObject.GetPos();
-			}
-			else
-			{
-				// m_posとm_localPosは等価
-				m_localPos = pos;
+				// 親に追従する設定 && 親を持っている？
+				if (m_relativeParent &&
+					thisNode->HasParent())
+				{
+					// 親ノードに関連付けられたObjectを取得	
+					if (auto parentObject = GetParent())
+					{
+						// 親との相対座標を算出
+						m_localPos = m_pos - parentObject->GetPos();
+					}
+				}
+				else
+				{
+					// m_posとm_localPosは等価
+					m_localPos = pos;
+				}
 			}
 		}
 
@@ -343,22 +347,24 @@ void Object::SetPosForChild()
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
 	// よって、子のワールド座標は確実に更新が発生する。
 
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	if (thisNode.GetChildCount() > 0)
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
 	{
-		for (auto& childID : thisNode.GetChildrenID())
+		if (thisNode->GetChildCount() > 0)
 		{
-			auto& childObject = GetObjectByID(childID);
-			
-			// 子は親に追従する？
-			if (childObject.GetRelativeParent())
+			for (auto& childHandler : thisNode->GetChildrenHandler())
 			{
-				// 子のワールド座標更新
-				childObject.m_pos = m_pos + childObject.GetLocalPos();
+				if (auto childObject = GetObjectByHandler(childHandler))
+				{
+					// 子は親に追従する？
+					if (childObject->GetRelativeParent())
+					{
+						// 子のワールド座標更新
+						childObject->m_pos = m_pos + childObject->GetLocalPos();
 
-				// ワールド座標が変化したので子に伝搬する
-				childObject.SetPosForChild();
+						// ワールド座標が変化したので子に伝搬する
+						childObject->SetPosForChild();
+					}
+				}
 			}
 		}
 	}
@@ -382,10 +388,11 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 				HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				auto& parentObject = GetParent();
-
-				// 親との相対座標からワールド座標を算出
-				m_pos = parentObject.GetPos() + m_localPos;
+				if (auto parentObject = GetParent())
+				{
+					// 親との相対座標からワールド座標を算出
+					m_pos = parentObject->GetPos() + m_localPos;
+				}
 			}
 			else
 			{
@@ -419,10 +426,11 @@ void Object::SetRelativeParent(bool on)
 			HasParent())
 		{
 			// 親ノードに関連付けられたObjectを取得	
-			auto& parentObject = GetParent();
-			
-			// 親との相対座標を算出
-			m_localPos = m_pos - parentObject.GetPos();
+			if (auto parentObject = GetParent())
+			{
+				// 親との相対座標を算出
+				m_localPos = m_pos - parentObject->GetPos();
+			}
 		}
 		else
 		{
@@ -451,30 +459,30 @@ void Object::Update()
 		m_vUpdate.clear();
 
 		// ルートノード取得
-		auto& rootNode = Node<Object>::GetNodeByID(0);
+		if (auto rootNode = Node<Object>::Root())
+		{
+			// ノードを辿り、スケジュール配列に追加していく
+			Node<Object>::Visit(*rootNode, [](Node<Object>& node, int32_t nestDepth)->bool {
+				auto& object = node.GetAttach();		// 追加条件判定
+				if (object.IsActive())
+				{
+					// スケジュール配列にノードを追加
+					m_vUpdate.push_back(object.GetNodeHandler());
+					return true;
+				}
+				return false;
+			});
 
-		// ルートオブジェクト取得
-		//auto rootObject = rootNode.GetAttach();
-
-		// ノードを辿り、スケジュール配列に追加していく
-		Node<Object>::Visit(rootNode, [](Node<Object>& node, int32_t nestDepth)->bool {
-			auto object = node.GetAttach();		// 追加条件判定
-			if (object.IsActive())
-			{
-				// スケジュール配列にノードを追加
-				m_vUpdate.push_back(object.GetNodeID());
-				return true;
-			}
-			return false;
-		});
-
-		m_dirty = false;
+			m_dirty = false;
+		}
 	}
 
 	for (auto& id : m_vUpdate)
 	{
-		auto& obj = GetObjectByID(id);
-		obj.OnFixedUpdate();
+		if (auto obj = GetObjectByHandler(id))
+		{
+			obj->OnFixedUpdate();
+		}
 	}
 }
 
@@ -485,28 +493,29 @@ void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		Node<Object>::Visit(*thisNode, [this, &renderer](Node<Object>& node, int32_t nestDepth)->bool {
+			auto& obj = node.GetAttach();
 
-	Node<Object>::Visit(thisNode, [this, &renderer](Node<Object>& node, int32_t nestDepth)->bool {
-		auto& obj = node.GetAttach();
-
-		// アクティブかつ表示状態でなければこの先のノードは処理しない
-		if (!obj.m_active || !obj.m_visible)
-		{
-			return false;
-		}
-
-		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
-		for (auto& renderObject : obj.m_vRenderObject)
-		{
-			if (renderObject->IsVisible())
+			// アクティブかつ表示状態でなければこの先のノードは処理しない
+			if (!obj.m_active || !obj.m_visible)
 			{
-				renderer->AddRenderQueue(renderObject.get());
+				return false;
 			}
-		}
 
-		return true;
-	});
+			// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+			for (auto& renderObject : obj.m_vRenderObject)
+			{
+				if (renderObject->IsVisible())
+				{
+					renderer->AddRenderQueue(renderObject.get());
+				}
+			}
+
+			return true;
+		});
+	}
 
 	return true;
 }
@@ -516,107 +525,114 @@ stAsset& Object::GetAsset()
 	return m_asset;
 }
 
-void Object::SetNodeID(NodeID id)
+void Object::SetNodeHandler(const NodeHandler& handler)
 {
-	m_nodeID = id;
+	m_nodeHandler = handler;
 }
 
-NodeID Object::GetNodeID() const
+NodeHandler Object::GetNodeHandler() const
 {
-	return m_nodeID;
+	return m_nodeHandler;
 }
 
-Object& Object::GetObjectByID(NodeID id)
+Object* Object::GetObjectByHandler(const NodeHandler& handler)
 {
-	auto& node = Node<Object>::GetNodeByID(id);
-	return node.GetAttach();
+	if (auto node = Node<Object>::GetNodeByHandler(handler))
+	{
+		return &node->GetAttach();
+	}
+
+	return nullptr;
 }
 
-//std::shared_ptr<Object>& Object::Self()
-Object& Object::Self()
+Object* Object::Self()
 {
-	return GetObjectByID(m_nodeID);
+	return GetObjectByHandler(m_nodeHandler);
 }
 
 bool Object::HasParent() const
 {
-	return Node<Object>::GetNodeByID(m_nodeID).HasParent();
+	if (auto node = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		return node->HasParent();
+	}
+
+	return false;
 }
 
-//Object& Object::GetParent()
-NodeID Object::GetParentID() const
+NodeHandler Object::GetParentHandler() const
 {
-	auto& selfNode = Node<Object>::GetNodeByID(m_nodeID);// .GetParent();
-	return selfNode.GetParentID();
+	if (auto* selfNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		return selfNode->GetParentHandler();
+	}
+
+	return{};
 }
 
-Object& Object::GetParent() const
+Object* Object::GetParent() const
 {
-	return GetObjectByID(GetParentID());
+	return GetObjectByHandler(GetParentHandler());
 }
 
 void Object::Destroy()
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	if (!thisNode.IsDestroyed())
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
 	{
-		thisNode.Destroy();
+		if (!thisNode->IsDestroyed())
+		{
+			thisNode->Destroy();
 
-		// 再構築フラグセット
-		m_dirty = true;
+			// 再構築フラグセット
+			m_dirty = true;
+		}
 	}
 }
 
 bool Object::IsDestroyed() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		return thisNode->IsDestroyed();
+	}
 
-	return thisNode.IsDestroyed();
+	return false;
 }
 
-//void Object::SetParent(std::shared_ptr<Object>& newParent)
-void Object::SetParentID(NodeID newParent)
+void Object::SetParentHandler(const NodeHandler& newParent)
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-//	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
-
-	thisNode.SetParent(newParent);
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		thisNode->SetParentHandler(newParent);
+	}
 
 	m_dirty = true;
 }
-
-#if 0
-std::shared_ptr<Object>& Object::GetParent() const
-{
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	if (auto& parentObject = thisNode->GetParent())
-	{
-		return parentObject->GetAttach();
-	}
-
-	return nullObject;
-}
-#endif
 
 void Object::DetachChildren()
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	thisNode.DetachChildren();
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		thisNode->DetachChildren();
+	}
 
 	m_dirty = true;
 }
 
-const EqVector<NodeID>& Object::GetChildrenID() const
+const EqVector<NodeHandler>& Object::GetChildrenHandler() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode.GetChildrenID();
+	auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler);
+	return thisNode->GetChildrenHandler();
 }
 
 int32_t Object::GetChildCount() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode.GetChildCount();
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	{
+		return thisNode->GetChildCount();
+	}
+
+	return 0;
 }
 
 bool Object::IsActive() const

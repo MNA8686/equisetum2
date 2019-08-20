@@ -30,7 +30,7 @@ public:
 	virtual bool FixedUpdate();
 
 	//void SetOwner(std::shared_ptr<Object>& ownerObject);
-	void SetOwner(NodeID ownerObject);
+	void SetOwner(NodeHandler ownerObject);
 	bool Start();
 
 	static void SetScriptTbl(const std::vector<stScriptTbl>& tbl);
@@ -66,11 +66,11 @@ private:
 	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
 	String m_identify;
 	//std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
-	NodeID m_ownerObject = -1;		/// このスクリプトを所持しているオブジェクト
+	NodeHandler m_ownerObject;		/// このスクリプトを所持しているオブジェクト
 
 protected:
 	//std::shared_ptr<Object> GetOwner();
-	NodeID GetOwner();
+	NodeHandler GetOwner();
 };
 
 

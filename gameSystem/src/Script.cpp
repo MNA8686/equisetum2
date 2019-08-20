@@ -55,7 +55,7 @@ bool Script::FixedUpdate()
 }
 
 //void Script::SetOwner(std::shared_ptr<Object>& ownerObject)
-void Script::SetOwner(NodeID ownerObject)
+void Script::SetOwner(NodeHandler ownerObject)
 {
 	m_ownerObject = ownerObject;
 }
@@ -86,7 +86,7 @@ String Script::Identify() const
 }
 
 //std::shared_ptr<Object> Script::GetOwner()
-NodeID Script::GetOwner()
+NodeHandler Script::GetOwner()
 {
 	//return m_ownerObject.lock();
 	return m_ownerObject;

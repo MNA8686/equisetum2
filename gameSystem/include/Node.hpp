@@ -17,44 +17,52 @@ public:
 	Node() = default;
 	~Node() = default;
 
-	static NodeID GetFreeNodeWithInit(const String& objectName)
+	static NodeHandler GetFreeNodeWithInit(const String& objectName)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
-		//int32_ index = 0;
 
 		// 未使用ノードあり？
-		if (ctx->m_queFreeNode.Size() == 0)
+		if (ctx->m_stackFreeNodeID.Size() == 0)
 		{
-			return -1;
+			return{};
 		}
 
-		NodeID id = ctx->m_queFreeNode.Back();
-		ctx->m_queFreeNode.PopBack();
+		NodeID id = ctx->m_stackFreeNodeID.Back();
+		ctx->m_stackFreeNodeID.PopBack();
 
 		Node<T>& node = ctx->m_vNodeSlot[id];
 		
 		// ノードのIDを設定
-		node.SetID(id);
-		node.m_attach.SetNodeID(id);
+		NodeHandler handler;
+		handler.id = id;
+		handler.serial = ctx->m_nextSerial;
+
+		node.SetHandler(handler);
+		node.m_attach.SetNodeHandler(handler);
 		// ノードの名前を設定
 		node.SetName(objectName);
 		// rootノードではない？
 		if (id != 0)
 		{
+			Node<T>& rootNode = ctx->m_vNodeSlot[0];
 			// rootノードを親に設定
-			node.SetParent(0);
+			node.SetParentHandler(rootNode.GetHandler());
 		}
 
 		// 使用中のオブジェクト数を加算
 		ctx->m_numOfObjects++;
 
-		// 再構築フラグセット
-//		pNodePool->m_dirty = true;
+		// シリアルをインクリメント
+		ctx->m_nextSerial++;
+		if (ctx->m_nextSerial == 0)
+		{
+			ctx->m_nextSerial = 1;
+		}
 
 		Logger::OutputDebug("spawn id %d, numOfObjects %d", id, ctx->m_numOfObjects);
 
-		return id;
+		return handler;
 	}
 
 	T& GetAttach()
@@ -78,10 +86,7 @@ public:
 			DetachChildren();
 
 			// 削除キューに入れる(後のGCでこのオブジェクトは破棄される)
-			pNodePool->m_vGcQueue.push_back(m_nodeID);
-
-			// 再構築フラグセット
-			//pNodePool->m_dirty = true;
+			pNodePool->m_vGcQueue.push_back(m_nodeHandler.id);
 		}
 	}
 
@@ -90,9 +95,9 @@ public:
 		return m_destroyed;
 	}
 
-	NodeID GetID() const
+	NodeHandler GetHandler() const
 	{
-		return m_nodeID;
+		return m_nodeHandler;
 	}
 
 	void SetName(const String & name)
@@ -105,57 +110,56 @@ public:
 		return m_name;
 	}
 
-	void SetParent(NodeID newParent)
+	void SetParentHandler(NodeHandler newParentHandler)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
-		if (m_nodeID == 0)
+		if (m_nodeHandler.id == 0)
 		{
 			Logger::OutputError(u8"rootノードに親を設定しようとしました。");
 			return;
 		}
 
-		if (newParent < 0)
+		if (newParentHandler.id < 0)
 		{
 			// rootノードを取得
-			newParent = 0;
+			auto rootNode = &(ctx->m_vNodeSlot[0]);
+			newParentHandler = rootNode->GetHandler();
 		}
 
-		auto& newParentNode = ctx->m_vNodeSlot[newParent];
-		if (!newParentNode.IsDestroyed())
+		if (auto newParentNode = GetNodeByHandler(newParentHandler))
 		{
-			// 前の親の子リストから自分を削除
-			DetachParent();
+			if (!newParentNode->IsDestroyed())
+			{
+				// 前の親の子リストから自分を削除
+				DetachParent();
 
-			// 新しい親の子リストに追加
-			newParentNode.m_listChildren.PushBack(m_nodeID);
+				// 新しい親の子リストに追加
+				newParentNode->m_vChildren.PushBack(m_nodeHandler);
 
-			// 新しい親をセット
-			m_parentId = newParent;// newParent->GetID();
+				// 新しい親をセット
+				m_parentHandler = newParentHandler;
 
-			Logger::OutputDebug("obj %d, new parent %d", m_nodeID, newParentNode.GetID());
-
-			// 再構築フラグセット
-			//pNodePool->m_dirty = true;
+				Logger::OutputDebug("obj %d, new parent %d", m_nodeHandler.id, newParentNode->GetHandler().id);
+			}
 		}
 	}
 
-	NodeID GetParentID() const
+	NodeHandler GetParentHandler() const
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
-		if (m_parentId >= 0)
+		if (auto parentNode = GetNodeByHandler(m_parentHandler))
 		{
-			auto& parentNode = ctx->m_vNodeSlot[m_parentId];
-			if (!parentNode.IsDestroyed())
+			if (!parentNode->IsDestroyed())
 			{
-				return m_parentId;
+				return m_parentHandler;
 			}
 		}
 
-		return -1;
+		return{};
 	}
 
 	void DetachChildren()
@@ -164,34 +168,36 @@ public:
 		auto ctx = pNodePool->GetContext();
 
 		// 子を全て解除
-		Logger::OutputDebug("obj %d, num children %d", m_nodeID, m_listChildren.Size());
+		Logger::OutputDebug("obj %d, num children %d", m_nodeHandler.id, m_vChildren.Size());
 
-		for (auto& nodeID : m_listChildren)
+		for (auto& nodeHandler : m_vChildren)
 		{
-			auto& node = ctx->m_vNodeSlot[nodeID];
-
-			if(!node.IsDestroyed())
+			if (auto node = GetNodeByHandler(nodeHandler))
 			{
-				node.SetParent(-1);	// nullptrを設定すると自動的に親はrootノードに設定される
+				if (!node->IsDestroyed())
+				{
+					NodeHandler empty;
+					node->SetParentHandler(empty);	// -1を設定すると自動的に親はrootノードに設定される
 
-				Logger::OutputDebug("  nodeID %d, detach childID %d", m_nodeID, node.GetID());
+					Logger::OutputDebug("  nodeID %d, detach childID %d", m_nodeHandler.id, node->GetHandler().id);
+				}
 			}
 		}
 	}
 
-	const EqVector<NodeID>& GetChildrenID() const
+	const EqVector<NodeHandler>& GetChildrenHandler() const
 	{
-		return m_listChildren;
+		return m_vChildren;
 	}
 
 	int32_t GetChildCount() const
 	{
-		return m_listChildren.Size();
+		return m_vChildren.Size();
 	}
 
 	bool HasParent() const
 	{
-		return m_parentId >= 0;
+		return m_parentHandler.id >= 0;
 	}
 
 	/*virtual*/ bool AddScheduler()
@@ -225,7 +231,7 @@ public:
 			ctx->m_vNodeSlot[nodeID] = {};		//TODO:解放処理は？
 			ctx->m_numOfObjects--;
 
-			ctx->m_queFreeNode.PushBack(nodeID);
+			ctx->m_stackFreeNodeID.PushBack(nodeID);
 		}
 
 		// 削除対象リストクリア
@@ -250,7 +256,7 @@ public:
 
 		for (auto& node : ctx->m_vNodeSlot)
 		{
-			if (node.m_nodeID > 0)
+			if (node.m_nodeHandler.id >= 0)
 			{
 				node.Destroy();
 			}
@@ -258,7 +264,7 @@ public:
 
 		GC();
 
-		Logger::OutputDebug("obj num %d, destroy %d, free %d", ctx->m_numOfObjects, pNodePool->m_vGcQueue.size(), ctx->m_queFreeNode.Size());
+		Logger::OutputDebug("obj num %d, destroy %d, free %d", ctx->m_numOfObjects, pNodePool->m_vGcQueue.size(), ctx->m_stackFreeNodeID.Size());
 
 #if 0
 		for (auto& zombie : pNodePool->m_listZombie)
@@ -277,7 +283,7 @@ public:
 		return ctx->m_numOfObjects;
 	}
 
-	static Node<T>& GetNodeByID(NodeID nodeID)
+	static Node<T>* GetNodeByHandler(const NodeHandler& handler)
 	{
 		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
@@ -290,7 +296,28 @@ public:
 		}
 #endif
 
-		return ctx->m_vNodeSlot[nodeID];
+		if (handler.id >= 0)
+		{
+			auto node = &(ctx->m_vNodeSlot[handler.id]);
+			if (node->GetHandler().serial == handler.serial)
+			{
+				return node;
+			}
+		}
+
+		return nullptr;
+	}
+
+	static Node<T>* Root()
+	{
+		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
+
+		if (ctx->m_numOfObjects > 0)
+		{
+			return &(ctx->m_vNodeSlot[0]);
+		}
+
+		return nullptr;
 	}
 
 	// cbでfalseを返すとvisitを終了する
@@ -307,9 +334,9 @@ public:
 			{
 				auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
 
-				for (auto& child : beginNode.GetChildrenID())
+				for (auto& childHandler : beginNode.GetChildrenHandler())
 				{
-					Visit(ctx->m_vNodeSlot[child], cb, nestDepth + 1);
+					Visit(ctx->m_vNodeSlot[childHandler.id], cb, nestDepth + 1);
 				}
 			}
 		}
@@ -348,7 +375,7 @@ public:
 			return true;
 		});
 
-		Logger::OutputInfo("vGcQueue %d, queFreeNode %d, listZombie %d", pNodePool->m_vGcQueue.size(), pNodePool->m_queFreeNode.size(), pNodePool->m_listZombie.size());
+		Logger::OutputInfo("vGcQueue %d, queFreeNode %d, listZombie %d", pNodePool->m_vGcQueue.size(), pNodePool->m_stackFreeNodeID.size(), pNodePool->m_listZombie.size());
 		Logger::OutputInfo("--- dump end ---");
 #endif
 	}
@@ -395,25 +422,25 @@ public:
 	}
 
 protected:
-	void SetID(NodeID id)
+	void SetHandler(const NodeHandler& handler)
 	{
-		m_nodeID = id;
+		m_nodeHandler = handler;
 	}
 
-	Node<T>& Self()
+	Node<T>* Self()
 	{
-		return GetNodeByID(GetID());
+		return GetNodeByHandler(m_nodeHandler);
 	}
 
 private:
 
 	// --- serialize begin ---
-	NodeID m_nodeID = -1;				/// インスタンスのID、管理配列のインデックスと同じである
-	NodeID m_parentId = -1;				/// 親ノードのID、管理配列のインデックスと同じである
-	EqVector<NodeID> m_listChildren;	/// 子ノードIDリスト
-	String m_name;						/// ノードの名前
-	bool m_destroyed = false;			/// 破棄フラグ trueにするとGC対象となる
-	T m_attach;							/// アタッチされたオブジェクト
+	NodeHandler m_nodeHandler;				/// インスタンスのID、管理配列のインデックスと同じである
+	NodeHandler m_parentHandler;			/// 親ノードのID、管理配列のインデックスと同じである
+	EqVector<NodeHandler> m_vChildren;		/// 子ノードIDリスト
+	String m_name;							/// ノードの名前
+	bool m_destroyed = false;				/// 破棄フラグ trueにするとGC対象となる
+	T m_attach;								/// アタッチされたオブジェクト
 	// --- serialize end ---
 
 	void DetachParent()
@@ -421,35 +448,36 @@ private:
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
-		if (m_parentId < 0)
-		{
-			return;
-		}
+		//if (m_parentHandler.id < 0)
+		//{
+	//		return;
+		//}
 
 		// 親のインスタンスが存在する？
-		Node<T>& parent = ctx->m_vNodeSlot[m_parentId];
-
-		// 破棄されていない？
-		if (!parent.IsDestroyed())
+		if (Node<T>* parent = GetNodeByHandler(m_parentHandler))
 		{
-			// 親の子リストから自分を削除する
-			auto& refList = parent.m_listChildren;
-
-			auto it = refList.begin();
-			while (it != refList.end())
+			// 破棄されていない？
+			if (!parent->IsDestroyed())
 			{
-				if (*it == m_nodeID)
+				// 親の子リストから自分を削除する
+				auto& refList = parent->m_vChildren;
+
+				auto it = refList.begin();
+				while (it != refList.end())
 				{
-					refList.Erase(it);
-					break;
+					if (*it == m_nodeHandler)
+					{
+						refList.Erase(it);
+						break;
+					}
+					++it;
 				}
-				++it;
+
+				m_parentHandler = {};
+
+				// 再構築フラグセット
+	//			pNodePool->m_dirty = true;
 			}
-
-			m_parentId = -1;
-
-			// 再構築フラグセット
-//			pNodePool->m_dirty = true;
 		}
 	}
 };
@@ -466,7 +494,8 @@ public:
 	{
 		Node<T> m_vNodeSlot[defaultNum];	// ノードの実体を格納した配列
 		int32_t m_numOfObjects = 0;			// 現在生成されているノードの数
-		EqVector<NodeID> m_queFreeNode;		// 未使用状態のノードのIDを格納したキュー
+		uint32_t m_nextSerial = 1;			// ノードに設定する通し番号
+		EqVector<NodeID> m_stackFreeNodeID;		// 未使用状態のノードのIDを格納したスタック
 		//EqVector<NodeID> m_listZombie;		// ゾンビノードリスト
 	}Context;
 	
@@ -477,10 +506,10 @@ public:
 		{
 			if (auto ctx = handle.Ref())
 			{
-				ctx->m_queFreeNode.Resize(defaultNum);
+				ctx->m_stackFreeNodeID.Resize(defaultNum);
 
 				int32_t index = defaultNum - 1;
-				for (auto& elem : ctx->m_queFreeNode)
+				for (auto& elem : ctx->m_stackFreeNodeID)
 				{
 					elem = index;
 					index--;

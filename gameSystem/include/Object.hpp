@@ -121,8 +121,8 @@ public:
 	Object();
 	~Object();
 
-	static NodeID Create(const String& id);
-	NodeID CreateChild(const String & id);
+	static NodeHandler Create(const String& id);
+	//NodeID CreateChild(const String & id);
 
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
@@ -135,21 +135,21 @@ public:
 	stAsset& GetAsset();
 	bool OnFixedUpdate();
 
-	static Object& GetObjectByID(NodeID id);
-	Object& Self();
+	static Object* GetObjectByHandler(const NodeHandler& handler);
+	Object* Self();
 	bool HasParent() const;
-	NodeID GetParentID() const;
+	NodeHandler GetParentHandler() const;
 
-	void SetNodeID(NodeID id) override;
-	NodeID GetNodeID() const override;
+	void SetNodeHandler(const NodeHandler& handler) override;
+	NodeHandler GetNodeHandler() const override;
 
 	void Destroy();
 	bool IsDestroyed() const;
-	void SetParentID(NodeID newParent);
-	Object& GetParent() const;
+	void SetParentHandler(const NodeHandler& newParentHandler);
+	Object* GetParent() const;
 	void DetachChildren();
 	int32_t GetChildCount() const;
-	const EqVector<NodeID>& GetChildrenID() const;
+	const EqVector<NodeHandler>& GetChildrenHandler() const;
 
 	std::shared_ptr<Object> Fork();
 
@@ -175,14 +175,14 @@ private:
 //	int32_t m_angle = 0;
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない
-	NodeID m_nodeID = -1;			/// アタッチしているノードのID
+	NodeHandler m_nodeHandler;		/// アタッチしているノードのハンドラ
 	// --- serialize end ---
 
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
 
 //	static bool m_dirty;		/// スケジュール配列再構築フラグ
-	static std::vector<NodeID> m_vUpdate;		/// スケジュール配列
+	static std::vector<NodeHandler> m_vUpdate;		/// スケジュール配列
 
 public:
 	static bool m_dirty;		/// スケジュール配列再構築フラグ
