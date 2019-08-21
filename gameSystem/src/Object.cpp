@@ -525,16 +525,6 @@ stAsset& Object::GetAsset()
 	return m_asset;
 }
 
-void Object::SetNodeHandler(const NodeHandler& handler)
-{
-	m_hNode = handler;
-}
-
-NodeHandler Object::GetNodeHandler() const
-{
-	return m_hNode;
-}
-
 Object* Object::GetObjectByHandler(const NodeHandler& handler)
 {
 	if (auto node = Node<Object>::GetNodeByHandler(handler))

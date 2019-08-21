@@ -19,13 +19,22 @@ struct NodeHandler
 	}
 };
 
+// 本来なら抽象クラスにすべきだが、virtualを使えないのでここに実装を書く
 class INodeAttachment
 {
 public:
-	static const int32_t nullNode = -2;
+	void SetNodeHandler(const NodeHandler& handler)
+	{
+		m_hNode = handler;
+	}
 
-	virtual void SetNodeHandler(const NodeHandler& handler) = 0;
-	virtual NodeHandler GetNodeHandler() const = 0;
+	NodeHandler GetNodeHandler() const
+	{
+		return m_hNode;
+	}
+
+protected:
+	NodeHandler m_hNode;		/// アタッチしているノードのハンドラ
 };
 
 #endif
