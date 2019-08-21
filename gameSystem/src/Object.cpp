@@ -316,7 +316,7 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 		// ローカル座標更新
 		//-------------------------------------
 		{
-			if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+			if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 			{
 				// 親に追従する設定 && 親を持っている？
 				if (m_relativeParent &&
@@ -347,7 +347,7 @@ void Object::SetPosForChild()
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
 	// よって、子のワールド座標は確実に更新が発生する。
 
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		if (thisNode->GetChildCount() > 0)
 		{
@@ -493,7 +493,7 @@ void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		Node<Object>::Visit(*thisNode, [this, &renderer](Node<Object>& node, int32_t nestDepth)->bool {
 			auto& obj = node.GetAttach();
@@ -527,12 +527,12 @@ stAsset& Object::GetAsset()
 
 void Object::SetNodeHandler(const NodeHandler& handler)
 {
-	m_nodeHandler = handler;
+	m_hNode = handler;
 }
 
 NodeHandler Object::GetNodeHandler() const
 {
-	return m_nodeHandler;
+	return m_hNode;
 }
 
 Object* Object::GetObjectByHandler(const NodeHandler& handler)
@@ -547,12 +547,12 @@ Object* Object::GetObjectByHandler(const NodeHandler& handler)
 
 Object* Object::Self()
 {
-	return GetObjectByHandler(m_nodeHandler);
+	return GetObjectByHandler(m_hNode);
 }
 
 bool Object::HasParent() const
 {
-	if (auto node = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto node = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		return node->HasParent();
 	}
@@ -562,7 +562,7 @@ bool Object::HasParent() const
 
 NodeHandler Object::GetParentHandler() const
 {
-	if (auto* selfNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto* selfNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		return selfNode->GetParentHandler();
 	}
@@ -577,7 +577,7 @@ Object* Object::GetParent() const
 
 void Object::Destroy()
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		if (!thisNode->IsDestroyed())
 		{
@@ -591,7 +591,7 @@ void Object::Destroy()
 
 bool Object::IsDestroyed() const
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		return thisNode->IsDestroyed();
 	}
@@ -601,7 +601,7 @@ bool Object::IsDestroyed() const
 
 void Object::SetParentHandler(const NodeHandler& newParent)
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		thisNode->SetParentHandler(newParent);
 	}
@@ -611,7 +611,7 @@ void Object::SetParentHandler(const NodeHandler& newParent)
 
 void Object::DetachChildren()
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		thisNode->DetachChildren();
 	}
@@ -621,13 +621,13 @@ void Object::DetachChildren()
 
 const EqVector<NodeHandler>& Object::GetChildrenHandler() const
 {
-	auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler);
+	auto thisNode = Node<Object>::GetNodeByHandler(m_hNode);
 	return thisNode->GetChildrenHandler();
 }
 
 int32_t Object::GetChildCount() const
 {
-	if (auto thisNode = Node<Object>::GetNodeByHandler(m_nodeHandler))
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		return thisNode->GetChildCount();
 	}

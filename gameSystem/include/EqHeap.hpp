@@ -76,6 +76,11 @@ public:
 
 		~Container()
 		{
+			Reset();
+		}
+
+		void Reset()
+		{
 			auto heap = Singleton<EqHeap>::GetInstance();
 			if (heap->DecRef(m_handler) == 0)
 			{
@@ -86,6 +91,8 @@ public:
 
 				heap->Delete(m_handler);
 			}
+
+			m_handler = 0;
 		}
 
 		operator Handler () const

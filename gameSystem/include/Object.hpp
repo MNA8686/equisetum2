@@ -175,7 +175,7 @@ private:
 //	int32_t m_angle = 0;
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない
-	NodeHandler m_nodeHandler;		/// アタッチしているノードのハンドラ
+	NodeHandler m_hNode;		/// アタッチしているノードのハンドラ
 	// --- serialize end ---
 
 	/// 子に親の座標移動を反映させる
