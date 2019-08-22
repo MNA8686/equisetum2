@@ -209,33 +209,17 @@ public:
 		return m_hParent.id >= 0;
 	}
 
-	/*virtual*/ bool AddScheduler()
-	{
-		return true;
-	}
-
-	/*virtual*/ bool OnSchedule()
-	{
-		return true;
-	}
-
 	static void GC()
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
 
-#if 0
-		if (pNodePool->m_dirty)
-		{
-			// スケジュール配列を削除
-			pNodePool->m_vNodeScheduler.clear();
-		}
-#endif
-
 		// 削除対象リストを元にオブジェクトの削除を行う
 		for (auto& nodeID : pNodePool->m_vGcQueue)
 		{
-			ctx->m_vNodeSlot[nodeID] = {};		//TODO:解放処理は？
+			ctx->m_vNodeSlot[nodeID].~Node<T>();
+			new (&ctx->m_vNodeSlot[nodeID]) Node<T>();
+
 			ctx->m_numOfObjects--;
 
 			ctx->m_stackFreeNodeID.PushBack(nodeID);
@@ -363,47 +347,6 @@ public:
 #endif
 	}
 
-	static void MakeScheduler()
-	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-
-#if 0
-		if (pNodePool->m_dirty)
-		{
-			// スケジュール配列をクリア
-			pNodePool->m_vNodeScheduler.clear();
-
-			// ルートノード取得
-			if (auto pThisNode = pNodePool->m_vNodeSlot[0])
-			{
-				// ノードを辿り、スケジュール配列に追加していく
-				Visit(pThisNode, [](std::shared_ptr<Node<T>>& node, int32_t nestDepth)->bool {
-					bool add = node->AddScheduler();		// 追加条件判定
-					if (add)
-					{
-						// スケジュール配列にノードを追加
-						Singleton<NodePool<T>>::GetInstance()->m_vNodeScheduler.push_back(node);
-					}
-					return add;
-				});
-			}
-
-			pNodePool->m_dirty = false;
-		}
-#endif
-	}
-
-	static void ProcScheduler()
-	{
-		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
-#if 0
-		for (auto& node : pNodePool->m_vNodeScheduler)
-		{
-			node->OnSchedule();
-		}
-#endif
-	}
-
 protected:
 	void SetHandler(const NodeHandler& handler)
 	{
@@ -449,9 +392,6 @@ private:
 				}
 
 				m_hParent = {};
-
-				// 再構築フラグセット
-	//			pNodePool->m_dirty = true;
 			}
 		}
 	}
