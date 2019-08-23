@@ -8,111 +8,7 @@ using namespace Equisetum2;
 #include "Script.hpp"
 #include "EqVector.hpp"
 
-/**
-  アセット管理構造体
-*/
-class Script;
-struct stAsset
-{
-	std::vector<std::shared_ptr<Sprite>> m_sprite;
-	std::vector<std::shared_ptr<BGM>> m_bgm;
-	std::vector<std::shared_ptr<SE>> m_se;
-	std::vector<std::shared_ptr<Script>> m_script;
-
-#if 0
-	// アセットはIDのみを保存しておき、リストア時にはロードし直す
-	// (スクリプトは除く)
-	template<class Archive>
-	void save(Archive & archive) const
-	{
-		// スプライト
-		{
-			std::vector<std::string> spriteID;
-			for (auto& sprite : m_sprite)
-			{
-				spriteID.push_back(sprite ? sprite->Identify() : "");
-			}
-			archive(CEREAL_NVP(spriteID));
-		}
-
-		// BGM
-		{
-			std::vector<std::string> bgmID;
-			for (auto& p : m_bgm)
-			{
-				bgmID.push_back(p ? p->Identify() : "");
-			}
-			archive(CEREAL_NVP(bgmID));
-		}
-
-		// SE
-		{
-			std::vector<std::string> seID;
-			for (auto& p : m_se)
-			{
-				seID.push_back(p ? p->Identify() : "");
-			}
-			archive(CEREAL_NVP(seID));
-		}
-
-		// スクリプト
-		{
-			archive(CEREAL_NVP(m_script));
-		}
-	}
-
-	template<class Archive>
-	void load(Archive & archive)
-	{
-		// スプライト
-		{
-			std::vector<std::string> spriteID;
-			archive(CEREAL_NVP(spriteID));
-
-			int index = 0;
-			m_sprite.clear();
-			for (auto& id : spriteID)
-			{
-				m_sprite.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<Sprite>(id));
-				index++;
-			}
-		}
-
-		// BGM
-		{
-			std::vector<std::string> bgmID;
-			archive(CEREAL_NVP(bgmID));
-
-			int index = 0;
-			m_bgm.clear();
-			for (auto& id : bgmID)
-			{
-				m_bgm.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<BGM>(id));
-				index++;
-			}
-		}
-
-		// SE
-		{
-			std::vector<std::string> seID;
-			archive(CEREAL_NVP(seID));
-
-			int index = 0;
-			m_se.clear();
-			for (auto& id : seID)
-			{
-				m_se.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<SE>(id));
-				index++;
-			}
-		}
-
-		// スクリプト
-		{
-			archive(CEREAL_NVP(m_script));
-		}
-	}
-#endif
-};
+struct stAsset;
 
 class Object final : public INodeAttachment 
 {
@@ -132,7 +28,7 @@ public:
 	void SetRelativeParent(bool on);
 	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
-	stAsset& GetAsset();
+	stAsset* GetAsset();
 	bool OnFixedUpdate();
 
 	static Object* GetObjectByHandler(const NodeHandler& handler);
@@ -164,7 +60,6 @@ protected:
 private:
 
 	// --- serialize begin ---
-	stAsset m_asset;				/// アセット管理構造体
 	std::vector<std::shared_ptr<RenderObject>> m_vRenderObject;	/// レンダーオブジェクト配列
 	Point_t<FixedDec> m_pos;		/// ワールド座標
 	Point_t<FixedDec> m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
@@ -177,7 +72,6 @@ private:
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
 
-//	static bool m_dirty;		/// スケジュール配列再構築フラグ
 	static std::vector<NodeHandler> m_vUpdate;		/// スケジュール配列
 
 public:

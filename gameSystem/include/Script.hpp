@@ -3,8 +3,8 @@
 
 #include "Equisetum2.h"
 
+#include "AssetMapper.hpp"
 #include "Object.hpp"
-//#include <cereal/cereal.hpp>
 
 using namespace Equisetum2;
 

@@ -1,6 +1,7 @@
 #include "Object.hpp"
 #include "Node.hpp"
 #include "Script.hpp"
+#include "AssetMapper.hpp"
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
 #include "cereal/external/rapidjson/error/error.h"
@@ -69,6 +70,7 @@ Object::Object()
 
 Object::~Object()
 {
+	Singleton<AssetMapper>::GetInstance()->Unmap(m_hNode.id);
 }
 
 NodeHandler Object::Create(const String& id)
@@ -84,6 +86,11 @@ NodeHandler Object::Create(const String& id)
 		// オブジェクトを取得
 		Node<Object>* node = Node<Object>::GetNodeByHandler(nodeHandler);
 		Object& attachedObject = node->GetAttach();
+		stAsset* pAsset = attachedObject.GetAsset();
+		if (!pAsset)
+		{
+			EQ_THROW(u8"アセットのマッピングに失敗しました。");
+		}
 
 		/*
 			R"({
@@ -171,7 +178,7 @@ NodeHandler Object::Create(const String& id)
 							EQ_THROW(u8"spriteのロードに失敗しました。");
 						}
 
-						attachedObject.m_asset.m_sprite.push_back(p);
+						pAsset->m_sprite.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -196,7 +203,7 @@ NodeHandler Object::Create(const String& id)
 							EQ_THROW(u8"bgmのロードに失敗しました。");
 						}
 
-						attachedObject.m_asset.m_bgm.push_back(p);
+						pAsset->m_bgm.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -221,7 +228,7 @@ NodeHandler Object::Create(const String& id)
 							EQ_THROW(u8"seのロードに失敗しました。");
 						}
 
-						attachedObject.m_asset.m_se.push_back(p);
+						pAsset->m_se.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -251,7 +258,7 @@ NodeHandler Object::Create(const String& id)
 						// IDを設定する
 						p->SetIdentify(v.GetString());
 
-						attachedObject.m_asset.m_script.push_back(p);
+						pAsset->m_script.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -260,7 +267,7 @@ NodeHandler Object::Create(const String& id)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : attachedObject.m_asset.m_script)
+		for (auto& script : pAsset->m_script)
 		{
 			script->OnCreate();
 		}
@@ -442,13 +449,18 @@ void Object::SetRelativeParent(bool on)
 
 bool Object::OnFixedUpdate()
 {
-	auto& vScript = m_asset.m_script;
-	for (auto& script : vScript)
+	stAsset* pAsset = GetAsset();
+	if (pAsset)
 	{
-		script->FixedUpdate();
+		auto& vScript = pAsset->m_script;
+		for (auto& script : vScript)
+		{
+			script->FixedUpdate();
+		}
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void Object::Update()
@@ -520,9 +532,10 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 	return true;
 }
 
-stAsset& Object::GetAsset()
+stAsset* Object::GetAsset()
 {
-	return m_asset;
+	stAsset* pAsset = Singleton<AssetMapper>::GetInstance()->Map(m_hNode.id);
+	return pAsset;
 }
 
 Object* Object::GetObjectByHandler(const NodeHandler& handler)
