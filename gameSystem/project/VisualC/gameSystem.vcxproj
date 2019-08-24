@@ -158,7 +158,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
   <ItemGroup>
     <ClCompile Include="..\..\include\Dashboard.cpp" />
     <ClCompile Include="..\..\src\Application.cpp" />
-    <ClCompile Include="..\..\src\AssetMapper.cpp" />
+    <ClCompile Include="..\..\src\ResourceMapper.cpp" />
     <ClCompile Include="..\..\src\EqHeap.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Node.cpp" />
@@ -190,7 +190,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Application.hpp" />
-    <ClInclude Include="..\..\include\AssetMapper.hpp" />
+    <ClInclude Include="..\..\include\ResourceMapper.hpp" />
     <ClInclude Include="..\..\include\Dashboard.hpp" />
     <ClInclude Include="..\..\include\EqHeap.hpp" />
     <ClInclude Include="..\..\include\EqVector.hpp" />

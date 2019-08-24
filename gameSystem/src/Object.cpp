@@ -1,7 +1,7 @@
 #include "Object.hpp"
 #include "Node.hpp"
 #include "Script.hpp"
-#include "AssetMapper.hpp"
+#include "ResourceMapper.hpp"
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
 #include "cereal/external/rapidjson/error/error.h"
@@ -70,7 +70,7 @@ Object::Object()
 
 Object::~Object()
 {
-	Singleton<AssetMapper>::GetInstance()->Unmap(m_hNode.id);
+	Singleton<ResourceMapper>::GetInstance()->Unmap(m_hNode.id);
 }
 
 NodeHandler Object::Create(const String& id)
@@ -534,8 +534,12 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 
 stAsset* Object::GetAsset()
 {
-	stAsset* pAsset = Singleton<AssetMapper>::GetInstance()->Map(m_hNode.id);
-	return pAsset;
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
+	{
+		return &pMapped->asset;
+	}
+	
+	return nullptr;
 }
 
 Object* Object::GetObjectByHandler(const NodeHandler& handler)

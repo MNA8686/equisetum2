@@ -3,7 +3,7 @@
 
 #include "Equisetum2.h"
 
-#include "AssetMapper.hpp"
+#include "ResourceMapper.hpp"
 #include "Object.hpp"
 
 using namespace Equisetum2;
