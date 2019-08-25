@@ -10,7 +10,6 @@
 using namespace Equisetum2;
 
 bool Object::m_dirty = true;
-std::vector<NodeHandler> Object::m_vUpdate;
 
 class JsonParseHelper
 {
@@ -467,29 +466,20 @@ void Object::Update()
 {
 	if (m_dirty)
 	{
-		// スケジュール配列をクリア
-		m_vUpdate.clear();
-
-		// ルートノード取得
-		if (auto rootNode = Node<Object>::Root())
-		{
-			// ノードを辿り、スケジュール配列に追加していく
-			Node<Object>::Visit(*rootNode, [](Node<Object>& node, int32_t nestDepth)->bool {
+		Node<Object>::Reschedule([](Node<Object>& node)->bool {
 				auto& object = node.GetAttach();		// 追加条件判定
 				if (object.IsActive())
 				{
-					// スケジュール配列にノードを追加
-					m_vUpdate.push_back(object.GetNodeHandler());
 					return true;
 				}
 				return false;
 			});
 
-			m_dirty = false;
-		}
+		m_dirty = false;
 	}
 
-	for (auto& id : m_vUpdate)
+	const auto& schedule = Node<Object>::GetSchedule();
+	for (const auto& id : schedule)
 	{
 		if (auto obj = GetObjectByHandler(id))
 		{
@@ -500,7 +490,10 @@ void Object::Update()
 
 void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
 {
-	m_vRenderObject.push_back(renderObject);
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
+	{
+		pMapped->renderObject.push_back(renderObject);
+	}
 }
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
@@ -516,12 +509,15 @@ bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 				return false;
 			}
 
-			// 表示状態のレンダーオブジェクトをレンダーキューに入れる
-			for (auto& renderObject : obj.m_vRenderObject)
+			if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(obj.m_hNode.id))
 			{
-				if (renderObject->IsVisible())
+				// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+				for (auto& renderObject : pMapped->renderObject)
 				{
-					renderer->AddRenderQueue(renderObject.get());
+					if (renderObject->IsVisible())
+					{
+						renderer->AddRenderQueue(renderObject.get());
+					}
 				}
 			}
 

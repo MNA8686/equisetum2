@@ -347,6 +347,35 @@ public:
 #endif
 	}
 
+	static void Reschedule(const std::function<bool(Node<T>&)>& isAdd)
+	{
+		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
+
+		// スケジュール配列をクリア
+		ctx->m_vSchedule.Clear();
+
+		// ルートノード取得
+		if (auto rootNode = Node<Object>::Root())
+		{
+			// ノードを辿り、スケジュール配列に追加していく
+			Node<Object>::Visit(*rootNode, [&isAdd, ctx](Node<Object>& node, int32_t nestDepth)->bool {
+				if (isAdd(node))
+				{
+					// スケジュール配列にノードを追加
+					ctx->m_vSchedule.PushBack(node.m_hNode);
+					return true;
+				}
+				return false;
+			});
+		}
+	}
+
+	static const EqVector<NodeHandler>& GetSchedule()
+	{
+		auto ctx = Singleton<NodePool<T>>::GetInstance()->GetContext();
+		return ctx->m_vSchedule;
+	}
+
 protected:
 	void SetHandler(const NodeHandler& handler)
 	{
@@ -411,6 +440,7 @@ public:
 		int32_t m_numOfObjects = 0;			// 現在生成されているノードの数
 		uint32_t m_nextSerial = 1;			// ノードに設定する通し番号
 		EqVector<NodeID> m_stackFreeNodeID;		// 未使用状態のノードのIDを格納したスタック
+		EqVector<NodeHandler> m_vSchedule;		// スケジュール配列
 	}Context;
 	
 	EqHeap::Container<Context> CreateContext()

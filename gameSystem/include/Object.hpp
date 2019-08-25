@@ -60,19 +60,15 @@ protected:
 private:
 
 	// --- serialize begin ---
-	std::vector<std::shared_ptr<RenderObject>> m_vRenderObject;	/// レンダーオブジェクト配列
 	Point_t<FixedDec> m_pos;		/// ワールド座標
 	Point_t<FixedDec> m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
 	bool m_relativeParent = true;	/// 親の座標に追従するかどうか
-//	int32_t m_angle = 0;
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない
 	// --- serialize end ---
 
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
-
-	static std::vector<NodeHandler> m_vUpdate;		/// スケジュール配列
 
 public:
 	static bool m_dirty;		/// スケジュール配列再構築フラグ
