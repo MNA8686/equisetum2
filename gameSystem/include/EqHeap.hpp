@@ -100,6 +100,12 @@ public:
 			return m_handler;
 		}
 
+		void Wrap(Handler handler)
+		{
+			Reset();
+			m_handler = handler;
+		}
+
 	private:
 		void CallConstructor(T* ref, uint32_t num)
 		{
@@ -173,10 +179,10 @@ protected:
 
 	typedef struct
 	{
-		Handler handler;
-		uint32_t size;
-		int32_t refCount;
-		void* ptr;
+		Handler handler = 0;
+		uint32_t size = 0;
+		int32_t refCount = 0;
+		void* ptr = nullptr;
 	}stHeap;
 
 	std::vector<stHeap> m_vHandler;
@@ -212,8 +218,8 @@ public:
 	void* Ref(Handler handler) const;
 	bool Test(Handler handler) const;
 
-	bool Load(std::shared_ptr<IStream> in);
-	bool Save(std::shared_ptr<IStream> out);
+	bool Load(std::shared_ptr<IStream> in, Handler& hint);
+	bool Save(std::shared_ptr<IStream> out, Handler hint);
 
 	template<class T>
 	struct isContainer : std::false_type {};

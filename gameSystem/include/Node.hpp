@@ -313,38 +313,32 @@ public:
 
 	static void Dump()
 	{
-#if 0
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
+		auto ctx = pNodePool->GetContext();
 
-		if (pNodePool->m_numOfObjects == 0)
+		if (ctx->m_numOfObjects == 0)
 		{
 			Logger::OutputInfo("--- node not found ---");
 			return;
 		}
 
-		Logger::OutputInfo("--- dump begin numOfObjects %d ---", pNodePool->m_numOfObjects);
+		Logger::OutputInfo("--- dump begin numOfObjects %d ---", ctx->m_numOfObjects);
 
-		Visit(pNodePool->m_vNodeSlot[0], [](std::shared_ptr<Node<T>>& node, int32_t nestDepth)->bool {
-
+		Visit(*Root(), [](Node<T>& node, int32_t nestDepth)->bool {
 			String out;
 
 			for (int i = 0; i < nestDepth; i++)
 			{
 				out += "  ";
 			}
-
-			std::shared_ptr<Node<T>> parent = node->GetParent();
-
-			out += String::Sprintf("obj index %d, children num %d, parent index %d, name '%s'", node->GetID(), node->GetChildCount(), parent ? parent->GetID() : -1, node->GetName().c_str());
-
+			out += String::Sprintf("obj id %d, children num %d, parent id %d, name '%s', destroyed %d", node.m_hNode.id, node.GetChildCount(), node.GetParentHandler().id, node.GetName().c_str(), node.m_destroyed);
 			Logger::OutputInfo(out.c_str());
 
 			return true;
 		});
 
-		Logger::OutputInfo("vGcQueue %d, queFreeNode %d", pNodePool->m_vGcQueue.size(), pNodePool->m_stackFreeNodeID.size());
+		Logger::OutputInfo("vGcQueue size %d, stackFreeNodeID size %d", pNodePool->m_vGcQueue.size(), ctx->m_stackFreeNodeID.Size());
 		Logger::OutputInfo("--- dump end ---");
-#endif
 	}
 
 	static void Reschedule(const std::function<bool(Node<T>&)>& isAdd)
@@ -355,10 +349,10 @@ public:
 		ctx->m_vSchedule.Clear();
 
 		// ルートノード取得
-		if (auto rootNode = Node<Object>::Root())
+		if (auto rootNode = Node<T>::Root())
 		{
 			// ノードを辿り、スケジュール配列に追加していく
-			Node<Object>::Visit(*rootNode, [&isAdd, ctx](Node<Object>& node, int32_t nestDepth)->bool {
+			Node<T>::Visit(*rootNode, [&isAdd, ctx](Node<T>& node, int32_t nestDepth)->bool {
 				if (isAdd(node))
 				{
 					// スケジュール配列にノードを追加
