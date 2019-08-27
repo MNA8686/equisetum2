@@ -4,67 +4,212 @@
 
 using namespace Equisetum2;
 
-#if 0
-class ScriptBinder
+
+class ScriptMapper final
 {
 public:
-	ScriptBinder() = default;
-	~ScriptBinder()
+	friend Singleton<ScriptMapper>;	// シングルトンからインスタンスを作成してもらえるようにする
+
+	struct Value
+	{
+		String id;
+		size_t hash = 0;
+		size_t instanceSize = 0;
+		std::function<bool (EqHeap::Handler handler)> constructor;
+		std::function<bool (EqHeap::Handler handler)> destructor;
+	};
+
+	void Set(const Value& value);
+	int32_t ToIndex(const String& id) const;
+	const Value* Get(int32_t index) const;
+
+private:
+	std::vector<Value> m_vValue;
+};
+
+void ScriptMapper::Set(const Value& value)
+{
+	m_vValue.push_back(value);
+}
+
+int32_t ScriptMapper::ToIndex(const String& id) const
+{
+	int32_t index = 0;
+
+	for (auto& val : m_vValue)
+	{
+		if (id == val.id)
+		{
+			return index;
+		}
+
+		index++;
+	}
+
+	return -1;
+}
+
+const ScriptMapper::Value* ScriptMapper::Get(int32_t index) const
+{
+	if (index >= 0 && index < static_cast<int32_t>(m_vValue.size()))
+	{
+		return &m_vValue[index];
+	}
+
+	return nullptr;
+}
+
+#define EQ_SCRIPT_REGISTER(NAME) \
+	class NAME##_register\
+	{\
+	public:\
+		NAME##_register()\
+		{\
+			ScriptMapper::Value val;\
+			val.id = #NAME;\
+			val.hash = std::hash<String>()(#NAME);\
+			val.instanceSize = sizeof(NAME);\
+			val.constructor = [](EqHeap::Handler handler)->bool {\
+				auto heap = Singleton<EqHeap>::GetInstance();\
+				if (auto p = heap->Ref<NAME>(handler))\
+				{\
+					new (p) NAME;\
+					return true;\
+				}\
+				return false;\
+			};\
+			val.destructor = [](EqHeap::Handler handler)->bool {\
+				auto heap = Singleton<EqHeap>::GetInstance();\
+				if (auto p = heap->Ref<NAME>(handler))\
+				{\
+					p->~NAME();\
+					return true;\
+				}\
+				return false;\
+			};\
+			Singleton<ScriptMapper>::GetInstance()->Set(val);\
+		}\
+	};\
+	static NAME##_register NAME##inst;\
+
+
+class Testdayo
+{
+public:
+	int a;
+};
+EQ_SCRIPT_REGISTER(Testdayo);
+
+#if 1
+class ScriptContainer
+{
+public:
+	ScriptContainer() = default;
+	~ScriptContainer()
 	{
 		auto heap = Singleton<EqHeap>::GetInstance();
+		auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
 
-		if(heap->DecRef(m_ctx) == 0)
+		if (heap->DecRef(m_ctx) == 0)
 		{
-			Destruct(*this);
-			heap->Delete(m_ctx);
+			// スクリプト情報を取得
+			if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
+			{
+				// スクリプトのデストラクタを呼び出す
+				p->destructor(m_ctx);
+				// スクリプトのインスタンスを削除
+				heap->Delete(m_ctx);
+			}
 		}
 	}
 
-	static EqHeap::Container<ScriptBinder> Create(const String& scriptName)
+	static EqHeap::Container<ScriptContainer> Create(const String& scriptName)
 	{
 		auto heap = Singleton<EqHeap>::GetInstance();
+		auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
 
-		auto inst = heap->New<ScriptBinder>();
-		if(auto ref = inst.Ref())
+		// スクリプトコンテナのインスタンスを作成
+		auto inst = heap->New<ScriptContainer>();
+		if (auto ref = inst.Ref())
 		{
-//			ref->m_ctx;
+			// スクリプト情報のインデックスを取得
+			ref->m_index = scriptMapper->ToIndex(scriptName);
+			if (ref->m_index >= 0)
+			{
+				// スクリプト情報を取得
+				if (const ScriptMapper::Value* p = scriptMapper->Get(ref->m_index))
+				{
+					// ハッシュを設定
+					ref->m_hash = p->hash;
 
-			return inst;
+					// スクリプトのインスタンスを作成
+					ref->m_ctx = heap->New(p->instanceSize);
+
+					// スクリプトのコンストラクタを呼び出す
+					if (p->constructor(ref->m_ctx))
+					{
+						heap->AddRef(ref->m_ctx);
+						return inst;
+					}
+				}
+			}
 		}
 
-		return {};
+		return  EqHeap::Container<ScriptContainer>{};
 	}
 
 	template <class T>
 	T* Ref()
 	{
-		if(T::hash() == m_hash)
+		auto heap = Singleton<EqHeap>::GetInstance();
+		auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+		if (const ScriptMapper::Value* value = scriptMapper->Get(m_index))
 		{
-			return Singleton<EqHeap>::GetInstance()->Ref<T>(m_ctx);
+			if (auto ref = heap->Ref<T>(m_ctx))
+			{
+				// TODO これはあかん
+				// 型が合っているかチェック
+				if (ref->GetHash() == value->hash)
+				{
+					return ref;
+				}
+			}
 		}
 
 		return nullptr;
 	}
 
 
-	static void Destruct(ScriptBinder& inst)
+private:
+
+	size_t GetHash() const
 	{
-		// ハッシュに対応するデストラクタを呼び出す
+		return m_hash;
 	}
 
-private:
-	EqHeap::Container<char> m_name;		// スクリプト名
-	EqHeap::Handler m_ctx;			// スクリプトの実体
+	EqHeap::Handler m_ctx = 0;	// スクリプトの実体
+	int32_t m_index = -1;		// スクリプトマッパーのインデックス
 	size_t m_hash = 0;			// キャスト時判定用ハッシュ
 };
 #endif
-
 
 int Main()
 {
 	Singleton<EqHeap>::GetInstance();
 
-	if(1)
+	{
+		auto index = Singleton<ScriptMapper>::GetInstance()->ToIndex("Test");
+		if (index >= 0)
+		{
+		}
+		auto index2 = Singleton<ScriptMapper>::GetInstance()->ToIndex("Testdayo");
+		if (index2 >= 0)
+		{
+		}
+	}
+
+	if(0)
 	{
 		class Test final : public INodeAttachment
 		{
