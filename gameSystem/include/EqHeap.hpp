@@ -188,9 +188,6 @@ protected:
 	std::vector<stHeap> m_vHandler;
 	int32_t m_reservedSize = 0;
 
-	int32_t AddRef(Handler handler);
-	int32_t DecRef(Handler handler);
-
 public:
 	bool InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize = 0);
 
@@ -217,6 +214,9 @@ public:
 	int32_t Size(Handler handler) const;
 	void* Ref(Handler handler) const;
 	bool Test(Handler handler) const;
+
+	int32_t AddRef(Handler handler);
+	int32_t DecRef(Handler handler);
 
 	bool Load(std::shared_ptr<IStream> in, Handler& hint);
 	bool Save(std::shared_ptr<IStream> out, Handler hint);
