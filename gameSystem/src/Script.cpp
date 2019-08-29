@@ -1,6 +1,14 @@
 
 #include "Script.hpp"
 
+std::shared_ptr<Renderer> ScriptBase::m_renderer;
+
+std::shared_ptr<Renderer>& ScriptBase::GetRenderer(void)
+{
+	return m_renderer;
+}
+
+#if 0
 
 static std::vector<stScriptTbl> g_scriptTbl;
 
@@ -91,3 +99,5 @@ NodeHandler Script::GetOwner()
 	//return m_ownerObject.lock();
 	return m_ownerObject;
 }
+#endif
+

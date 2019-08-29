@@ -7,6 +7,7 @@ using namespace Equisetum2;
 #include "INodeAttachment.hpp"
 #include "Script.hpp"
 #include "EqVector.hpp"
+#include "ScriptContainer.hpp"
 
 struct stAsset;
 
@@ -62,6 +63,7 @@ private:
 	// --- serialize begin ---
 	Point_t<FixedDec> m_pos;		/// ワールド座標
 	Point_t<FixedDec> m_localPos;	/// 親との相対座標。親がいない時、または親に追従しない時はm_posと同じ。
+	EqHeap::Container<ScriptContainer> m_script;	/// スクリプト
 	bool m_relativeParent = true;	/// 親の座標に追従するかどうか
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない

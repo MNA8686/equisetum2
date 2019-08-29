@@ -246,18 +246,13 @@ NodeHandler Object::Create(const String& id)
 							EQ_THROW(u8"script名は文字列でなければいけません。");
 						}
 
-						auto p = Script::Create(v.GetString());
-						if (!p)
+						auto script = ScriptContainer::Create(v.GetString());
+						auto* ref = script.Ref();
+						if (!ref)
 						{
 							EQ_THROW(u8"スクリプトのロードに失敗しました。");
 						}
-
-						// 所有しているオブジェクトを設定する
-						p->SetOwner(attachedObject.GetNodeHandler());
-						// IDを設定する
-						p->SetIdentify(v.GetString());
-
-						pAsset->m_script.push_back(p);
+						attachedObject.m_script = script;
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -266,9 +261,9 @@ NodeHandler Object::Create(const String& id)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : pAsset->m_script)
+		if (auto scriptRef = attachedObject.m_script.Ref())
 		{
-			script->OnCreate();
+			scriptRef->OnCreate(&attachedObject);
 		}
 
 		// 再構築フラグセット
@@ -448,6 +443,7 @@ void Object::SetRelativeParent(bool on)
 
 bool Object::OnFixedUpdate()
 {
+#if 0
 	stAsset* pAsset = GetAsset();
 	if (pAsset)
 	{
@@ -457,6 +453,12 @@ bool Object::OnFixedUpdate()
 			script->FixedUpdate();
 		}
 		return true;
+	}
+#endif
+
+	if (auto script = m_script.Ref())
+	{
+		script->FixedUpdate(this);
 	}
 
 	return false;

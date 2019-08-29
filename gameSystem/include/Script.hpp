@@ -2,12 +2,29 @@
 #define _EQSCRIPT_H_
 
 #include "Equisetum2.h"
-
-#include "ResourceMapper.hpp"
-#include "Object.hpp"
-
 using namespace Equisetum2;
 
+#include "ResourceMapper.hpp"
+#include "ScriptMapper.hpp"
+#include "Object.hpp"
+
+class ScriptBase
+{
+public:
+	static std::shared_ptr<Renderer>& GetRenderer(void);
+	static std::shared_ptr<Renderer> m_renderer;		// 暫定
+
+	bool OnCreate(Object* owner)
+	{
+		return true;
+	}
+	bool FixedUpdate(Object* owner)
+	{
+		return true;
+	}
+};
+
+#if 0
 // スクリプトテーブル型定義
 class Script;
 using funcCreateScript = std::function<std::shared_ptr<Script>()>;
@@ -49,29 +66,14 @@ public:
 	*/
 	String Identify() const;
 
-
-#if 0
-	template<class Archive>
-	void serialize(Archive & archive)
-	{
-		archive(CEREAL_NVP(m_isStarted));
-		archive(CEREAL_NVP(m_ownerObject));
-
-		std::string& str = m_identify;
-		archive(CEREAL_NVP(str));
-	}
-#endif
-
 private:
 	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
 	String m_identify;
-	//std::weak_ptr<Object> m_ownerObject;		/// このスクリプトを所持しているオブジェクト
 	NodeHandler m_ownerObject;		/// このスクリプトを所持しているオブジェクト
 
 protected:
-	//std::shared_ptr<Object> GetOwner();
 	NodeHandler GetOwner();
 };
-
+#endif
 
 #endif

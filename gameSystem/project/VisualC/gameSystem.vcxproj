@@ -164,6 +164,8 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClCompile Include="..\..\src\Node.cpp" />
     <ClCompile Include="..\..\src\Object.cpp" />
     <ClCompile Include="..\..\src\Script.cpp" />
+    <ClCompile Include="..\..\src\ScriptContainer.cpp" />
+    <ClCompile Include="..\..\src\ScriptMapper.cpp" />
     <ClCompile Include="..\..\src\SystemChoiceDialog.cpp" />
     <ClCompile Include="..\..\src\SystemView.cpp" />
     <ClCompile Include="..\..\src\SystemViewAnimationTest.cpp" />
@@ -198,6 +200,8 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClInclude Include="..\..\include\Node.hpp" />
     <ClInclude Include="..\..\include\Object.hpp" />
     <ClInclude Include="..\..\include\Script.hpp" />
+    <ClInclude Include="..\..\include\ScriptContainer.hpp" />
+    <ClInclude Include="..\..\include\ScriptMapper.hpp" />
     <ClInclude Include="..\..\include\SystemChoiceDialog.hpp" />
     <ClInclude Include="..\..\include\SystemView.hpp" />
     <ClInclude Include="..\..\include\SystemViewAnimationTest.hpp" />
