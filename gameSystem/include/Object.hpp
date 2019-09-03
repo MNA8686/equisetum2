@@ -32,6 +32,7 @@ public:
 	stAsset* GetAsset();
 	bool OnFixedUpdate();
 
+	static Object* GetRoot();
 	static Object* GetObjectByHandler(const NodeHandler& handler);
 	Object* Self();
 	bool HasParent() const;

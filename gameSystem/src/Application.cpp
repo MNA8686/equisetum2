@@ -11,6 +11,7 @@
 #include "Dashboard.hpp"
 #include "SystemViewTopMenu.hpp"
 #include <iomanip>
+#include <fstream>
 
 static const String logfile = "log.txt";
 
@@ -202,6 +203,48 @@ int Application::Main()
 		m_renderer->Present();
 
 		Node<Object>::GC();
+
+		if (KB::KeyL.IsDown())
+		{
+#if 1
+			auto in = FileStream::CreateFromPath(Path::GetFullPath("mem.bin"));
+
+			EqHeap::Handler handler;
+			m_nodePoolCtx.Reset();
+			Singleton<EqHeap>::GetInstance()->Load(in, handler);
+			m_nodePoolCtx.Wrap(handler);
+
+			Singleton<NodePool<Object>>::GetInstance()->SetContext(m_nodePoolCtx);
+#endif
+#if 1
+			Singleton<ResourceMapper>::GetInstance()->Reset();
+
+			std::ifstream ifs(Path::GetFullPath("out.json").c_str());
+			if (ifs)
+			{
+				cereal::JSONInputArchive i_archive(ifs);
+				Singleton<ResourceMapper>::GetInstance()->load(i_archive);
+
+				//Object::m_dirty = true;
+			}
+#endif
+
+		}
+		else if (KB::KeyS.IsDown())
+		{
+#if 1
+			std::ofstream ofs(Path::GetFullPath("out.json").c_str());
+			if (ofs)
+			{
+				cereal::JSONOutputArchive o_archive(ofs);
+				Singleton<ResourceMapper>::GetInstance()->save(o_archive);
+			}
+#endif
+
+			auto out = FileStream::NewFileFromPath(Path::GetFullPath("mem.bin"));
+
+			Singleton<EqHeap>::GetInstance()->Save(out, m_nodePoolCtx);
+		}
 
 		// ‹K’èŽžŠÔ‘Ò‚¿
 		while (true)

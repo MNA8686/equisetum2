@@ -25,3 +25,8 @@ void ResourceMapper::Unmap(int32_t id)
 		m_vMapped[id] = {};
 	}
 }
+
+void ResourceMapper::Reset()
+{
+	m_vMapped.clear();
+}

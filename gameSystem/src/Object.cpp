@@ -550,6 +550,16 @@ Object* Object::GetObjectByHandler(const NodeHandler& handler)
 	return nullptr;
 }
 
+Object* Object::GetRoot()
+{
+	if (auto node = Node<Object>::Root())
+	{
+		return &node->GetAttach();
+	}
+
+	return nullptr;
+}
+
 Object* Object::Self()
 {
 	return GetObjectByHandler(m_hNode);

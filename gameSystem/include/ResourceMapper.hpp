@@ -127,6 +127,7 @@ public:
 
 	stMappedResource* Map(int32_t id);
 	void Unmap(int32_t id);
+	void Reset();
 
 	template<class Archive>
 	void save(Archive & archive) const
