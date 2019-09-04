@@ -72,7 +72,7 @@ Object::~Object()
 	Singleton<ResourceMapper>::GetInstance()->Unmap(m_hNode.id);
 }
 
-NodeHandler Object::Create(const String& id)
+NodeHandler Object::Create(const String& id, NodeHandler parent)
 {
 	EQ_DURING
 	{
@@ -84,6 +84,10 @@ NodeHandler Object::Create(const String& id)
 		}
 		// オブジェクトを取得
 		Node<Object>* node = Node<Object>::GetNodeByHandler(nodeHandler);
+		if (parent.id >= 0)
+		{
+			node->SetParentHandler(parent);
+		}
 		Object& attachedObject = node->GetAttach();
 		stAsset* pAsset = attachedObject.GetAsset();
 		if (!pAsset)
@@ -280,19 +284,10 @@ NodeHandler Object::Create(const String& id)
 	return{};
 }
 
-#if 0
-NodeID Object::CreateChild(const String& id)
+NodeHandler Object::CreateChild(const String& id)
 {
-	NodeID childID = Object::Create(id);
-	if (childID >= 0)
-	{
-		auto& childObject = GetObjectByID(childID);
-		childObject.SetParentID(m_nodeHandler);
-	}
-
-	return childID;
+	return Object::Create(id, m_hNode);
 }
-#endif
 
 const Point_t<FixedDec>& Object::GetPos() const
 {
@@ -443,19 +438,6 @@ void Object::SetRelativeParent(bool on)
 
 bool Object::OnFixedUpdate()
 {
-#if 0
-	stAsset* pAsset = GetAsset();
-	if (pAsset)
-	{
-		auto& vScript = pAsset->m_script;
-		for (auto& script : vScript)
-		{
-			script->FixedUpdate();
-		}
-		return true;
-	}
-#endif
-
 	if (auto script = m_script.Ref())
 	{
 		script->FixedUpdate(this);
@@ -490,12 +472,29 @@ void Object::Update()
 	}
 }
 
-void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+int32_t Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+{
+	int32_t index = -1;
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
+	{
+		index = static_cast<int32_t>(pMapped->renderObject.size());
+		pMapped->renderObject.push_back(renderObject);
+	}
+
+	return index;
+}
+
+RenderObject * Object::GetRenderObject(int32_t index)
 {
 	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
 	{
-		pMapped->renderObject.push_back(renderObject);
+		if (index >= 0 && index < static_cast<int32_t>(pMapped->renderObject.size()))
+		{
+			return pMapped->renderObject[index].get();
+		}
 	}
+
+	return nullptr;
 }
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)

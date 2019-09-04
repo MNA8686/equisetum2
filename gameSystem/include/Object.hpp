@@ -18,8 +18,8 @@ public:
 	Object();
 	~Object();
 
-	static NodeHandler Create(const String& id);
-	//NodeID CreateChild(const String & id);
+	static NodeHandler Create(const String& id, NodeHandler parent = {});
+	NodeHandler CreateChild(const String & id);
 
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
@@ -27,7 +27,8 @@ public:
 	void SetLocalPos(const Point_t<FixedDec>& pos);
 	bool GetRelativeParent() const;
 	void SetRelativeParent(bool on);
-	void AddRenderObject(std::shared_ptr<RenderObject> renderObject);
+	int32_t AddRenderObject(std::shared_ptr<RenderObject> renderObject);
+	RenderObject* GetRenderObject(int32_t index);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset* GetAsset();
 	bool OnFixedUpdate();
