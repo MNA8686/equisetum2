@@ -7,6 +7,7 @@ using namespace Equisetum2;
 #include "ResourceMapper.hpp"
 #include "ScriptMapper.hpp"
 #include "Object.hpp"
+#include "RendererContainer.hpp"
 
 class ScriptBase
 {
