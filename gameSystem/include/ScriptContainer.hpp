@@ -41,8 +41,11 @@ public:
 	bool FixedUpdate(Object* owner);
 
 private:
+	bool OnStart(Object* owner);
 
 	EqHeap::Handler m_ctx = 0;	// スクリプトの実体
 	int32_t m_index = -1;		// スクリプトマッパーのインデックス
+	bool m_isCreated = false;
+	bool m_isStarted = false;
 };
 #endif

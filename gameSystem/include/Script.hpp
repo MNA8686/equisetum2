@@ -4,6 +4,7 @@
 #include "Equisetum2.h"
 using namespace Equisetum2;
 
+// スクリプトからはこのファイルのみインクルードすればいいようにしておく
 #include "ResourceMapper.hpp"
 #include "ScriptMapper.hpp"
 #include "Object.hpp"
@@ -19,6 +20,10 @@ public:
 	{
 		return true;
 	}
+	bool OnStart(Object* owner)
+	{
+		return true;
+	}
 	bool FixedUpdate(Object* owner)
 	{
 		return true;
@@ -26,16 +31,6 @@ public:
 };
 
 #if 0
-// スクリプトテーブル型定義
-class Script;
-using funcCreateScript = std::function<std::shared_ptr<Script>()>;
-typedef struct
-{
-	String id;				// スクリプトID
-	funcCreateScript func;	// スクリプトオブジェクト取得メソッド
-}stScriptTbl;
-#define EQ_SCRIPT_DEFINE(id) { String(#id), []()->std::shared_ptr<Script> { return std::make_shared<id>(); } }
-
 class Object;
 class Script
 {

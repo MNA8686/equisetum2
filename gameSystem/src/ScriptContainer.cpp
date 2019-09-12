@@ -54,21 +54,52 @@ ScriptContainer::~ScriptContainer()
 
 bool ScriptContainer::OnCreate(Object* owner)
 {
-	auto heap = Singleton<EqHeap>::GetInstance();
 	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
 
 	// スクリプト情報を取得
 	if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
 	{
-		return p->onCreate(m_ctx, owner);
+		if (p->onCreate(m_ctx, owner))
+		{
+			m_isCreated = true;
+			return true;
+		}
 	}
+	return false;
+}
+
+bool ScriptContainer::OnStart(Object * owner)
+{
+	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+	// そもそも作成成功している？
+	if (m_isCreated)
+	{
+		// スクリプト情報を取得
+		if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
+		{
+			if(p->onStart(m_ctx, owner))
+			{
+				m_isStarted = true;
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
 bool ScriptContainer::FixedUpdate(Object* owner)
 {
-	auto heap = Singleton<EqHeap>::GetInstance();
 	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+	if (!m_isStarted)
+	{
+		if (!OnStart(owner))
+		{
+			return false;
+		}
+	}
 
 	// スクリプト情報を取得
 	if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
@@ -77,4 +108,5 @@ bool ScriptContainer::FixedUpdate(Object* owner)
 	}
 	return false;
 }
+
 

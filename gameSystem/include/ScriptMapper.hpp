@@ -22,6 +22,7 @@ public:
 		std::function<bool (EqHeap::Handler handler)> constructor;
 		std::function<bool (EqHeap::Handler handler)> destructor;
 		std::function<bool (EqHeap::Handler handler, Object* owner)> onCreate;
+		std::function<bool (EqHeap::Handler handler, Object* owner)> onStart;
 		std::function<bool (EqHeap::Handler handler, Object* owner)> fixedUpdate;
 	};
 
@@ -71,6 +72,14 @@ private:
 				if (auto p = heap->Ref<NAME>(handler))\
 				{\
 					return p->OnCreate(owner);\
+				}\
+				return false;\
+			};\
+			val.onStart = [](EqHeap::Handler handler, Object* owner)->bool {\
+				auto heap = Singleton<EqHeap>::GetInstance();\
+				if (auto p = heap->Ref<NAME>(handler))\
+				{\
+					return p->OnStart(owner);\
 				}\
 				return false;\
 			};\

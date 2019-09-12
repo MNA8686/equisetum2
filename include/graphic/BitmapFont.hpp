@@ -10,6 +10,21 @@ namespace Equisetum2
 	class BitmapFont
 	{
 	public:
+#if 0
+		struct SerializeHint
+		{
+			enum class From : int32_t
+			{
+				FromFontManager,	// FontManagerで作られた
+				FromAsset,			// アセットとしてロードされた
+				//Raw,	// don't work
+			};
+
+			From from;
+			String param;
+		};
+#endif
+
 		BitmapFont() = default;
 		virtual ~BitmapFont() = default;
 
