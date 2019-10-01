@@ -2,10 +2,15 @@
 #include "ScriptContainer.hpp"
 #include "ScriptMapper.hpp"
 
-EqHeap::Container<ScriptContainer> ScriptContainer::Create(const String& scriptName)
+static Object* pCurrentObject = nullptr;
+
+EqHeap::Container<ScriptContainer> ScriptContainer::Create(Object* owner, const String& scriptName)
 {
 	auto heap = Singleton<EqHeap>::GetInstance();
 	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+	EqHeap::Container<ScriptContainer> retInst;
+
+	pCurrentObject = owner;
 
 	// スクリプトコンテナのインスタンスを作成
 	auto inst = heap->New<ScriptContainer>();
@@ -25,13 +30,20 @@ EqHeap::Container<ScriptContainer> ScriptContainer::Create(const String& scriptN
 				if (p->constructor(ref->m_ctx))
 				{
 					heap->AddRef(ref->m_ctx);
-					return inst;
+					retInst = inst;
 				}
 			}
 		}
 	}
 
-	return  EqHeap::Container<ScriptContainer>{};
+	pCurrentObject = nullptr;
+
+	return retInst;
+}
+
+Object* ScriptContainer::GetCurrentObject()
+{
+	return pCurrentObject;
 }
 
 ScriptContainer::~ScriptContainer()

@@ -250,7 +250,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 							EQ_THROW(u8"script–¼‚Í•¶š—ñ‚Å‚È‚¯‚ê‚Î‚¢‚¯‚Ü‚¹‚ñB");
 						}
 
-						auto script = ScriptContainer::Create(v.GetString());
+						auto script = ScriptContainer::Create(&attachedObject, v.GetString());
 						auto* ref = script.Ref();
 						if (!ref)
 						{

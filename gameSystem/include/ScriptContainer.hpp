@@ -10,7 +10,8 @@ class Object;
 class ScriptContainer
 {
 public:
-	static EqHeap::Container<ScriptContainer> Create(const String& scriptName);
+	static EqHeap::Container<ScriptContainer> Create(Object* owner, const String& scriptName);
+	static Object* GetCurrentObject();
 
 	ScriptContainer() = default;
 	~ScriptContainer();
