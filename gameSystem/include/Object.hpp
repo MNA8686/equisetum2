@@ -57,6 +57,7 @@ public:
 
 	// スケジュール実行
 	static void Update();
+	static Object* GetCreatingObject();
 
 protected:
 
@@ -74,8 +75,8 @@ private:
 	/// 子に親の座標移動を反映させる
 	void SetPosForChild();
 
-public:
 	static bool m_dirty;		/// スケジュール配列再構築フラグ
+	static std::vector<Object*> m_creatingObj;		/// 現在作成中のオブジェクト
 };
 
 #endif

@@ -10,6 +10,7 @@
 using namespace Equisetum2;
 
 bool Object::m_dirty = true;
+std::vector<Object*> Object::m_creatingObj;		/// 現在作成中のオブジェクト
 
 class JsonParseHelper
 {
@@ -74,6 +75,8 @@ Object::~Object()
 
 NodeHandler Object::Create(const String& id, NodeHandler parent)
 {
+	Object* attachedObject = nullptr;
+
 	EQ_DURING
 	{
 		// ノード作成
@@ -88,8 +91,10 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 		{
 			node->SetParentHandler(parent);
 		}
-		Object& attachedObject = node->GetAttach();
-		stAsset* pAsset = attachedObject.GetAsset();
+		attachedObject = &node->GetAttach();
+		m_creatingObj.push_back(attachedObject);
+
+		stAsset* pAsset = attachedObject->GetAsset();
 		if (!pAsset)
 		{
 			EQ_THROW(u8"アセットのマッピングに失敗しました。");
@@ -250,13 +255,13 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 							EQ_THROW(u8"script名は文字列でなければいけません。");
 						}
 
-						auto script = ScriptContainer::Create(&attachedObject, v.GetString());
+						auto script = ScriptContainer::Create(attachedObject, v.GetString());
 						auto* ref = script.Ref();
 						if (!ref)
 						{
 							EQ_THROW(u8"スクリプトのロードに失敗しました。");
 						}
-						attachedObject.m_script = script;
+						attachedObject->m_script = script;
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -265,9 +270,9 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		if (auto scriptRef = attachedObject.m_script.Ref())
+		if (auto scriptRef = attachedObject->m_script.Ref())
 		{
-			scriptRef->OnCreate(&attachedObject);
+			scriptRef->OnCreate(attachedObject);
 		}
 
 		// 再構築フラグセット
@@ -280,6 +285,11 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 		Logger::OutputError(EQ_GET_HANDLER().what());
 	}
 	EQ_END_HANDLER
+
+	if (attachedObject)
+	{
+		m_creatingObj.pop_back();
+	}
 
 	return{};
 }
@@ -470,6 +480,16 @@ void Object::Update()
 			obj->OnFixedUpdate();
 		}
 	}
+}
+
+Object* Object::GetCreatingObject()
+{
+	if (m_creatingObj.size() > 0)
+	{
+		return m_creatingObj.back();
+	}
+
+	return nullptr;
 }
 
 int32_t Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)

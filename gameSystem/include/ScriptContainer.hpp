@@ -26,7 +26,7 @@ public:
 		{
 			if (auto ref = heap->Ref<T>(m_ctx))
 			{
-				// 型が合っているかチェック
+				// TODO 型が合っているかチェック
 				//if (EQ_SCRIPT_REGISTER_NAME(T)::Hash() == value->hash)
 				//if ((T##_register)::Hash() == value->hash)
 				{

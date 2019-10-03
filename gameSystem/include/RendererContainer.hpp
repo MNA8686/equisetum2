@@ -9,10 +9,9 @@ using namespace Equisetum2;
 class SpriteRendererContainer
 {
 public:
-	SpriteRendererContainer() = default;
+	SpriteRendererContainer();
 	~SpriteRendererContainer() = default;
 
-//	bool BindObject(Object* obj);
 	SpriteRenderer* Ref();
 
 	SpriteRenderer* operator->();
@@ -25,7 +24,7 @@ private:
 class LineRendererContainer
 {
 public:
-	LineRendererContainer() = default;
+	LineRendererContainer();
 	~LineRendererContainer() = default;
 
 	LineRenderer* Ref();
@@ -33,8 +32,6 @@ public:
 	LineRenderer* operator->();
 
 private:
-	bool BindObject(Object* obj);
-
 	NodeHandler m_nodeHandler;
 	int32_t m_rendererIndex = -1;
 };
@@ -42,7 +39,7 @@ private:
 class RectRendererContainer
 {
 public:
-	RectRendererContainer() = default;
+	RectRendererContainer();
 	~RectRendererContainer() = default;
 
 	RectRenderer* Ref();
@@ -50,8 +47,6 @@ public:
 	RectRenderer* operator->();
 
 private:
-	bool BindObject(Object* obj);
-
 	NodeHandler m_nodeHandler;
 	int32_t m_rendererIndex = -1;
 };
@@ -59,7 +54,7 @@ private:
 class CircleRendererContainer
 {
 public:
-	CircleRendererContainer() = default;
+	CircleRendererContainer();
 	~CircleRendererContainer() = default;
 
 	CircleRenderer* Ref();
@@ -67,8 +62,6 @@ public:
 	CircleRenderer* operator->();
 
 private:
-	bool BindObject(Object* obj);
-
 	NodeHandler m_nodeHandler;
 	int32_t m_rendererIndex = -1;
 };

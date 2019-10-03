@@ -1,9 +1,8 @@
 #include "RendererContainer.hpp"
 
-bool SpriteRendererContainer::BindObject(Object* obj)
+SpriteRendererContainer::SpriteRendererContainer()
 {
-	// 既にバインドされていない？
-	if (m_nodeHandler.id < 0 && obj)
+	if (auto obj = Object::GetCreatingObject())
 	{
 		// スプライトレンダラを作る
 		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<SpriteRenderer>())
@@ -13,12 +12,9 @@ bool SpriteRendererContainer::BindObject(Object* obj)
 			{
 				m_nodeHandler = obj->GetNodeHandler();
 				m_rendererIndex = rendererIndex;
-				return true;
 			}
 		}
 	}
-
-	return false;
 }
 
 SpriteRenderer* SpriteRendererContainer::Ref()
@@ -42,11 +38,11 @@ SpriteRenderer* SpriteRendererContainer::operator->()
 	return Ref();
 }
 
+//-----------------------------------------------------------------------------------------------
 
-bool LineRendererContainer::BindObject(Object* obj)
+LineRendererContainer::LineRendererContainer()
 {
-	// 既にバインドされていない？
-	if (m_nodeHandler.id < 0 && obj)
+	if (auto obj = Object::GetCreatingObject())
 	{
 		// ラインレンダラを作る
 		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<LineRenderer>())
@@ -56,12 +52,9 @@ bool LineRendererContainer::BindObject(Object* obj)
 			{
 				m_nodeHandler = obj->GetNodeHandler();
 				m_rendererIndex = rendererIndex;
-				return true;
 			}
 		}
 	}
-
-	return false;
 }
 
 LineRenderer* LineRendererContainer::Ref()
@@ -86,12 +79,11 @@ LineRenderer* LineRendererContainer::operator->()
 	return Ref();
 }
 
+//-----------------------------------------------------------------------------------------------
 
-
-bool RectRendererContainer::BindObject(Object* obj)
+RectRendererContainer::RectRendererContainer()
 {
-	// 既にバインドされていない？
-	if (m_nodeHandler.id < 0 && obj)
+	if (auto obj = Object::GetCreatingObject())
 	{
 		// レクトレンダラを作る
 		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<RectRenderer>())
@@ -101,12 +93,9 @@ bool RectRendererContainer::BindObject(Object* obj)
 			{
 				m_nodeHandler = obj->GetNodeHandler();
 				m_rendererIndex = rendererIndex;
-				return true;
 			}
 		}
 	}
-
-	return false;
 }
 
 RectRenderer* RectRendererContainer::Ref()
@@ -131,12 +120,11 @@ RectRenderer* RectRendererContainer::operator->()
 	return Ref();
 }
 
+//-----------------------------------------------------------------------------------------------
 
-
-bool CircleRendererContainer::BindObject(Object* obj)
+CircleRendererContainer::CircleRendererContainer()
 {
-	// 既にバインドされていない？
-	if (m_nodeHandler.id < 0 && obj)
+	if (auto obj = Object::GetCreatingObject())
 	{
 		// サークルレンダラを作る
 		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<CircleRenderer>())
@@ -146,12 +134,9 @@ bool CircleRendererContainer::BindObject(Object* obj)
 			{
 				m_nodeHandler = obj->GetNodeHandler();
 				m_rendererIndex = rendererIndex;
-				return true;
 			}
 		}
 	}
-
-	return false;
 }
 
 CircleRenderer* CircleRendererContainer::Ref()
