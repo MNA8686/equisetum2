@@ -1,10 +1,10 @@
 @echo off
-:開発者コマンド プロンプト for VS2013 のパスを設定
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsMSBuildCmd.bat"
+:開発者コマンド プロンプト for VS2019 のパスを設定
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
 :MSBuild.exeのパスを設定
 set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v4.0.30319\
+set VCTargetsPath=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Microsoft\VC\v160\
 
-chcp 65001
 echo ==============================
 echo =    libEquisetum2 Debug     =
 echo ==============================
