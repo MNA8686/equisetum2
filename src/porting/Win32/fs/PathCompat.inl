@@ -169,7 +169,7 @@ namespace Equisetum2
 			{
 				wchar_t path[MAX_PATH];
 
-				auto result = ::SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, NULL, path);
+				auto result = ::SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, NULL, path);
 				if (result != S_OK)
 				{
 					EQ_THROW(u8"キャッシュディレクトリの取得に失敗しました。");
@@ -229,7 +229,7 @@ namespace Equisetum2
 			{
 				wchar_t path[MAX_PATH];
 
-				auto result = ::SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, NULL, path);
+				auto result = ::SHGetFolderPathW(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, NULL, path);
 				if (result != S_OK)
 				{
 					EQ_THROW(u8"プライベートドキュメントディレクトリの取得に失敗しました。");
@@ -280,7 +280,7 @@ namespace Equisetum2
 			{
 				wchar_t path[MAX_PATH];
 
-				auto result = ::SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, NULL, path);
+				auto result = ::SHGetFolderPathW(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, NULL, path);
 				if (result != S_OK)
 				{
 					EQ_THROW(u8"パブリックドキュメントディレクトリの取得に失敗しました。");
