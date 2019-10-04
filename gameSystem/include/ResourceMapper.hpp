@@ -118,7 +118,7 @@ struct stAsset
 			m_font.clear();
 			for (auto& id : fontManagerID)
 			{
-				m_font.push_back(id.empty() ? nullptr : Singleton<FontManager>::GetInstance()->Load<FontManager>(id));
+				m_font.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<FontManager>(id));
 				index++;
 			}
 		}
