@@ -66,4 +66,18 @@ private:
 	int32_t m_rendererIndex = -1;
 };
 
+class TextRendererContainer
+{
+public:
+	TextRendererContainer();
+	~TextRendererContainer() = default;
+
+	TextRenderer* Ref();
+
+	TextRenderer* operator->();
+
+private:
+	NodeHandler m_nodeHandler;
+	int32_t m_rendererIndex = -1;
+};
 #endif
