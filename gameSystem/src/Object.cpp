@@ -241,6 +241,45 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 						Logger::OutputDebug(v.GetString());
 					}
 				}
+				else if (obj.name == "font")
+				{
+					if (!obj.value.IsArray())
+					{
+						EQ_THROW(u8"fontは配列でなければいけません。");
+					}
+
+					for (auto& v : obj.value.GetArray())
+					{
+						auto& it = v.FindMember("id");
+						if (it == json.MemberEnd() ||
+							!it->value.IsString())
+						{
+							EQ_THROW(u8"idが見つかりません。");
+						}
+
+						String strFontName = it->value.GetString();
+
+						auto& it2 = v.FindMember("size");
+						if (it2 == json.MemberEnd() ||
+							!it2->value.IsInt())
+						{
+							EQ_THROW(u8"sizeが見つかりません。");
+						}
+
+						int size = it2->value.GetInt();
+
+						String reqName = String::Sprintf("%s?%d", strFontName.c_str(), static_cast<int32_t>(size));
+						auto p = Singleton<AssetManager>::GetInstance()->Load<FontManager>(reqName);
+						if (!p)
+						{
+							EQ_THROW(u8"fontのロードに失敗しました。");
+						}
+
+						pAsset->m_font.push_back(p);
+
+						Logger::OutputDebug(it->value.GetString());
+					}
+				}
 				else if (obj.name == "script")
 				{
 					if (!obj.value.IsArray())
