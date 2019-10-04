@@ -462,7 +462,8 @@ void Object::Update()
 	{
 		Node<Object>::Reschedule([](Node<Object>& node)->bool {
 				auto& object = node.GetAttach();		// í«â¡èåèîªíË
-				if (object.IsActive())
+				if (object.IsActive() &&
+					object.IsScheduled())
 				{
 					return true;
 				}
@@ -679,6 +680,11 @@ bool Object::IsVisible() const
 	return m_visible;
 }
 
+bool Object::IsScheduled() const
+{
+	return m_isScheduled;
+}
+
 void Object::SetActive(bool active)
 {
 	if (m_active != active)
@@ -692,6 +698,16 @@ void Object::SetActive(bool active)
 void Object::SetVisible(bool visible)
 {
 	m_visible = visible;
+}
+
+void Object::SetSchedule(bool schedule)
+{
+	if (m_isScheduled != schedule)
+	{
+		m_dirty = true;
+	}
+
+	m_isScheduled = schedule;
 }
 
 std::shared_ptr<Object> Object::Fork()
