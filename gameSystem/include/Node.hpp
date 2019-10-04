@@ -468,7 +468,7 @@ public:
 protected:
 
 	friend Node<T>;
-	Context* m_pCtx;
+	Context* m_pCtx = nullptr;
 
 	std::vector<NodeID> m_vGcQueue;							// GC‘ÎÛ‚Æ‚È‚éƒm[ƒh‚ÌID‚ğŠi”[‚µ‚½”z—ñ
 
