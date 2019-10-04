@@ -17,6 +17,7 @@ struct stAsset
 	std::vector<std::shared_ptr<Sprite>> m_sprite;
 	std::vector<std::shared_ptr<BGM>> m_bgm;
 	std::vector<std::shared_ptr<SE>> m_se;
+	std::vector<std::shared_ptr<FontManager>> m_font;
 
 	// アセットはIDのみを保存しておき、リストア時にはロードし直す
 	template<class Archive>
@@ -50,6 +51,16 @@ struct stAsset
 				seID.push_back(p ? p->Identify() : "");
 			}
 			archive(CEREAL_NVP(seID));
+		}
+		
+		// フォントマネージャー
+		{
+			std::vector<std::string> fontManagerID;
+			for (auto& p : m_font)
+			{
+				fontManagerID.push_back(p ? p->Identify() : "");
+			}
+			archive(CEREAL_NVP(fontManagerID));
 		}
 	}
 
@@ -94,6 +105,20 @@ struct stAsset
 			for (auto& id : seID)
 			{
 				m_se.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<SE>(id));
+				index++;
+			}
+		}
+
+		// フォントマネージャー
+		{
+			std::vector<std::string> fontManagerID;
+			archive(CEREAL_NVP(fontManagerID));
+
+			int index = 0;
+			m_font.clear();
+			for (auto& id : fontManagerID)
+			{
+				m_font.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<FontManager>(id));
 				index++;
 			}
 		}

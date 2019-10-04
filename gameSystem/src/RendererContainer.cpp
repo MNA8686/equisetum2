@@ -161,4 +161,45 @@ CircleRenderer* CircleRendererContainer::operator->()
 	return Ref();
 }
 
+//-----------------------------------------------------------------------------------------------
+
+TextRendererContainer::TextRendererContainer()
+{
+	if (auto obj = Object::GetCreatingObject())
+	{
+		// テキストレンダラを作る
+		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<TextRenderer>())
+		{
+			int32_t rendererIndex = obj->AddRenderObject(newRenderer);
+			if (rendererIndex >= 0)
+			{
+				m_nodeHandler = obj->GetNodeHandler();
+				m_rendererIndex = rendererIndex;
+			}
+		}
+	}
+}
+
+TextRenderer* TextRendererContainer::Ref()
+{
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		if (auto renderObject = obj->GetRenderObject(m_rendererIndex))
+		{
+			if (renderObject->GetType() == RenderType::TEXT)
+			{
+				return static_cast<TextRenderer*>(renderObject);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+TextRenderer* TextRendererContainer::operator->()
+{
+	return Ref();
+}
+
+
 

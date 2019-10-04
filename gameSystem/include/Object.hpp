@@ -51,9 +51,11 @@ public:
 
 	bool IsActive() const;
 	bool IsVisible() const;
+	bool IsScheduled() const;
 
 	void SetActive(bool active);
 	void SetVisible(bool visible);
+	void SetSchedule(bool schedule);
 
 	// スケジュール実行
 	static void Update();
@@ -70,6 +72,7 @@ private:
 	bool m_relativeParent = true;	/// 親の座標に追従するかどうか
 	bool m_active = true;			/// falseの場合、スクリプトなどが呼び出されない
 	bool m_visible = true;			/// falseの場合、レンダリング対象とならない
+	bool m_isScheduled = true;		/// スケジュールするかどうか(Visit処理では呼び出す必要がない場合にfalseにする。)
 	// --- serialize end ---
 
 	/// 子に親の座標移動を反映させる

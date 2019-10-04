@@ -241,6 +241,45 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 						Logger::OutputDebug(v.GetString());
 					}
 				}
+				else if (obj.name == "font")
+				{
+					if (!obj.value.IsArray())
+					{
+						EQ_THROW(u8"fontは配列でなければいけません。");
+					}
+
+					for (auto& v : obj.value.GetArray())
+					{
+						auto& it = v.FindMember("id");
+						if (it == json.MemberEnd() ||
+							!it->value.IsString())
+						{
+							EQ_THROW(u8"idが見つかりません。");
+						}
+
+						String strFontName = it->value.GetString();
+
+						auto& it2 = v.FindMember("size");
+						if (it2 == json.MemberEnd() ||
+							!it2->value.IsInt())
+						{
+							EQ_THROW(u8"sizeが見つかりません。");
+						}
+
+						int size = it2->value.GetInt();
+
+						String reqName = String::Sprintf("%s?%d", strFontName.c_str(), static_cast<int32_t>(size));
+						auto p = Singleton<AssetManager>::GetInstance()->Load<FontManager>(reqName);
+						if (!p)
+						{
+							EQ_THROW(u8"fontのロードに失敗しました。");
+						}
+
+						pAsset->m_font.push_back(p);
+
+						Logger::OutputDebug(it->value.GetString());
+					}
+				}
 				else if (obj.name == "script")
 				{
 					if (!obj.value.IsArray())
@@ -462,7 +501,8 @@ void Object::Update()
 	{
 		Node<Object>::Reschedule([](Node<Object>& node)->bool {
 				auto& object = node.GetAttach();		// 追加条件判定
-				if (object.IsActive())
+				if (object.IsActive() &&
+					object.IsScheduled())
 				{
 					return true;
 				}
@@ -679,6 +719,11 @@ bool Object::IsVisible() const
 	return m_visible;
 }
 
+bool Object::IsScheduled() const
+{
+	return m_isScheduled;
+}
+
 void Object::SetActive(bool active)
 {
 	if (m_active != active)
@@ -692,6 +737,16 @@ void Object::SetActive(bool active)
 void Object::SetVisible(bool visible)
 {
 	m_visible = visible;
+}
+
+void Object::SetSchedule(bool schedule)
+{
+	if (m_isScheduled != schedule)
+	{
+		m_dirty = true;
+	}
+
+	m_isScheduled = schedule;
 }
 
 std::shared_ptr<Object> Object::Fork()
