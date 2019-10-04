@@ -228,6 +228,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_textHAlignment));
 		}
 
 		template<class Archive>
@@ -248,6 +249,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_textHAlignment));
 		}
 
 		class Impl;
