@@ -43,7 +43,6 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
-			//archive(CEREAL_NVP(m_renderer));
 		}
 
 		template<class Archive>
@@ -54,7 +53,6 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
-			//archive(CEREAL_NVP(m_renderer));
 		}
 
 		virtual bool Calculation() = 0;
@@ -67,7 +65,6 @@ namespace Equisetum2
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
 		bool m_visible = true;		/// 表示属性
-		std::weak_ptr<Renderer> m_renderer;
 		// --- serialize end ---
 	};
 }
@@ -145,7 +142,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<SpriteRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<SpriteRenderer> Create();
 		void InitTest();
 		//
 		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
@@ -257,7 +254,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<TextRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<TextRenderer> Create();
 		void InitTest();
 
 		void MeasurementBoxSize();
@@ -370,7 +367,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<LineRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<LineRenderer> Create();
 		void InitTest();
 
 		std::vector<Point> m_vPos;			/// 表示位置
@@ -429,7 +426,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<RectRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<RectRenderer> Create();
 		void InitTest();
 
 		static const int vertexMax = 4;
@@ -491,7 +488,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<CircleRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<CircleRenderer> Create();
 		void InitTest();
 
 		Point m_pos{};			/// 表示位置

@@ -88,6 +88,7 @@ int Application::Main()
 	m_fpsCounter = FpsCounter::Create(m_fpsCounterTick);
 
 	m_renderer = Renderer::Create();
+	Singleton<CurrentRenderer>::GetInstance()->Set(m_renderer);
 
 	m_nodePoolCtx = Singleton<NodePool<Object>>::GetInstance()->CreateContext();
 	Singleton<NodePool<Object>>::GetInstance()->SetContext(m_nodePoolCtx);

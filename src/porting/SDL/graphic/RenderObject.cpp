@@ -56,7 +56,7 @@ namespace Equisetum2
 		m_pImpl = std::make_shared<SpriteRenderer::Impl>();
 	}
 
-	std::shared_ptr<SpriteRenderer> SpriteRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	std::shared_ptr<SpriteRenderer> SpriteRenderer::Create()
 	{
 		EQ_DURING
 		{
@@ -66,9 +66,6 @@ namespace Equisetum2
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
-
-			// レンダラを保持
-			inst->m_renderer = renderer;
 
 			// インスタンス初期化
 			inst->m_pImpl = std::make_shared<SpriteRenderer::Impl>();
@@ -342,7 +339,7 @@ namespace Equisetum2
 		m_pImpl = std::make_shared<TextRenderer::Impl>();
 	}
 
-	std::shared_ptr<TextRenderer> TextRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	std::shared_ptr<TextRenderer> TextRenderer::Create()
 	{
 		EQ_DURING
 		{
@@ -352,9 +349,6 @@ namespace Equisetum2
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
-
-			// レンダラを保持
-			inst->m_renderer = renderer;
 
 			// インスタンス初期化
 			inst->m_pImpl = std::make_shared<TextRenderer::Impl>();
@@ -403,7 +397,7 @@ namespace Equisetum2
 
 		m_vSpriteRenderer.resize(m_text.size());
 
-		if (auto pRenderer = m_renderer.lock())
+		if (auto pRenderer = Singleton<CurrentRenderer>::GetInstance()->Get())
 		{
 			// 1文字1スプライトとして運用する
 			for (uint32_t i = 0; i < m_text.size(); i++)
@@ -812,7 +806,7 @@ namespace Equisetum2
 		m_pImpl = std::make_shared<LineRenderer::Impl>();
 	}
 
-	std::shared_ptr<LineRenderer> LineRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	std::shared_ptr<LineRenderer> LineRenderer::Create()
 	{
 		EQ_DURING
 		{
@@ -822,9 +816,6 @@ namespace Equisetum2
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
-
-			// レンダラを保持
-			inst->m_renderer = renderer;
 
 			// インスタンス初期化
 			inst->m_pImpl = std::make_shared<LineRenderer::Impl>();
@@ -952,7 +943,7 @@ namespace Equisetum2
 		m_pImpl = std::make_shared<CircleRenderer::Impl>();
 	}
 
-	std::shared_ptr<CircleRenderer> CircleRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	std::shared_ptr<CircleRenderer> CircleRenderer::Create()
 	{
 		EQ_DURING
 		{
@@ -962,9 +953,6 @@ namespace Equisetum2
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
-
-			// レンダラを保持
-			inst->m_renderer = renderer;
 
 			// インスタンス初期化
 			inst->m_pImpl = std::make_shared<CircleRenderer::Impl>();
@@ -1069,7 +1057,7 @@ namespace Equisetum2
 		m_pImpl->m_vertex.resize(vertexMax);
 	}
 
-	std::shared_ptr<RectRenderer> RectRenderer::Create(std::shared_ptr<Renderer>& renderer)
+	std::shared_ptr<RectRenderer> RectRenderer::Create()
 	{
 		EQ_DURING
 		{
@@ -1079,9 +1067,6 @@ namespace Equisetum2
 			{
 				EQ_THROW(u8"インスタンスの作成に失敗しました。");
 			}
-
-			// レンダラを保持
-			inst->m_renderer = renderer;
 
 			// インスタンス初期化
 			inst->m_pImpl = std::make_shared<RectRenderer::Impl>();

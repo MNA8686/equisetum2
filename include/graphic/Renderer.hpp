@@ -103,6 +103,19 @@ namespace Equisetum2
 		void SetOrthographicProjection();
 		bool SelectProgram(ShaderType type);
 	};
+
+	class CurrentRenderer final
+	{
+	public:
+		friend Singleton<CurrentRenderer>;	// シングルトンからインスタンスを作成してもらえるようにする
+
+		void Set(const std::shared_ptr<Renderer>& renderer);
+		std::shared_ptr<Renderer> Get();
+
+	private:
+		// 保持しているレンダラー
+		std::weak_ptr<Renderer> m_renderer;
+	};
 }
 
 #endif
