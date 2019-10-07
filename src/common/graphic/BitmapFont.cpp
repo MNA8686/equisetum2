@@ -64,6 +64,11 @@ namespace Equisetum2
 		return true;
 	}
 
+	String Equisetum2::BitmapFont::CodePoint() const
+	{
+		return String(m_codePoint);
+	}
+
 	const std::shared_ptr<Sprite>& BitmapFont::GetSprite() const
 	{
 		return m_sprite;

@@ -48,6 +48,12 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
+		/**
+		* @brief コードポイント文字列を取得する
+		* @return コードポイント文字列
+		*/
+		virtual String CodePoint() const;
+
 		const std::shared_ptr<Sprite>& GetSprite() const;
 		int CodePointToAtlas(char32_t code);
 
