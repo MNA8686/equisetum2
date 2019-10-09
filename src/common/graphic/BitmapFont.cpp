@@ -92,6 +92,16 @@ namespace Equisetum2
 		return atlas;
 	}
 
+	void BitmapFont::SetHint(const BitmapFont::SerializeHint& hint)
+	{
+		m_hint = hint;
+	}
+
+	BitmapFont::SerializeHint BitmapFont::GetHint(void) const
+	{
+		return m_hint;
+	}
+
 	void BitmapFont::SetIdentify(const String& id)
 	{
 		m_id = id;

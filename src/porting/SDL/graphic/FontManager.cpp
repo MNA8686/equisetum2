@@ -354,6 +354,13 @@ namespace Equisetum2
 				EQ_THROW(u8"ビットマップフォントの作成に失敗しました。");
 			}
 
+			// リストア用のヒントを設定する
+			BitmapFont::SerializeHint hint;
+			hint.fontName = m_id;
+			hint.color = inColor;
+			hint.maxSize = maxSize;
+			bitmapFont->SetHint(hint);
+			
 			return bitmapFont;
 		}
 		EQ_HANDLER

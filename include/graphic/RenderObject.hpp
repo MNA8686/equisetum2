@@ -214,18 +214,30 @@ namespace Equisetum2
 		{
 			archive(cereal::base_class<RenderObject>(this));
 
-//			std::string spriteId = m_sprite->Identify();
-//			archive(CEREAL_NVP(spriteId));
-
-//			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_pivot));
 			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
 			archive(CEREAL_NVP(m_textHAlignment));
+			std::string text = String(m_text);
+			archive(CEREAL_NVP(text));
+
+			if (m_bitmapFont)
+			{
+				BitmapFont::SerializeHint hint = m_bitmapFont->GetHint();
+				std::string fontName = hint.fontName;
+				archive(CEREAL_NVP(fontName));
+				Color color = hint.color;
+				archive(CEREAL_NVP(color));
+				Size maxSize = hint.maxSize;
+				archive(CEREAL_NVP(maxSize));
+				std::string codepoint = m_bitmapFont->CodePoint();
+				archive(CEREAL_NVP(codepoint));
+			}
 		}
 
 		template<class Archive>
@@ -233,20 +245,37 @@ namespace Equisetum2
 		{
 			InitTest();
 			archive(cereal::base_class<RenderObject>(this));
-
-//			std::string spriteId;
-//			archive(CEREAL_NVP(spriteId));
-//			m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
-
-//			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_pivot));
 			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
 			archive(CEREAL_NVP(m_textHAlignment));
+			std::string text;
+			archive(CEREAL_NVP(text));
+
+			std::string fontName;
+			archive(CEREAL_NVP(fontName));
+
+			if (!fontName.empty())
+			{
+				auto font = Singleton<AssetManager>::GetInstance()->Load<FontManager>(fontName);
+				if (font)
+				{
+					Color color;
+					archive(CEREAL_NVP(color));
+					Size maxSize;
+					archive(CEREAL_NVP(maxSize));
+					std::string codepoint;
+					archive(CEREAL_NVP(codepoint));
+
+					SetBitmapFont(font->MakeBitmapFont(codepoint, color, maxSize));
+					SetText(text);
+				}
+			}
 		}
 
 		class Impl;
@@ -270,11 +299,11 @@ namespace Equisetum2
 		bool m_flipY = false;	/// Y方向反転
 		float m_angle = 0;		/// 回転角度
 		TextHAlignment m_textHAlignment = TextHAlignment::Left;
+		std::u32string m_text;		/// コードポイント配列
 		//
 
 		float m_angleRad = 0;
 		std::vector<std::shared_ptr<SpriteRenderer>> m_vSpriteRenderer;
-		std::u32string m_text;		/// コードポイント配列
 		int32_t m_height = 0;		/// フォントの高さ
 
 		typedef struct

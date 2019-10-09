@@ -10,7 +10,7 @@ namespace Equisetum2
 	class BitmapFont
 	{
 	public:
-#if 0
+#if 1
 		struct SerializeHint
 		{
 			enum class From : int32_t
@@ -20,8 +20,9 @@ namespace Equisetum2
 				//Raw,	// don't work
 			};
 
-			From from;
-			String param;
+			String fontName;
+			Color color;
+			Size maxSize;
 		};
 #endif
 
@@ -57,11 +58,15 @@ namespace Equisetum2
 		const std::shared_ptr<Sprite>& GetSprite() const;
 		int CodePointToAtlas(char32_t code);
 
+		virtual void SetHint(const SerializeHint& hint);
+		virtual SerializeHint GetHint(void) const;
+
 	private:
 
 		String m_id;		/// SpriteのID
 		std::shared_ptr<Sprite> m_sprite;		/// 画像本体
 		std::u32string m_codePoint;		/// コードポイント配列
+		SerializeHint m_hint;
 	};
 }
 
