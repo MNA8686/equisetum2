@@ -56,10 +56,29 @@ namespace Equisetum2
 		*/
 		virtual String CodePoint() const;
 
+		/**
+		* @brief 設定されているスプライトを取得する
+		* @return 設定されているスプライト
+		*/
 		const std::shared_ptr<Sprite>& GetSprite() const;
+
+		/**
+		* @brief コードポイントがスプライトアトラスの何番目に割り当てられているかを返す
+		* @return アトラス番号
+		*/
 		int CodePointToAtlas(char32_t code);
 
+		/**
+		* @brief シリアライズに必要なヒントを設定する
+		* @param hint 設定するヒント
+		* @return なし 
+		*/
 		virtual void SetHint(const SerializeHint& hint);
+
+		/**
+		* @brief シリアライズに必要なヒントを取得する
+		* @return ヒント
+		*/
 		virtual SerializeHint GetHint(void) const;
 
 	private:
@@ -67,7 +86,7 @@ namespace Equisetum2
 		String m_id;		/// SpriteのID
 		std::shared_ptr<Sprite> m_sprite;		/// 画像本体
 		std::u32string m_codePoint;		/// コードポイント配列
-		SerializeHint m_hint;
+		SerializeHint m_hint;			/// シリアライズ用ヒント
 	};
 }
 
