@@ -226,11 +226,15 @@ namespace Equisetum2
 			std::string text = String(m_text);
 			archive(CEREAL_NVP(text));
 
+			BitmapFont::SerializeHint::From from = BitmapFont::SerializeHint::From::Empty;
+
 			if (m_bitmapFont)
 			{
 				BitmapFont::SerializeHint hint = m_bitmapFont->GetHint();
-				std::string fontName = hint.fontName;
-				archive(CEREAL_NVP(fontName));
+				from = hint.from;
+
+				std::string id = hint.id;
+				archive(CEREAL_NVP(id));
 				Color color = hint.color;
 				archive(CEREAL_NVP(color));
 				Size maxSize = hint.maxSize;
@@ -238,6 +242,7 @@ namespace Equisetum2
 				std::string codepoint = m_bitmapFont->CodePoint();
 				archive(CEREAL_NVP(codepoint));
 			}
+			archive(CEREAL_NVP(from));
 		}
 
 		template<class Archive>
@@ -257,23 +262,29 @@ namespace Equisetum2
 			std::string text;
 			archive(CEREAL_NVP(text));
 
-			std::string fontName;
-			archive(CEREAL_NVP(fontName));
+			BitmapFont::SerializeHint::From from = BitmapFont::SerializeHint::From::Empty;
+			archive(CEREAL_NVP(from));
 
-			if (!fontName.empty())
+			if (from == BitmapFont::SerializeHint::From::FontManager)
 			{
-				auto font = Singleton<AssetManager>::GetInstance()->Load<FontManager>(fontName);
-				if (font)
-				{
-					Color color;
-					archive(CEREAL_NVP(color));
-					Size maxSize;
-					archive(CEREAL_NVP(maxSize));
-					std::string codepoint;
-					archive(CEREAL_NVP(codepoint));
+				std::string id;
+				archive(CEREAL_NVP(id));
 
-					SetBitmapFont(font->MakeBitmapFont(codepoint, color, maxSize));
-					SetText(text);
+				if (!id.empty())
+				{
+					auto font = Singleton<AssetManager>::GetInstance()->Load<FontManager>(id);
+					if (font)
+					{
+						Color color;
+						archive(CEREAL_NVP(color));
+						Size maxSize;
+						archive(CEREAL_NVP(maxSize));
+						std::string codepoint;
+						archive(CEREAL_NVP(codepoint));
+
+						SetBitmapFont(font->MakeBitmapFont(codepoint, color, maxSize));
+						SetText(text);
+					}
 				}
 			}
 		}

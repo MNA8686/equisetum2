@@ -356,7 +356,8 @@ namespace Equisetum2
 
 			// リストア用のヒントを設定する
 			BitmapFont::SerializeHint hint;
-			hint.fontName = m_id;
+			hint.from = BitmapFont::SerializeHint::From::FontManager;
+			hint.id = m_id;
 			hint.color = inColor;
 			hint.maxSize = maxSize;
 			bitmapFont->SetHint(hint);
