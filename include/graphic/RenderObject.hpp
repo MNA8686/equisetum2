@@ -233,14 +233,22 @@ namespace Equisetum2
 				BitmapFont::SerializeHint hint = m_bitmapFont->GetHint();
 				from = hint.from;
 
-				std::string id = hint.id;
-				archive(CEREAL_NVP(id));
-				Color color = hint.color;
-				archive(CEREAL_NVP(color));
-				Size maxSize = hint.maxSize;
-				archive(CEREAL_NVP(maxSize));
-				std::string codepoint = m_bitmapFont->CodePoint();
-				archive(CEREAL_NVP(codepoint));
+				if (from == BitmapFont::SerializeHint::From::FontManager)
+				{
+					std::string id = hint.id;
+					archive(CEREAL_NVP(id));
+					Color color = hint.color;
+					archive(CEREAL_NVP(color));
+					Size maxSize = hint.maxSize;
+					archive(CEREAL_NVP(maxSize));
+					std::string codepoint = m_bitmapFont->CodePoint();
+					archive(CEREAL_NVP(codepoint));
+				}
+				else if (from == BitmapFont::SerializeHint::From::Asset)
+				{
+					std::string id = hint.id;
+					archive(CEREAL_NVP(id));
+				}
 			}
 			archive(CEREAL_NVP(from));
 		}
@@ -283,6 +291,21 @@ namespace Equisetum2
 						archive(CEREAL_NVP(codepoint));
 
 						SetBitmapFont(font->MakeBitmapFont(codepoint, color, maxSize));
+						SetText(text);
+					}
+				}
+			}
+			else if (from == BitmapFont::SerializeHint::From::Asset)
+			{
+				std::string id;
+				archive(CEREAL_NVP(id));
+
+				if (!id.empty())
+				{
+					auto bitmapfont = Singleton<AssetManager>::GetInstance()->Load<BitmapFont>(id);
+					if (bitmapfont)
+					{
+						SetBitmapFont(bitmapfont);
 						SetText(text);
 					}
 				}
