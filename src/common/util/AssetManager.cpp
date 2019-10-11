@@ -947,6 +947,22 @@ namespace Equisetum2
 					animation->SetLoopType(AnimationLoopType::loop);
 				}
 
+				// parse "rotatable"
+				bool rotatableType = false;
+				auto& rotatable = obj.FindMember("rotatable");
+				if (rotatable != obj.MemberEnd())
+				{
+					if(rotatable->value.GetType() == rapidjson::kTrueType)
+					{
+						rotatableType = true;
+					}
+				}
+				if (rotatableType)
+				{
+					// ‰ñ“]‰Â”\Ý’è
+					animation->SetRotatable(true, 32);
+				}
+
 				// for "timeline" parse
 				typedef struct
 				{

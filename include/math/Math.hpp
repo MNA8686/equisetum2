@@ -20,13 +20,13 @@ namespace Equisetum2
 		const float PI = 3.14159265358979323846f;
 
 		// 固定小数点版三角関数 小数部の桁数(標準は4096)
-		const int afterTheDecimalPoint = 12;
+		const int32_t afterTheDecimalPoint = 12;
 		// 角度の範囲: 0～4095
-		const int maxDegree = 1 << 12;
+		const int32_t maxDegree = 1 << 12;
 		// Sin,Cos,Tanなどの戻り値の範囲: -4096～4096
-		const int maxValue = 1 << 12;
+		const int32_t maxValue = 1 << 12;
 		// Atanテーブルのサイズ(45度あたりの分解能) 比の範囲: 0～1024
-		const int atanTableSize = 1 << 10;
+		const int32_t atanTableSize = 1 << 10;
 
 		void Init();
 		int32_t Sin(FixedDegree degree);

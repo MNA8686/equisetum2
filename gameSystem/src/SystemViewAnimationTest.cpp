@@ -237,7 +237,7 @@ int SystemViewAnimationTest::Do()
 	if (m_playing)
 	{
 		// 現在のフレームに対応するアニメーションパターンを取得
-		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000);
+		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000/*, 1024*/);
 		if (index >= 0)
 		{
 			// アニメーションパターンをセット
@@ -262,7 +262,7 @@ int SystemViewAnimationTest::Render()
 	if (m_spriteRenderer)
 	{
 		// 現在表示すべきアニメーションパターンを取得する
-		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr);
+		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr/*, 1024*/);
 		if (elem)
 		{
 			m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);

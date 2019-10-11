@@ -40,6 +40,9 @@ namespace Equisetum2
 		static std::shared_ptr<AnimationTimeline> Create();
 		bool AppendTimeline(const std::shared_ptr<Sprite>& sprite, const String& tag, int32_t ptr, int32_t delay);
 		void SetLoopType(AnimationLoopType type);
+		void SetRotatable(bool rotatable, int32_t step=0);
+		bool IsRotatable() const;
+		int32_t GetRotatableStep() const;
 
 		/**
 		* @brief 新しいインスタンスで現在のインスタンスを置き換える
@@ -57,7 +60,8 @@ namespace Equisetum2
 		std::vector<stAnimationElement> m_vTimeline;
 		AnimationLoopType m_loop = AnimationLoopType::none;
 		int32_t m_totalTime = 0;
-
+		bool m_rotatable = false;
+		int32_t m_rotatableStep = 0;
 	};
 
 	class Animation
@@ -80,8 +84,8 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
-		int32_t GetIndexByTime(int32_t tagIndex, int32_t time) const;
-		const stAnimationElement* GetElement(int32_t tagIndex, int32_t index) const;
+		int32_t GetIndexByTime(int32_t tagIndex, int32_t time/*, int32_t degree=0*/) const;
+		const stAnimationElement* GetElement(int32_t tagIndex, int32_t index/*, int32_t degree = 0*/) const;
 		int32_t TagToInt(const String& tag) const;
 		String IntToTag(int32_t tagIndex) const;
 		void AppendAnimation(const String& tag, const std::shared_ptr<AnimationTimeline>& timeline);
