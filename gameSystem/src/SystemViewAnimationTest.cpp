@@ -174,6 +174,14 @@ int SystemViewAnimationTest::Enter()
 	});
 	menu->SetWidget(play);
 
+	auto degree = SystemWidgetSpin::Create(u8"角度", [this](int32_t val) {
+		m_degree = val;
+	});
+	degree->SetRange(0, 4095, 8);
+	degree->SetValue(0);
+	degree->SetCyclic(true);
+	menu->SetWidget(degree);
+	
 	auto r = SystemWidgetSpin::Create(u8"色成分 R", [this](int32_t val) {
 		m_color.rgba8888.r = static_cast<uint8_t>(val + 128);
 	});
@@ -237,7 +245,7 @@ int SystemViewAnimationTest::Do()
 	if (m_playing)
 	{
 		// 現在のフレームに対応するアニメーションパターンを取得
-		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000/*, 1024*/);
+		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000);
 		if (index >= 0)
 		{
 			// アニメーションパターンをセット
@@ -262,12 +270,14 @@ int SystemViewAnimationTest::Render()
 	if (m_spriteRenderer)
 	{
 		// 現在表示すべきアニメーションパターンを取得する
-		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr/*, 1024*/);
+		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr);
 		if (elem)
 		{
+			int32_t offset = m_animation->GetRotateOffset(m_animationTagIndex, m_degree);
+
 			m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
 			m_spriteRenderer->SetSprite(elem->m_sprite);
-			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr));
+			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
 			m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
 			m_spriteRenderer->SetColor(m_color);
 

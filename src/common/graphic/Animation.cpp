@@ -39,20 +39,14 @@ namespace Equisetum2
 		m_loop = type;
 	}
 
-	void AnimationTimeline::SetRotatable(bool rotatable, int32_t step)
+	void AnimationTimeline::SetRotate(AnimationTimeline::stRotate rotate)
 	{
-		m_rotatable = rotatable;
-		m_rotatableStep = step;
+		m_rotate = rotate;
 	}
 
-	bool AnimationTimeline::IsRotatable() const
+	AnimationTimeline::stRotate AnimationTimeline::GetRotate(void) const
 	{
-		return m_rotatable && m_rotatableStep > 0;
-	}
-
-	int32_t AnimationTimeline::GetRotatableStep() const
-	{
-		return m_rotatableStep;
+		return m_rotate;
 	}
 
 	bool AnimationTimeline::MoveFrom(std::shared_ptr<AnimationTimeline>&& src)
@@ -122,66 +116,51 @@ namespace Equisetum2
 		return m_id;
 	}
 
-	int32_t Animation::GetIndexByTime(int32_t tagIndex, int32_t time/*, int32_t degree*/) const
+	int32_t Animation::GetIndexByTime(int32_t tagIndex, int32_t time) const
 	{
 		if (tagIndex < 0 || tagIndex >= static_cast<int32_t>(m_vTimeline.size()))
 		{
 			return -1;
 		}
 
-		int32_t index = m_vTimeline[tagIndex].timeline->GetIndexByTime(time);
-
-#if 0
-		// 回転可能なら角度から回転パターンが何番になるか算出する
-		if (degree != 0 &&
-			m_vTimeline[tagIndex].timeline->IsRotatable())
-		{
-			int32_t step = m_vTimeline[tagIndex].timeline->GetRotatableStep();
-
-			// 一切れ分の角度を算出
-			int32_t pieceDegree = FixedMath::maxDegree / step;
-			// TODO: 0になったらまずい
-
-			// 0度の場合 (-pieceDegree / 2) <= 0 < (pieceDegree / 2) の範囲となる
-			// TODO: ものによっては0度からカウントしたほうが都合が良いものもあるのでゼロオリジン設定を作る
-			int32_t degree_ = (degree + (pieceDegree / 2)) % FixedMath::maxDegree;
-			int32_t offset = degree_ / pieceDegree;
-
-			index += offset;
-		}
-#endif
-
-		return index;
+		return m_vTimeline[tagIndex].timeline->GetIndexByTime(time);
 	}
 
-	const stAnimationElement * Animation::GetElement(int32_t tagIndex, int32_t index/*, int32_t degree*/) const
+	const stAnimationElement * Animation::GetElement(int32_t tagIndex, int32_t index) const
 	{
 		if (tagIndex < 0 || tagIndex >= static_cast<int32_t>(m_vTimeline.size()))
 		{
 			return nullptr;
 		}
 
-#if 0
-		// 回転可能なら角度から回転パターンが何番になるか算出する
-		if (degree != 0 &&
-			m_vTimeline[tagIndex].timeline->IsRotatable())
-		{
-			int32_t step = m_vTimeline[tagIndex].timeline->GetRotatableStep();
+		return m_vTimeline[tagIndex].timeline->GetElement(index);
+	}
 
+	int32_t Animation::GetRotateOffset(int32_t tagIndex, int32_t degree) const
+	{
+		if (tagIndex < 0 || tagIndex >= static_cast<int32_t>(m_vTimeline.size()))
+		{
+			return 0;
+		}
+
+		int32_t offset = 0;
+
+		// 回転可能なら角度から回転パターンが何番になるか算出する
+		if (degree != 0)
+		{
+			AnimationTimeline::stRotate rotate = m_vTimeline[tagIndex].timeline->GetRotate();
+		
 			// 一切れ分の角度を算出
-			int32_t pieceDegree = FixedMath::maxDegree / step;
+			int32_t pieceDegree = FixedMath::maxDegree / rotate.step;
 			// TODO: 0になったらまずい
 
 			// 0度の場合 (-pieceDegree / 2) <= 0 < (pieceDegree / 2) の範囲となる
 			// TODO: ものによっては0度からカウントしたほうが都合が良いものもあるのでゼロオリジン設定を作る
 			int32_t degree_ = (degree + (pieceDegree / 2)) % FixedMath::maxDegree;
-			int32_t offset = degree_ / pieceDegree;
-
-			index += offset;
+			offset = (degree_ / pieceDegree) * rotate.offset;
 		}
-#endif
 
-		return m_vTimeline[tagIndex].timeline->GetElement(index);
+		return offset;
 	}
 
 	int32_t Animation::TagToInt(const String & tag) const
