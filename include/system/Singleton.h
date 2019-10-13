@@ -21,8 +21,15 @@ namespace Equisetum2
 
 		static T* GetInstance()
 		{
-			std::call_once(m_InitFlag, Create);
+//			std::call_once(m_InitFlag, Create);
 			//			assert(instance);
+
+			if (!m_InitFlag)
+			{
+				Create();
+				m_InitFlag = true;
+			}
+
 			return m_Instance;
 		}
 
@@ -40,11 +47,13 @@ namespace Equisetum2
 			m_Instance = nullptr;
 		}
 
-		static std::once_flag m_InitFlag;
+//		static std::once_flag m_InitFlag;
+		static bool m_InitFlag;
 		static T* m_Instance;
 	};
 
-	template <typename T> std::once_flag Singleton<T>::m_InitFlag;
+//	template <typename T> std::once_flag Singleton<T>::m_InitFlag;
+	template <typename T> bool Singleton<T>::m_InitFlag = false;
 	template <typename T> T* Singleton<T>::m_Instance = nullptr;
 }
 
