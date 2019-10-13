@@ -692,6 +692,12 @@ namespace Equisetum2
 				EQ_THROW(String::Sprintf(u8"BitmapFont(%s)のロードに失敗しました。", id.c_str()));
 			}
 
+			// シリアライズ用ヒントを設定する
+			BitmapFont::SerializeHint hint;
+			hint.from = BitmapFont::SerializeHint::From::Asset;
+			hint.id = id;
+			bitmapFont->SetHint(hint);
+
 			return bitmapFont;
 		}
 		EQ_HANDLER
