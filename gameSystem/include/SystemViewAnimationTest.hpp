@@ -24,6 +24,7 @@ protected:
 	int32_t m_animationTagIndex = -1;	// –¢İ’è -1
 	int32_t m_animationPtr = 0;
 	int32_t m_frame = 0;
+	int32_t m_degree = 0;
 	bool m_playing = false;
 	Point m_spritePos;
 	std::shared_ptr<SpriteRenderer> m_spriteRenderer;

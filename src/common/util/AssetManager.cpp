@@ -947,6 +947,38 @@ namespace Equisetum2
 					animation->SetLoopType(AnimationLoopType::loop);
 				}
 
+				// parse "rotate"
+				auto& rotate = obj.FindMember("rotate");
+				if (rotate != obj.MemberEnd())
+				{
+					if (rotate->value.GetType() != rapidjson::kObjectType)
+					{
+						EQ_THROW(u8"rotate‚Íobject‚Å‚È‚¯‚ê‚Î‚¢‚¯‚Ü‚¹‚ñB");
+					}
+
+					auto& rotateObj = rotate->value.GetObject();
+
+					AnimationTimeline::stRotate rotate;
+
+					// parse "step"
+					auto& step = rotateObj.FindMember("step");
+					if (step != rotateObj.MemberEnd() &&
+						step->value.GetType() == rapidjson::kNumberType)
+					{
+						rotate.step = step->value.GetInt();
+					}
+
+					// parse "offset"
+					auto& offset = rotateObj.FindMember("offset");
+					if (offset != rotateObj.MemberEnd() &&
+						offset->value.GetType() == rapidjson::kNumberType)
+					{
+						rotate.offset = offset->value.GetInt();
+					}
+
+					animation->SetRotate(rotate);
+				}
+
 				// for "timeline" parse
 				typedef struct
 				{

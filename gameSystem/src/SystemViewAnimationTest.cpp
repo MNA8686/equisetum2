@@ -174,6 +174,14 @@ int SystemViewAnimationTest::Enter()
 	});
 	menu->SetWidget(play);
 
+	auto degree = SystemWidgetSpin::Create(u8"Šp“x", [this](int32_t val) {
+		m_degree = val;
+	});
+	degree->SetRange(0, 4095, 8);
+	degree->SetValue(0);
+	degree->SetCyclic(true);
+	menu->SetWidget(degree);
+	
 	auto r = SystemWidgetSpin::Create(u8"F¬•ª R", [this](int32_t val) {
 		m_color.rgba8888.r = static_cast<uint8_t>(val + 128);
 	});
@@ -265,9 +273,11 @@ int SystemViewAnimationTest::Render()
 		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr);
 		if (elem)
 		{
+			int32_t offset = m_animation->GetRotateOffset(m_animationTagIndex, m_degree);
+
 			m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
 			m_spriteRenderer->SetSprite(elem->m_sprite);
-			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr));
+			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
 			m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
 			m_spriteRenderer->SetColor(m_color);
 

@@ -2,6 +2,7 @@
 #include "system/Logger.h"
 #include "graphic/Animation.hpp"
 #include "graphic/Sprite.hpp"
+#include "math/Math.hpp"
 #include <algorithm>
 #include <numeric>
 
@@ -36,6 +37,16 @@ namespace Equisetum2
 	void AnimationTimeline::SetLoopType(AnimationLoopType type)
 	{
 		m_loop = type;
+	}
+
+	void AnimationTimeline::SetRotate(AnimationTimeline::stRotate rotate)
+	{
+		m_rotate = rotate;
+	}
+
+	AnimationTimeline::stRotate AnimationTimeline::GetRotate(void) const
+	{
+		return m_rotate;
 	}
 
 	bool AnimationTimeline::MoveFrom(std::shared_ptr<AnimationTimeline>&& src)
@@ -88,6 +99,8 @@ namespace Equisetum2
 		return static_cast<int32_t>(m_vTimeline.size());
 	}
 
+	//------------------------------------------------------------------------------------------------
+
 	std::shared_ptr<Animation> Animation::Create()
 	{
 		return std::make_shared<Animation>();
@@ -121,6 +134,33 @@ namespace Equisetum2
 		}
 
 		return m_vTimeline[tagIndex].timeline->GetElement(index);
+	}
+
+	int32_t Animation::GetRotateOffset(int32_t tagIndex, int32_t degree) const
+	{
+		if (tagIndex < 0 || tagIndex >= static_cast<int32_t>(m_vTimeline.size()))
+		{
+			return 0;
+		}
+
+		int32_t offset = 0;
+
+		// 回転可能なら角度から回転パターンが何番になるか算出する
+		if (degree != 0)
+		{
+			AnimationTimeline::stRotate rotate = m_vTimeline[tagIndex].timeline->GetRotate();
+		
+			// 一切れ分の角度を算出
+			int32_t pieceDegree = FixedMath::maxDegree / rotate.step;
+			// TODO: 0になったらまずい
+
+			// 0度の場合 (-pieceDegree / 2) <= 0 < (pieceDegree / 2) の範囲となる
+			// TODO: ものによっては0度からカウントしたほうが都合が良いものもあるのでゼロオリジン設定を作る
+			int32_t degree_ = (degree + (pieceDegree / 2)) % FixedMath::maxDegree;
+			offset = (degree_ / pieceDegree) * rotate.offset;
+		}
+
+		return offset;
 	}
 
 	int32_t Animation::TagToInt(const String & tag) const

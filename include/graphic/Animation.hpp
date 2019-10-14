@@ -33,6 +33,11 @@ namespace Equisetum2
 	class AnimationTimeline
 	{
 	public:
+		typedef struct
+		{
+			int32_t step = 1;
+			int32_t offset = 1;
+		}stRotate;
 
 		AnimationTimeline() = default;
 		virtual ~AnimationTimeline() = default;
@@ -40,6 +45,8 @@ namespace Equisetum2
 		static std::shared_ptr<AnimationTimeline> Create();
 		bool AppendTimeline(const std::shared_ptr<Sprite>& sprite, const String& tag, int32_t ptr, int32_t delay);
 		void SetLoopType(AnimationLoopType type);
+		void SetRotate(stRotate rotate);
+		stRotate GetRotate(void) const;
 
 		/**
 		* @brief 新しいインスタンスで現在のインスタンスを置き換える
@@ -58,6 +65,7 @@ namespace Equisetum2
 		AnimationLoopType m_loop = AnimationLoopType::none;
 		int32_t m_totalTime = 0;
 
+		stRotate m_rotate;
 	};
 
 	class Animation
@@ -80,13 +88,14 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
-		int32_t GetIndexByTime(int32_t tagIndex, int32_t time) const;
-		const stAnimationElement* GetElement(int32_t tagIndex, int32_t index) const;
+		int32_t GetIndexByTime(int32_t tagIndex, int32_t time/*, int32_t degree=0*/) const;
+		const stAnimationElement* GetElement(int32_t tagIndex, int32_t index/*, int32_t degree = 0*/) const;
 		int32_t TagToInt(const String& tag) const;
 		String IntToTag(int32_t tagIndex) const;
 		void AppendAnimation(const String& tag, const std::shared_ptr<AnimationTimeline>& timeline);
 		int32_t GetTimelineSize(int32_t tagIndex) const;
 		int32_t GetTagSize() const;	/// タグの種類を返す
+		int32_t GetRotateOffset(int32_t tagIndex, int32_t degree) const;
 		
 	private:
 
