@@ -6,6 +6,8 @@ using namespace Equisetum2;
 
 #include "SystemView.hpp"
 #include "Dashboard.hpp"
+#include "Node.hpp"
+#include "Object.hpp"
 
 class Application
 {
@@ -47,6 +49,10 @@ private:
 	std::shared_ptr<FpsPaceMaker> m_fpsMaker;
 	std::shared_ptr<TickCounter> m_fpsCounterTick;
 	std::shared_ptr<FpsCounter> m_fpsCounter;
+
+	// --- serialize begin ---
+	EqHeap::Container<NodePool<Object>::Context> m_nodePoolCtx;
+	// --- serialize end ---
 
 	int32_t m_fps = 60;
 	int32_t m_systemFontSize = 8;

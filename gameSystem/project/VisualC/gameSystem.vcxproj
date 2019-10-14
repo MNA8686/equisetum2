@@ -158,11 +158,15 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
   <ItemGroup>
     <ClCompile Include="..\..\include\Dashboard.cpp" />
     <ClCompile Include="..\..\src\Application.cpp" />
+    <ClCompile Include="..\..\src\RendererContainer.cpp" />
+    <ClCompile Include="..\..\src\ResourceMapper.cpp" />
     <ClCompile Include="..\..\src\EqHeap.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Node.cpp" />
     <ClCompile Include="..\..\src\Object.cpp" />
     <ClCompile Include="..\..\src\Script.cpp" />
+    <ClCompile Include="..\..\src\ScriptContainer.cpp" />
+    <ClCompile Include="..\..\src\ScriptMapper.cpp" />
     <ClCompile Include="..\..\src\SystemChoiceDialog.cpp" />
     <ClCompile Include="..\..\src\SystemView.cpp" />
     <ClCompile Include="..\..\src\SystemViewAnimationTest.cpp" />
@@ -189,6 +193,8 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Application.hpp" />
+    <ClInclude Include="..\..\include\RendererContainer.hpp" />
+    <ClInclude Include="..\..\include\ResourceMapper.hpp" />
     <ClInclude Include="..\..\include\Dashboard.hpp" />
     <ClInclude Include="..\..\include\EqHeap.hpp" />
     <ClInclude Include="..\..\include\EqVector.hpp" />
@@ -196,6 +202,8 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClInclude Include="..\..\include\Node.hpp" />
     <ClInclude Include="..\..\include\Object.hpp" />
     <ClInclude Include="..\..\include\Script.hpp" />
+    <ClInclude Include="..\..\include\ScriptContainer.hpp" />
+    <ClInclude Include="..\..\include\ScriptMapper.hpp" />
     <ClInclude Include="..\..\include\SystemChoiceDialog.hpp" />
     <ClInclude Include="..\..\include\SystemView.hpp" />
     <ClInclude Include="..\..\include\SystemViewAnimationTest.hpp" />

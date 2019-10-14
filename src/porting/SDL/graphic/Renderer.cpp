@@ -461,7 +461,7 @@ namespace Equisetum2
 					size_t vertexCount = textRenderer->m_pImpl->GetVertexCount();
 					size_t indexCount = textRenderer->m_pImpl->GetIndexCount();
 					RenderState::BlendMode blendMode = textRenderer->m_blend;
-					Texture* pTexture = textRenderer->m_bitmapFont->GetSprite()->GetTexture().get();
+					Texture* pTexture = textRenderer->m_bitmapFont ? textRenderer->m_bitmapFont->GetSprite()->GetTexture().get() : nullptr;
 
 					if (vertexCount > 0)
 					{
@@ -644,11 +644,11 @@ namespace Equisetum2
 		switch (type)
 		{
 		case RenderType::SPRITE:
-			obj = SpriteRenderer::Create(shared_from_this());
+			obj = SpriteRenderer::Create();
 			break;
 
 		case RenderType::TEXT:
-			obj = TextRenderer::Create(shared_from_this());
+			obj = TextRenderer::Create();
 			break;
 
 		case RenderType::PRIMITIVE:
@@ -656,13 +656,13 @@ namespace Equisetum2
 			switch(subType)
 			{
 			case PrimitiveType::LINE:
-				obj = LineRenderer::Create(shared_from_this());
+				obj = LineRenderer::Create();
 				break;
 			case PrimitiveType::RECT:
-				obj = RectRenderer::Create(shared_from_this());
+				obj = RectRenderer::Create();
 				break;
 			case PrimitiveType::CIRCLE:
-				obj = CircleRenderer::Create(shared_from_this());
+				obj = CircleRenderer::Create();
 				break;
 			}
 			break;
@@ -1035,4 +1035,15 @@ namespace Equisetum2
 			}
 		}
 	}
+
+	void CurrentRenderer::Set(const std::shared_ptr<Renderer>& renderer)
+	{
+		m_renderer = renderer;
+	}
+
+	std::shared_ptr<Renderer> CurrentRenderer::Get()
+	{
+		return m_renderer.lock();
+	}
 }
+

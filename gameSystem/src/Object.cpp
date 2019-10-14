@@ -1,6 +1,7 @@
 #include "Object.hpp"
 #include "Node.hpp"
 #include "Script.hpp"
+#include "ResourceMapper.hpp"
 #include "cereal/external/rapidjson/document.h"
 #include "cereal/external/rapidjson/reader.h"
 #include "cereal/external/rapidjson/error/error.h"
@@ -8,9 +9,8 @@
 
 using namespace Equisetum2;
 
-static std::shared_ptr<Object> nullObject;
 bool Object::m_dirty = true;
-std::vector<NodeID> Object::m_vUpdate;
+std::vector<Object*> Object::m_creatingObj;		/// 現在作成中のオブジェクト
 
 class JsonParseHelper
 {
@@ -70,27 +70,35 @@ Object::Object()
 
 Object::~Object()
 {
+	Singleton<ResourceMapper>::GetInstance()->Unmap(m_hNode.id);
 }
 
-std::shared_ptr<Object> Object::Create(const String& id)
+NodeHandler Object::Create(const String& id, NodeHandler parent)
 {
+	Object* attachedObject = nullptr;
+
 	EQ_DURING
 	{
-		// インスタンス作成
-		auto tmpObject = std::make_shared<Object>();
-		if (!tmpObject)
-		{
-			EQ_THROW(u8"インスタンスの作成に失敗しました。");
-		}
-
 		// ノード作成
-		auto tmpNode = Node<Object>::Create(id);
-		if (!tmpNode)
+		NodeHandler nodeHandler = Node<Object>::GetFreeNodeWithInit(id);
+		if (nodeHandler.id < 0)
 		{
 			EQ_THROW(u8"ノードの作成に失敗しました。");
 		}
-		// オブジェクトをアタッチ
-		tmpNode->SetAttach(tmpObject);
+		// オブジェクトを取得
+		Node<Object>* node = Node<Object>::GetNodeByHandler(nodeHandler);
+		if (parent.id >= 0)
+		{
+			node->SetParentHandler(parent);
+		}
+		attachedObject = &node->GetAttach();
+		m_creatingObj.push_back(attachedObject);
+
+		stAsset* pAsset = attachedObject->GetAsset();
+		if (!pAsset)
+		{
+			EQ_THROW(u8"アセットのマッピングに失敗しました。");
+		}
 
 		/*
 			R"({
@@ -178,7 +186,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"spriteのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_sprite.push_back(p);
+						pAsset->m_sprite.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -203,7 +211,7 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"bgmのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_bgm.push_back(p);
+						pAsset->m_bgm.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -228,7 +236,71 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"seのロードに失敗しました。");
 						}
 
-						tmpObject->m_asset.m_se.push_back(p);
+						pAsset->m_se.push_back(p);
+
+						Logger::OutputDebug(v.GetString());
+					}
+				}
+				else if (obj.name == "font")
+				{
+					if (!obj.value.IsArray())
+					{
+						EQ_THROW(u8"fontは配列でなければいけません。");
+					}
+
+					for (auto& v : obj.value.GetArray())
+					{
+						auto& it = v.FindMember("id");
+						if (it == json.MemberEnd() ||
+							!it->value.IsString())
+						{
+							EQ_THROW(u8"idが見つかりません。");
+						}
+
+						String strFontName = it->value.GetString();
+
+						auto& it2 = v.FindMember("size");
+						if (it2 == json.MemberEnd() ||
+							!it2->value.IsInt())
+						{
+							EQ_THROW(u8"sizeが見つかりません。");
+						}
+
+						int size = it2->value.GetInt();
+
+						String reqName = String::Sprintf("%s?%d", strFontName.c_str(), static_cast<int32_t>(size));
+						auto p = Singleton<AssetManager>::GetInstance()->Load<FontManager>(reqName);
+						if (!p)
+						{
+							EQ_THROW(u8"fontのロードに失敗しました。");
+						}
+
+						pAsset->m_font.push_back(p);
+
+						Logger::OutputDebug(it->value.GetString());
+					}
+				}
+				else if (obj.name == "bitmapfont")
+				{
+					if(!obj.value.IsArray())
+					{
+						EQ_THROW(u8"bitmapfontは配列でなければいけません。");
+					}
+
+					for (auto& v : obj.value.GetArray())
+					{
+						if (!v.IsString())
+						{
+							EQ_THROW(u8"bitmapfont名は文字列でなければいけません。");
+						}
+
+						auto p = Singleton<AssetManager>::GetInstance()->Load<BitmapFont>(v.GetString());
+						if (!p)
+						{
+							EQ_THROW(u8"bitmapfontのロードに失敗しました。");
+						}
+
+						pAsset->m_bitmapfont.push_back(p);
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -247,18 +319,13 @@ std::shared_ptr<Object> Object::Create(const String& id)
 							EQ_THROW(u8"script名は文字列でなければいけません。");
 						}
 
-						auto p = Script::Create(v.GetString());
-						if (!p)
+						auto script = ScriptContainer::Create(attachedObject, v.GetString());
+						auto* ref = script.Ref();
+						if (!ref)
 						{
 							EQ_THROW(u8"スクリプトのロードに失敗しました。");
 						}
-
-						// 所有しているオブジェクトを設定する
-						p->SetOwner(tmpObject);
-						// IDを設定する
-						p->SetIdentify(v.GetString());
-
-						tmpObject->m_asset.m_script.push_back(p);
+						attachedObject->m_script = script;
 
 						Logger::OutputDebug(v.GetString());
 					}
@@ -267,15 +334,15 @@ std::shared_ptr<Object> Object::Create(const String& id)
 		}
 
 		// スクリプトのOnCreate呼び出し
-		for (auto& script : tmpObject->m_asset.m_script)
+		if (auto scriptRef = attachedObject->m_script.Ref())
 		{
-			script->OnCreate();
+			scriptRef->OnCreate(attachedObject);
 		}
 
 		// 再構築フラグセット
 		m_dirty = true;
 
-		return tmpObject;
+		return nodeHandler;
 	}
 	EQ_HANDLER
 	{
@@ -283,18 +350,17 @@ std::shared_ptr<Object> Object::Create(const String& id)
 	}
 	EQ_END_HANDLER
 
-	return nullptr;
-}
-
-std::shared_ptr<Object> Object::CreateChild(const String& id)
-{
-	auto childObject = Object::Create(id);
-	if (childObject)
+	if (attachedObject)
 	{
-		childObject->SetParent(Self());
+		m_creatingObj.pop_back();
 	}
 
-	return childObject;
+	return{};
+}
+
+NodeHandler Object::CreateChild(const String& id)
+{
+	return Object::Create(id, m_hNode);
 }
 
 const Point_t<FixedDec>& Object::GetPos() const
@@ -320,23 +386,24 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 		// ローカル座標更新
 		//-------------------------------------
 		{
-			auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-			// 親に追従する設定 && 親を持っている？
-			if (m_relativeParent &&
-				thisNode->HasParent())
+			if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 			{
-				// 親ノードに関連付けられたObjectを取得	
-				if(auto& parentObject = thisNode->GetParent()->GetAttach())
+				// 親に追従する設定 && 親を持っている？
+				if (m_relativeParent &&
+					thisNode->HasParent())
 				{
-					// 親との相対座標を算出
-					m_localPos = m_pos - parentObject->GetPos();
+					// 親ノードに関連付けられたObjectを取得	
+					if (auto parentObject = GetParent())
+					{
+						// 親との相対座標を算出
+						m_localPos = m_pos - parentObject->GetPos();
+					}
 				}
-			}
-			else
-			{
-				// m_posとm_localPosは等価
-				m_localPos = pos;
+				else
+				{
+					// m_posとm_localPosは等価
+					m_localPos = pos;
+				}
 			}
 		}
 
@@ -350,22 +417,23 @@ void Object::SetPosForChild()
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
 	// よって、子のワールド座標は確実に更新が発生する。
 
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	if (thisNode->GetChildCount() > 0)
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
-		for (auto& child : thisNode->GetChildrenID())
+		if (thisNode->GetChildCount() > 0)
 		{
-			if (auto& childObject = GetObjectByID(child))
+			for (auto& childHandler : thisNode->GetChildrenHandler())
 			{
-				// 子は親に追従する？
-				if (childObject->GetRelativeParent())
+				if (auto childObject = GetObjectByHandler(childHandler))
 				{
-					// 子のワールド座標更新
-					childObject->m_pos = m_pos + childObject->GetLocalPos();
+					// 子は親に追従する？
+					if (childObject->GetRelativeParent())
+					{
+						// 子のワールド座標更新
+						childObject->m_pos = m_pos + childObject->GetLocalPos();
 
-					// ワールド座標が変化したので子に伝搬する
-					childObject->SetPosForChild();
+						// ワールド座標が変化したので子に伝搬する
+						childObject->SetPosForChild();
+					}
 				}
 			}
 		}
@@ -390,7 +458,7 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 				HasParent())
 			{
 				// 親ノードに関連付けられたObjectを取得	
-				if (auto& parentObject = GetParent())
+				if (auto parentObject = GetParent())
 				{
 					// 親との相対座標からワールド座標を算出
 					m_pos = parentObject->GetPos() + m_localPos;
@@ -428,7 +496,7 @@ void Object::SetRelativeParent(bool on)
 			HasParent())
 		{
 			// 親ノードに関連付けられたObjectを取得	
-			if (auto& parentObject = GetParent())
+			if (auto parentObject = GetParent())
 			{
 				// 親との相対座標を算出
 				m_localPos = m_pos - parentObject->GetPos();
@@ -444,213 +512,226 @@ void Object::SetRelativeParent(bool on)
 
 bool Object::OnFixedUpdate()
 {
-	auto& vScript = m_asset.m_script;
-	for (auto& script : vScript)
+	if (auto script = m_script.Ref())
 	{
-		script->FixedUpdate();
+		script->FixedUpdate(this);
 	}
 
-	return true;
+	return false;
 }
 
 void Object::Update()
 {
 	if (m_dirty)
 	{
-		// スケジュール配列をクリア
-		m_vUpdate.clear();
+		Node<Object>::Reschedule([](Node<Object>& node)->bool {
+				auto& object = node.GetAttach();		// 追加条件判定
+				if (object.IsActive() &&
+					object.IsScheduled())
+				{
+					return true;
+				}
+				return false;
+			});
 
-		// ルートノード取得
-		if (auto& rootNode = Node<Object>::GetNodeByID(0))
-		{
-			// ルートオブジェクト取得
-			if (auto rootObject = rootNode->GetAttach())
-			{
-				// ノードを辿り、スケジュール配列に追加していく
-				Node<Object>::Visit(rootNode, [](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
-					auto object = node->GetAttach();		// 追加条件判定
-					if (object && object->IsActive())
-					{
-						// スケジュール配列にノードを追加
-						m_vUpdate.push_back(object->GetNodeID());
-						return true;
-					}
-					return false;
-				});
-
-				m_dirty = false;
-			}
-		}
+		m_dirty = false;
 	}
 
-	for (auto& id : m_vUpdate)
+	const auto& schedule = Node<Object>::GetSchedule();
+	for (const auto& id : schedule)
 	{
-		if (auto& obj = GetObjectByID(id))
+		if (auto obj = GetObjectByHandler(id))
 		{
 			obj->OnFixedUpdate();
 		}
 	}
 }
 
-void Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+Object* Object::GetCreatingObject()
 {
-	m_vRenderObject.push_back(renderObject);
+	if (m_creatingObj.size() > 0)
+	{
+		return m_creatingObj.back();
+	}
+
+	return nullptr;
+}
+
+int32_t Object::AddRenderObject(std::shared_ptr<RenderObject> renderObject)
+{
+	int32_t index = -1;
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
+	{
+		index = static_cast<int32_t>(pMapped->renderObject.size());
+		pMapped->renderObject.push_back(renderObject);
+	}
+
+	return index;
+}
+
+RenderObject * Object::GetRenderObject(int32_t index)
+{
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
+	{
+		if (index >= 0 && index < static_cast<int32_t>(pMapped->renderObject.size()))
+		{
+			return pMapped->renderObject[index].get();
+		}
+	}
+
+	return nullptr;
 }
 
 bool Object::OnDraw(std::shared_ptr<Renderer>& renderer)
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
+	{
+		Node<Object>::Visit(*thisNode, [this, &renderer](Node<Object>& node, int32_t nestDepth)->bool {
+			auto& obj = node.GetAttach();
 
-	Node<Object>::Visit(thisNode, [this, &renderer](std::shared_ptr<Node<Object>>& node, int32_t nestDepth)->bool {
-		auto& obj = node->GetAttach();
-
-		// アクティブかつ表示状態でなければこの先のノードは処理しない
-		if (!obj->m_active || !obj->m_visible)
-		{
-			return false;
-		}
-
-		// 表示状態のレンダーオブジェクトをレンダーキューに入れる
-		for (auto& renderObject : obj->m_vRenderObject)
-		{
-			if (renderObject->IsVisible())
+			// アクティブかつ表示状態でなければこの先のノードは処理しない
+			if (!obj.m_active || !obj.m_visible)
 			{
-				renderer->AddRenderQueue(renderObject.get());
+				return false;
 			}
-		}
 
-		return true;
-	});
+			if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(obj.m_hNode.id))
+			{
+				// 表示状態のレンダーオブジェクトをレンダーキューに入れる
+				for (auto& renderObject : pMapped->renderObject)
+				{
+					if (renderObject->IsVisible())
+					{
+						renderer->AddRenderQueue(renderObject.get());
+					}
+				}
+			}
+
+			return true;
+		});
+	}
 
 	return true;
 }
 
-stAsset& Object::GetAsset()
+stAsset* Object::GetAsset()
 {
-	return m_asset;
-}
-
-void Object::SetNodeID(NodeID id)
-{
-	m_nodeID = id;
-}
-
-NodeID Object::GetNodeID() const
-{
-	return m_nodeID;
-}
-
-std::shared_ptr<Object>& Object::GetObjectByID(NodeID id)
-{
-	if (auto& node = Node<Object>::GetNodeByID(id))
+	if (stMappedResource* pMapped = Singleton<ResourceMapper>::GetInstance()->Map(m_hNode.id))
 	{
-		return node->GetAttach();
+		return &pMapped->asset;
+	}
+	
+	return nullptr;
+}
+
+Object* Object::GetObjectByHandler(const NodeHandler& handler)
+{
+	if (auto node = Node<Object>::GetNodeByHandler(handler))
+	{
+		return &node->GetAttach();
 	}
 
-	return nullObject;
+	return nullptr;
 }
 
-std::shared_ptr<Object>& Object::Self()
+Object* Object::GetRoot()
 {
-	return GetObjectByID(m_nodeID);
+	if (auto node = Node<Object>::Root())
+	{
+		return &node->GetAttach();
+	}
+
+	return nullptr;
+}
+
+Object* Object::Self()
+{
+	return GetObjectByHandler(m_hNode);
 }
 
 bool Object::HasParent() const
 {
-	return Node<Object>::GetNodeByID(m_nodeID)->HasParent();
-}
-
-std::shared_ptr<Object>& Object::GetParent()
-{
-	if (auto parentNode = Node<Object>::GetNodeByID(m_nodeID)->GetParent())
+	if (auto node = Node<Object>::GetNodeByHandler(m_hNode))
 	{
-		return parentNode->GetAttach();
+		return node->HasParent();
 	}
 
-	return nullObject;
+	return false;
+}
+
+NodeHandler Object::GetParentHandler() const
+{
+	if (auto* selfNode = Node<Object>::GetNodeByHandler(m_hNode))
+	{
+		return selfNode->GetParentHandler();
+	}
+
+	return{};
+}
+
+Object* Object::GetParent() const
+{
+	return GetObjectByHandler(GetParentHandler());
 }
 
 void Object::Destroy()
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	if (!thisNode->IsDestroyed())
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
-		thisNode->Destroy();
+		if (!thisNode->IsDestroyed())
+		{
+			thisNode->Destroy();
 
-		// 再構築フラグセット
-		m_dirty = true;
+			// 再構築フラグセット
+			m_dirty = true;
+		}
 	}
 }
 
 bool Object::IsDestroyed() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	return thisNode->IsDestroyed();
-}
-
-void Object::SetParent(std::shared_ptr<Object>& newParent)
-{
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	auto& newParentNode = Node<Object>::GetNodeByID(newParent->m_nodeID);
-
-	thisNode->SetParent(newParentNode);
-
-	m_dirty = true;
-}
-
-std::shared_ptr<Object>& Object::GetParent() const
-{
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	if (auto& parentObject = thisNode->GetParent())
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
-		return parentObject->GetAttach();
+		return thisNode->IsDestroyed();
 	}
 
-	return nullObject;
+	return false;
+}
+
+void Object::SetParentHandler(const NodeHandler& newParent)
+{
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
+	{
+		thisNode->SetParentHandler(newParent);
+	}
+
+	m_dirty = true;
 }
 
 void Object::DetachChildren()
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	thisNode->DetachChildren();
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
+	{
+		thisNode->DetachChildren();
+	}
 
 	m_dirty = true;
 }
 
-std::vector<std::shared_ptr<Object>> Object::GetChildren() const
+const EqVector<NodeHandler>& Object::GetChildrenHandler() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-
-	std::vector<std::shared_ptr<Object>> vChildren;
-	vChildren.reserve(thisNode->GetChildCount());
-
-	for (auto& nodeID : thisNode->GetChildrenID())
-	{
-		auto& childNode = Node<Object>::GetNodeByID(nodeID);
-
-		if (childNode &&
-			!childNode->IsDestroyed() &&
-			childNode->GetAttach())
-		{
-			vChildren.push_back(childNode->GetAttach());
-		}
-	}
-
-	return vChildren;
-}
-
-const std::list<NodeID>& Object::GetChildrenID() const
-{
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode->GetChildrenID();
+	auto thisNode = Node<Object>::GetNodeByHandler(m_hNode);
+	return thisNode->GetChildrenHandler();
 }
 
 int32_t Object::GetChildCount() const
 {
-	auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
-	return thisNode->GetChildCount();
+	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
+	{
+		return thisNode->GetChildCount();
+	}
+
+	return 0;
 }
 
 bool Object::IsActive() const
@@ -661,6 +742,11 @@ bool Object::IsActive() const
 bool Object::IsVisible() const
 {
 	return m_visible;
+}
+
+bool Object::IsScheduled() const
+{
+	return m_isScheduled;
 }
 
 void Object::SetActive(bool active)
@@ -678,8 +764,19 @@ void Object::SetVisible(bool visible)
 	m_visible = visible;
 }
 
+void Object::SetSchedule(bool schedule)
+{
+	if (m_isScheduled != schedule)
+	{
+		m_dirty = true;
+	}
+
+	m_isScheduled = schedule;
+}
+
 std::shared_ptr<Object> Object::Fork()
 {
+#if 0
 	EQ_DURING
 	{
 		auto& thisNode = Node<Object>::GetNodeByID(m_nodeID);
@@ -747,6 +844,7 @@ std::shared_ptr<Object> Object::Fork()
 		Logger::OutputError(EQ_GET_HANDLER().what());
 	}
 	EQ_END_HANDLER
+#endif
 
 	return nullptr;
 }

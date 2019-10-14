@@ -31,9 +31,9 @@ bool EqHeap::InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize)
 	{
 		// 上位16ビットはハンドラの番号、下位16ビットはシリアル番号
 		slot.handler = (index << 16) | 1;
-		slot.size = 0;
-		slot.refCount = 0;
-		slot.ptr = nullptr;
+		//slot.size = 0;
+		//slot.refCount = 0;
+		//slot.ptr = nullptr;
 
 		index++;
 	}
@@ -55,6 +55,7 @@ EqHeap::Handler EqHeap::New(uint32_t allocSize)
 			{
 				slot.ptr = malloc(allocSize);
 				slot.size = allocSize;
+				//slot.refCount = 0;
 				memset(slot.ptr, 0, allocSize);
 				handler = slot.handler;
 				break;
@@ -149,6 +150,70 @@ bool EqHeap::Test(Handler handler) const
 	return false;
 }
 
+bool EqHeap::Load(std::shared_ptr<IStream> in, EqHeap::Handler& hint)
+{
+	if (in->CanRead())
+	{
+		// ヒント
+		in->Read(reinterpret_cast<uint8_t*>(&hint), sizeof(hint));
+
+		for (auto& handler : m_vHandler)
+		{
+			if (handler.ptr)
+			{
+				free(handler.ptr);
+			}
+
+			// ハンドラ
+			in->Read(reinterpret_cast<uint8_t*>(&handler.handler), sizeof(handler.handler));
+			// 参照カウンタ
+			in->Read(reinterpret_cast<uint8_t*>(&handler.refCount), sizeof(handler.refCount));
+			// サイズ
+			in->Read(reinterpret_cast<uint8_t*>(&handler.size), sizeof(handler.size));
+
+			// データ実体
+			if (handler.size > 0)
+			{
+				handler.ptr = malloc(handler.size);
+				in->Read(reinterpret_cast<uint8_t*>(handler.ptr), handler.size);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool EqHeap::Save(std::shared_ptr<IStream> out, EqHeap::Handler hint)
+{
+	if (out->CanWrite())
+	{
+		// ヒント
+		out->Write(reinterpret_cast<uint8_t*>(&hint), sizeof(hint));
+
+		for (auto& handler : m_vHandler)
+		{
+			// ハンドラ
+			out->Write(reinterpret_cast<uint8_t*>(&handler.handler), sizeof(handler.handler));
+			// 参照カウンタ
+			out->Write(reinterpret_cast<uint8_t*>(&handler.refCount), sizeof(handler.refCount));
+			// サイズ
+			out->Write(reinterpret_cast<uint8_t*>(&handler.size), sizeof(handler.size));
+
+			// データ実体
+			if (handler.ptr)
+			{
+				out->Write(reinterpret_cast<uint8_t*>(handler.ptr), handler.size);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 // 実体をすり替える
 bool EqHeap::Swap(Handler handler1, Handler handler2)
 {
@@ -186,6 +251,7 @@ void EqHeap::Delete(Handler handler)
 			free(slot.ptr);
 			slot.ptr = nullptr;
 			slot.size = 0;
+			slot.refCount = 0;
 			//memset(slot.id, 0, sizeof(slot.id));
 
 			// 次回のためにシリアル番号をインクリメント(0は避ける)

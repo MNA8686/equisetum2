@@ -10,58 +10,10 @@ template<typename T>
 class EqVector final
 {
 public:
-	class iterator
-	{
-	private:
-		T* m_ptr = nullptr;
-		int32_t m_count = 0;
+	using iterator = T*;
+	using const_iterator = const T*;
 
-	public:
-
-		iterator(T* ptr, int32_t count)
-		{
-			m_ptr = ptr;
-			m_count = count;
-		}
-
-		iterator& operator++()
-		{
-			m_count++;
-
-			return *this;
-		}
-
-		iterator operator++(int)
-		{
-			auto it = *this;
-
-			++(*this);
-
-			return it;
-		}
-
-		const T& operator*() const
-		{
-			return m_ptr[m_count];
-		}
-
-		const T* operator->() const
-		{
-			return &m_ptr[m_count];
-		}
-
-		bool operator== (const iterator& r) const
-		{
-			return m_count == r.m_count;
-		}
-
-		bool operator!= (const iterator& r) const
-		{
-			return !(m_count == r.m_count);
-		}
-	};
-
-	EqVector() = default;
+ 	EqVector() = default;
 	EqVector(int32_t num)
 	{
 		Resize(num);
@@ -115,6 +67,12 @@ public:
 		}
 
 		return (*this);
+	}
+
+	T& operator[](std::size_t index)
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+		return heap->Ref<T>(m_handler)[index];
 	}
 
 	void Reserve(int32_t reserveSize)
@@ -206,6 +164,54 @@ public:
 		Resize(0);
 	}
 
+	iterator Erase(iterator pos)
+	{
+		int32_t index = 0;
+		auto data = Data();
+
+		for (int32_t i = 0; i < m_usedSize; i++)
+		{
+			if (pos == &data[i])
+			{
+				if (std::is_class<T>::value)
+				{
+					// 古い方の配列に入っているオブジェクトのデストラクタを呼ぶ
+					CallDestructor(&data[i], 1);
+				}
+				memset(&data[i], 0, sizeof(T));
+				break;
+			}
+			index++;
+		}
+
+		for (int32_t i = index + 1; i < m_usedSize; i++)
+		{
+			if (std::is_class<T>::value)
+			{
+				//コピーコンストラクタ呼び出し
+				CallCopyConstructor(&data[i-1], &data[i], 1);
+
+				// 古い方のオブジェクトのデストラクタを呼ぶ
+				CallDestructor(&data[i], m_usedSize);
+			}
+			else
+			{
+				memcpy(&data[i-1], &data[i], sizeof(T));
+			}
+			memset(&data[i], 0, sizeof(T));
+		}
+
+		if (index != m_usedSize)
+		{
+			m_usedSize--;
+			return pos;
+		}
+		else
+		{
+			return end();
+		}
+	}
+
 	void PushBack(const T& src)
 	{
 		// まずはメモリだけ確保する
@@ -235,19 +241,34 @@ public:
 		}
 	}
 
+	T& Back()
+	{
+		return Data()[m_usedSize - 1];
+	}
+
 	int32_t Size() const
 	{
 		return m_usedSize;
 	}
 
+	const_iterator begin() const
+	{
+		return Data();
+	}
+
+	const_iterator end() const
+	{
+		return Data() + m_usedSize;
+	}
+
 	iterator begin()
 	{
-		return{ Data(), 0 };
+		return Data();
 	}
 
 	iterator end()
 	{
-		return{ Data(), m_usedSize };
+		return Data() + m_usedSize;
 	}
 
 private:

@@ -76,6 +76,11 @@ public:
 
 		~Container()
 		{
+			Reset();
+		}
+
+		void Reset()
+		{
 			auto heap = Singleton<EqHeap>::GetInstance();
 			if (heap->DecRef(m_handler) == 0)
 			{
@@ -86,11 +91,19 @@ public:
 
 				heap->Delete(m_handler);
 			}
+
+			m_handler = 0;
 		}
 
 		operator Handler () const
 		{
 			return m_handler;
+		}
+
+		void Wrap(Handler handler)
+		{
+			Reset();
+			m_handler = handler;
 		}
 
 	private:
@@ -166,17 +179,14 @@ protected:
 
 	typedef struct
 	{
-		Handler handler;
-		uint32_t size;
-		int32_t refCount;
-		void* ptr;
+		Handler handler = 0;
+		uint32_t size = 0;
+		int32_t refCount = 0;
+		void* ptr = nullptr;
 	}stHeap;
 
 	std::vector<stHeap> m_vHandler;
 	int32_t m_reservedSize = 0;
-
-	int32_t AddRef(Handler handler);
-	int32_t DecRef(Handler handler);
 
 public:
 	bool InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize = 0);
@@ -205,8 +215,11 @@ public:
 	void* Ref(Handler handler) const;
 	bool Test(Handler handler) const;
 
-	bool Load(std::shared_ptr<IStream> in);
-	bool Save(std::shared_ptr<IStream> out);
+	int32_t AddRef(Handler handler);
+	int32_t DecRef(Handler handler);
+
+	bool Load(std::shared_ptr<IStream> in, Handler& hint);
+	bool Save(std::shared_ptr<IStream> out, Handler hint);
 
 	template<class T>
 	struct isContainer : std::false_type {};

@@ -43,7 +43,6 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
-			//archive(CEREAL_NVP(m_renderer));
 		}
 
 		template<class Archive>
@@ -54,7 +53,6 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_layer));
 			archive(CEREAL_NVP(m_orderInLayer));
 			archive(CEREAL_NVP(m_visible));
-			//archive(CEREAL_NVP(m_renderer));
 		}
 
 		virtual bool Calculation() = 0;
@@ -67,7 +65,6 @@ namespace Equisetum2
 		int m_layer = 0;			/// 表示レイヤー
 		int32_t m_orderInLayer = 0;		/// レイヤー内での表示順序(小さいほど奥に表示される)
 		bool m_visible = true;		/// 表示属性
-		std::weak_ptr<Renderer> m_renderer;
 		// --- serialize end ---
 	};
 }
@@ -145,7 +142,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<SpriteRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<SpriteRenderer> Create();
 		void InitTest();
 		//
 		std::shared_ptr<Sprite> m_sprite;	/// 表示スプライト
@@ -217,17 +214,43 @@ namespace Equisetum2
 		{
 			archive(cereal::base_class<RenderObject>(this));
 
-//			std::string spriteId = m_sprite->Identify();
-//			archive(CEREAL_NVP(spriteId));
-
-//			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_pivot));
 			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_textHAlignment));
+			std::string text = String(m_text);
+			archive(CEREAL_NVP(text));
+
+			BitmapFont::SerializeHint::From from = BitmapFont::SerializeHint::From::Empty;
+
+			if (m_bitmapFont)
+			{
+				BitmapFont::SerializeHint hint = m_bitmapFont->GetHint();
+				from = hint.from;
+
+				if (from == BitmapFont::SerializeHint::From::FontManager)
+				{
+					std::string id = hint.id;
+					archive(CEREAL_NVP(id));
+					Color color = hint.color;
+					archive(CEREAL_NVP(color));
+					Size maxSize = hint.maxSize;
+					archive(CEREAL_NVP(maxSize));
+					std::string codepoint = m_bitmapFont->CodePoint();
+					archive(CEREAL_NVP(codepoint));
+				}
+				else if (from == BitmapFont::SerializeHint::From::Asset)
+				{
+					std::string id = hint.id;
+					archive(CEREAL_NVP(id));
+				}
+			}
+			archive(CEREAL_NVP(from));
 		}
 
 		template<class Archive>
@@ -235,19 +258,58 @@ namespace Equisetum2
 		{
 			InitTest();
 			archive(cereal::base_class<RenderObject>(this));
-
-//			std::string spriteId;
-//			archive(CEREAL_NVP(spriteId));
-//			m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
-
-//			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
 			archive(CEREAL_NVP(m_scale));
+			archive(CEREAL_NVP(m_pivot));
 			archive(CEREAL_NVP(m_color));
 			archive(CEREAL_NVP(m_blend));
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_textHAlignment));
+			std::string text;
+			archive(CEREAL_NVP(text));
+
+			BitmapFont::SerializeHint::From from = BitmapFont::SerializeHint::From::Empty;
+			archive(CEREAL_NVP(from));
+
+			if (from == BitmapFont::SerializeHint::From::FontManager)
+			{
+				std::string id;
+				archive(CEREAL_NVP(id));
+
+				if (!id.empty())
+				{
+					auto font = Singleton<AssetManager>::GetInstance()->Load<FontManager>(id);
+					if (font)
+					{
+						Color color;
+						archive(CEREAL_NVP(color));
+						Size maxSize;
+						archive(CEREAL_NVP(maxSize));
+						std::string codepoint;
+						archive(CEREAL_NVP(codepoint));
+
+						SetBitmapFont(font->MakeBitmapFont(codepoint, color, maxSize));
+						SetText(text);
+					}
+				}
+			}
+			else if (from == BitmapFont::SerializeHint::From::Asset)
+			{
+				std::string id;
+				archive(CEREAL_NVP(id));
+
+				if (!id.empty())
+				{
+					auto bitmapfont = Singleton<AssetManager>::GetInstance()->Load<BitmapFont>(id);
+					if (bitmapfont)
+					{
+						SetBitmapFont(bitmapfont);
+						SetText(text);
+					}
+				}
+			}
 		}
 
 		class Impl;
@@ -255,7 +317,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<TextRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<TextRenderer> Create();
 		void InitTest();
 
 		void MeasurementBoxSize();
@@ -271,11 +333,11 @@ namespace Equisetum2
 		bool m_flipY = false;	/// Y方向反転
 		float m_angle = 0;		/// 回転角度
 		TextHAlignment m_textHAlignment = TextHAlignment::Left;
+		std::u32string m_text;		/// コードポイント配列
 		//
 
 		float m_angleRad = 0;
 		std::vector<std::shared_ptr<SpriteRenderer>> m_vSpriteRenderer;
-		std::u32string m_text;		/// コードポイント配列
 		int32_t m_height = 0;		/// フォントの高さ
 
 		typedef struct
@@ -368,7 +430,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<LineRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<LineRenderer> Create();
 		void InitTest();
 
 		std::vector<Point> m_vPos;			/// 表示位置
@@ -427,7 +489,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<RectRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<RectRenderer> Create();
 		void InitTest();
 
 		static const int vertexMax = 4;
@@ -489,7 +551,7 @@ namespace Equisetum2
 
 	private:
 		friend class Renderer;
-		static std::shared_ptr<CircleRenderer> Create(std::shared_ptr<Renderer>& renderer);
+		static std::shared_ptr<CircleRenderer> Create();
 		void InitTest();
 
 		Point m_pos{};			/// 表示位置
