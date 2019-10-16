@@ -13,9 +13,16 @@ namespace Equisetum2
 		return std::make_shared<AnimationTimeline>();
 	}
 
+	void AnimationTimeline::Begin()
+	{
+		m_totalTime = 0;
+		m_vTimeline.clear();
+		m_isAppending = true;
+	}
+
 	bool AnimationTimeline::AppendTimeline(const std::shared_ptr<Sprite>& sprite, const String & tag, int32_t ptr, int32_t delay)
 	{
-		if (!sprite)
+		if (!m_isAppending || !sprite)
 		{
 			return false;
 		}
@@ -34,9 +41,35 @@ namespace Equisetum2
 		return true;
 	}
 
+	void AnimationTimeline::End()
+	{
+		if (m_loop == AnimationLoopType::pingPong)
+		{
+			if (m_vTimeline.size() >= 3)
+			{
+				size_t begin = m_vTimeline.size() - 2;
+				size_t end = 1;
+
+				for (size_t i = begin; i >= end; i--)
+				{
+					auto elem = m_vTimeline[i];
+					elem.m_timing = m_totalTime;
+					m_totalTime += elem.m_length;
+					
+					m_vTimeline.push_back(elem);
+				}
+			}
+		}
+
+		m_isAppending = false;
+	}
+
 	void AnimationTimeline::SetLoopType(AnimationLoopType type)
 	{
-		m_loop = type;
+		if (m_isAppending)
+		{
+			m_loop = type;
+		}
 	}
 
 	void AnimationTimeline::SetRotate(AnimationTimeline::stRotate rotate)

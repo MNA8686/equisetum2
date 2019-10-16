@@ -919,6 +919,8 @@ namespace Equisetum2
 				// Animationオブジェクト作成
 				auto animation = AnimationTimeline::Create();
 
+				animation->Begin();
+
 				// parse "tag"
 				auto& tag = obj.FindMember("tag");
 				if (tag == obj.MemberEnd() ||
@@ -936,15 +938,19 @@ namespace Equisetum2
 				}
 				String strLoopType = looptype->value.GetString();
 				if (strLoopType != "none" &&
-					strLoopType != "loop" /*&&
-					strLoopType != "pingPong"*/)
+					strLoopType != "loop" &&
+					strLoopType != "pingPong")
 				{
 					EQ_THROW(u8"不正なlooptypeが設定されています。");
 				}
+				// アニメーションタイプを設定
 				if (strLoopType == "loop")
 				{
-					// アニメーションタイプを設定
 					animation->SetLoopType(AnimationLoopType::loop);
+				}
+				else if (strLoopType == "pingPong")
+				{
+					animation->SetLoopType(AnimationLoopType::pingPong);
 				}
 
 				// parse "rotate"
@@ -1082,7 +1088,10 @@ namespace Equisetum2
 					{
 						animation->AppendTimeline(timelineElem.sprite, timelineElem.tag, i, timelineElem.delay);
 					}
+
 				}
+
+				animation->End();
 
 				animationObj->AppendAnimation(tag->value.GetString(), animation);
 			}

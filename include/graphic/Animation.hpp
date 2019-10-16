@@ -43,7 +43,9 @@ namespace Equisetum2
 		virtual ~AnimationTimeline() = default;
 
 		static std::shared_ptr<AnimationTimeline> Create();
+		void Begin();
 		bool AppendTimeline(const std::shared_ptr<Sprite>& sprite, const String& tag, int32_t ptr, int32_t delay);
+		void End();
 		void SetLoopType(AnimationLoopType type);
 		void SetRotate(stRotate rotate);
 		stRotate GetRotate(void) const;
@@ -66,6 +68,7 @@ namespace Equisetum2
 		int32_t m_totalTime = 0;
 
 		stRotate m_rotate;
+		bool m_isAppending = false;
 	};
 
 	class Animation
