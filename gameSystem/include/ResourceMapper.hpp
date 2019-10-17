@@ -19,6 +19,7 @@ struct stAsset
 	std::vector<std::shared_ptr<SE>> m_se;
 	std::vector<std::shared_ptr<FontManager>> m_font;
 	std::vector<std::shared_ptr<BitmapFont>> m_bitmapfont;
+	std::vector<std::shared_ptr<Animation>> m_animation;
 
 	// アセットはIDのみを保存しておき、リストア時にはロードし直す
 	template<class Archive>
@@ -72,6 +73,16 @@ struct stAsset
 				bitmapfontID.push_back(p ? p->Identify() : "");
 			}
 			archive(CEREAL_NVP(bitmapfontID));
+		}
+
+		// アニメーション
+		{
+			std::vector<std::string> animationID;
+			for (auto& p : m_animation)
+			{
+				animationID.push_back(p ? p->Identify() : "");
+			}
+			archive(CEREAL_NVP(animationID));
 		}
 	}
 
@@ -144,6 +155,20 @@ struct stAsset
 			for (auto& id : bitmapfontID)
 			{
 				m_bitmapfont.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<BitmapFont>(id));
+				index++;
+			}
+		}
+
+		// アニメーション
+		{
+			std::vector<std::string> animationID;
+			archive(CEREAL_NVP(animationID));
+
+			int index = 0;
+			m_animation.clear();
+			for (auto& id : animationID)
+			{
+				m_animation.push_back(id.empty() ? nullptr : Singleton<AssetManager>::GetInstance()->Load<Animation>(id));
 				index++;
 			}
 		}

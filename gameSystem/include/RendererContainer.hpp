@@ -21,6 +21,28 @@ private:
 	int32_t m_rendererIndex = -1;
 };
 
+class AnimationContainer
+{
+public:
+	AnimationContainer();
+	~AnimationContainer() = default;
+
+	bool SetAnimation(int32_t assetAnimation);
+	bool Inc(int32_t delta);
+#if 0
+	SpriteRenderer* Ref();
+
+	SpriteRenderer* operator->();
+#endif
+
+private:
+	NodeHandler m_nodeHandler;
+	int32_t m_assetAnimation = -1;
+	int32_t m_count = 0;
+
+	SpriteRendererContainer m_sprite;
+};
+
 class LineRendererContainer
 {
 public:

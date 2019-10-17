@@ -40,6 +40,93 @@ SpriteRenderer* SpriteRendererContainer::operator->()
 
 //-----------------------------------------------------------------------------------------------
 
+AnimationContainer::AnimationContainer()
+{
+	if (auto obj = Object::GetCreatingObject())
+	{
+		m_nodeHandler = obj->GetNodeHandler();
+	}
+
+#if 0
+	if (auto obj = Object::GetCreatingObject())
+	{
+		// スプライトレンダラを作る
+		if (auto newRenderer = ScriptBase::GetRenderer()->CreateRenderObject<SpriteRenderer>())
+		{
+			int32_t rendererIndex = obj->AddRenderObject(newRenderer);
+			if (rendererIndex >= 0)
+			{
+				m_nodeHandler = obj->GetNodeHandler();
+				m_rendererIndex = rendererIndex;
+			}
+		}
+	}r
+#endif
+}
+
+bool AnimationContainer::SetAnimation(int32_t assetAnimation)
+{
+	m_assetAnimation = assetAnimation;
+	m_count = 0;
+
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		int32_t index = anim->GetIndexByTime(0, m_count);
+		
+		m_sprite->SetSprite(anim->GetElement(0, index)->m_sprite);
+	}
+
+	return true;
+}
+
+bool AnimationContainer::Inc(int32_t delta)
+{
+	m_count += delta;
+
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		int32_t index = anim->GetIndexByTime(0, m_count);
+		int32_t offset = anim->GetRotateOffset(0, 0);
+		auto elem = anim->GetElement(0, index);
+		
+		m_sprite->SetSprite(elem->m_sprite).
+			SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset).
+			SetLayer(5).
+			SetBlendMode(BlendMode::Blend).
+			SetPos({ 448 / 2, 480 / 2 }).
+			SetScale(1.5f, 1.5f);
+	}
+
+	return true;
+}
+
+#if 0
+SpriteRenderer* SpriteRendererContainer::Ref()
+{
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		if (auto renderObject = obj->GetRenderObject(m_rendererIndex))
+		{
+			if (renderObject->GetType() == RenderType::SPRITE)
+			{
+				return static_cast<SpriteRenderer*>(renderObject);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+SpriteRenderer* SpriteRendererContainer::operator->()
+{
+	return Ref();
+}
+#endif
+
+//-----------------------------------------------------------------------------------------------
+
 LineRendererContainer::LineRendererContainer()
 {
 	if (auto obj = Object::GetCreatingObject())

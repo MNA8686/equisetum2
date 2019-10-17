@@ -305,6 +305,31 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 						Logger::OutputDebug(v.GetString());
 					}
 				}
+				else if (obj.name == "animation")
+				{
+					if(!obj.value.IsArray())
+					{
+						EQ_THROW(u8"animationは配列でなければいけません。");
+					}
+
+					for (auto& v : obj.value.GetArray())
+					{
+						if (!v.IsString())
+						{
+							EQ_THROW(u8"animation名は文字列でなければいけません。");
+						}
+
+						auto p = Singleton<AssetManager>::GetInstance()->Load<Animation>(v.GetString());
+						if (!p)
+						{
+							EQ_THROW(u8"ainimationのロードに失敗しました。");
+						}
+
+						pAsset->m_animation.push_back(p);
+
+						Logger::OutputDebug(v.GetString());
+					}
+				}
 				else if (obj.name == "script")
 				{
 					if (!obj.value.IsArray())

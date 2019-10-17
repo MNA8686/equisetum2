@@ -321,7 +321,7 @@ namespace Equisetum2
 		Singleton<SharedPool<BGM>>::GetInstance();
 		Singleton<SharedPool<SE>>::GetInstance();
 		Singleton<SharedPool<Texture>>::GetInstance();
-		Singleton<SharedPool<AnimationTimeline>>::GetInstance();
+		Singleton<SharedPool<Animation>>::GetInstance();
 	}
 
 	bool AssetManager::SetArchivePath(const String& path, const String& secretKey)
