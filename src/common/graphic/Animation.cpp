@@ -82,6 +82,11 @@ namespace Equisetum2
 		return m_rotate;
 	}
 
+	int32_t AnimationTimeline::GetTotalTime(void) const
+	{
+		return m_totalTime;
+	}
+
 	bool AnimationTimeline::MoveFrom(std::shared_ptr<AnimationTimeline>&& src)
 	{
 		m_vTimeline = std::move(src->m_vTimeline);
@@ -236,6 +241,16 @@ namespace Equisetum2
 		}
 
 		return m_vTimeline[tagIndex].timeline->GetSize();
+	}
+
+	int32_t Animation::GetTotalTime(int32_t tagIndex) const
+	{
+		if (tagIndex < 0 || tagIndex >= static_cast<int32_t>(m_vTimeline.size()))
+		{
+			return 0;
+		}
+
+		return m_vTimeline[tagIndex].timeline->GetTotalTime();
 	}
 
 	int32_t Animation::GetTagSize() const

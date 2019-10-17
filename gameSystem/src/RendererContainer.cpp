@@ -59,6 +59,30 @@ bool AnimationContainer::SetAnimation(int32_t assetAnimation)
 	return true;
 }
 
+void AnimationContainer::SetDegree(int32_t degree)
+{
+	m_degree = degree;
+}
+
+int32_t AnimationContainer::TagToInt(const String& tag) const
+{
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		return anim->TagToInt(tag);
+	}
+
+	return -1;
+}
+
+void AnimationContainer::Start(int32_t tagIndex)
+{
+	m_tagIndex = tagIndex;
+	m_count = 0;
+
+	Update();
+}
+
 bool AnimationContainer::Inc(int32_t delta)
 {
 	m_count += delta;
@@ -66,6 +90,11 @@ bool AnimationContainer::Inc(int32_t delta)
 	Update();
 
 	return true;
+}
+
+SpriteRenderer* AnimationContainer::GetSpriteRenderer()
+{
+	return m_sprite.Ref();
 }
 
 void AnimationContainer::Update()
@@ -79,36 +108,13 @@ void AnimationContainer::Update()
 	{
 		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
 		int32_t index = anim->GetIndexByTime(m_tagIndex, m_count);
-		int32_t offset = anim->GetRotateOffset(m_tagIndex, 0);
 		auto elem = anim->GetElement(m_tagIndex, index);
 		
-	//	m_sprite->SetSprite(elem->m_sprite).
-	//		SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+		int32_t offset = anim->GetRotateOffset(m_tagIndex, m_degree);
+		m_sprite->SetSprite(elem->m_sprite).
+			SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
 	}
 }
-
-#if 0
-SpriteRenderer* SpriteRendererContainer::Ref()
-{
-	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
-	{
-		if (auto renderObject = obj->GetRenderObject(m_rendererIndex))
-		{
-			if (renderObject->GetType() == RenderType::SPRITE)
-			{
-				return static_cast<SpriteRenderer*>(renderObject);
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-SpriteRenderer* SpriteRendererContainer::operator->()
-{
-	return Ref();
-}
-#endif
 
 //-----------------------------------------------------------------------------------------------
 
