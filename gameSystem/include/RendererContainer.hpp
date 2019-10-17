@@ -39,8 +39,11 @@ private:
 	NodeHandler m_nodeHandler;
 	int32_t m_assetAnimation = -1;
 	int32_t m_count = 0;
+	int32_t m_tagIndex = -1;
 
 	SpriteRendererContainer m_sprite;
+
+	void Update();
 };
 
 class LineRendererContainer

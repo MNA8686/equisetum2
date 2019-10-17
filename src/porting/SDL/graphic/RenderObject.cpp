@@ -91,9 +91,8 @@ namespace Equisetum2
 		{
 			m_sprite = sprite;
 		}
-		m_atlasNum = 0;
-
-		m_dirtyTexCoords = true;
+			m_atlasNum = 0;
+			m_dirtyTexCoords = true;
 		return *this;
 	}
 
