@@ -75,10 +75,11 @@ int32_t AnimationContainer::TagToInt(const String& tag) const
 	return -1;
 }
 
-void AnimationContainer::Start(int32_t tagIndex)
+void AnimationContainer::Start(int32_t tagIndex, bool reverse)
 {
 	m_tagIndex = tagIndex;
 	m_count = 0;
+	m_reverse = reverse;
 
 	Update();
 }
@@ -99,18 +100,36 @@ SpriteRenderer* AnimationContainer::GetSpriteRenderer()
 
 void AnimationContainer::Update()
 {
-	//if (m_tagIndex < 0)
-	//{
-	//	return;
-	//}
-
 	if (Object* obj = Object::GetObjectByHandler(m_nodeHandler))
 	{
 		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
 		if (const std::shared_ptr<AnimationTimeline> timeline = anim->GetTimeline(m_tagIndex))
 		{
+			int32_t totalTime = timeline->GetTotalTime();
+			if (totalTime == 0)
+			{
+				m_count = 0;
+			}
+			else
+			{
+				switch (timeline->GetLoopType())
+				{
+				case AnimationLoopType::none:
+					if (m_count > totalTime)
+					{
+						m_count = totalTime;
+					}
+					break;
+				case AnimationLoopType::loop:
+				case AnimationLoopType::pingPong:
+					m_count %= totalTime;
+					break;
+				}
+
+			}
+
 			// 現在時刻に対応するアニメーション番号を取得する
-			int32_t index = timeline->GetIndexByTime(m_count);
+			int32_t index = timeline->GetIndexByTime(m_reverse ? totalTime - m_count :m_count);
 			// アニメーション番号からスプライトなどのデータを取り出す
 			const stAnimationElement* elem = timeline->GetElement(index);
 

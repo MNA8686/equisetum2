@@ -30,7 +30,7 @@ public:
 	bool SetAnimation(int32_t assetAnimation);
 	void SetDegree(int32_t degree);
 	int32_t TagToInt(const String& tag) const;
-	void Start(int32_t tagIndex);	/// アニメーションを開始する
+	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
 	bool Inc(int32_t delta=1000);		/// アニメーションを進める(1000で1フレーム相当)
 	SpriteRenderer* GetSpriteRenderer();
 
@@ -42,6 +42,7 @@ private:
 	int32_t m_degree = 0;		/// 回転アニメーション用の角度
 
 	SpriteRendererContainer m_sprite;
+	bool m_reverse = false;
 
 	void Update();
 };

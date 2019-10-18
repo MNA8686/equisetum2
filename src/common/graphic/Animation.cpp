@@ -87,6 +87,11 @@ namespace Equisetum2
 		return m_totalTime;
 	}
 
+	AnimationLoopType AnimationTimeline::GetLoopType(void) const
+	{
+		return m_loop;
+	}
+
 	bool AnimationTimeline::MoveFrom(std::shared_ptr<AnimationTimeline>&& src)
 	{
 		m_vTimeline = std::move(src->m_vTimeline);
