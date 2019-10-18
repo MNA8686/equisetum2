@@ -62,6 +62,7 @@ namespace Equisetum2
 		int32_t GetIndexByTime(int32_t time) const;
 		const stAnimationElement* GetElement(int32_t index) const;
 		int32_t GetSize() const;
+		int32_t GetRotateOffset(int32_t degree) const;
 
 	private:
 
@@ -93,15 +94,11 @@ namespace Equisetum2
 		*/
 		virtual String Identify() const;
 
-		int32_t GetIndexByTime(int32_t tagIndex, int32_t time) const;
-		const stAnimationElement* GetElement(int32_t tagIndex, int32_t index) const;
+		int32_t GetTagSize() const;	/// タグの種類を返す
 		int32_t TagToInt(const String& tag) const;
 		String IntToTag(int32_t tagIndex) const;
 		void AppendAnimation(const String& tag, const std::shared_ptr<AnimationTimeline>& timeline);
-		int32_t GetTimelineSize(int32_t tagIndex) const;
-		int32_t GetTotalTime(int32_t tagIndex) const;
-		int32_t GetTagSize() const;	/// タグの種類を返す
-		int32_t GetRotateOffset(int32_t tagIndex, int32_t degree) const;
+		const std::shared_ptr<AnimationTimeline> GetTimeline(int32_t tagIndex) const;
 		
 	private:
 

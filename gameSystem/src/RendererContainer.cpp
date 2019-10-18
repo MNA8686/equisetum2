@@ -99,20 +99,31 @@ SpriteRenderer* AnimationContainer::GetSpriteRenderer()
 
 void AnimationContainer::Update()
 {
-	if (m_tagIndex < 0)
-	{
-		return;
-	}
+	//if (m_tagIndex < 0)
+	//{
+	//	return;
+	//}
 
-	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	if (Object* obj = Object::GetObjectByHandler(m_nodeHandler))
 	{
 		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
-		int32_t index = anim->GetIndexByTime(m_tagIndex, m_count);
-		auto elem = anim->GetElement(m_tagIndex, index);
-		
-		int32_t offset = anim->GetRotateOffset(m_tagIndex, m_degree);
-		m_sprite->SetSprite(elem->m_sprite).
-			SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+		if (const std::shared_ptr<AnimationTimeline> timeline = anim->GetTimeline(m_tagIndex))
+		{
+			// 現在時刻に対応するアニメーション番号を取得する
+			int32_t index = timeline->GetIndexByTime(m_count);
+			// アニメーション番号からスプライトなどのデータを取り出す
+			const stAnimationElement* elem = timeline->GetElement(index);
+
+			// 回転をサポートしているならオフセットを取得する
+			int32_t offset = timeline->GetRotateOffset(m_degree);
+
+			auto sprite = m_sprite.Ref();
+			if (sprite->GetSprite() != elem->m_sprite.get())
+			{
+				sprite->SetSprite(elem->m_sprite);
+			}
+			sprite->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+		}
 	}
 }
 
