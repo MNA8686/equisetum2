@@ -351,7 +351,7 @@ namespace Equisetum2
 				ext, _MAX_EXT
 			);
 
-			return{ (const char16_t*)drive, (const char16_t*)dir, (const char16_t*)fname, (const char16_t*)ext };
+			return { String((const char16_t*)drive), String((const char16_t*)dir), String((const char16_t*)fname), String((const char16_t*)ext) };
 		}
 	};
 

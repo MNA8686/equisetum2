@@ -5,6 +5,7 @@
 using namespace Equisetum2;
 
 #include "EqHeap.hpp"
+#include "ScriptMapper.hpp"
 
 class Object;
 class ScriptContainer

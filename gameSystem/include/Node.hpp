@@ -10,6 +10,9 @@ using namespace Equisetum2;
 #include <functional>
 
 template<class T>
+class NodePool;
+
+template<class T>
 class Node final
 {
 public:

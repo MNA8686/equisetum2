@@ -57,6 +57,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -97,6 +98,7 @@ copy "debug\libEquisetum2_d.lib" "..\..\lib\win32\lib"</Command>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

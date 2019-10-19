@@ -122,7 +122,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 
 		// objectの定義ファイルかどうかチェック
 		{
-			auto& it = json.FindMember("type");
+			auto it = json.FindMember("type");
 			if (it == json.MemberEnd() ||
 				!it->value.IsString())
 			{
@@ -139,7 +139,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 		// ID一致チェック
 		{
 			// id取得
-			auto& id_ = json.FindMember("id");
+			auto id_ = json.FindMember("id");
 			if (id_ == json.MemberEnd() ||
 				id_->value.GetType() != rapidjson::kStringType)
 			{
@@ -156,7 +156,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 
 		// アセットを取得
 		{
-			auto& it = json.FindMember("asset");
+			auto it = json.FindMember("asset");
 			if (it == json.MemberEnd() ||
 				!it->value.IsObject())
 			{
@@ -250,7 +250,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 
 					for (auto& v : obj.value.GetArray())
 					{
-						auto& it = v.FindMember("id");
+						auto it = v.FindMember("id");
 						if (it == json.MemberEnd() ||
 							!it->value.IsString())
 						{
@@ -259,7 +259,7 @@ NodeHandler Object::Create(const String& id, NodeHandler parent)
 
 						String strFontName = it->value.GetString();
 
-						auto& it2 = v.FindMember("size");
+						auto it2 = v.FindMember("size");
 						if (it2 == json.MemberEnd() ||
 							!it2->value.IsInt())
 						{

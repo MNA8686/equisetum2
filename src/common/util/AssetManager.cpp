@@ -73,7 +73,7 @@ namespace Equisetum2
 			// タイプ一致チェック
 			{
 				// type取得
-				auto& type = doc.FindMember("type");
+				auto type = doc.FindMember("type");
 				if (type == doc.MemberEnd() ||
 					type->value.GetType() != rapidjson::kStringType)
 				{
@@ -92,7 +92,7 @@ namespace Equisetum2
 			std::shared_ptr<Texture> textureIn;
 			{
 				// テクスチャID取得
-				auto& imageid = doc.FindMember("textureid");
+				auto imageid = doc.FindMember("textureid");
 				if (imageid == doc.MemberEnd() ||
 					imageid->value.GetType() != rapidjson::kStringType)
 				{
@@ -118,7 +118,7 @@ namespace Equisetum2
 			std::vector<stTag> vSpriteTag;
 
 			{
-				auto& atlas = doc.FindMember("atlas");
+				auto atlas = doc.FindMember("atlas");
 				if (atlas == doc.MemberEnd() ||
 					atlas->value.GetType() != rapidjson::kArrayType)
 				{
@@ -140,9 +140,9 @@ namespace Equisetum2
 							Size matrix{ 1, 1 };	// 横 x 縦
 						}tmp;
 
-						auto& obj = atlas->value[i].GetObject();
+						auto obj = atlas->value[i].GetObject();
 
-						auto& tag = obj.FindMember("tag");
+						auto tag = obj.FindMember("tag");
 						if (tag != obj.MemberEnd())
 						{
 							// テクスチャ読み込み
@@ -153,7 +153,7 @@ namespace Equisetum2
 							Logger::OutputDebug("  tag %s %d", tagInfo.tag.c_str(), tagInfo.index);
 						}
 
-						auto& pos = obj.FindMember("pos");
+						auto pos = obj.FindMember("pos");
 						if (pos != obj.MemberEnd())
 						{
 							if (pos->value.GetType() != rapidjson::kArrayType)
@@ -177,7 +177,7 @@ namespace Equisetum2
 							Logger::OutputDebug("  pos %d %d", tmp.point.x, tmp.point.y);
 						}
 
-						auto& size = obj.FindMember("size");
+						auto size = obj.FindMember("size");
 						if (size != obj.MemberEnd())
 						{
 							if (size->value.GetType() != rapidjson::kArrayType)
@@ -201,7 +201,7 @@ namespace Equisetum2
 							Logger::OutputDebug("  size %d %d", tmp.src.x, tmp.src.y);
 						}
 
-						auto& pivot = obj.FindMember("pivot");
+						auto pivot = obj.FindMember("pivot");
 						if (pivot != obj.MemberEnd())
 						{
 							if (pivot->value.GetType() != rapidjson::kArrayType)
@@ -225,7 +225,7 @@ namespace Equisetum2
 							Logger::OutputDebug("  pivot %lf %lf", tmp.pivot.x, tmp.pivot.y);
 						}
 
-						auto& matrix = obj.FindMember("matrix");
+						auto matrix = obj.FindMember("matrix");
 						if (matrix != obj.MemberEnd())
 						{
 							if (matrix->value.GetType() != rapidjson::kArrayType)
@@ -600,7 +600,7 @@ namespace Equisetum2
 			imageIn->SetIdentify(id);
 			
 			auto data = imageIn->Data();
-			for (int i = 0; i < imageIn->Width() * imageIn->Height(); i++)
+			for (uint32_t i = 0; i < imageIn->Width() * imageIn->Height(); i++)
 			{
 				if (data[i].rgba8888.r == 0 &&
 					data[i].rgba8888.g == 0xff &&
@@ -666,7 +666,7 @@ namespace Equisetum2
 
 			// スプライトのjson追加項目としてcodepointが存在するので、それをコールバックで読み出す
 			auto cb = [&codePoint](rapidjson::Document& doc)->bool {
-				auto& codepoint_ = doc.FindMember("codepoint");
+				auto codepoint_ = doc.FindMember("codepoint");
 				if (codepoint_ == doc.MemberEnd() ||
 					codepoint_->value.GetType() != rapidjson::kStringType)
 				{
@@ -886,7 +886,7 @@ namespace Equisetum2
 			// タイプ一致チェック
 			{
 				// type取得
-				auto& type = doc.FindMember("type");
+				auto type = doc.FindMember("type");
 				if (type == doc.MemberEnd() ||
 					type->value.GetType() != rapidjson::kStringType)
 				{
@@ -902,7 +902,7 @@ namespace Equisetum2
 			}
 
 			// parse "ptr"
-			auto& ptr = doc.FindMember("ptr");
+			auto ptr = doc.FindMember("ptr");
 			if (ptr == doc.MemberEnd() ||
 				ptr->value.GetType() != rapidjson::kArrayType)
 			{
@@ -914,7 +914,7 @@ namespace Equisetum2
 				{
 					EQ_THROW(u8"ptrの配列内にはobjectが配置されていなければいけません。");
 				}
-				auto& obj = elem.GetObject();
+				auto obj = elem.GetObject();
 
 				// Animationオブジェクト作成
 				auto animation = AnimationTimeline::Create();
@@ -922,7 +922,7 @@ namespace Equisetum2
 				animation->Begin();
 
 				// parse "tag"
-				auto& tag = obj.FindMember("tag");
+				auto tag = obj.FindMember("tag");
 				if (tag == obj.MemberEnd() ||
 					tag->value.GetType() != rapidjson::kStringType)
 				{
@@ -930,7 +930,7 @@ namespace Equisetum2
 				}
 
 				// parse "looptype"
-				auto& looptype = obj.FindMember("looptype");
+				auto looptype = obj.FindMember("looptype");
 				if (looptype == obj.MemberEnd() ||
 					looptype->value.GetType() != rapidjson::kStringType)
 				{
@@ -954,7 +954,7 @@ namespace Equisetum2
 				}
 
 				// parse "rotate"
-				auto& rotate = obj.FindMember("rotate");
+				auto rotate = obj.FindMember("rotate");
 				if (rotate != obj.MemberEnd())
 				{
 					if (rotate->value.GetType() != rapidjson::kObjectType)
@@ -962,12 +962,12 @@ namespace Equisetum2
 						EQ_THROW(u8"rotateはobjectでなければいけません。");
 					}
 
-					auto& rotateObj = rotate->value.GetObject();
+					auto rotateObj = rotate->value.GetObject();
 
 					AnimationTimeline::stRotate rotate;
 
 					// parse "step"
-					auto& step = rotateObj.FindMember("step");
+					auto step = rotateObj.FindMember("step");
 					if (step != rotateObj.MemberEnd() &&
 						step->value.GetType() == rapidjson::kNumberType)
 					{
@@ -975,7 +975,7 @@ namespace Equisetum2
 					}
 
 					// parse "offset"
-					auto& offset = rotateObj.FindMember("offset");
+					auto offset = rotateObj.FindMember("offset");
 					if (offset != rotateObj.MemberEnd() &&
 						offset->value.GetType() == rapidjson::kNumberType)
 					{
@@ -996,7 +996,7 @@ namespace Equisetum2
 				stTimelineElem timelineElem;
 
 				// parse "timeline"
-				auto& timeline = obj.FindMember("timeline");
+				auto timeline = obj.FindMember("timeline");
 				if (timeline == obj.MemberEnd() ||
 					timeline->value.GetType() != rapidjson::kArrayType)
 				{
@@ -1009,10 +1009,10 @@ namespace Equisetum2
 						EQ_THROW(u8"timelineの配列内にはobjectが配置されていなければいけません。");
 					}
 
-					auto& objTL = elemTL.GetObject();
+					auto objTL = elemTL.GetObject();
 
 					// parse "sprite"
-					auto& sprite = objTL.FindMember("sprite");
+					auto sprite = objTL.FindMember("sprite");
 					if (sprite == objTL.MemberEnd() ||
 						sprite->value.GetType() != rapidjson::kStringType)
 					{
@@ -1027,7 +1027,7 @@ namespace Equisetum2
 					}
 
 					// parse "tag"
-					auto& tag = objTL.FindMember("tag");
+					auto tag = objTL.FindMember("tag");
 					if (tag == objTL.MemberEnd() ||
 						tag->value.GetType() != rapidjson::kStringType)
 					{
@@ -1036,7 +1036,7 @@ namespace Equisetum2
 					timelineElem.tag = tag->value.GetString();
 
 					// parse "range"
-					auto& range = objTL.FindMember("range");
+					auto range = objTL.FindMember("range");
 					if (range == objTL.MemberEnd() ||
 						range->value.GetType() != rapidjson::kArrayType)
 					{
@@ -1055,7 +1055,7 @@ namespace Equisetum2
 					timelineElem.range[1] = static_cast<int32_t>(range->value[1].GetInt());
 
 					// parse "delay"
-					auto& delay = objTL.FindMember("delay");
+					auto delay = objTL.FindMember("delay");
 					if (delay == objTL.MemberEnd() ||
 						delay->value.GetType() != rapidjson::kNumberType)
 					{
