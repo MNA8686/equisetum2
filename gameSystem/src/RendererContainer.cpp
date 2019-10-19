@@ -40,6 +40,114 @@ SpriteRenderer* SpriteRendererContainer::operator->()
 
 //-----------------------------------------------------------------------------------------------
 
+AnimationContainer::AnimationContainer()
+{
+	if (auto obj = Object::GetCreatingObject())
+	{
+		m_nodeHandler = obj->GetNodeHandler();
+		m_sprite->SetVisible(false);
+	}
+}
+
+bool AnimationContainer::SetAnimation(int32_t assetAnimation)
+{
+	m_assetAnimation = assetAnimation;
+	m_count = 0;
+
+	Update();
+
+	return true;
+}
+
+void AnimationContainer::SetDegree(int32_t degree)
+{
+	m_degree = degree;
+}
+
+int32_t AnimationContainer::TagToInt(const String& tag) const
+{
+	if (auto obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		return anim->TagToInt(tag);
+	}
+
+	return -1;
+}
+
+void AnimationContainer::Start(int32_t tagIndex, bool reverse)
+{
+	m_tagIndex = tagIndex;
+	m_count = 0;
+	m_reverse = reverse;
+
+	Update();
+}
+
+bool AnimationContainer::Inc(int32_t delta)
+{
+	m_count += delta;
+
+	Update();
+
+	return true;
+}
+
+SpriteRenderer* AnimationContainer::GetSpriteRenderer()
+{
+	return m_sprite.Ref();
+}
+
+void AnimationContainer::Update()
+{
+	if (Object* obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		if (const std::shared_ptr<AnimationTimeline> timeline = anim->GetTimeline(m_tagIndex))
+		{
+			int32_t totalTime = timeline->GetTotalTime();
+			if (totalTime == 0)
+			{
+				m_count = 0;
+			}
+			else
+			{
+				switch (timeline->GetLoopType())
+				{
+				case AnimationLoopType::none:
+					if (m_count > totalTime)
+					{
+						m_count = totalTime;
+					}
+					break;
+				case AnimationLoopType::loop:
+				case AnimationLoopType::pingPong:
+					m_count %= totalTime;
+					break;
+				}
+
+			}
+
+			// 現在時刻に対応するアニメーション番号を取得する
+			int32_t index = timeline->GetIndexByTime(m_reverse ? totalTime - m_count :m_count);
+			// アニメーション番号からスプライトなどのデータを取り出す
+			const stAnimationElement* elem = timeline->GetElement(index);
+
+			// 回転をサポートしているならオフセットを取得する
+			int32_t offset = timeline->GetRotateOffset(m_degree);
+
+			auto sprite = m_sprite.Ref();
+			if (sprite->GetSprite() != elem->m_sprite.get())
+			{
+				sprite->SetSprite(elem->m_sprite);
+			}
+			sprite->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
 LineRendererContainer::LineRendererContainer()
 {
 	if (auto obj = Object::GetCreatingObject())

@@ -21,6 +21,32 @@ private:
 	int32_t m_rendererIndex = -1;
 };
 
+class AnimationContainer
+{
+public:
+	AnimationContainer();
+	~AnimationContainer() = default;
+
+	bool SetAnimation(int32_t assetAnimation);
+	void SetDegree(int32_t degree);
+	int32_t TagToInt(const String& tag) const;
+	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
+	bool Inc(int32_t delta=1000);		/// アニメーションを進める(1000で1フレーム相当)
+	SpriteRenderer* GetSpriteRenderer();
+
+private:
+	NodeHandler m_nodeHandler;
+	int32_t m_assetAnimation = -1;
+	int32_t m_count = 0;		/// 経過時間
+	int32_t m_tagIndex = -1;	/// 選択されているアニメーションの名前
+	int32_t m_degree = 0;		/// 回転アニメーション用の角度
+
+	SpriteRendererContainer m_sprite;
+	bool m_reverse = false;
+
+	void Update();
+};
+
 class LineRendererContainer
 {
 public:

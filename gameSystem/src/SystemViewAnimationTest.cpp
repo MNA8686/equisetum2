@@ -42,35 +42,39 @@ void SystemViewAnimationTest::LoadAnimation()
 	{
 		m_animation = animation;
 
-		// スプライト関連設定
-		const stAnimationElement* elem = animation->GetElement(0, 0);
-		if (elem)
+		if (const std::shared_ptr<AnimationTimeline> timeline = m_animation->GetTimeline(0))
 		{
-			// スプライトレンダラ作成
-			m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
-			if (m_spriteRenderer)
+
+			// スプライト関連設定
+			const stAnimationElement* elem = timeline->GetElement(0);
+			if (elem)
 			{
-				m_spriteRenderer->SetSprite(elem->m_sprite);
+				// スプライトレンダラ作成
+				m_spriteRenderer = GetApplication()->GetRenderer()->CreateRenderObject<SpriteRenderer>();
+				if (m_spriteRenderer)
+				{
+					m_spriteRenderer->SetSprite(elem->m_sprite);
 
-				m_spriteRenderer->SetBlendMode(BlendMode::Blend);
-				m_spritePos = Window::Size() / 2;
-				m_spriteRenderer->SetPos(m_spritePos);
+					m_spriteRenderer->SetBlendMode(BlendMode::Blend);
+					m_spritePos = Window::Size() / 2;
+					m_spriteRenderer->SetPos(m_spritePos);
+				}
 			}
+
+			// タグ選択スピン設定
+			// アニメーションパターンが無い場合は-1～-1を設定範囲とし、-1はempty扱いとする。
+			size_t tagsSize = animation->GetTagSize();
+			int32_t minIndex = tagsSize <= 0 ? -1 : 0;
+			int32_t maxIndex = tagsSize > 0 ? tagsSize - 1 : -1;
+			m_animationTagIndex = minIndex;
+			m_spinTag->SetRange(minIndex, maxIndex, 1);
+			m_spinTag->SetValue(minIndex);
+
+			// アニメーションパターン数設定
+			int32_t animSize = timeline->GetSize();
+			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+			m_animationPtr = 0;
 		}
-
-		// タグ選択スピン設定
-		// アニメーションパターンが無い場合は-1～-1を設定範囲とし、-1はempty扱いとする。
-		size_t tagsSize = animation->GetTagSize();
-		int32_t minIndex = tagsSize <= 0 ? -1 : 0;
-		int32_t maxIndex = tagsSize > 0 ? tagsSize - 1 : -1;
-		m_animationTagIndex = minIndex;
-		m_spinTag->SetRange(minIndex, maxIndex, 1);	
-		m_spinTag->SetValue(minIndex);
-
-		// アニメーションパターン数設定
-		int32_t animSize = animation->GetTimelineSize(0);
-		m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
-		m_animationPtr = 0;
 	}
 }
 
@@ -129,9 +133,12 @@ int SystemViewAnimationTest::Enter()
 		m_animationPtr = 0;	// タグを切り替えたら表示アニメーションパターンを0に戻す
 
 		// アニメーションサイズなどを設定
-		int32_t animSize = m_animation->GetTimelineSize(m_animationTagIndex);
-		m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
-		m_spinAnim->SetValue(m_animationPtr);
+		if (const std::shared_ptr<AnimationTimeline> timeline = m_animation->GetTimeline(m_animationTagIndex))
+		{
+			int32_t animSize = timeline->GetSize();
+			m_spinAnim->SetRange(0, animSize > 0 ? animSize - 1 : 0, 1);
+			m_spinAnim->SetValue(m_animationPtr);
+		}
 	});
 	tag->SetCyclic(true);
 	tag->SetEnable(true);
@@ -245,21 +252,24 @@ int SystemViewAnimationTest::Do()
 	if (m_playing)
 	{
 		// 現在のフレームに対応するアニメーションパターンを取得
-		auto index = m_animation->GetIndexByTime(m_animationTagIndex, m_frame * 1000);
-		if (index >= 0)
+		if (const std::shared_ptr<AnimationTimeline> timeline = m_animation->GetTimeline(m_animationTagIndex))
 		{
-			// アニメーションパターンをセット
-			m_animationPtr = index;
-			// UIにも反映する
-			m_spinAnim->SetValue(index);
-		}
-		else
-		{
-			m_playing = false;
-		}
+			auto index = timeline->GetIndexByTime(m_frame * 1000);
+			if (index >= 0)
+			{
+				// アニメーションパターンをセット
+				m_animationPtr = index;
+				// UIにも反映する
+				m_spinAnim->SetValue(index);
+			}
+			else
+			{
+				m_playing = false;
+			}
 
-		// 1フレーム進める
-		m_frame++;
+			// 1フレーム進める
+			m_frame++;
+		}
 	}
 
 	return 0;
@@ -270,18 +280,21 @@ int SystemViewAnimationTest::Render()
 	if (m_spriteRenderer)
 	{
 		// 現在表示すべきアニメーションパターンを取得する
-		const stAnimationElement* elem = m_animation->GetElement(m_animationTagIndex, m_animationPtr);
-		if (elem)
+		if (const std::shared_ptr<AnimationTimeline> timeline = m_animation->GetTimeline(m_animationTagIndex))
 		{
-			int32_t offset = m_animation->GetRotateOffset(m_animationTagIndex, m_degree);
+			const stAnimationElement* elem = timeline->GetElement(m_animationPtr);
+			if (elem)
+			{
+				int32_t offset = timeline->GetRotateOffset(m_degree);
 
-			m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
-			m_spriteRenderer->SetSprite(elem->m_sprite);
-			m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
-			m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
-			m_spriteRenderer->SetColor(m_color);
+				m_spriteRenderer->SetScale(m_rate / 100.f, m_rate / 100.f);
+				m_spriteRenderer->SetSprite(elem->m_sprite);
+				m_spriteRenderer->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+				m_spriteRenderer->SetPos(PosNormalToPixel() + m_spritePos);
+				m_spriteRenderer->SetColor(m_color);
 
-			GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
+				GetApplication()->GetRenderer()->AddRenderQueue(m_spriteRenderer.get());
+			}
 		}
 	}
 
