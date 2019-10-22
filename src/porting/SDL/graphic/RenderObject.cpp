@@ -186,6 +186,11 @@ namespace Equisetum2
 
 	bool SpriteRenderer::Calculation()
 	{
+		if (!m_sprite)
+		{
+			return false;
+		}
+		
 		const stSpriteAnimAtlas* atlas = m_sprite->GetAtlas(m_atlasNum);
 		auto& vert = m_pImpl->m_vertex;
 

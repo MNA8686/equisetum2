@@ -380,7 +380,10 @@ namespace Equisetum2
 				auto& renderObject = objectsInLayer[i];
 
 				// 表示内容を算出する
-				renderObject->Calculation();
+				if (!renderObject->Calculation())
+				{
+					continue;
+				}
 
 				if (renderObject->GetType() == RenderType::SPRITE)
 				{
