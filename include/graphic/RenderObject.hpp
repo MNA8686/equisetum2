@@ -104,7 +104,7 @@ namespace Equisetum2
 		{
 			archive(cereal::base_class<RenderObject>(this));
 
-			std::string spriteId = m_sprite->Identify();
+			std::string spriteId = m_sprite ? m_sprite->Identify() : "";
 			archive(CEREAL_NVP(spriteId));
 
 			archive(CEREAL_NVP(m_atlasNum));
@@ -125,7 +125,10 @@ namespace Equisetum2
 
 			std::string spriteId;
 			archive(CEREAL_NVP(spriteId));
-			m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
+			if (!spriteId.empty())
+			{
+				m_sprite = Singleton<AssetManager>::GetInstance()->Load<Sprite>(spriteId);
+			}
 
 			archive(CEREAL_NVP(m_atlasNum));
 			archive(CEREAL_NVP(m_pos));
