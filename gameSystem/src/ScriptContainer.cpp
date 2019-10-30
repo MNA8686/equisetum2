@@ -101,6 +101,18 @@ bool ScriptContainer::OnStart(Object * owner)
 	return false;
 }
 
+bool ScriptContainer::BeforeUpdate(Object* owner)
+{
+	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+	// スクリプト情報を取得
+	if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
+	{
+		return p->beforeUpdate(m_ctx, owner);
+	}
+	return false;
+}
+
 bool ScriptContainer::FixedUpdate(Object* owner)
 {
 	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
@@ -117,6 +129,18 @@ bool ScriptContainer::FixedUpdate(Object* owner)
 	if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
 	{
 		return p->fixedUpdate(m_ctx, owner);
+	}
+	return false;
+}
+
+bool ScriptContainer::LateUpdate(Object* owner)
+{
+	auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+	// スクリプト情報を取得
+	if (const ScriptMapper::Value* p = scriptMapper->Get(m_index))
+	{
+		return p->lateUpdate(m_ctx, owner);
 	}
 	return false;
 }

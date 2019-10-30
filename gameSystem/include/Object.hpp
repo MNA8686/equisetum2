@@ -31,7 +31,9 @@ public:
 	RenderObject* GetRenderObject(int32_t index);
 	bool OnDraw(std::shared_ptr<Renderer>& renderer);
 	stAsset* GetAsset();
+	bool OnBeforeUpdate();
 	bool OnFixedUpdate();
+	bool OnLateUpdate();
 
 	static Object* GetRoot();
 	static Object* GetObjectByHandler(const NodeHandler& handler);
@@ -58,7 +60,10 @@ public:
 	void SetSchedule(bool schedule);
 
 	// スケジュール実行
+	static void Reschedule();
+	static void BeforeUpdate();
 	static void Update();
+	static void LateUpdate();
 	static Object* GetCreatingObject();
 
 protected:

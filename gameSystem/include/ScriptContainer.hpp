@@ -40,7 +40,9 @@ public:
 	}
 
 	bool OnCreate(Object* owner);
+	bool BeforeUpdate(Object* owner);
 	bool FixedUpdate(Object* owner);
+	bool LateUpdate(Object* owner);
 
 private:
 	bool OnStart(Object* owner);

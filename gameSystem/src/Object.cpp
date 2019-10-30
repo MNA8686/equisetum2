@@ -535,6 +535,16 @@ void Object::SetRelativeParent(bool on)
 	}
 }
 
+bool Object::OnBeforeUpdate()
+{
+	if (auto script = m_script.Ref())
+	{
+		script->BeforeUpdate(this);
+	}
+
+	return false;
+}
+
 bool Object::OnFixedUpdate()
 {
 	if (auto script = m_script.Ref())
@@ -545,22 +555,46 @@ bool Object::OnFixedUpdate()
 	return false;
 }
 
-void Object::Update()
+bool Object::OnLateUpdate()
+{
+	if (auto script = m_script.Ref())
+	{
+		script->LateUpdate(this);
+	}
+
+	return false;
+}
+
+void Object::Reschedule()
 {
 	if (m_dirty)
 	{
 		Node<Object>::Reschedule([](Node<Object>& node)->bool {
-				auto& object = node.GetAttach();		// í«â¡èåèîªíË
-				if (object.IsActive() &&
-					object.IsScheduled())
-				{
-					return true;
-				}
-				return false;
+			auto& object = node.GetAttach();		// í«â¡èåèîªíË
+			return (object.IsActive() && object.IsScheduled());
 			});
 
 		m_dirty = false;
 	}
+}
+
+void Object::BeforeUpdate()
+{
+	Reschedule();
+
+	const auto& schedule = Node<Object>::GetSchedule();
+	for (const auto& id : schedule)
+	{
+		if (auto obj = GetObjectByHandler(id))
+		{
+			obj->OnBeforeUpdate();
+		}
+	}
+}
+
+void Object::Update()
+{
+	Reschedule();
 
 	const auto& schedule = Node<Object>::GetSchedule();
 	for (const auto& id : schedule)
@@ -568,6 +602,18 @@ void Object::Update()
 		if (auto obj = GetObjectByHandler(id))
 		{
 			obj->OnFixedUpdate();
+		}
+	}
+}
+
+void Object::LateUpdate()
+{
+	const auto& schedule = Node<Object>::GetSchedule();
+	for (const auto& id : schedule)
+	{
+		if (auto obj = GetObjectByHandler(id))
+		{
+			obj->OnLateUpdate();
 		}
 	}
 }

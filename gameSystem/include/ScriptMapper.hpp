@@ -23,7 +23,9 @@ public:
 		std::function<bool (EqHeap::Handler handler)> destructor;
 		std::function<bool (EqHeap::Handler handler, Object* owner)> onCreate;
 		std::function<bool (EqHeap::Handler handler, Object* owner)> onStart;
+		std::function<bool (EqHeap::Handler handler, Object* owner)> beforeUpdate;
 		std::function<bool (EqHeap::Handler handler, Object* owner)> fixedUpdate;
+		std::function<bool (EqHeap::Handler handler, Object* owner)> lateUpdate;
 	};
 
 	void Register(const Value& value);
@@ -83,11 +85,27 @@ private:
 				}\
 				return false;\
 			};\
+			val.beforeUpdate = [](EqHeap::Handler handler, Object* owner)->bool {\
+				auto heap = Singleton<EqHeap>::GetInstance();\
+				if (auto p = heap->Ref<NAME>(handler))\
+				{\
+					return p->BeforeUpdate(owner);\
+				}\
+				return false;\
+			};\
 			val.fixedUpdate = [](EqHeap::Handler handler, Object* owner)->bool {\
 				auto heap = Singleton<EqHeap>::GetInstance();\
 				if (auto p = heap->Ref<NAME>(handler))\
 				{\
 					return p->FixedUpdate(owner);\
+				}\
+				return false;\
+			};\
+			val.lateUpdate = [](EqHeap::Handler handler, Object* owner)->bool {\
+				auto heap = Singleton<EqHeap>::GetInstance();\
+				if (auto p = heap->Ref<NAME>(handler))\
+				{\
+					return p->LateUpdate(owner);\
 				}\
 				return false;\
 			};\

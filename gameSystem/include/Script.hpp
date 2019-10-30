@@ -16,60 +16,35 @@ public:
 	static std::shared_ptr<Renderer>& GetRenderer(void);
 	static std::shared_ptr<Renderer> m_renderer;		// 暫定
 
+	/// スクリプトインスタンス生成時に呼び出される
 	bool OnCreate(Object* owner)
 	{
 		return true;
 	}
+	
+	/// 最初のFixedUpdate()呼び出し前に呼び出される
 	bool OnStart(Object* owner)
 	{
 		return true;
 	}
+	
+	/// FixedUpdate()呼び出し前に呼び出される
+	bool BeforeUpdate(Object* owner)
+	{
+		return true;
+	}
+	
+	/// 毎フレーム呼び出される処理
 	bool FixedUpdate(Object* owner)
 	{
 		return true;
 	}
+	
+	/// FixedUpdate()のあとに呼び出される
+	bool LateUpdate(Object* owner)
+	{
+		return true;
+	}
 };
-
-#if 0
-class Object;
-class Script
-{
-public:
-	Script();
-	virtual ~Script();
-
-	virtual bool OnCreate();
-	virtual bool OnStart();
-	virtual bool FixedUpdate();
-
-	//void SetOwner(std::shared_ptr<Object>& ownerObject);
-	void SetOwner(NodeHandler ownerObject);
-	bool Start();
-
-	static void SetScriptTbl(const std::vector<stScriptTbl>& tbl);
-	static std::shared_ptr<Script> Create(const String& id);
-	static std::shared_ptr<Renderer>& GetRenderer(void);
-	static std::shared_ptr<Renderer> m_renderer;		// 暫定
-
-	/**
-	* @brief イメージのIDを設定する
-	*/
-	void SetIdentify(const String& id);
-
-	/**
-	* @brief イメージのIDを取得する
-	* @return イメージのID
-	*/
-	String Identify() const;
-
-private:
-	bool m_isStarted = false;					/// このスクリプトが開始済みかどうか
-	String m_identify;
-	NodeHandler m_ownerObject;		/// このスクリプトを所持しているオブジェクト
-
-protected:
-	NodeHandler GetOwner();
-};
-#endif
 
 #endif
