@@ -578,42 +578,45 @@ void Object::Reschedule()
 	}
 }
 
-void Object::BeforeUpdate()
-{
-	Reschedule();
-
-	const auto& schedule = Node<Object>::GetSchedule();
-	for (const auto& id : schedule)
-	{
-		if (auto obj = GetObjectByHandler(id))
-		{
-			obj->OnBeforeUpdate();
-		}
-	}
-}
-
 void Object::Update()
 {
-	Reschedule();
-
-	const auto& schedule = Node<Object>::GetSchedule();
-	for (const auto& id : schedule)
+	// beforeUpdate
 	{
-		if (auto obj = GetObjectByHandler(id))
+		Reschedule();
+
+		const auto& schedule = Node<Object>::GetSchedule();
+		for (const auto& id : schedule)
 		{
-			obj->OnFixedUpdate();
+			if (auto obj = GetObjectByHandler(id))
+			{
+				obj->OnBeforeUpdate();
+			}
 		}
 	}
-}
 
-void Object::LateUpdate()
-{
-	const auto& schedule = Node<Object>::GetSchedule();
-	for (const auto& id : schedule)
+	// Update
 	{
-		if (auto obj = GetObjectByHandler(id))
+		Reschedule();
+
+		const auto& schedule = Node<Object>::GetSchedule();
+		for (const auto& id : schedule)
 		{
-			obj->OnLateUpdate();
+			if (auto obj = GetObjectByHandler(id))
+			{
+				obj->OnFixedUpdate();
+			}
+		}
+	}
+
+	// LateUpdate
+	{
+		const auto& schedule = Node<Object>::GetSchedule();
+		for (const auto& id : schedule)
+		{
+			if (auto obj = GetObjectByHandler(id))
+			{
+				obj->OnLateUpdate();
+			}
 		}
 	}
 }

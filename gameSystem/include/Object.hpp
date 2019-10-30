@@ -61,9 +61,7 @@ public:
 
 	// スケジュール実行
 	static void Reschedule();
-	static void BeforeUpdate();
 	static void Update();
-	static void LateUpdate();
 	static Object* GetCreatingObject();
 
 protected:
