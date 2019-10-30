@@ -37,6 +37,7 @@ public:
 
 	static Object* GetRoot();
 	static Object* GetObjectByHandler(const NodeHandler& handler);
+	static Object* GetObjectByName(Object* beginNode, const String& name);
 	Object* Self();
 	bool HasParent() const;
 	NodeHandler GetParentHandler() const;

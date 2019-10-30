@@ -708,6 +708,31 @@ Object* Object::GetObjectByHandler(const NodeHandler& handler)
 	return nullptr;
 }
 
+Object* Object::GetObjectByName(Object* beginNode, const String& name)
+{
+	Object* obj = nullptr;
+
+	if (auto thisNode = Node<Object>::GetNodeByHandler(beginNode->GetNodeHandler()))
+	{
+		Node<Object>::Visit(*thisNode, [&obj, &name](Node<Object>& node, int32_t nestDepth)->bool {
+			if (nestDepth == 0)
+			{
+				return true;
+			}
+
+			if (node.GetName() == name)
+			{
+				obj = &node.GetAttach();
+				return false;
+			}
+
+			return true;
+		});
+	}
+
+	return obj;
+}
+
 Object* Object::GetRoot()
 {
 	if (auto node = Node<Object>::Root())
