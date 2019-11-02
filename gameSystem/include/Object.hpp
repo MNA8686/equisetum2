@@ -65,6 +65,17 @@ public:
 	static void Update();
 	static Object* GetCreatingObject();
 
+	template<class T>
+	T* GetScript()
+	{
+		if (auto script = m_script.Ref())
+		{
+			return script->Ref<T>();
+		}
+
+		return nullptr;
+	}
+
 protected:
 
 private:
