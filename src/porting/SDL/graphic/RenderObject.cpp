@@ -435,6 +435,7 @@ namespace Equisetum2
 		SetLayer(m_layer);
 		SetOrderInLayer(m_orderInLayer);
 		SetBlendMode(m_blend);
+		SetLineSpacing(m_lineSpacing);
 
 		MeasurementBoxSize();
 
@@ -621,11 +622,11 @@ namespace Equisetum2
 
 					// ボックスサイズ更新
 					m_boxSize.x = std::max(m_boxSize.x, pos.x);	// 最大幅が更新されていたらそれをセット
-					m_boxSize.y += m_height;
+					m_boxSize.y += m_height + m_lineSpacing;
 
 					// 改行を行う
 					pos.x = 0;
-					pos.y += m_height;
+					pos.y += m_height + m_lineSpacing;
 				}
 				else
 				{
@@ -663,6 +664,14 @@ namespace Equisetum2
 	const std::u32string & TextRenderer::GetTextU32() const
 	{
 		return m_text;
+	}
+
+	TextRenderer& TextRenderer::SetLineSpacing(int32_t lineSpacing)
+	{
+		m_lineSpacing = lineSpacing;
+		MeasurementBoxSize();
+
+		return *this;
 	}
 	
 	bool TextRenderer::Calculation()
@@ -706,7 +715,7 @@ namespace Equisetum2
 				colCount = -1;
 				rowCount++;
 
-				pos.y = static_cast<int32_t>(m_height * rowCount * m_scale.y);
+				pos.y = static_cast<int32_t>((m_height + m_lineSpacing) * rowCount * m_scale.y);
 			}
 			else if (codeMap.atlas >= 0)
 			{

@@ -209,6 +209,7 @@ namespace Equisetum2
 		size_t GetLetterSize() const;
 		Size GetBoxSize() const;
 		const std::u32string& GetTextU32() const;
+		TextRenderer& SetLineSpacing(int32_t lineSpacing);
 
 		bool Calculation();
 
@@ -225,6 +226,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_lineSpacing));
 			archive(CEREAL_NVP(m_textHAlignment));
 			std::string text = String(m_text);
 			archive(CEREAL_NVP(text));
@@ -269,6 +271,7 @@ namespace Equisetum2
 			archive(CEREAL_NVP(m_flipX));
 			archive(CEREAL_NVP(m_flipY));
 			archive(CEREAL_NVP(m_angle));
+			archive(CEREAL_NVP(m_lineSpacing));
 			archive(CEREAL_NVP(m_textHAlignment));
 			std::string text;
 			archive(CEREAL_NVP(text));
@@ -335,6 +338,7 @@ namespace Equisetum2
 		bool m_flipX = false;	/// X方向反転
 		bool m_flipY = false;	/// Y方向反転
 		float m_angle = 0;		/// 回転角度
+		int32_t m_lineSpacing = 0;		/// 行間 
 		TextHAlignment m_textHAlignment = TextHAlignment::Left;
 		std::u32string m_text;		/// コードポイント配列
 		//
