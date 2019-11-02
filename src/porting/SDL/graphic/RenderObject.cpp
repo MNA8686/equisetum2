@@ -401,6 +401,7 @@ namespace Equisetum2
 		m_text = text.to_u32();
 
 		m_vSpriteRenderer.resize(m_text.size());
+		m_visibleSize = static_cast<int32_t>(m_text.size());
 
 		if (auto pRenderer = Singleton<CurrentRenderer>::GetInstance()->Get())
 		{
@@ -436,6 +437,7 @@ namespace Equisetum2
 		SetOrderInLayer(m_orderInLayer);
 		SetBlendMode(m_blend);
 		SetLineSpacing(m_lineSpacing);
+		SetVisibleSize(m_visibleSize);
 
 		MeasurementBoxSize();
 
@@ -673,6 +675,12 @@ namespace Equisetum2
 
 		return *this;
 	}
+
+	TextRenderer& Equisetum2::TextRenderer::SetVisibleSize(int32_t size)
+	{
+		m_visibleSize = size;
+		return *this;
+	}
 	
 	bool TextRenderer::Calculation()
 	{
@@ -782,6 +790,12 @@ namespace Equisetum2
 		codeCount = 0;
 		for (auto& codeMap : m_vCodeMap)
 		{
+			// 指定されている文字数表示したらループを抜ける
+			if (codeCount == m_visibleSize)
+			{
+				break;
+			}
+
 			if (codeMap.atlas >= 0)
 			{
 				auto& spriteRenderer = m_vSpriteRenderer[codeCount];
