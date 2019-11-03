@@ -42,7 +42,7 @@ public:
 	bool HasParent() const;
 	NodeHandler GetParentHandler() const;
 
-	void Destroy();
+	void Destroy(bool late=false);
 	bool IsDestroyed() const;
 	void SetParentHandler(const NodeHandler& newParentHandler);
 	Object* GetParent() const;

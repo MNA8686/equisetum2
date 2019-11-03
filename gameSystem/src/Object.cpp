@@ -773,13 +773,13 @@ Object* Object::GetParent() const
 	return GetObjectByHandler(GetParentHandler());
 }
 
-void Object::Destroy()
+void Object::Destroy(bool late)
 {
 	if (auto thisNode = Node<Object>::GetNodeByHandler(m_hNode))
 	{
 		if (!thisNode->IsDestroyed())
 		{
-			thisNode->Destroy();
+			thisNode->Destroy(late);
 
 			// 再構築フラグセット
 			m_dirty = true;

@@ -73,7 +73,8 @@ public:
 		return m_attach;
 	}
 
-	void Destroy()
+	// late true:レンダリング後に削除、false:レンダリング前に削除
+	void Destroy(bool late=false)
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 
@@ -82,14 +83,28 @@ public:
 			// 削除フラグを設定
 			m_destroyed = true;
 
-			// 親の参照リストから自分を削除
-			DetachParent();
+			if (late)
+			{
+				// 遅延削除キューに入れる
+				pNodePool->m_vLateDestroyQueue.push_back(m_hNode.id);
+			}
+			else
+			{
+				// 親の参照リストから自分を削除
+				DetachParent();
 
-			// 全ての子をデタッチ
-			DetachChildren();
+				// 全ての子を削除
+				for (auto& children : GetChildrenHandler())
+				{
+					if (auto node = GetNodeByHandler(children))
+					{
+						node->Destroy();
+					}
+				}
 
-			// 削除キューに入れる(後のGCでこのオブジェクトは破棄される)
-			pNodePool->m_vGcQueue.push_back(m_hNode.id);
+				// 削除キューに入れる(後のGCでこのオブジェクトは破棄される)
+				pNodePool->m_vGcQueue.push_back(m_hNode.id);
+			}
 		}
 	}
 
@@ -216,6 +231,26 @@ public:
 	{
 		auto pNodePool = Singleton<NodePool<T>>::GetInstance();
 		auto ctx = pNodePool->GetContext();
+
+		// 遅延削除登録されているオブジェクトのDestroyを呼び出す
+		for (auto& nodeID : pNodePool->m_vLateDestroyQueue)
+		{
+			// 親の参照リストから自分を削除
+			ctx->m_vNodeSlot[nodeID].DetachParent();
+
+			// 全ての子を削除
+			for (auto& children : ctx->m_vNodeSlot[nodeID].GetChildrenHandler())
+			{
+				if (auto node = GetNodeByHandler(children))
+				{
+					node->Destroy();
+				}
+			}
+
+			// 削除対象リストに追加
+			pNodePool->m_vGcQueue.push_back(nodeID);
+		}
+		pNodePool->m_vLateDestroyQueue.clear();
 
 		// 削除対象リストを元にオブジェクトの削除を行う
 		for (auto& nodeID : pNodePool->m_vGcQueue)
@@ -473,6 +508,7 @@ protected:
 	friend Node<T>;
 	Context* m_pCtx = nullptr;
 
+	std::vector<NodeID> m_vLateDestroyQueue;				// レンダリング後に削除するノード
 	std::vector<NodeID> m_vGcQueue;							// GC対象となるノードのIDを格納した配列
 
 	NodePool() = default;
