@@ -36,10 +36,24 @@ namespace Equisetum2
 			return *this;
 		}
 
+		Point_t<T>& operator += (const T& src)
+		{
+			x += src;
+			y += src;
+			return *this;
+		}
+
 		Point_t<T>& operator -= (const Point_t<T>& src)
 		{
 			x -= src.x;
 			y -= src.y;
+			return *this;
+		}
+
+		Point_t<T>& operator -= (const T& src)
+		{
+			x -= src;
+			y -= src;
 			return *this;
 		}
 
@@ -50,10 +64,24 @@ namespace Equisetum2
 			return *this;
 		}
 
+		Point_t<T>& operator *= (const T& src)
+		{
+			x *= src;
+			y *= src;
+			return *this;
+		}
+
 		Point_t<T>& operator /= (const Point_t<T>& src)
 		{
 			x /= src.x;
 			y /= src.y;
+			return *this;
+		}
+
+		Point_t<T>& operator /= (const T& src)
+		{
+			x /= src;
+			y /= src;
 			return *this;
 		}
 
