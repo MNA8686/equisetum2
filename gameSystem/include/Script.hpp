@@ -9,6 +9,7 @@ using namespace Equisetum2;
 #include "ScriptMapper.hpp"
 #include "Object.hpp"
 #include "RendererContainer.hpp"
+#include "AudioContainer.hpp"
 
 class ScriptBase
 {
