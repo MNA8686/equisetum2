@@ -299,6 +299,11 @@ namespace Equisetum2
 					m_se[id].m_loop = loop;
 					ret = true;
 				}
+				else
+				{
+					const char* error = Mix_GetError();
+					Logger::OutputError(error);
+				}
 			}
 
 			return ret;
