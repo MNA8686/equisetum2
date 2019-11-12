@@ -85,6 +85,13 @@ namespace Equisetum2
 			return *this;
 		}
 
+		Point_t<T>& operator = (const T& src)
+		{
+			x = src;
+			y = src;
+			return *this;
+		}
+
 		template<class Archive>
 		void serialize(Archive & archive)
 		{
