@@ -156,10 +156,11 @@ namespace Equisetum2
 		std::shared_ptr<Texture> _LoadTexture(const String& id);
 		std::shared_ptr<Animation> _LoadAnimation(const String& id);
 
-		bool m_allowUrlRewrite = true;
-		String m_archivePath;
-		std::shared_ptr<ArchiveAccessor> m_archiveStream;
-		String m_secretKey;
+		bool m_allowUrlRewrite = true;		/// アーカイブの外に単体のファイルがあった場合、そちらを優先してロードするかどうか
+		String m_archivePath;				/// アーカイブのパス
+		std::shared_ptr<ArchiveAccessor> m_archiveStream;		/// アーカイブのストリーム
+		String m_secretKey;		/// アーカイブのシークレットキー
+		std::unordered_map<size_t, ArchiveMeta> m_hashArchiveMeta;		/// アーカイブ内のファイルリスト(メモリキャッシュ)
 	};
 }
 

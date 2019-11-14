@@ -348,6 +348,13 @@ namespace Equisetum2
 			m_archivePath = path;
 			m_secretKey = secretKey;
 
+			// アーカイブ内のファイルを列挙し、メモリキャッシュを作成する
+			m_hashArchiveMeta.clear();
+			m_archiveStream->EnumerateFiles([this](const ArchiveMeta& meta)->bool {
+					m_hashArchiveMeta.insert({ std::hash<std::string>{}(meta.id), meta });
+					return false;
+				});
+
 			return true;
 		}
 		EQ_HANDLER
@@ -387,19 +394,8 @@ namespace Equisetum2
 				EQ_THROW(u8"アーカイブがオープンされていません。");
 			}
 
-			// アーカイブ内のファイルを探す
-			ArchiveMeta assetMeta;
-			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
-				if (id == meta.id)
-				{
-					assetMeta = meta;
-					return true;
-				}
-
-				return false;
-			});
-
-			return !assetMeta.id.empty();
+			// アーカイブの中に存在しているか判定
+			return m_hashArchiveMeta.find(std::hash<std::string>{}(id)) != m_hashArchiveMeta.end();
 		}
 		EQ_HANDLER
 		{
@@ -469,19 +465,9 @@ namespace Equisetum2
 				EQ_THROW(u8"アーカイブがオープンされていません。");
 			}
 
-			// アーカイブ内のファイルを開く
-			ArchiveMeta assetMeta;
-			m_archiveStream->EnumerateFiles([&assetMeta, &id](const ArchiveMeta& meta)->bool {
-				if (id == meta.id)
-				{
-					assetMeta = meta;
-					return true;
-				}
-
-				return false;
-			});
-
-			if (assetMeta.id.empty())
+			// アーカイブ内に目的のファイルがあるか調べる
+			auto assetMeta = m_hashArchiveMeta.find(std::hash<std::string>{}(id));
+			if (assetMeta == m_hashArchiveMeta.end())
 			{
 				EQ_THROW(String::Sprintf(u8"%sが見つかりません。", id.c_str()));
 			}
@@ -493,7 +479,7 @@ namespace Equisetum2
 				EQ_THROW(String::Sprintf(u8"アーカイブ %sのオープンに失敗しました。", m_archivePath.c_str()));
 			}
 
-			return ArchiveAccessor::QuickLoadFromStream(fileStream, assetMeta, m_secretKey);
+			return ArchiveAccessor::QuickLoadFromStream(fileStream, assetMeta->second, m_secretKey);
 		}
 		EQ_HANDLER
 		{
@@ -553,14 +539,14 @@ namespace Equisetum2
 			{
 				// アーカイブの中のファイル一覧を取得する
 				const String cmpType = type + "/";
-				m_archiveStream->EnumerateFiles([&type, &vID, &cmpType](const ArchiveMeta& meta)->bool {
-					if (meta.id.compare(0, cmpType.size(), cmpType) == 0)
+				for (auto& e : m_hashArchiveMeta)
+				{
+					if (e.second.id.compare(0, cmpType.size(), cmpType) == 0)
 					{
-						vID.push_back(meta.id.substr(cmpType.size()));
+						vID.push_back(e.second.id.substr(cmpType.size()));
 					}
-
-					return false;
-				});
+				}
+				std::sort(vID.begin(), vID.end());
 			}
 			else
 			{
