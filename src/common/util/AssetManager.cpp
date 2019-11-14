@@ -556,7 +556,7 @@ namespace Equisetum2
 				m_archiveStream->EnumerateFiles([&type, &vID, &cmpType](const ArchiveMeta& meta)->bool {
 					if (meta.id.compare(0, cmpType.size(), cmpType) == 0)
 					{
-						vID.push_back(meta.id);
+						vID.push_back(meta.id.substr(cmpType.size()));
 					}
 
 					return false;
