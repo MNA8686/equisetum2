@@ -32,6 +32,8 @@ public:
 	int32_t TagToInt(const String& tag) const;
 	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
 	bool Inc(int32_t delta=1000);		/// アニメーションを進める(1000で1フレーム相当)
+	int32_t GetLoopCount() const;
+	int32_t GetAnimIndex() const;
 	SpriteRenderer* GetSpriteRenderer();
 
 private:
@@ -40,6 +42,8 @@ private:
 	int32_t m_count = 0;		/// 経過時間
 	int32_t m_tagIndex = -1;	/// 選択されているアニメーションの名前
 	int32_t m_degree = 0;		/// 回転アニメーション用の角度
+	int32_t m_loopCount = 0;	/// Update()時にアニメーションが何周したか
+	int32_t m_animIndex = -1;	/// 現在表示しているアニメーションパターンのインデックス
 
 	SpriteRendererContainer m_sprite;
 	bool m_reverse = false;

@@ -45,7 +45,6 @@ AnimationContainer::AnimationContainer()
 	if (auto obj = Object::GetCreatingObject())
 	{
 		m_nodeHandler = obj->GetNodeHandler();
-		m_sprite->SetVisible(false);
 	}
 }
 
@@ -93,6 +92,16 @@ bool AnimationContainer::Inc(int32_t delta)
 	return true;
 }
 
+int32_t AnimationContainer::GetLoopCount() const
+{
+	return m_loopCount;
+}
+
+int32_t AnimationContainer::GetAnimIndex() const
+{
+	return m_animIndex;
+}
+
 SpriteRenderer* AnimationContainer::GetSpriteRenderer()
 {
 	return m_sprite.Ref();
@@ -100,6 +109,8 @@ SpriteRenderer* AnimationContainer::GetSpriteRenderer()
 
 void AnimationContainer::Update()
 {
+	m_loopCount = 0;
+
 	if (Object* obj = Object::GetObjectByHandler(m_nodeHandler))
 	{
 		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
@@ -117,31 +128,37 @@ void AnimationContainer::Update()
 				case AnimationLoopType::none:
 					if (m_count > totalTime)
 					{
-						m_count = totalTime;
+						m_count = totalTime - 1;
+						m_loopCount = 1;
 					}
 					break;
 				case AnimationLoopType::loop:
 				case AnimationLoopType::pingPong:
+					m_loopCount = m_count / totalTime;
 					m_count %= totalTime;
 					break;
 				}
-
 			}
 
 			// 現在時刻に対応するアニメーション番号を取得する
-			int32_t index = timeline->GetIndexByTime(m_reverse ? totalTime - m_count :m_count);
+			int32_t index = timeline->GetIndexByTime(m_reverse ? totalTime - m_count : m_count);
 			// アニメーション番号からスプライトなどのデータを取り出す
 			const stAnimationElement* elem = timeline->GetElement(index);
 
 			// 回転をサポートしているならオフセットを取得する
 			int32_t offset = timeline->GetRotateOffset(m_degree);
 
-			auto sprite = m_sprite.Ref();
-			if (sprite->GetSprite() != elem->m_sprite.get())
+			if (elem && index != m_animIndex)
 			{
-				sprite->SetSprite(elem->m_sprite);
+				auto sprite = m_sprite.Ref();
+				if (sprite->GetSprite() != elem->m_sprite.get())
+				{
+					sprite->SetSprite(elem->m_sprite);
+				}
+				sprite->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
+
+				m_animIndex = index;
 			}
-			sprite->SetAtlasNum(elem->m_sprite->ToAtlasNumWithTagIndex(elem->m_tagIndex, elem->m_ptr) + offset);
 		}
 	}
 }
