@@ -31,7 +31,7 @@ public:
 	void SetDegree(int32_t degree);
 	int32_t TagToInt(const String& tag) const;
 	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
-	bool Inc(int32_t delta=1000);		/// アニメーションを進める(1000で1フレーム相当)
+	bool Inc(int32_t delta=AnimationTimeline::timePerFrame);		/// アニメーションを進める(1000で1フレーム相当)
 	int32_t GetLoopCount() const;
 	int32_t GetAnimIndex() const;
 	SpriteRenderer* GetSpriteRenderer();

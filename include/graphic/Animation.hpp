@@ -33,6 +33,9 @@ namespace Equisetum2
 	class AnimationTimeline
 	{
 	public:
+		// 1ƒtƒŒ[ƒ€‚Ì’PˆÊ
+		static const int32_t timePerFrame = 1000;
+
 		typedef struct
 		{
 			int32_t step = 1;
