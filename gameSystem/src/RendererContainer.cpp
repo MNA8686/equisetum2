@@ -102,6 +102,20 @@ int32_t AnimationContainer::GetAnimIndex() const
 	return m_animIndex;
 }
 
+int32_t AnimationContainer::GetTotalTime() const
+{
+	if (Object * obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		if (const std::shared_ptr<AnimationTimeline> timeline = anim->GetTimeline(m_tagIndex))
+		{
+			return timeline->GetTotalTime();
+		}
+	}
+
+	return 0;
+}
+
 SpriteRenderer* AnimationContainer::GetSpriteRenderer()
 {
 	return m_sprite.Ref();

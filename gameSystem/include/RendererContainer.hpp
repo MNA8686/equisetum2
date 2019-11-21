@@ -34,6 +34,7 @@ public:
 	bool Inc(int32_t delta=AnimationTimeline::timePerFrame);		/// アニメーションを進める(1000で1フレーム相当)
 	int32_t GetLoopCount() const;
 	int32_t GetAnimIndex() const;
+	int32_t GetTotalTime() const;
 	SpriteRenderer* GetSpriteRenderer();
 
 private:
