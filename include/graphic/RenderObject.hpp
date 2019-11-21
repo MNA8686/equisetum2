@@ -80,6 +80,8 @@ namespace Equisetum2
 		SpriteRenderer& SetSprite(const std::shared_ptr<Sprite>& sprite);
 		const Sprite* GetSprite() const;
 		SpriteRenderer& SetAtlasNum(int atlasNum);
+		SpriteRenderer& SetAtlasNumWithTag(const String& tag, int atlasNum);
+		SpriteRenderer& SetAtlasNumWithTagIndex(int32_t tagIndex, int atlasNum);
 		
 		SpriteRenderer& SetPos(const Point& pos);
 

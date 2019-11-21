@@ -110,6 +110,17 @@ namespace Equisetum2
 		return *this;
 	}
 
+	SpriteRenderer& Equisetum2::SpriteRenderer::SetAtlasNumWithTag(const String& tag, int atlasNum)
+	{
+		int32_t tagIndex = m_sprite->TagToInt(tag);
+		return SetAtlasNum(m_sprite->ToAtlasNumWithTagIndex(tagIndex, atlasNum));
+	}
+
+	SpriteRenderer& Equisetum2::SpriteRenderer::SetAtlasNumWithTagIndex(int32_t tagIndex, int atlasNum)
+	{
+		return SetAtlasNum(m_sprite->ToAtlasNumWithTagIndex(tagIndex, atlasNum));
+	}
+
 	SpriteRenderer& SpriteRenderer::SetPos(const Point& pos)
 	{
 		m_pos = pos;
