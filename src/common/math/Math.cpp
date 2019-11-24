@@ -119,7 +119,7 @@ namespace Equisetum2
 			else if (degree < quoit * 2)
 			{
 				auto d = degree - quoit;
-				retVal = maxValue - g_sinTable[d];
+				retVal = g_sinTable[quoit - 1 - d];
 			}
 			else if (degree < quoit * 3)
 			{
@@ -129,7 +129,7 @@ namespace Equisetum2
 			else
 			{
 				auto d = degree - quoit * 3;
-				retVal = g_sinTable[d] - maxValue;
+				retVal = -g_sinTable[quoit - 1 - d];
 			}
 
 			return retVal;
