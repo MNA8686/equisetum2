@@ -61,6 +61,7 @@ bool AnimationContainer::SetAnimation(int32_t assetAnimation)
 void AnimationContainer::SetDegree(int32_t degree)
 {
 	m_degree = degree;
+	m_animIndex = -1;
 }
 
 int32_t AnimationContainer::TagToInt(const String& tag) const
@@ -79,6 +80,7 @@ void AnimationContainer::Start(int32_t tagIndex, bool reverse)
 	m_tagIndex = tagIndex;
 	m_count = 0;
 	m_reverse = reverse;
+	m_animIndex = -1;
 
 	Update();
 }
