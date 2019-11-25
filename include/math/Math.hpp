@@ -36,6 +36,9 @@ namespace Equisetum2
 
 		bool OutputSinTableToStream(std::shared_ptr<IStream> stream);
 		bool OutputAtanTableToStream(std::shared_ptr<IStream> stream);
+
+		FixedDec Sin(FixedDegree degree, const FixedDec& mul);
+		FixedDec Cos(FixedDegree degree, const FixedDec& mul);
 	}
 }
 

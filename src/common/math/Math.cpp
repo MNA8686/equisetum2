@@ -258,6 +258,20 @@ namespace Equisetum2
 
 			return x;
 		}
+
+		FixedDec Sin(FixedDegree degree, const FixedDec& mul)
+		{
+			FixedDec ret;
+			ret.SetRaw((FixedMath::Sin(degree) * mul.GetRaw()) >> FixedMath::afterTheDecimalPoint);
+			return ret;
+		}
+
+		FixedDec Cos(FixedDegree degree, const FixedDec& mul)
+		{
+			FixedDec ret;
+			ret.SetRaw((FixedMath::Cos(degree) * mul.GetRaw()) >> FixedMath::afterTheDecimalPoint);
+			return ret;
+		}
 	}
 }
 
