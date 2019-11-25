@@ -181,6 +181,13 @@ namespace Equisetum2
 		return fixedVal;
 	}
 
+	inline FixedDec operator-(const FixedDec& op1)
+	{
+		FixedDec fixedVal;
+		fixedVal.SetRaw(op1.GetRaw() * -1);
+		return fixedVal;
+	}
+
 	inline FixedDec operator*(const FixedDec& op1, const FixedDec& op2)
 	{
 		auto fixedVal = op1;
