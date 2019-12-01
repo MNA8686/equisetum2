@@ -58,6 +58,7 @@ EqHeap::Handler EqHeap::New(uint32_t allocSize)
 				//slot.refCount = 0;
 				memset(slot.ptr, 0, allocSize);
 				handler = slot.handler;
+				m_usedNum++;
 				break;
 			}
 		}
@@ -262,22 +263,13 @@ void EqHeap::Delete(Handler handler)
 			}
 
 			slot.handler = (handler & 0xffff0000) | nextSerial;
+			m_usedNum--;
 		}
 	}
 }
 
 int32_t EqHeap::UsedHandlerNum() const
 {
-	int32_t num = 0;
-
-	for (auto& slot : m_vHandler)
-	{
-		if (slot.ptr != 0)
-		{
-			num++;
-		}
-	}
-
-	return num;
+	return m_usedNum;
 }
 

@@ -187,6 +187,7 @@ protected:
 
 	std::vector<stHeap> m_vHandler;
 	int32_t m_reservedSize = 0;
+	uint32_t m_usedNum = 0;
 
 public:
 	bool InitHeapSystem(int32_t maxHandlerSize, int32_t reservedSize = 0);
