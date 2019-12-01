@@ -32,6 +32,8 @@ public:
 	int32_t TagToInt(const String& tag) const;
 	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
 	bool Inc(int32_t delta=AnimationTimeline::timePerFrame);		/// アニメーションを進める(1000で1フレーム相当)
+	void Reverse();			/// アニメーションの向きを変更する
+	int32_t GetTagIndex() const;
 	int32_t GetLoopCount() const;
 	int32_t GetAnimIndex() const;
 	int32_t GetTotalTime() const;

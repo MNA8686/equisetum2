@@ -94,6 +94,27 @@ bool AnimationContainer::Inc(int32_t delta)
 	return true;
 }
 
+void AnimationContainer::Reverse()
+{
+	if (Object * obj = Object::GetObjectByHandler(m_nodeHandler))
+	{
+		auto& anim = obj->GetAsset()->m_animation[m_assetAnimation];
+		if (const std::shared_ptr<AnimationTimeline> timeline = anim->GetTimeline(m_tagIndex))
+		{
+			int32_t totalTime = timeline->GetTotalTime();
+			m_count = totalTime - m_count;
+
+			m_reverse = !m_reverse;
+			Update();
+		}
+	}
+}
+
+int32_t AnimationContainer::GetTagIndex() const
+{
+	return m_tagIndex;
+}
+
 int32_t AnimationContainer::GetLoopCount() const
 {
 	return m_loopCount;
