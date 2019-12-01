@@ -24,7 +24,9 @@ public:
 	const Point_t<FixedDec>& GetPos() const;
 	const Point_t<FixedDec>& GetLocalPos() const;
 	void SetPos(const Point_t<FixedDec>& pos);
+	void MovePos(const Point_t<FixedDec>& vec);
 	void SetLocalPos(const Point_t<FixedDec>& pos);
+	void MoveLocalPos(const Point_t<FixedDec>& vec);
 	bool GetRelativeParent() const;
 	void SetRelativeParent(bool on);
 	int32_t AddRenderObject(std::shared_ptr<RenderObject> renderObject);

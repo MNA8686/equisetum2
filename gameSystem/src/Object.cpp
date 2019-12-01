@@ -437,6 +437,11 @@ void Object::SetPos(const Point_t<FixedDec>& pos)
 	}
 }
 
+void Object::MovePos(const Point_t<FixedDec>& vec)
+{
+	SetPos(m_pos + vec);
+}
+
 void Object::SetPosForChild()
 {
 	// このメソッドが呼び出されるのはワールド座標が変化したときのみである。
@@ -499,6 +504,11 @@ void Object::SetLocalPos(const Point_t<FixedDec>& pos)
 		// ワールド座標が変化したので子に伝搬する
 		SetPosForChild();
 	}
+}
+
+void Object::MoveLocalPos(const Point_t<FixedDec>& vec)
+{
+	SetLocalPos(m_localPos + vec);
 }
 
 bool Object::GetRelativeParent() const
