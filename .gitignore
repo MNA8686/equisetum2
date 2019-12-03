@@ -1,3 +1,5 @@
+.vs
+*.bak
 /projects/VisualC/Debug
 /projects/VisualC/Debugs
 /projects/VisualC/Release
@@ -10,6 +12,7 @@
 /unittest/project/VisualC/tests
 /gameSystem/project/VisualC/Release
 /gameSystem/project/VisualC/Debug
+/gameSystem/project/VisualC/x64
 /lib
 /projects/VisualC/.vs/libEquisetum2/v14/*.suo
 /projects/VisualC/*.db
@@ -21,5 +24,7 @@
 /projects/VisualC/ipch
 /gameSystem/include/*.bak
 /include/graphic/*.bak
+/eqtools/project/VisualC/eqtools
+!/eqtools/project/VisualC/eqtools/empty.txt
 /eqtools/project/VisualC/Debugs
 /eqtools/project/VisualC/Releases
