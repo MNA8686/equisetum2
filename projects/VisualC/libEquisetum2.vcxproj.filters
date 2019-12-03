@@ -327,6 +327,9 @@
     <ClInclude Include="..\..\include\graphic\Animation.hpp">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\math\CollisionDetection.hpp">
+      <Filter>ヘッダー ファイル\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\crypt\HMAC.cpp">
@@ -481,6 +484,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\graphic\Animation.cpp">
       <Filter>ソース ファイル\common\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\math\CollisionDetection.cpp">
+      <Filter>ソース ファイル\common\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

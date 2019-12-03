@@ -18,6 +18,7 @@
 #endif
 
 #include "math/Math.hpp"
+#include "math/CollisionDetection.hpp"
 
 #include "system/Exception.hpp"
 #include "system/Logger.h"
