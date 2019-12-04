@@ -10,6 +10,7 @@ using namespace Equisetum2;
 #include "Object.hpp"
 #include "RendererContainer.hpp"
 #include "AudioContainer.hpp"
+#include "HitBox.hpp"
 
 class ScriptBase
 {

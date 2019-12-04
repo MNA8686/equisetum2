@@ -161,6 +161,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
     <ClCompile Include="..\..\include\Dashboard.cpp" />
     <ClCompile Include="..\..\src\Application.cpp" />
     <ClCompile Include="..\..\src\AudioContainer.cpp" />
+    <ClCompile Include="..\..\src\HitBox.cpp" />
     <ClCompile Include="..\..\src\RendererContainer.cpp" />
     <ClCompile Include="..\..\src\ResourceMapper.cpp" />
     <ClCompile Include="..\..\src\EqHeap.cpp" />
@@ -197,6 +198,7 @@ eqtools archive -I "..\..\..\gameSystem\assets" -O "..\..\..\lib\win32\system.eq
   <ItemGroup>
     <ClInclude Include="..\..\include\Application.hpp" />
     <ClInclude Include="..\..\include\AudioContainer.hpp" />
+    <ClInclude Include="..\..\include\HitBox.hpp" />
     <ClInclude Include="..\..\include\RendererContainer.hpp" />
     <ClInclude Include="..\..\include\ResourceMapper.hpp" />
     <ClInclude Include="..\..\include\Dashboard.hpp" />
