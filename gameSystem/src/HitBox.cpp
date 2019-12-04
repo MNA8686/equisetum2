@@ -68,4 +68,26 @@ HitBox::iterator HitBox::end()
 	return &m_vRect[index];
 }
 
+HitBox::const_iterator HitBox::begin() const
+{
+	if (m_current < 0)
+	{
+		return nullptr;
+	}
+
+	int32_t index = m_vManager[m_current].begin;
+	return &m_vRect[index];
+}
+
+HitBox::const_iterator HitBox::end() const
+{
+	if (m_current < 0)
+	{
+		return nullptr;
+	}
+
+	int32_t index = m_vManager[m_current].begin + m_vManager[m_current].size;
+	return &m_vRect[index];
+}
+
 

@@ -24,6 +24,8 @@ public:
 	// 矩形イテレータ
 	iterator begin();
 	iterator end();
+	const_iterator begin() const;
+	const_iterator end() const;
 
 private:
 
