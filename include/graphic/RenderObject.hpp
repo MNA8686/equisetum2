@@ -408,6 +408,7 @@ namespace Equisetum2
 
 		LineRenderer& Clear();
 		LineRenderer& PushLine(const Point& m_beginPos, const Point& m_endPos);
+		LineRenderer& PushRect(const Rect& rect);
 
 		LineRenderer& SetColor(const Color& color);
 

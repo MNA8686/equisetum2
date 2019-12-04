@@ -901,6 +901,20 @@ namespace Equisetum2
 		return *this;
 	}
 
+	LineRenderer& Equisetum2::LineRenderer::PushRect(const Rect& rect)
+	{
+		if (rect.width > 0 && rect.height > 0)
+		{
+			const Point pos = { rect.x, rect.y };
+
+			PushLine(pos, pos + Point{ rect.width, 0 });
+			PushLine(pos + Point{ 0, rect.height - 1 }, pos + Point{ rect.width, rect.height - 1 });
+			PushLine(pos, pos + Point{ 0, rect.height });
+			PushLine(pos + Point{ rect.width - 1, 0 }, pos + Point{ rect.width - 1, rect.height });
+		}
+		return *this;
+	}
+
 	LineRenderer& LineRenderer::SetColor(const Color& color)
 	{
 		m_color = color;
@@ -952,8 +966,8 @@ namespace Equisetum2
 				auto& curentVert = vert[vertSize];
 
 				// 頂点
-				curentVert.vertices[0] = static_cast<float>(m_vPos[i].x);
-				curentVert.vertices[1] = static_cast<float>(m_vPos[i].y);
+				curentVert.vertices[0] = static_cast<float>(m_vPos[i].x) + 0.5f;
+				curentVert.vertices[1] = static_cast<float>(m_vPos[i].y) + 0.5f;
 				auto dstColor = reinterpret_cast<uint32_t*>(curentVert.colors);
 				*dstColor = color;
 			}
@@ -963,8 +977,8 @@ namespace Equisetum2
 				auto& curentVert = vert[vertSize + 1];
 
 				// 頂点
-				curentVert.vertices[0] = static_cast<float>(m_vPos[i + 1].x);
-				curentVert.vertices[1] = static_cast<float>(m_vPos[i + 1].y);
+				curentVert.vertices[0] = static_cast<float>(m_vPos[i + 1].x) + 0.5f;
+				curentVert.vertices[1] = static_cast<float>(m_vPos[i + 1].y) + 0.5f;
 				auto dstColor = reinterpret_cast<uint32_t*>(curentVert.colors);
 				*dstColor = color;
 			}
