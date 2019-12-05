@@ -1199,6 +1199,9 @@ namespace Equisetum2
 		blend = m_blend;
 		solid = m_solid;
 
+		int32_t width = m_rect.width + (solid ? 0 : -1);
+		int32_t height = m_rect.height + (solid ? 0 : -1);
+
 		// 頂点
 		{
 			const int32_t cur = 0;
@@ -1213,7 +1216,7 @@ namespace Equisetum2
 			const int32_t cur = 1;
 
 			vert[cur].vertices[0] = static_cast<GLfloat>(m_rect.x) + 0.5f;
-			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height - 1) + 0.5f;
+			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + height) + 0.5f;
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
 			*vertexColor = m_colors[cur].pixel;
@@ -1221,7 +1224,7 @@ namespace Equisetum2
 		{
 			const int32_t cur = solid ? 2 : 3;
 
-			vert[cur].vertices[0] = static_cast<GLfloat>(m_rect.x + m_rect.width - 1) + 0.5f;
+			vert[cur].vertices[0] = static_cast<GLfloat>(m_rect.x + width) + 0.5f;
 			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y) + 0.5f;
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
@@ -1230,8 +1233,8 @@ namespace Equisetum2
 		{
 			const int32_t cur = solid ? 3 : 2;
 
-			vert[cur].vertices[0] = static_cast<GLfloat>(m_rect.x + m_rect.width - 1) + 0.5f;
-			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + m_rect.height - 1) + 0.5f;
+			vert[cur].vertices[0] = static_cast<GLfloat>(m_rect.x + width) + 0.5f;
+			vert[cur].vertices[1] = static_cast<GLfloat>(m_rect.y + height) + 0.5f;
 
 			auto vertexColor = reinterpret_cast<uint32_t*>(vert[cur].colors);
 			*vertexColor = m_colors[solid ? cur : cur + 1].pixel;
