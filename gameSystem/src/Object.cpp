@@ -957,3 +957,33 @@ std::shared_ptr<Object> Object::Fork()
 
 	return nullptr;
 }
+
+//---------------------------------------------------------------------------
+
+ObjectContainer::operator bool() const
+{
+	return !!Object::GetObjectByHandler(*this);
+}
+
+ObjectContainer::operator NodeHandler() const
+{
+	return *this;
+}
+
+Object* ObjectContainer::Ref()
+{
+	return Object::GetObjectByHandler(*this);
+}
+
+Object* ObjectContainer::operator->()
+{
+	return Ref();
+}
+
+ObjectContainer& ObjectContainer::operator=(const NodeHandler& handler)
+{
+	id = handler.id;
+	serial = handler.serial;
+
+	return *this;
+}

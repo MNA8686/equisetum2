@@ -99,4 +99,13 @@ private:
 	static std::vector<Object*> m_creatingObj;		/// 現在作成中のオブジェクト
 };
 
+struct ObjectContainer : NodeHandler
+{
+	operator bool() const;
+	operator NodeHandler() const;
+	Object* Ref();
+	Object* operator ->();
+	ObjectContainer& operator =(const NodeHandler& handler);
+};
+
 #endif
