@@ -68,6 +68,17 @@ public:
 	static Object* GetCreatingObject();
 
 	template<class T>
+	const T* GetScript() const
+	{
+		if (auto script = m_script.Ref())
+		{
+			return script->Ref<T>();
+		}
+
+		return nullptr;
+	}
+
+	template<class T>
 	T* GetScript()
 	{
 		if (auto script = m_script.Ref())
@@ -103,6 +114,8 @@ struct ObjectContainer : NodeHandler
 {
 	operator bool() const;
 	operator NodeHandler() const;
+	const Object* Ref() const;
+	const Object* operator ->() const;
 	Object* Ref();
 	Object* operator ->();
 	ObjectContainer& operator =(const NodeHandler& handler);

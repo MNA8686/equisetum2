@@ -970,6 +970,16 @@ ObjectContainer::operator NodeHandler() const
 	return *this;
 }
 
+const Object* ObjectContainer::Ref() const
+{
+	return Object::GetObjectByHandler(*this);
+}
+
+const Object* ObjectContainer::operator->() const
+{
+	return Ref();
+}
+
 Object* ObjectContainer::Ref()
 {
 	return Object::GetObjectByHandler(*this);

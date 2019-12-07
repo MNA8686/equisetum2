@@ -18,6 +18,23 @@ public:
 	~ScriptContainer();
 
 	template <class T>
+	const T* Ref() const
+	{
+		auto heap = Singleton<EqHeap>::GetInstance();
+		auto scriptMapper = Singleton<ScriptMapper>::GetInstance();
+
+		if (const ScriptMapper::Value* value = scriptMapper->Get(m_index))
+		{
+			if (auto ref = heap->Ref<T>(m_ctx))
+			{
+				return ref;
+			}
+		}
+
+		return nullptr;
+	}
+
+	template <class T>
 	T* Ref()
 	{
 		auto heap = Singleton<EqHeap>::GetInstance();

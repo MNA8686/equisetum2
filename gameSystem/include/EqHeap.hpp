@@ -68,6 +68,12 @@ public:
 			return (*this);
 		}
 
+		const T* Ref() const
+		{
+			auto heap = Singleton<EqHeap>::GetInstance();
+			return heap->Ref<T>(m_handler);
+		}
+
 		T* Ref()
 		{
 			auto heap = Singleton<EqHeap>::GetInstance();
