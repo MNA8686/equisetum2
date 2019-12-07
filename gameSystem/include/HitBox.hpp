@@ -44,3 +44,34 @@ private:
 	EqVector<Manager> m_vManager;
 };
 
+class HitBoxIterator
+{
+public:
+	class iterator
+	{
+	private:
+		Point_t<FixedDec> m_pos;		// オブジェクトの座標
+		HitBox::const_iterator m_it;
+		Rect_t<FixedDec> m_rect;	// ワールド座標に変換された当たり判定
+
+	public:
+		iterator(const Point_t<FixedDec>& pos, const HitBox::const_iterator& it);
+		void calc();
+		iterator& operator++();
+		iterator operator++(int);
+		const Rect_t<FixedDec>& operator*();
+		const Rect_t<FixedDec>* operator->();
+		bool operator== (const iterator& r) const;
+		bool operator!= (const iterator& r) const;
+	};
+
+	HitBoxIterator(const Point_t<FixedDec>& pos, const HitBox* pHitBox);
+	iterator begin() const;
+	iterator end() const;
+	bool HitTest(const Rect_t<FixedDec>& rect) const;
+
+private:
+	Point_t<FixedDec> m_pos;
+	const HitBox* m_pHitBox = nullptr;
+};
+
