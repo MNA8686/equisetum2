@@ -208,6 +208,13 @@ namespace Equisetum2
 		fixedVal /= op2;
 		return fixedVal;
 	}
+
+	static FixedDec Raw(int32_t val)
+	{
+		FixedDec ret;
+		ret.SetRaw(val);
+		return ret;
+	}
 }
 
 #endif
