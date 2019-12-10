@@ -6,7 +6,7 @@
 
 namespace Equisetum2
 {
-	class FixedDec final
+	class FixedDec
 	{
 	public:
 		// 小数部の桁数
@@ -207,13 +207,6 @@ namespace Equisetum2
 		auto fixedVal = op1;
 		fixedVal /= op2;
 		return fixedVal;
-	}
-
-	static FixedDec Raw(int32_t val)
-	{
-		FixedDec ret;
-		ret.SetRaw(val);
-		return ret;
 	}
 }
 
