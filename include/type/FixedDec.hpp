@@ -83,6 +83,19 @@ namespace Equisetum2
 			return *this;
 		}
 
+		inline FixedDec& operator %= (const FixedDec& op1)
+		{
+			m_val %= op1.m_val;
+			return *this;
+		}
+
+		inline FixedDec& operator %= (const int32_t& op1)
+		{
+			const int32_t mul = op1 << afterTheDecimalPoint;
+			m_val %= mul;
+			return *this;
+		}
+
 // 一応小数なのでインクリメントとデクリメントは不要では？
 #if 0
 		inline FixedDec operator ++()
@@ -206,6 +219,20 @@ namespace Equisetum2
 	{
 		auto fixedVal = op1;
 		fixedVal /= op2;
+		return fixedVal;
+	}
+
+	inline FixedDec operator%(const FixedDec& op1, const FixedDec& op2)
+	{
+		auto fixedVal = op1;
+		fixedVal %= op2;
+		return fixedVal;
+	}
+
+	inline FixedDec operator%(const FixedDec& op1, const int32_t& op2)
+	{
+		auto fixedVal = op1;
+		fixedVal %= op2;
 		return fixedVal;
 	}
 }
