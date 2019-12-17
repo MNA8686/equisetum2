@@ -28,7 +28,7 @@ namespace Equisetum2
 				[](uint32_t* pId) {
 				if (pId != nullptr)
 				{
-					Singleton<AudioCompat>::GetInstance()->DeleteBGM();
+					Singleton<AudioCompat>::GetInstance()->DeleteBGM(*pId);
 					delete pId;
 				}
 			});
@@ -60,47 +60,47 @@ namespace Equisetum2
 
 	bool BGM::Play(bool loop)
 	{
-		return Singleton<AudioCompat>::GetInstance()->PlayBGM(loop);
+		return Singleton<AudioCompat>::GetInstance()->PlayBGM(*m_id, loop);
 	}
 
 	bool BGM::Stop()
 	{
-		return Singleton<AudioCompat>::GetInstance()->StopBGM();
+		return Singleton<AudioCompat>::GetInstance()->StopBGM(*m_id);
 	}
 
 	void BGM::Pause()
 	{
-		Singleton<AudioCompat>::GetInstance()->PauseBGM();
+		Singleton<AudioCompat>::GetInstance()->PauseBGM(*m_id);
 	}
 
 	void BGM::Resume()
 	{
-		Singleton<AudioCompat>::GetInstance()->ResumeBGM();
+		Singleton<AudioCompat>::GetInstance()->ResumeBGM(*m_id);
 	}
 
 	bool BGM::IsPlaying() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->IsPlayingBGM();
+		return Singleton<AudioCompat>::GetInstance()->IsPlayingBGM(*m_id);
 	}
 
 	bool BGM::IsPaused() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->IsPausedBGM();
+		return Singleton<AudioCompat>::GetInstance()->IsPausedBGM(*m_id);
 	}
 
 	bool BGM::SetVolume(double volume)
 	{
-		return Singleton<AudioCompat>::GetInstance()->SetVolumeBGM(volume);
+		return Singleton<AudioCompat>::GetInstance()->SetVolumeBGM(*m_id, volume);
 	}
 
 	double BGM::Volume() const
 	{
-		return Singleton<AudioCompat>::GetInstance()->VolumeBGM();
+		return Singleton<AudioCompat>::GetInstance()->VolumeBGM(*m_id);
 	}
 
 	bool BGM::SetPos(double pos)
 	{
-		return Singleton<AudioCompat>::GetInstance()->SetPos(pos);
+		return Singleton<AudioCompat>::GetInstance()->SetPos(*m_id, pos);
 	}
 
 	void BGM::SetIdentify(const String& id)

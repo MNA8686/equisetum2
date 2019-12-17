@@ -24,16 +24,16 @@ namespace Equisetum2
 
 		// BGM関連メソッド
 		AudioHandlerID CreateBGMFromStream(const std::shared_ptr<IStream> stream);
-		void DeleteBGM();
-		bool PlayBGM(bool loop);
-		bool StopBGM();
-		void PauseBGM();
-		void ResumeBGM();
-		bool SetVolumeBGM(double volume);
-		double VolumeBGM() const;
-		bool IsPlayingBGM() const;
-		bool IsPausedBGM() const;
-		bool SetPos(double pos);
+		void DeleteBGM(AudioHandlerID id);
+		bool PlayBGM(AudioHandlerID id, bool loop);
+		bool StopBGM(AudioHandlerID id);
+		void PauseBGM(AudioHandlerID id);
+		void ResumeBGM(AudioHandlerID id);
+		bool SetVolumeBGM(AudioHandlerID id, double volume);
+		double VolumeBGM(AudioHandlerID id) const;
+		bool IsPlayingBGM(AudioHandlerID id) const;
+		bool IsPausedBGM(AudioHandlerID id) const;
+		bool SetPos(AudioHandlerID id, double pos);
 
 		// SE関連メソッド
 		AudioHandlerID CreateSEFromStream(const std::shared_ptr<IStream> stream);

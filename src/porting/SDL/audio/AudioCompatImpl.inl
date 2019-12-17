@@ -7,7 +7,7 @@
 
 namespace Equisetum2
 {
-	static const int g_maxBGM = 1;
+	static const int g_maxBGM = 8;
 	static const int g_maxChannel = 32;
 
 	class SDLMixer
@@ -78,10 +78,6 @@ namespace Equisetum2
 					EQ_THROW(u8"rwopsの作成に失敗しました。");
 				}
 			
-				auto& bgm = m_bgm[0];
-				bgm.m_music = nullptr;
-				bgm.m_stream = stream;
-
 				auto pMusic = Mix_LoadMUS_RW(rwops, 1);
 				if (!pMusic)
 				{
@@ -96,10 +92,26 @@ namespace Equisetum2
 					EQ_THROW(u8"デリーターの作成に失敗しました。");
 				}
 
-				bgm.m_music = spMusic;
-				bgm.m_pauseRefCount = 0;
+				// 空いてる登録領域を探す
+				AudioHandlerID count = 0;
+				for (auto& ref : m_bgm)
+				{
+					if (!ref.m_music)
+					{
+						ref.m_music = spMusic;
+						ref.m_stream = stream;
+						ref.m_pauseRefCount = 0;
+						id = count;
+						break;
+					}
 
-				id = 0;
+					count++;
+				}
+
+				if (id < 0)
+				{
+					EQ_THROW(u8"BGMの登録領域がありません。");
+				}
 			}
 			EQ_HANDLER
 			{
@@ -110,87 +122,139 @@ namespace Equisetum2
 			return id;
 		}
 
-		void DeleteBGM()
+		void DeleteBGM(AudioHandlerID id)
 		{
-			m_bgm[0].m_music = nullptr;
+			if (id >= 0 && id < g_maxBGM)
+			{
+				m_bgm[id].m_music = nullptr;
+			}
 		}
 
-		bool PlayBGM(bool loop)
+		bool PlayBGM(AudioHandlerID id, bool loop)
 		{
-			StopBGM();
-			return Mix_PlayMusic(m_bgm[0].m_music.get(), loop ? -1 : 0) == 0;
+			StopBGM(m_nowPlaying);
+			if (id >= 0 && id < g_maxBGM)
+			{
+				if (Mix_PlayMusic(m_bgm[id].m_music.get(), loop ? -1 : 0) == 0)
+				{
+					m_nowPlaying = id;
+					SetVolumeBGM(id, m_bgm[id].m_volume);
+					return true;
+				}
+			}
+			return false;
 		}
 
-		bool StopBGM()
+		bool StopBGM(AudioHandlerID id)
 		{
-			Mix_HaltMusic();
-			m_bgm[0].m_pauseRefCount = 0;
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
+			{
+				Mix_HaltMusic();
+
+				m_bgm[id].m_pauseRefCount = 0;
+				m_nowPlaying = -1;
+			}
 			return true;
 		}
 
-		void PauseBGM()
+		void PauseBGM(AudioHandlerID id)
 		{
-			auto& bgm = m_bgm[0];
-
-			if (bgm.m_pauseRefCount == 0)
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
 			{
-				Mix_PauseMusic();
-			}
-			bgm.m_pauseRefCount++;
-		}
+				auto& bgm = m_bgm[id];
 
-		void ResumeBGM()
-		{
-			auto& bgm = m_bgm[0];
-
-			if (bgm.m_pauseRefCount > 0)
-			{
-				bgm.m_pauseRefCount--;
-			}
-
-			if (bgm.m_pauseRefCount == 0)
-			{
-				Mix_ResumeMusic();
+				if (bgm.m_pauseRefCount == 0)
+				{
+					Mix_PauseMusic();
+				}
+				bgm.m_pauseRefCount++;
 			}
 		}
 
-		bool IsPlayingBGM() const
+		void ResumeBGM(AudioHandlerID id)
+		{
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
+			{
+				auto& bgm = m_bgm[id];
+
+				if (bgm.m_pauseRefCount > 0)
+				{
+					bgm.m_pauseRefCount--;
+				}
+
+				if (bgm.m_pauseRefCount == 0)
+				{
+					Mix_ResumeMusic();
+				}
+			}
+		}
+
+		bool IsPlayingBGM(AudioHandlerID id) const
 		{
 			auto ret = false;
 
-			ret = (Mix_PlayingMusic() == 1);
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
+			{
+				ret = (Mix_PlayingMusic() == 1);
+			}
 
 			return ret;
 		}
 
-		bool IsPausedBGM() const
+		bool IsPausedBGM(AudioHandlerID id) const
 		{
 			auto ret = false;
 
-			ret = (Mix_PausedMusic() == 1);
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
+			{
+				ret = (Mix_PausedMusic() == 1);
+			}
 
 			return ret;
 		}
 
-		bool SetVolumeBGM(double volume)
+		bool SetVolumeBGM(AudioHandlerID id, double volume)
 		{
-			auto& bgm = m_bgm[0];
+			if (id >= 0 && id < g_maxBGM)
+			{
+				auto& bgm = m_bgm[id];
 
-			bgm.m_volume = SatVolume(volume);
-			Mix_VolumeMusic(ToSDLVolume(m_volume * bgm.m_volume));
+				bgm.m_volume = SatVolume(volume);
+
+				if (m_nowPlaying == id)
+				{
+					Mix_VolumeMusic(ToSDLVolume(m_volume * bgm.m_volume));
+				}
+			}
 
 			return true;
 		}
 
-		double VolumeBGM() const
+		double VolumeBGM(AudioHandlerID id) const
 		{
-			return m_bgm[0].m_volume;
+			if (id >= 0 && id < g_maxBGM)
+			{
+				return m_bgm[id].m_volume;
+			}
+
+			return -1;
 		}
 
-		bool SetPos(double pos)
+		bool SetPos(AudioHandlerID id, double pos)
 		{
-			Mix_RewindMusic();
-			return Mix_SetMusicPosition(pos) == 0;
+			if (m_nowPlaying >= 0 &&
+				m_nowPlaying == id)
+			{
+				Mix_RewindMusic();
+				return Mix_SetMusicPosition(pos) == 0;
+			}
+
+			return false;
 		}
 
 		AudioHandlerID CreateSEFromStream(const std::shared_ptr<IStream> stream)
@@ -411,7 +475,10 @@ namespace Equisetum2
 		{
 			if (m_pauseRefCount == 0)
 			{
-				PauseBGM();
+				for (AudioHandlerID i = 0; i < g_maxBGM; i++)
+				{
+					PauseBGM(i);
+				}
 
 				for (AudioHandlerID i = 0; i < g_maxChannel; i++)
 				{
@@ -429,7 +496,10 @@ namespace Equisetum2
 
 			if (m_pauseRefCount == 0)
 			{
-				ResumeBGM();
+				for (AudioHandlerID i = 0; i < g_maxBGM; i++)
+				{
+					ResumeBGM(i);
+				}
 
 				for (AudioHandlerID i = 0; i < g_maxChannel; i++)
 				{
@@ -494,6 +564,7 @@ namespace Equisetum2
 		};
 
 		BGM m_bgm[g_maxBGM];
+		AudioHandlerID m_nowPlaying = -1;
 		SE m_se[g_maxChannel];
 
 		int m_pauseRefCount = 0;		/// マスターの再生状態

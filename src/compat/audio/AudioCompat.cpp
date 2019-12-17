@@ -50,54 +50,54 @@ namespace Equisetum2
 		return m_Impl->CreateBGMFromStream(stream);
 	}
 
-	void AudioCompat::DeleteBGM()
+	void AudioCompat::DeleteBGM(AudioHandlerID id)
 	{
-		m_Impl->DeleteBGM();
+		m_Impl->DeleteBGM(id);
 	}
 
-	bool AudioCompat::PlayBGM(bool loop)
+	bool AudioCompat::PlayBGM(AudioHandlerID id, bool loop)
 	{
-		return m_Impl->PlayBGM(loop);
+		return m_Impl->PlayBGM(id, loop);
 	}
 
-	bool AudioCompat::StopBGM()
+	bool AudioCompat::StopBGM(AudioHandlerID id)
 	{
-		return m_Impl->StopBGM();
+		return m_Impl->StopBGM(id);
 	}
 
-	void AudioCompat::PauseBGM()
+	void AudioCompat::PauseBGM(AudioHandlerID id)
 	{
-		m_Impl->PauseBGM();
+		m_Impl->PauseBGM(id);
 	}
 
-	void AudioCompat::ResumeBGM()
+	void AudioCompat::ResumeBGM(AudioHandlerID id)
 	{
-		m_Impl->ResumeBGM();
+		m_Impl->ResumeBGM(id);
 	}
 
-	bool AudioCompat::IsPlayingBGM() const
+	bool AudioCompat::IsPlayingBGM(AudioHandlerID id) const
 	{
-		return m_Impl->IsPlayingBGM();
+		return m_Impl->IsPlayingBGM(id);
 	}
 
-	bool AudioCompat::IsPausedBGM() const
+	bool AudioCompat::IsPausedBGM(AudioHandlerID id) const
 	{
-		return m_Impl->IsPausedBGM();
+		return m_Impl->IsPausedBGM(id);
 	}
 
-	bool AudioCompat::SetPos(double pos)
+	bool AudioCompat::SetPos(AudioHandlerID id, double pos)
 	{
-		return m_Impl->SetPos(pos);
+		return m_Impl->SetPos(id, pos);
 	}
 
-	bool AudioCompat::SetVolumeBGM(double volume)
+	bool AudioCompat::SetVolumeBGM(AudioHandlerID id, double volume)
 	{
-		return m_Impl->SetVolumeBGM(volume);
+		return m_Impl->SetVolumeBGM(id, volume);
 	}
 
-	double AudioCompat::VolumeBGM() const
+	double AudioCompat::VolumeBGM(AudioHandlerID id) const
 	{
-		return m_Impl->VolumeBGM();
+		return m_Impl->VolumeBGM(id);
 	}
 
 	AudioHandlerID AudioCompat::CreateSEFromStream(const std::shared_ptr<IStream> stream)
