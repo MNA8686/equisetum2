@@ -244,6 +244,14 @@ namespace Equisetum2
 			return retVal;
 		}
 
+		FixedDegree NormalizeDegree(FixedDegree degree)
+		{
+			const int32_t mask = (maxDegree - 1);
+
+			FixedDegree masked = degree & mask;
+			return masked;
+		}
+
 		FixedDec Sqrt(FixedDec val)
 		{
 			const FixedDec div = 2;
