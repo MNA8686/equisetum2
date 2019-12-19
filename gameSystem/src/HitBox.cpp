@@ -122,6 +122,22 @@ bool HitBoxIterator::HitTest(const Rect_t<FixedDec>& rect) const
 	return false;
 }
 
+bool HitBoxIterator::HitTest(const HitBoxIterator& it) const
+{
+	for (auto& selfRect : *this)
+	{
+		for (auto& opponentRect : it)
+		{
+			if (CollisionDetection::HitTest(opponentRect, selfRect))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 HitBoxIterator::iterator::iterator(const Point_t<FixedDec>& pos, const HitBox::const_iterator& it)
 {
 	m_pos = pos;

@@ -69,6 +69,7 @@ public:
 	iterator begin() const;
 	iterator end() const;
 	bool HitTest(const Rect_t<FixedDec>& rect) const;
+	bool HitTest(const HitBoxIterator& it) const;
 
 private:
 	Point_t<FixedDec> m_pos;
