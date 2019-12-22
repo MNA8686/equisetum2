@@ -393,6 +393,7 @@ copy "release\libEquisetum2.lib" "..\..\lib\win32\lib"</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Zen-Ichi\projects\VisualC\Zen-Ichi.sln" />
     <None Include="..\..\src\porting\SDL\audio\AudioCompatImpl.inl" />
     <None Include="..\..\src\porting\SDL\graphic\FontManagerImpl.hpp" />
     <None Include="..\..\src\porting\SDL\graphic\ImageCompatImpl.inl">

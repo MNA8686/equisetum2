@@ -3,6 +3,7 @@
 
 #include "util/SharedPool.hpp"
 #include "util/ArchiveAccessor.hpp"
+#include "system/Logger.h"
 #include "system/Singleton.h"
 #include "graphic/Image.hpp"
 #include "graphic/Sprite.hpp"

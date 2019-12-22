@@ -538,5 +538,8 @@
     <None Include="..\..\src\porting\SDL\graphic\FontManagerImpl.hpp">
       <Filter>ソース ファイル\compat&amp;porting\graphic</Filter>
     </None>
+    <None Include="..\..\..\Zen-Ichi\projects\VisualC\Zen-Ichi.sln">
+      <Filter>ヘッダー ファイル\system</Filter>
+    </None>
   </ItemGroup>
 </Project>
