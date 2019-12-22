@@ -60,7 +60,7 @@ bool AnimationContainer::SetAnimation(int32_t assetAnimation)
 
 void AnimationContainer::SetDegree(int32_t degree)
 {
-	m_degree = degree;
+	m_degree = FixedMath::NormalizeDegree(degree);
 	m_animIndex = -1;
 }
 
