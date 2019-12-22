@@ -34,7 +34,7 @@ namespace Equisetum2
 					// 90度分のsinテーブルを出力する
 					for (int i = 0; i < maxDegree / 4; i++)
 					{
-						auto val = static_cast<int32_t>(sin(PI * i / (maxDegree / 2)) * maxValue);
+						const auto val = static_cast<int32_t>(sin(PI * i / (maxDegree / 2)) * maxValue);
 						out += String::Sprintf("%s%4d,", index == 0 ? "\t" : " ", val);
 
 						index++;
@@ -78,7 +78,7 @@ namespace Equisetum2
 					// 45度分のテーブルを出力する
 					for (int i = 0; i <= atanTableSize; i++)
 					{
-						auto val = static_cast<int32_t>(atan(i / static_cast<float>(atanTableSize)) * (maxDegree / 2) / PI);
+						const auto val = static_cast<int32_t>(atan(i / static_cast<float>(atanTableSize)) * (maxDegree / 2) / PI);
 						out += String::Sprintf("%s/* %4d */%4d,", index == 0 ? "\t" : " ", i, val);
 
 						index++;
@@ -146,8 +146,8 @@ namespace Equisetum2
 			const FixedDegree quoit = maxDegree / 4;
 			FixedDegree retVal = 0;
 
-			int32_t x_ = x.GetRaw();
-			int32_t y_ = y.GetRaw();
+			const int32_t x_ = x.GetRaw();
+			const int32_t y_ = y.GetRaw();
 
 			// IEC 60559準拠のようなもの
 			if (y_ == 0)
@@ -185,12 +185,12 @@ namespace Equisetum2
 				{
 					if (y_ < x_)
 					{
-						int32_t ratio = y_ * atanTableSize / x_;
+						const int32_t ratio = y_ * atanTableSize / x_;
 						retVal = g_atanTable[ratio];
 					}
 					else
 					{
-						int32_t ratio = x_ * atanTableSize / y_;
+						const int32_t ratio = x_ * atanTableSize / y_;
 						retVal = quoit - g_atanTable[ratio];
 					}
 				}
@@ -199,12 +199,12 @@ namespace Equisetum2
 				{
 					if (-y_ < x_)
 					{
-						int32_t ratio = -y_ * atanTableSize / x_;
+						const int32_t ratio = -y_ * atanTableSize / x_;
 						retVal = quoit * 4 - g_atanTable[ratio];
 					}
 					else
 					{
-						int32_t ratio = x_ * atanTableSize / -y_;
+						const int32_t ratio = x_ * atanTableSize / -y_;
 						retVal = quoit * 3 + g_atanTable[ratio];
 					}
 				}
@@ -216,12 +216,12 @@ namespace Equisetum2
 				{
 					if (y_ < -x_)
 					{
-						int32_t ratio = y_ * atanTableSize / -x_;
+						const int32_t ratio = y_ * atanTableSize / -x_;
 						retVal = quoit * 2 - g_atanTable[ratio];
 					}
 					else
 					{
-						int32_t ratio = -x_ * atanTableSize / y_;
+						const int32_t ratio = -x_ * atanTableSize / y_;
 						retVal = quoit + g_atanTable[ratio];
 					}
 				}
@@ -230,12 +230,12 @@ namespace Equisetum2
 				{
 					if (-y_ < -x_)
 					{
-						int32_t ratio = -y_ * atanTableSize / -x_;
+						const int32_t ratio = -y_ * atanTableSize / -x_;
 						retVal = quoit * 2 + g_atanTable[ratio];
 					}
 					else
 					{
-						int32_t ratio = -x_ * atanTableSize / -y_;
+						const int32_t ratio = -x_ * atanTableSize / -y_;
 						retVal = quoit * 3 - g_atanTable[ratio];
 					}
 				}
@@ -248,8 +248,33 @@ namespace Equisetum2
 		{
 			const int32_t mask = (maxDegree - 1);
 
-			FixedDegree masked = degree & mask;
+			const FixedDegree masked = degree & mask;
+
 			return masked;
+		}
+
+		int32_t GetNearDirection(FixedDegree srcDegree, FixedDegree dstDegree)
+		{
+			int32_t direction = 0;
+			const FixedDegree srcDegree_ = NormalizeDegree(srcDegree);
+			const FixedDegree dstDegree_ = NormalizeDegree(dstDegree);
+
+			if (srcDegree_ != dstDegree_)
+			{
+				const int32_t right = (maxDegree + srcDegree_ - dstDegree_) % maxDegree;
+				const int32_t left = (maxDegree + dstDegree_ - srcDegree_) % maxDegree;
+
+				if (left <= right)
+				{
+					direction = 1;
+				}
+				else if (left > right)
+				{
+					direction = -1;
+				}
+			}
+
+			return direction;
 		}
 
 		FixedDec Sqrt(FixedDec val)

@@ -33,6 +33,7 @@ namespace Equisetum2
 		int32_t Cos(FixedDegree degree);
 		FixedDegree Atan2(FixedDec y, FixedDec x);
 		FixedDegree NormalizeDegree(FixedDegree degree);
+		int32_t GetNearDirection(FixedDegree srcDegree, FixedDegree dstDegree);
 		FixedDec Sqrt(FixedDec val);
 
 		bool OutputSinTableToStream(std::shared_ptr<IStream> stream);
