@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include "type/FixedDec.hpp"
+#include "type/Point.h"
 #include "type/Rect.hpp"
 
 namespace Equisetum2
@@ -27,6 +28,26 @@ namespace Equisetum2
 			}
 
 			return false;
+		}
+
+		template <typename T>
+		bool HitTest(const Point_t<T>& op1, const Rect_t<T>& op2)
+		{
+			if (op1.x < op2.x + op2.width &&
+				op1.x >= op2.x &&
+				op1.y < op2.y + op2.height &&
+				op1.y >= op2.y)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		template <typename T>
+		bool HitTest(const Rect_t<T>& op1, const Point_t<T>& op2)
+		{
+			return HitTest(op2, op1);
 		}
 	}
 }
