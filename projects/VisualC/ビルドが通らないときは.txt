@@ -1,0 +1,6 @@
+下記パスが存在することを確認。
+C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Microsoft\VC\v160
+
+存在しない場合は下記サイトを参考に Build Tools for Visual Studio 2019 をインストールすること。
+https://www.kkaneko.jp/tools/win/buildtool.html
+https://visualstudio.microsoft.com/ja/downloads/
