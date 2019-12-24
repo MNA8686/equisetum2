@@ -87,7 +87,10 @@ void AnimationContainer::Start(int32_t tagIndex, bool reverse)
 
 bool AnimationContainer::Inc(int32_t delta)
 {
-	m_count += delta;
+	if (!m_suspend)
+	{
+		m_count += delta;
+	}
 
 	Update();
 
@@ -108,6 +111,16 @@ void AnimationContainer::Reverse()
 			Update();
 		}
 	}
+}
+
+void AnimationContainer::Suspend()
+{
+	m_suspend = true;
+}
+
+void AnimationContainer::Resume()
+{
+	m_suspend = false;
 }
 
 int32_t AnimationContainer::GetTagIndex() const

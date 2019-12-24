@@ -33,6 +33,8 @@ public:
 	void Start(int32_t tagIndex, bool reverse=false);	/// アニメーションを開始する
 	bool Inc(int32_t delta=AnimationTimeline::timePerFrame);		/// アニメーションを進める(1000で1フレーム相当)
 	void Reverse();			/// アニメーションの向きを変更する
+	void Suspend();			/// サスペンド状態にする。Incを実行しても無視される
+	void Resume();			/// サスペンド状態を解除する
 	int32_t GetTagIndex() const;
 	int32_t GetLoopCount() const;
 	int32_t GetAnimIndex() const;
@@ -50,6 +52,7 @@ private:
 
 	SpriteRendererContainer m_sprite;
 	bool m_reverse = false;
+	bool m_suspend = false;
 
 	void Update();
 };
