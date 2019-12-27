@@ -19,6 +19,7 @@ public:
 
 	void SetTargetFps(int32_t fps);
 	int32_t NowFps(void) const;
+	void AllowDashBoard(bool allow);
 
 	std::shared_ptr<Renderer>& GetRenderer(void);
 	std::shared_ptr<FontManager>& GetSystemFont(void);
@@ -57,6 +58,7 @@ private:
 	int32_t m_fps = 60;
 	int32_t m_systemFontSize = 8;
 	bool m_isQuit = false;
+	bool m_isAllowDashBoard = true;
 };
 
 extern Application* GetApplication(void);

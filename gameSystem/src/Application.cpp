@@ -180,7 +180,8 @@ int Application::Main()
 		else
 		{
 			OnUpdate();
-			if (KB::KeyT.IsDown())
+			if (m_isAllowDashBoard &&
+				KB::KeyT.IsDown())
 			{
 				atDashboard = true;
 				isModeChange = true;
@@ -204,6 +205,11 @@ int Application::Main()
 		m_renderer->Present();
 
 		Node<Object>::GC();
+
+
+		{
+			Logger::OutputDebug(u8"heap used %d", Singleton<EqHeap>::GetInstance()->UsedHandlerNum());
+		}
 
 		if (KB::KeyL.IsDown())
 		{
@@ -313,4 +319,9 @@ void Application::SetTargetFps(int32_t fps)
 int32_t Application::NowFps(void) const
 {
 	return m_fpsCounter->Fps();
+}
+
+void Application::AllowDashBoard(bool allow)
+{
+	m_isAllowDashBoard = allow;
 }
