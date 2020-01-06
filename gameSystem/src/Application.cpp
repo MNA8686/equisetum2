@@ -128,21 +128,6 @@ int Application::Main()
 			full = !full;
 		}
 
-#if 0
-		// ポーズ切り替え
-		if (KB::KeyP.IsDown())
-		{
-			pause = !pause;
-		}
-
-		// ポーズ機能
-		if (pause)
-		{
-			System::Sleep(1);
-			continue;
-		}
-#endif
-
 		if (isModeChange)
 		{
 			if (atDashboard)
