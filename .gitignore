@@ -4,12 +4,22 @@
 /projects/VisualC/Debugs
 /projects/VisualC/Release
 /projects/VisualC/Releases
+/projects/VisualC/x64/Debug
+/projects/VisualC/x64/Debugs
+/projects/VisualC/x64/Release
+/projects/VisualC/x64/Releases
 /unittest/project/VisualC/Debug
 /unittest/project/VisualC/Debugs
 /unittest/project/VisualC/Release
 /unittest/project/VisualC/Releases
 /unittest/project/VisualC/test
 /unittest/project/VisualC/tests
+/unittest/project/VisualC/x64/Debug
+/unittest/project/VisualC/x64/Debugs
+/unittest/project/VisualC/x64/Release
+/unittest/project/VisualC/x64/Releases
+/unittest/project/VisualC/x64/test
+/unittest/project/VisualC/x64/tests
 /gameSystem/project/VisualC/Release
 /gameSystem/project/VisualC/Debug
 /gameSystem/project/VisualC/x64
@@ -28,3 +38,4 @@
 !/eqtools/project/VisualC/eqtools/empty.txt
 /eqtools/project/VisualC/Debugs
 /eqtools/project/VisualC/Releases
+/eqtools/project/VisualC/x64
