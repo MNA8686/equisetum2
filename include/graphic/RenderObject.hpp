@@ -353,11 +353,11 @@ namespace Equisetum2
 		std::vector<std::shared_ptr<SpriteRenderer>> m_vSpriteRenderer;
 		int32_t m_height = 0;		/// フォントの高さ
 
-		typedef struct
+		struct stCodeMap
 		{
 			int32_t x = -1;
 			int atlas = -1;
-		}stCodeMap;
+		};
 
 		std::vector<stCodeMap> m_vCodeMap;
 		std::vector<int> m_vWidth;	/// 行ごとの横幅

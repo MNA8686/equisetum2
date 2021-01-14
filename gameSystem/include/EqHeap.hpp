@@ -183,13 +183,13 @@ public:
 
 protected:
 
-	typedef struct
+	struct stHeap
 	{
 		Handler handler = 0;
 		uint32_t size = 0;
 		int32_t refCount = 0;
 		void* ptr = nullptr;
-	}stHeap;
+	};
 
 	std::vector<stHeap> m_vHandler;
 	int32_t m_reservedSize = 0;

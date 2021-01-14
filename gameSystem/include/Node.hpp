@@ -466,14 +466,14 @@ public:
 
 	static const int32_t defaultNum = 4096;
 
-	typedef struct
+	struct Context
 	{
 		Node<T> m_vNodeSlot[defaultNum];	// ノードの実体を格納した配列
 		int32_t m_numOfObjects = 0;			// 現在生成されているノードの数
 		uint32_t m_nextSerial = 1;			// ノードに設定する通し番号
 		EqVector<NodeID> m_stackFreeNodeID;		// 未使用状態のノードのIDを格納したスタック
 		EqVector<NodeHandler> m_vSchedule;		// スケジュール配列
-	}Context;
+	};
 	
 	EqHeap::Container<Context> CreateContext()
 	{

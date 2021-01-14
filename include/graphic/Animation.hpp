@@ -36,11 +36,11 @@ namespace Equisetum2
 		// 1ƒtƒŒ[ƒ€‚Ì’PˆÊ
 		static const int32_t timePerFrame = 1000;
 
-		typedef struct
+		struct stRotate
 		{
 			int32_t step = 1;
 			int32_t offset = 1;
-		}stRotate;
+		};
 
 		AnimationTimeline() = default;
 		virtual ~AnimationTimeline() = default;

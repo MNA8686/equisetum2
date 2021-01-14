@@ -16,12 +16,12 @@ namespace Equisetum2
 	};
 
 	// シェーダキャッシュ
-	typedef struct
+	struct stShaderCache
 	{
 		ShaderKind type = ShaderKind::Vertex;
 		GLint m_id = GL_INVALID_ENUM;
 		const char* m_source = nullptr;
-	}stShaderCache;
+	};
 
 	// プログラムキャッシュ
 	class stProgramCache
@@ -35,12 +35,12 @@ namespace Equisetum2
 	};
 
 	// 頂点定義 for スプライト
-	typedef struct
+	struct stVertexSprite
 	{
 		GLfloat vertices[2];
 		GLfloat texCoords[2];
 		GLubyte colors[4];
-	}stVertexSprite;
+	};
 
 	// 頂点定義 for プリミティブ
 	typedef struct
@@ -56,7 +56,7 @@ namespace Equisetum2
 		std::shared_ptr<SDL_Window> m_attachedWindow;		// このレンダラに関連付けされているウィンドウ
 		std::shared_ptr<SDL_GLContext> m_GLContext;			// OpenGLコンテキスト
 
-		typedef struct
+		struct SpriteContext
 		{
 			// VBO
 			GLuint m_VBO[2] = {};
@@ -70,17 +70,17 @@ namespace Equisetum2
 			static const int INDEX_VBO_SIZE = VBO_SIZE * 6 / 4;
 			GLushort m_index[INDEX_VBO_SIZE] = {};
 			size_t m_filledIndexNum = 0;
-		}SpriteContext;
+		};
 		SpriteContext m_spriteContext;
 
-		typedef struct
+		struct PrimitiveContext
 		{
 			// VBO
 			GLuint m_VBO = {};
 
 			// レンダーオブジェクトを直接参照する
 			PrimitiveRenderer* pPrimitiveRender = nullptr;
-		}PrimitiveContext;
+		};
 		PrimitiveContext m_primitiveContext;
 
 	private:

@@ -22,12 +22,12 @@ namespace Equisetum2
 	public:
 		friend Singleton<SharedPool<T>>;	// シングルトンからインスタンスを作成してもらえるようにする
 
-		typedef struct
+		struct Info
 		{
 			String m_id;	/// ID比較用
 			std::weak_ptr<T> m_weakPtr;		/// リソースへの参照
 			bool m_shared = false;
-		}Info;
+		};
 
 		/**
 		* @brief リソースを登録する

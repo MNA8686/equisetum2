@@ -972,13 +972,13 @@ namespace Equisetum2
 				}
 
 				// for "timeline" parse
-				typedef struct
+				struct stTimelineElem
 				{
 					std::shared_ptr<Sprite> sprite;
 					String tag;
 					int32_t range[2] = { 0 };
 					int32_t delay = 0;
-				}stTimelineElem;
+				};
 				stTimelineElem timelineElem;
 
 				// parse "timeline"
