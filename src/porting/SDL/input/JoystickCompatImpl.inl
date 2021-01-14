@@ -299,7 +299,8 @@ namespace Equisetum2
 		{
 			const auto* pState = &m_nullState;
 
-			if (IsConnected(joyIndex))
+			if (IsConnected(joyIndex) &&
+				num < static_cast<int>(m_JoyState[joyIndex].vHats.size()))
 			{
 				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Up];
 			}
@@ -311,7 +312,8 @@ namespace Equisetum2
 		{
 			const auto* pState = &m_nullState;
 
-			if (IsConnected(joyIndex))
+			if (IsConnected(joyIndex) &&
+				num < static_cast<int>(m_JoyState[joyIndex].vHats.size()))
 			{
 				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Down];
 			}
@@ -323,9 +325,10 @@ namespace Equisetum2
 		{
 			const auto* pState = &m_nullState;
 
-			if (IsConnected(joyIndex))
+			if (IsConnected(joyIndex) &&
+				num < static_cast<int>(m_JoyState[joyIndex].vHats.size()))
 			{
-				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Left];
+				pState = &(m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Left]);
 			}
 
 			return *pState;
@@ -335,7 +338,8 @@ namespace Equisetum2
 		{
 			const auto* pState = &m_nullState;
 
-			if (IsConnected(joyIndex))
+			if (IsConnected(joyIndex) &&
+				num < static_cast<int>(m_JoyState[joyIndex].vHats.size()))
 			{
 				pState = &m_JoyState[joyIndex].vHats[num].state[(int)eHatState::Right];
 			}
